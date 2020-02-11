@@ -200,7 +200,8 @@ struct Module {
 	Remember to call `Module::fromJson(rootJ)` within your overridden method.
 	*/
 	virtual void fromJson(json_t* rootJ);
-
+	virtual json_t* paramsToJson();
+	virtual void paramsFromJson(json_t* rootJ);
 	/** Override to store extra internal data in the "data" property of the module's JSON object. */
 	virtual json_t* dataToJson() {
 		return NULL;

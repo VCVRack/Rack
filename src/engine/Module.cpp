@@ -14,9 +14,11 @@ struct Module::Internal {
 	bool bypassed = false;
 };
 
+
 Module::Module() {
 	internal = new Internal;
 }
+
 
 Module::~Module() {
 	for (ParamQuantity* paramQuantity : paramQuantities) {
@@ -33,6 +35,7 @@ Module::~Module() {
 	}
 	delete internal;
 }
+
 
 void Module::config(int numParams, int numInputs, int numOutputs, int numLights) {
 	// This method should only be called once.
@@ -57,6 +60,7 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 	}
 }
 
+
 void Module::processBypass(const ProcessArgs& args) {
 	for (BypassRoute& bypassRoute : bypassRoutes) {
 		// Route input voltages to output
@@ -70,6 +74,7 @@ void Module::processBypass(const ProcessArgs& args) {
 		output.setChannels(channels);
 	}
 }
+
 
 json_t* Module::toJson() {
 	json_t* rootJ = json_object();
@@ -87,19 +92,9 @@ json_t* Module::toJson() {
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
 
 	// params
-	json_t* paramsJ = json_array();
-	for (size_t paramId = 0; paramId < params.size(); paramId++) {
-		// Don't serialize unbounded Params
-		if (!paramQuantities[paramId]->isBounded())
-			continue;
-
-		json_t* paramJ = params[paramId].toJson();
-
-		json_object_set_new(paramJ, "id", json_integer(paramId));
-
-		json_array_append(paramsJ, paramJ);
-	}
-	json_object_set_new(rootJ, "params", paramsJ);
+	json_t* paramsJ = paramsToJson();
+	if (paramsJ)
+		json_object_set_new(rootJ, "params", paramsJ);
 
 	// bypassed
 	if (internal->bypassed)
@@ -121,6 +116,7 @@ json_t* Module::toJson() {
 
 	return rootJ;
 }
+
 
 void Module::fromJson(json_t* rootJ) {
 	// Check if plugin and model are incorrect
@@ -165,33 +161,8 @@ void Module::fromJson(json_t* rootJ) {
 
 	// params
 	json_t* paramsJ = json_object_get(rootJ, "params");
-	size_t i;
-	json_t* paramJ;
-	json_array_foreach(paramsJ, i, paramJ) {
-		// Get paramId
-		json_t* paramIdJ = json_object_get(paramJ, "id");
-		// Legacy v0.6 to <v1
-		if (!paramIdJ)
-			paramIdJ = json_object_get(paramJ, "paramId");
-		size_t paramId;
-		if (paramIdJ)
-			paramId = json_integer_value(paramIdJ);
-		// Use index if all else fails
-		else
-			paramId = i;
-
-		// Check ID bounds
-		if (paramId >= params.size())
-			continue;
-
-		// Check that the Param is bounded
-		if (!paramQuantities[paramId]->isBounded())
-			continue;
-
-		json_t* valueJ = json_object_get(paramJ, "value");
-		if (valueJ)
-			params[paramId].setValue(json_number_value(valueJ));
-	}
+	if (paramsJ)
+		paramsFromJson(paramsJ);
 
 	// bypassed
 	json_t* bypassedJ = json_object_get(rootJ, "bypassed");
@@ -219,6 +190,54 @@ void Module::fromJson(json_t* rootJ) {
 	json_t* dataJ = json_object_get(rootJ, "data");
 	if (dataJ)
 		dataFromJson(dataJ);
+}
+
+
+json_t* Module::paramsToJson() {
+	json_t* rootJ = json_array();
+	for (size_t paramId = 0; paramId < params.size(); paramId++) {
+		// Don't serialize unbounded Params
+		if (!paramQuantities[paramId]->isBounded())
+			continue;
+
+		json_t* paramJ = params[paramId].toJson();
+
+		json_object_set_new(paramJ, "id", json_integer(paramId));
+
+		json_array_append(rootJ, paramJ);
+	}
+	return rootJ;
+}
+
+
+void Module::paramsFromJson(json_t* rootJ) {
+	size_t i;
+	json_t* paramJ;
+	json_array_foreach(rootJ, i, paramJ) {
+		// Get paramId
+		json_t* paramIdJ = json_object_get(paramJ, "id");
+		// Legacy v0.6 to <v1
+		if (!paramIdJ)
+			paramIdJ = json_object_get(paramJ, "paramId");
+		size_t paramId;
+		if (paramIdJ)
+			paramId = json_integer_value(paramIdJ);
+		// Use index if all else fails
+		else
+			paramId = i;
+
+		// Check ID bounds
+		if (paramId >= params.size())
+			continue;
+
+		// Check that the Param is bounded
+		if (!paramQuantities[paramId]->isBounded())
+			continue;
+
+		json_t* valueJ = json_object_get(paramJ, "value");
+		if (valueJ)
+			params[paramId].setValue(json_number_value(valueJ));
+	}
 }
 
 
