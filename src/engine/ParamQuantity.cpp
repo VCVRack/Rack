@@ -122,6 +122,24 @@ std::string ParamQuantity::getUnit() {
 	return unit;
 }
 
+void ParamQuantity::reset() {
+	// Same as Quantity::reset
+	setValue(getDefaultValue());
+}
+
+void ParamQuantity::randomize() {
+	if (snapEnabled) {
+		// Randomize inclusive of the maximum value
+		float value = math::rescale(random::uniform(), 0.f, 1.f, getMinValue(), getMaxValue() + 1.f);
+		value = std::floor(value);
+		setValue(value);
+	}
+	else {
+		// Same as Quantity::randomize
+		setScaledValue(random::uniform());
+	}
+}
+
 std::string ParamQuantity::getDescription() {
 	return description;
 }

@@ -72,12 +72,14 @@ struct Quantity {
 	/** Returns a string representation of the quantity. */
 	virtual std::string getString();
 
+	/** Resets the value to the default value. */
+	virtual void reset();
+
+	/** Sets the value to a uniform random value between the bounds. */
+	virtual void randomize();
+
 	// Helper methods
 
-	/** Resets the value to the default value. */
-	void reset();
-	/** Sets the value to a uniform random value between the bounds. */
-	void randomize();
 	/** Checks whether the value is at the min value. */
 	bool isMin();
 	/** Checks whether the value is at the max value. */

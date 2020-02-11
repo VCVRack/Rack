@@ -246,6 +246,8 @@ void Module::onReset(const ResetEvent& e) {
 	for (ParamQuantity* pq : paramQuantities) {
 		if (!pq->resetEnabled)
 			continue;
+		if (!pq->isBounded())
+			continue;
 		pq->reset();
 	}
 	// Call deprecated event
@@ -257,6 +259,8 @@ void Module::onRandomize(const RandomizeEvent& e) {
 	// Randomize all parameters
 	for (ParamQuantity* pq : paramQuantities) {
 		if (!pq->randomizeEnabled)
+			continue;
+		if (!pq->isBounded())
 			continue;
 		pq->randomize();
 	}

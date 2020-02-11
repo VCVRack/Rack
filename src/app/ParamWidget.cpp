@@ -288,7 +288,7 @@ void ParamWidget::createContextMenu() {
 
 void ParamWidget::resetAction() {
 	engine::ParamQuantity* pq = getParamQuantity();
-	if (pq && pq->resetEnabled) {
+	if (pq && pq->resetEnabled && pq->isBounded()) {
 		float oldValue = pq->getValue();
 		pq->reset();
 		float newValue = pq->getValue();
