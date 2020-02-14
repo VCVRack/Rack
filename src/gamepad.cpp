@@ -17,7 +17,7 @@ static Driver* driver = NULL;
 
 struct InputDevice : midi::InputDevice {
 	int deviceId;
-	int8_t ccs[128] = {};
+	int16_t ccValues[128] = {};
 
 	std::string getName() override {
 		const char* name = glfwGetJoystickName(deviceId);
@@ -37,30 +37,41 @@ struct InputDevice : midi::InputDevice {
 		const unsigned char* buttons = glfwGetJoystickButtons(deviceId, &numButtons);
 
 		// Convert axes and buttons to MIDI CC
-		int numCcs = std::min(numAxes + numButtons, 128);
+		// Unfortunately to support 14-bit MIDI CC, only the first 32 CCs can be used.
+		// This could be fixed by continuing with CC 64 if more than 32 CCs are needed.
+		int numCcs = std::min(numAxes + numButtons, 32);
 		for (int i = 0; i < numCcs; i++) {
-			// Allow CC value to go negative, but clamp at -127 instead of -128 for symmetry
-			int8_t cc;
+			// Allow CC value to go negative
+			int16_t value;
 			if (i < numAxes) {
 				// Axis
-				cc = math::clamp((int) std::round(axes[i] * 127), -127, 127);
+				value = math::clamp((int) std::round(axes[i] * 0x3f80), -0x3f80, 0x3f80);
 			}
 			else {
 				// Button
-				cc = buttons[i - numAxes] ? 127 : 0;
+				value = buttons[i - numAxes] ? 0x3f80 : 0;
 			}
 
-			if (cc == ccs[i])
+			if (value == ccValues[i])
 				continue;
-			ccs[i] = cc;
+			ccValues[i] = value;
 
-			// Send MIDI message
+			// Send MSB MIDI message
 			midi::Message msg;
 			msg.setStatus(0xb);
 			msg.setNote(i);
 			// Allow 8th bit to be set to allow bipolar value hack.
-			msg.bytes[2] = cc;
+			msg.bytes[2] = (value >> 7);
 			onMessage(msg);
+
+			// Send LSB MIDI message for axis CCs
+			if (i < numAxes) {
+				midi::Message msg;
+				msg.setStatus(0xb);
+				msg.setNote(i + 32);
+				msg.bytes[2] = (value & 0x7f);
+				onMessage(msg);
+			}
 		}
 	}
 };
