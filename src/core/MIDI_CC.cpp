@@ -22,12 +22,17 @@ struct MIDI_CC : Module {
 
 	midi::InputQueue midiInput;
 	/** [cc][channel] */
-	int8_t values[128][16];
+	int8_t ccValues[128][16];
+	/** When LSB is enabled for CC 0-31, the MSB is stored here until the LSB is received.
+	[cc][channel]
+	*/
+	int8_t msbValues[32][16];
 	int learningId;
 	int learnedCcs[16];
 	/** [cell][channel] */
 	dsp::ExponentialFilter valueFilters[16][16];
 	bool mpeMode;
+	bool lsbEnabled;
 
 	MIDI_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -43,17 +48,23 @@ struct MIDI_CC : Module {
 	}
 
 	void onReset() override {
-		for (int i = 0; i < 128; i++) {
+		for (int cc = 0; cc < 128; cc++) {
 			for (int c = 0; c < 16; c++) {
-				values[i][c] = 0;
+				ccValues[cc][c] = 0;
 			}
 		}
+		for (int cc = 0; cc < 32; cc++) {
+			for (int c = 0; c < 16; c++) {
+				msbValues[cc][c] = 0;
+			}
+		}
+		learningId = -1;
 		for (int i = 0; i < 16; i++) {
 			learnedCcs[i] = i;
 		}
-		learningId = -1;
 		midiInput.reset();
 		mpeMode = false;
+		lsbEnabled = false;
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -77,7 +88,13 @@ struct MIDI_CC : Module {
 			int cc = learnedCcs[i];
 
 			for (int c = 0; c < channels; c++) {
-				float value = values[cc][c] / 127.f;
+				int16_t cellValue = ccValues[cc][c] * 128;
+				if (lsbEnabled && cc < 32)
+					cellValue += ccValues[cc + 32][c];
+				// Maximum value for 14-bit CC should be MSB=127 LSB=0, not MSB=127 LSB=127.
+				float value = cellValue / float(128 * 127);
+				// Support negative values because the gamepad MIDI driver generates nonstandard 8-bit CC values.
+				value = clamp(value, -1.f, 1.f);
 
 				// Detect behavior from MIDI buttons.
 				if (std::fabs(valueFilters[i][c].out - value) >= 1.f) {
@@ -93,7 +110,7 @@ struct MIDI_CC : Module {
 		}
 	}
 
-	void processMessage(const midi::Message &msg) {
+	void processMessage(const midi::Message& msg) {
 		switch (msg.getStatus()) {
 			// cc
 			case 0xb: {
@@ -103,22 +120,33 @@ struct MIDI_CC : Module {
 		}
 	}
 
-	void processCC(const midi::Message &msg) {
+	void processCC(const midi::Message& msg) {
 		uint8_t c = mpeMode ? msg.getChannel() : 0;
 		uint8_t cc = msg.getNote();
+		if (msg.bytes.size() < 2)
+			return;
 		// Allow CC to be negative if the 8th bit is set.
 		// The gamepad driver abuses this, for example.
 		// Cast uint8_t to int8_t
-		if (msg.bytes.size() < 2)
-			return;
 		int8_t value = msg.bytes[2];
-		value = clamp(value, -127, 127);
 		// Learn
-		if (learningId >= 0 && values[cc][c] != value) {
+		if (learningId >= 0 && ccValues[cc][c] != value) {
 			learnedCcs[learningId] = cc;
 			learningId = -1;
 		}
-		values[cc][c] = value;
+
+		if (lsbEnabled && cc < 32) {
+			// Don't set MSB yet. Wait for LSB to be received.
+			msbValues[cc][c] = value;
+		}
+		else if (lsbEnabled && 32 <= cc && cc < 64) {
+			// Apply MSB when LSB is received
+			ccValues[cc - 32][c] = msbValues[cc - 32][c];
+			ccValues[cc][c] = value;
+		}
+		else {
+			ccValues[cc][c] = value;
+		}
 	}
 
 	json_t* dataToJson() override {
@@ -134,13 +162,14 @@ struct MIDI_CC : Module {
 		json_t* valuesJ = json_array();
 		for (int i = 0; i < 128; i++) {
 			// Note: Only save channel 0. Since MPE mode won't be commonly used, it's pointless to save all 16 channels.
-			json_array_append_new(valuesJ, json_integer(values[i][0]));
+			json_array_append_new(valuesJ, json_integer(ccValues[i][0]));
 		}
 		json_object_set_new(rootJ, "values", valuesJ);
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 
 		json_object_set_new(rootJ, "mpeMode", json_boolean(mpeMode));
+		json_object_set_new(rootJ, "lsbEnabled", json_boolean(lsbEnabled));
 		return rootJ;
 	}
 
@@ -159,7 +188,7 @@ struct MIDI_CC : Module {
 			for (int i = 0; i < 128; i++) {
 				json_t* valueJ = json_array_get(valuesJ, i);
 				if (valueJ) {
-					values[i][0] = json_integer_value(valueJ);
+					ccValues[i][0] = json_integer_value(valueJ);
 				}
 			}
 		}
@@ -171,14 +200,10 @@ struct MIDI_CC : Module {
 		json_t* mpeModeJ = json_object_get(rootJ, "mpeMode");
 		if (mpeModeJ)
 			mpeMode = json_boolean_value(mpeModeJ);
-	}
-};
 
-
-struct MIDI_CCMpeModeItem : MenuItem {
-	MIDI_CC* module;
-	void onAction(const event::Action& e) override {
-		module->mpeMode ^= true;
+		json_t* lsbEnabledJ = json_object_get(rootJ, "lsbEnabled");
+		if (lsbEnabledJ)
+			lsbEnabled = json_boolean_value(lsbEnabledJ);
 	}
 };
 
@@ -223,11 +248,31 @@ struct MIDI_CCWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		MIDI_CCMpeModeItem* mpeModeItem = new MIDI_CCMpeModeItem;
+		struct MpeModeItem : MenuItem {
+			MIDI_CC* module;
+			void onAction(const event::Action& e) override {
+				module->mpeMode ^= true;
+			}
+		};
+
+		MpeModeItem* mpeModeItem = new MpeModeItem;
 		mpeModeItem->text = "MPE mode";
 		mpeModeItem->rightText = CHECKMARK(module->mpeMode);
 		mpeModeItem->module = module;
 		menu->addChild(mpeModeItem);
+
+		struct LSBItem : MenuItem {
+			MIDI_CC* module;
+			void onAction(const event::Action& e) override {
+				module->lsbEnabled ^= true;
+			}
+		};
+
+		LSBItem* highResolutionItem = new LSBItem;
+		highResolutionItem->text = "CC 0-31 controls are 14-bit";
+		highResolutionItem->rightText = CHECKMARK(module->lsbEnabled);
+		highResolutionItem->module = module;
+		menu->addChild(highResolutionItem);
 	}
 };
 
