@@ -264,6 +264,12 @@ void Output::sendMessage(Message message) {
 	}
 }
 
+void Output::sendMessage(uint8_t* bytes, size_t size) {
+	if (outputDevice) {
+		outputDevice->sendMessage(bytes, size);
+	}
+}
+
 
 ////////////////////
 // midi

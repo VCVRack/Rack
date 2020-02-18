@@ -70,6 +70,10 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	void sendMessage(midi::Message message) override {
 		rtMidiOut->sendMessage(message.bytes, message.size);
 	}
+
+	void sendMessage(uint8_t* bytes, size_t size) override {
+		rtMidiOut->sendMessage(bytes, size);
+	}
 };
 
 

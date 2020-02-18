@@ -106,6 +106,7 @@ struct OutputDevice : Device {
 	void subscribe(Output* input);
 	void unsubscribe(Output* input);
 	virtual void sendMessage(Message message) {}
+	virtual void sendMessage(uint8_t* bytes, size_t size) {}
 };
 
 ////////////////////
@@ -184,6 +185,7 @@ struct Output : Port {
 	std::vector<int> getChannels() override;
 
 	void sendMessage(Message message);
+	void sendMessage(uint8_t* bytes, size_t size);
 };
 
 

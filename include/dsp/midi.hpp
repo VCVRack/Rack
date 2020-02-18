@@ -213,6 +213,8 @@ struct MidiGenerator {
 	}
 
 	virtual void onMessage(midi::Message message) {}
+
+	virtual void onMessage(uint8_t* bytes, size_t size) {}
 };
 
 
