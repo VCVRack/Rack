@@ -501,17 +501,21 @@ struct SampleRateItem : ui::MenuItem {
 		enginePauseItem->rightText = CHECKMARK(APP->engine->isPaused());
 		menu->addChild(enginePauseItem);
 
-		for (int i = 0; i <= 4; i++) {
+		for (int i = -2; i <= 4; i++) {
 			for (int j = 0; j < 2; j++) {
-				int oversample = 1 << i;
+				float oversample = std::pow(2.f, i);
 				float sampleRate = (j == 0) ? 44100.f : 48000.f;
 				sampleRate *= oversample;
 
 				SampleRateValueItem* item = new SampleRateValueItem;
 				item->sampleRate = sampleRate;
 				item->text = string::f("%g kHz", sampleRate / 1000.0);
-				if (oversample > 1)
-					item->rightText += string::f("(%dx)", oversample);
+				if (oversample > 1.f) {
+					item->rightText += string::f("(%.0fx)", oversample);
+				}
+				else if (oversample < 1.f) {
+					item->rightText += string::f("(1/%.0fx)", 1.f / oversample);
+				}
 				item->rightText += " ";
 				item->rightText += CHECKMARK(settings::sampleRate == sampleRate);
 				menu->addChild(item);
