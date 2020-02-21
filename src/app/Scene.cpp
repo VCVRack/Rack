@@ -168,6 +168,12 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 			APP->window->setFullScreen(!APP->window->isFullScreen());
 			e.consume(this);
 		}
+		// Alternate key command for exiting fullscreen, since F11 doesn't work reliably on Mac due to "Show desktop" OS binding.
+		else if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
+			if (APP->window->isFullScreen())
+				APP->window->setFullScreen(false);
+			e.consume(this);
+		}
 	}
 }
 
