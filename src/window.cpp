@@ -298,6 +298,7 @@ Window::Window() {
 
 	// Load default Blendish font
 	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
+	bndSetFont(uiFont->handle);
 }
 
 Window::~Window() {
