@@ -269,13 +269,13 @@ struct Module {
 
 	struct ResetEvent {};
 	/** Called when the user resets (initializes) the module.
-	The default implementation resets all parameters to their default value, so you must call `Module::onRandomize(e)` if you want to keep this behavior.
+	The default implementation resets all parameters to their default value, so you must call `Module::onReset(e)` in your overridden method if you want to keep this behavior.
 	*/
 	virtual void onReset(const ResetEvent& e);
 
 	struct RandomizeEvent {};
 	/** Called when the user randomizes the module.
-	The default implementation randomizes all parameters by default, so you must call `Module::onRandomize(e)` if you want to keep this behavior.
+	The default implementation randomizes all parameters by default, so you must call `Module::onRandomize(e)` in your overridden method if you want to keep this behavior.
 	*/
 	virtual void onRandomize(const RandomizeEvent& e);
 
