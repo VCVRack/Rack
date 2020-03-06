@@ -1,3 +1,5 @@
+#include <vector>
+
 #define CURL_STATICLIB
 #include <curl/curl.h>
 
@@ -7,6 +9,11 @@
 
 namespace rack {
 namespace network {
+
+
+static const std::vector<std::string> methodNames = {
+	"GET", "POST", "PUT", "DELETE",
+};
 
 
 static CURL* createCurl() {
@@ -31,6 +38,18 @@ static size_t writeStringCallback(char* ptr, size_t size, size_t nmemb, void* us
 }
 
 
+static std::string getCookieString(const CookieMap& cookies) {
+	std::string s;
+	for (const auto& pair : cookies) {
+		s += encodeUrl(pair.first);
+		s += "=";
+		s += encodeUrl(pair.second);
+		s += ";";
+	}
+	return s;
+}
+
+
 void init() {
 	// curl_easy_init() calls this automatically, but it's good to make sure this is done on the main thread before other threads are spawned.
 	// https://curl.haxx.se/libcurl/c/curl_easy_init.html
@@ -38,7 +57,8 @@ void init() {
 }
 
 
-json_t* requestJson(Method method, std::string url, json_t* dataJ) {
+json_t* requestJson(Method method, const std::string& url, json_t* dataJ, const CookieMap& cookies) {
+	std::string urlS = url;
 	CURL* curl = createCurl();
 	char* reqStr = NULL;
 
@@ -46,20 +66,20 @@ json_t* requestJson(Method method, std::string url, json_t* dataJ) {
 	if (dataJ) {
 		if (method == METHOD_GET) {
 			// Append ?key=value&... to url
-			url += "?";
+			urlS += "?";
 			bool isFirst = true;
 			const char* key;
 			json_t* value;
 			json_object_foreach(dataJ, key, value) {
 				if (json_is_string(value)) {
 					if (!isFirst)
-						url += "&";
-					url += key;
-					url += "=";
+						urlS += "&";
+					urlS += key;
+					urlS += "=";
 					const char* str = json_string_value(value);
 					size_t len = json_string_length(value);
 					char* escapedStr = curl_easy_escape(curl, str, len);
-					url += escapedStr;
+					urlS += escapedStr;
 					curl_free(escapedStr);
 					isFirst = false;
 				}
@@ -70,22 +90,20 @@ json_t* requestJson(Method method, std::string url, json_t* dataJ) {
 		}
 	}
 
-	curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+	curl_easy_setopt(curl, CURLOPT_URL, urlS.c_str());
 
 	// Set HTTP method
-	switch (method) {
-		case METHOD_GET:
-			// This is CURL's default
-			break;
-		case METHOD_POST:
-			curl_easy_setopt(curl, CURLOPT_POST, true);
-			break;
-		case METHOD_PUT:
-			curl_easy_setopt(curl, CURLOPT_PUT, true);
-			break;
-		case METHOD_DELETE:
-			curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
-			break;
+	if (method == METHOD_GET) {
+		// This is CURL's default
+	}
+	else if (method == METHOD_POST) {
+		curl_easy_setopt(curl, CURLOPT_POST, true);
+	}
+	else if (method == METHOD_PUT) {
+		curl_easy_setopt(curl, CURLOPT_PUT, true);
+	}
+	else if (method == METHOD_DELETE) {
+		curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
 	}
 
 	// Set headers
@@ -93,6 +111,11 @@ json_t* requestJson(Method method, std::string url, json_t* dataJ) {
 	headers = curl_slist_append(headers, "Accept: application/json");
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+	// Cookies
+	if (!cookies.empty()) {
+		curl_easy_setopt(curl, CURLOPT_COOKIE, getCookieString(cookies).c_str());
+	}
 
 	// Body callbacks
 	if (reqStr)
@@ -103,6 +126,7 @@ json_t* requestJson(Method method, std::string url, json_t* dataJ) {
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
 
 	// Perform request
+	INFO("Requesting %s %s", methodNames[method].c_str(), urlS.c_str());
 	CURLcode res = curl_easy_perform(curl);
 
 	// Cleanup
@@ -132,7 +156,7 @@ static int xferInfoCallback(void* clientp, curl_off_t dltotal, curl_off_t dlnow,
 	return 0;
 }
 
-bool requestDownload(std::string url, const std::string& filename, float* progress) {
+bool requestDownload(const std::string& url, const std::string& filename, float* progress, const CookieMap& cookies) {
 	CURL* curl = createCurl();
 
 	FILE* file = fopen(filename.c_str(), "wb");
@@ -148,6 +172,12 @@ bool requestDownload(std::string url, const std::string& filename, float* progre
 	// Fail on 4xx and 5xx HTTP codes
 	curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 
+	// Cookies
+	if (!cookies.empty()) {
+		curl_easy_setopt(curl, CURLOPT_COOKIE, getCookieString(cookies).c_str());
+	}
+
+	INFO("Downloading %s", url.c_str());
 	CURLcode res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 

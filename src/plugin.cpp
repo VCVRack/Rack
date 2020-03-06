@@ -331,10 +331,9 @@ void queryUpdates() {
 
 	// Get user's plugins list
 	std::string pluginsUrl = API_URL + "/plugins";
-	json_t* pluginsReqJ = json_object();
-	json_object_set(pluginsReqJ, "token", json_string(settings::token.c_str()));
-	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, pluginsReqJ);
-	json_decref(pluginsReqJ);
+	network::CookieMap cookies;
+	cookies["token"] = settings::token;
+	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, NULL, cookies);
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
 		updateStatus = "Could not query updates";
@@ -440,16 +439,18 @@ void syncUpdate(Update* update) {
 	});
 
 	std::string downloadUrl = API_URL + "/download";
-	downloadUrl += "?token=" + network::encodeUrl(settings::token);
-	downloadUrl += "&slug=" + network::encodeUrl(update->pluginSlug);
+	downloadUrl += "?slug=" + network::encodeUrl(update->pluginSlug);
 	downloadUrl += "&version=" + network::encodeUrl(update->version);
 	downloadUrl += "&arch=" + network::encodeUrl(APP_ARCH);
+
+	network::CookieMap cookies;
+	cookies["token"] = settings::token;
 
 	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), APP_ARCH.c_str());
 
 	// Download zip
 	std::string pluginDest = asset::pluginsPath + "/" + update->pluginSlug + ".zip";
-	if (!network::requestDownload(downloadUrl, pluginDest, &update->progress)) {
+	if (!network::requestDownload(downloadUrl, pluginDest, &update->progress, cookies)) {
 		WARN("Plugin %s download was unsuccessful", update->pluginSlug.c_str());
 		return;
 	}
