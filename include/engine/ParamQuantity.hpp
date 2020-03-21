@@ -33,10 +33,18 @@ struct ParamQuantity : Quantity {
 	Unit symbols should have no space (e.g. "%", "º").
 	*/
 	std::string unit;
-	/** Set to 0 for linear, positive for exponential, negative for logarithmic. */
+	/** Set to 0 for linear, positive for exponential, negative for logarithmic.
+	The formula is $displayValue = f(value) * displayMultiplier + displayOffset$ where $f(value)$ is
+	- $value$ for $displayBase = 0$.
+	- $log_{-displayBase}(value)$ for $displayBase < 0$.
+	- $displayBase^value$ for $displayBase > 0$.
+	*/
 	float displayBase = 0.f;
 	float displayMultiplier = 1.f;
 	float displayOffset = 0.f;
+	/** Number of digits of precision to display.
+	With displayPrecision = 5 for example, numbers will print as 12.345, 0.12345, 1.2345e6, or 1.2345e-6.
+	*/
 	int displayPrecision = 5;
 	/** An optional one-sentence description of the parameter. */
 	std::string description;

@@ -97,6 +97,9 @@ struct Module {
 	/** Configures the number of Params, Outputs, Inputs, and Lights. */
 	void config(int numParams, int numInputs, int numOutputs, int numLights = 0);
 
+	/** Helper for creating a ParamQuantity and setting its properties.
+	See ParamQuantity for documentation of arguments.
+	*/
 	template <class TParamQuantity = ParamQuantity>
 	TParamQuantity* configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
 		assert(paramId < (int) params.size() && paramId < (int) paramQuantities.size());
@@ -121,6 +124,9 @@ struct Module {
 		return q;
 	}
 
+	/** Helper for creating a SwitchQuantity and setting its label strings.
+	See ParamQuantity and SwitchQuantity for documentation of arguments.
+	*/
 	template <class TSwitchQuantity = SwitchQuantity>
 	TSwitchQuantity* configSwitch(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::vector<std::string> labels = {}) {
 		TSwitchQuantity* sq = configParam<TSwitchQuantity>(paramId, minValue, maxValue, defaultValue, name);
@@ -128,6 +134,9 @@ struct Module {
 		return sq;
 	}
 
+	/** Helper for creating a PortInfo for an input port and setting its properties.
+	See PortInfo for documentation of arguments.
+	*/
 	template <class TPortInfo = PortInfo>
 	TPortInfo* configInput(int portId, std::string name = "") {
 		assert(portId < (int) inputs.size() && portId < (int) inputInfos.size());
@@ -143,6 +152,9 @@ struct Module {
 		return p;
 	}
 
+	/** Helper for creating a PortInfo for an output port and setting its properties.
+	See PortInfo for documentation of arguments.
+	*/
 	template <class TPortInfo = PortInfo>
 	TPortInfo* configOutput(int portId, std::string name = "") {
 		assert(portId < (int) outputs.size() && portId < (int) outputInfos.size());
@@ -158,7 +170,8 @@ struct Module {
 		return p;
 	}
 
-	/** Adds a direct route from an input to an output when the module is bypassed. */
+	/** Adds a direct route from an input to an output when the module is bypassed.
+	*/
 	void configBypass(int inputId, int outputId) {
 		assert(inputId < (int) inputs.size());
 		assert(outputId < (int) outputs.size());
