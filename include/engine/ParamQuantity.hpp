@@ -34,10 +34,10 @@ struct ParamQuantity : Quantity {
 	*/
 	std::string unit;
 	/** Set to 0 for linear, positive for exponential, negative for logarithmic.
-	The formula is $displayValue = f(value) * displayMultiplier + displayOffset$ where $f(value)$ is
-	- $value$ for $displayBase = 0$.
-	- $log_{-displayBase}(value)$ for $displayBase < 0$.
-	- $displayBase^value$ for $displayBase > 0$.
+	The formula is \f$displayValue = f(value) * displayMultiplier + displayOffset\f$ where \f$f(value)\f$ is
+	- \f$value\f$ for \f$displayBase = 0\f$.
+	- \f$\log_{-displayBase}(value)\f$ for \f$displayBase < 0\f$.
+	- \f$displayBase^{value}\f$ for \f$displayBase > 0\f$.
 	*/
 	float displayBase = 0.f;
 	float displayMultiplier = 1.f;
