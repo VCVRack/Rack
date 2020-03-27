@@ -192,15 +192,14 @@ inline int movemask(const Vector<int32_t, 4>& a) {
 
 /** `a @ b` */
 #define DECLARE_VECTOR_OPERATOR_INFIX(t, s, operator, func) \
-	inline Vector<t, s> operator(const Vector<t, s> &a, const Vector<t, s> &b) { \
+	inline Vector<t, s> operator(const Vector<t, s>& a, const Vector<t, s>& b) { \
 		return Vector<t, s>(func(a.v, b.v)); \
 	}
 
 /** `a @= b` */
 #define DECLARE_VECTOR_OPERATOR_INCREMENT(t, s, operator, opfunc) \
-	inline Vector<t, s> &operator(Vector<t, s> &a, const Vector<t, s> &b) { \
-		a = opfunc(a, b); \
-		return a; \
+	inline Vector<t, s>& operator(Vector<t, s>& a, const Vector<t, s>& b) { \
+		return a = opfunc(a, b); \
 	}
 
 DECLARE_VECTOR_OPERATOR_INFIX(float, 4, operator+, _mm_add_ps)
