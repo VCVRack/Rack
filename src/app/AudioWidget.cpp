@@ -1,4 +1,5 @@
 #include <app/AudioWidget.hpp>
+#include <ui/MenuSeparator.hpp>
 #include <helpers.hpp>
 
 
@@ -304,21 +305,38 @@ void AudioWidget::setAudioPort(audio::Port* port) {
 
 
 void appendAudioMenu(ui::Menu* menu, audio::Port* port) {
-	AudioDriverItem* driverItem = createMenuItem<AudioDriverItem>("Audio driver", RIGHT_ARROW);
-	driverItem->port = port;
-	menu->addChild(driverItem);
+	menu->addChild(createMenuLabel("Audio driver"));
+	appendAudioDriverMenu(menu, port);
 
-	AudioDeviceItem* deviceItem = createMenuItem<AudioDeviceItem>("Audio device", RIGHT_ARROW);
-	deviceItem->port = port;
-	menu->addChild(deviceItem);
+	menu->addChild(new ui::MenuSeparator);
+	menu->addChild(createMenuLabel("Audio device"));
+	appendAudioDeviceMenu(menu, port);
 
-	AudioSampleRateItem* sampleRateItem = createMenuItem<AudioSampleRateItem>("Sample rate", RIGHT_ARROW);
-	sampleRateItem->port = port;
-	menu->addChild(sampleRateItem);
+	menu->addChild(new ui::MenuSeparator);
+	menu->addChild(createMenuLabel("Sample rate"));
+	appendAudioSampleRateMenu(menu, port);
 
-	AudioBlockSizeItem* blockSizeItem = createMenuItem<AudioBlockSizeItem>("Block size", RIGHT_ARROW);
-	blockSizeItem->port = port;
-	menu->addChild(blockSizeItem);
+	menu->addChild(new ui::MenuSeparator);
+	menu->addChild(createMenuLabel("Block size"));
+	appendAudioBlockSizeMenu(menu, port);
+
+	// Uncomment this to use sub-menus instead of one big menu.
+
+	// AudioDriverItem* driverItem = createMenuItem<AudioDriverItem>("Audio driver", RIGHT_ARROW);
+	// driverItem->port = port;
+	// menu->addChild(driverItem);
+
+	// AudioDeviceItem* deviceItem = createMenuItem<AudioDeviceItem>("Audio device", RIGHT_ARROW);
+	// deviceItem->port = port;
+	// menu->addChild(deviceItem);
+
+	// AudioSampleRateItem* sampleRateItem = createMenuItem<AudioSampleRateItem>("Sample rate", RIGHT_ARROW);
+	// sampleRateItem->port = port;
+	// menu->addChild(sampleRateItem);
+
+	// AudioBlockSizeItem* blockSizeItem = createMenuItem<AudioBlockSizeItem>("Block size", RIGHT_ARROW);
+	// blockSizeItem->port = port;
+	// menu->addChild(blockSizeItem);
 }
 
 
