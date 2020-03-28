@@ -10,18 +10,6 @@
 namespace rack {
 
 
-void Context::init() {
-	engine = new engine::Engine;
-	patch = new PatchManager;
-	if (!settings::headless) {
-		event = new event::State;
-		history = new history::State;
-		window = new Window;
-		scene = new app::Scene;
-		event->rootWidget = scene;
-	}
-}
-
 Context::~Context() {
 	// Set pointers to NULL so other objects will segfault when attempting to access them
 	if (scene)

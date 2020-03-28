@@ -38,8 +38,6 @@ struct Context {
 	history::State* history = NULL;
 	PatchManager* patch = NULL;
 
-	/** Call this after setting the context for this thread, because initialization of application state accesses APP. */
-	void init();
 	~Context();
 };
 
