@@ -71,6 +71,9 @@ struct RtAudioDevice : audio::Device {
 
 		options = RtAudio::StreamOptions();
 		options.flags |= RTAUDIO_JACK_DONT_CONNECT;
+		options.flags |= RTAUDIO_MINIMIZE_LATENCY;
+		options.flags |= RTAUDIO_SCHEDULE_REALTIME;
+		options.numberOfBuffers = 2;
 		options.streamName = "VCV Rack";
 
 		int closestSampleRate = deviceInfo.preferredSampleRate;

@@ -16,7 +16,7 @@
 	ignore = untracked
 [submodule "dep/rtaudio"]
 	path = dep/rtaudio
-	url = https://github.com/thestk/rtaudio.git
+	url = https://github.com/AndrewBelt/rtaudio.git
 	ignore = untracked
 [submodule "dep/glfw"]
 	path = dep/glfw
