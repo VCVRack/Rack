@@ -14,7 +14,11 @@ namespace core {
 
 template <int NUM_AUDIO_INPUTS, int NUM_AUDIO_OUTPUTS>
 struct AudioInterface : Module, audio::Port {
+	static constexpr int NUM_INPUT_LIGHTS = (NUM_AUDIO_INPUTS > 2) ? (NUM_AUDIO_INPUTS / 2) : 0;
+	static constexpr int NUM_OUTPUT_LIGHTS = (NUM_AUDIO_OUTPUTS > 2) ? (NUM_AUDIO_OUTPUTS / 2) : 0;
+
 	enum ParamIds {
+		ENUMS(GAIN_PARAM, NUM_AUDIO_INPUTS == 2),
 		NUM_PARAMS
 	};
 	enum InputIds {
@@ -26,8 +30,9 @@ struct AudioInterface : Module, audio::Port {
 		NUM_OUTPUTS
 	};
 	enum LightIds {
-		ENUMS(INPUT_LIGHTS, NUM_AUDIO_INPUTS / 2 * 2),
-		ENUMS(OUTPUT_LIGHTS, NUM_AUDIO_OUTPUTS / 2 * 2),
+		ENUMS(INPUT_LIGHTS, NUM_INPUT_LIGHTS * 2),
+		ENUMS(OUTPUT_LIGHTS, NUM_OUTPUT_LIGHTS * 2),
+		ENUMS(VU_LIGHTS, (NUM_AUDIO_INPUTS == 2) ? (2 * 6) : 0),
 		NUM_LIGHTS
 	};
 
@@ -39,8 +44,9 @@ struct AudioInterface : Module, audio::Port {
 
 	dsp::ClockDivider lightDivider;
 	// For each pair of inputs/outputs
-	float inputClipTimers[NUM_AUDIO_INPUTS / 2] = {};
-	float outputClipTimers[NUM_AUDIO_OUTPUTS / 2] = {};
+	float inputClipTimers[(NUM_AUDIO_INPUTS > 0) ? NUM_INPUT_LIGHTS : 0] = {};
+	float outputClipTimers[(NUM_AUDIO_INPUTS > 0) ? NUM_OUTPUT_LIGHTS : 0] = {};
+	dsp::VuMeter2 vuMeter[(NUM_AUDIO_INPUTS == 2) ? 2 : 0];
 
 	// Port variables
 	int requestedEngineFrames = 0;
@@ -48,6 +54,8 @@ struct AudioInterface : Module, audio::Port {
 
 	AudioInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		if (NUM_AUDIO_INPUTS == 2)
+			configParam(GAIN_PARAM, 0.f, 2.f, 1.f, "Level", " dB", -10, 20);
 		for (int i = 0; i < NUM_AUDIO_INPUTS; i++)
 			configInput(AUDIO_INPUTS + i, string::f("To device %d", i + 1));
 		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++)
@@ -77,14 +85,33 @@ struct AudioInterface : Module, audio::Port {
 		const float clipTime = 0.25f;
 
 		// Push inputs to buffer
-		if (!inputBuffer.full()) {
-			dsp::Frame<NUM_AUDIO_INPUTS> inputFrame;
-			for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-				float v = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
-				inputFrame.samples[i] = v;
+		dsp::Frame<NUM_AUDIO_INPUTS> inputFrame;
+		for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+			// Get input
+			float v = 0.f;
+			if (inputs[AUDIO_INPUTS + i].isConnected())
+				v = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
+			// Normalize right input to left on Audio-2
+			else if (i > 0 && NUM_AUDIO_INPUTS == 2)
+				v = inputFrame.samples[i - 1];
+
+			// Detect clipping
+			if (NUM_AUDIO_INPUTS > 2) {
 				if (std::fabs(v) >= 1.f)
 					inputClipTimers[i / 2] = clipTime;
 			}
+			inputFrame.samples[i] = v;
+		}
+
+		// Apply gain from knob
+		if (NUM_AUDIO_INPUTS == 2) {
+			float gain = params[GAIN_PARAM].getValue();
+			for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+				inputFrame.samples[i] *= gain;
+			}
+		}
+
+		if (!inputBuffer.full()) {
 			inputBuffer.push(inputFrame);
 		}
 
@@ -94,8 +121,12 @@ struct AudioInterface : Module, audio::Port {
 			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
 				float v = outputFrame.samples[i];
 				outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * v);
-				if (std::fabs(v) >= 1.f)
-					outputClipTimers[i / 2] = clipTime;
+
+				// Detect clipping
+				if (NUM_AUDIO_OUTPUTS > 2) {
+					if (std::fabs(v) >= 1.f)
+						outputClipTimers[i / 2] = clipTime;
+				}
 			}
 		}
 		else {
@@ -104,26 +135,44 @@ struct AudioInterface : Module, audio::Port {
 			}
 		}
 
+		// Lights
+		if (NUM_AUDIO_INPUTS == 2) {
+			for (int i = 0; i < 2; i++) {
+				vuMeter[i].process(args.sampleTime, inputFrame.samples[i]);
+			}
+		}
 		if (lightDivider.process()) {
 			float lightTime = args.sampleTime * lightDivider.getDivision();
-			int numDeviceInputs = getNumInputs();
-			int numDeviceOutputs = getNumOutputs();
-			// Turn on light if at least one port is enabled in the nearby pair.
-			for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
-				bool active = numDeviceOutputs >= 2 * i + 1;
-				bool clip = inputClipTimers[i] > 0.f;
-				if (clip)
-					inputClipTimers[i] -= lightTime;
-				lights[INPUT_LIGHTS + i * 2 + 0].setBrightness(active && !clip);
-				lights[INPUT_LIGHTS + i * 2 + 1].setBrightness(active && clip);
+			if (NUM_AUDIO_INPUTS == 2) {
+				for (int i = 0; i < 2; i++) {
+					lights[VU_LIGHTS + i * 6 + 0].setBrightness(vuMeter[i].getBrightness(0, 0));
+					lights[VU_LIGHTS + i * 6 + 1].setBrightness(vuMeter[i].getBrightness(-3, 0));
+					lights[VU_LIGHTS + i * 6 + 2].setBrightness(vuMeter[i].getBrightness(-6, -3));
+					lights[VU_LIGHTS + i * 6 + 3].setBrightness(vuMeter[i].getBrightness(-12, -6));
+					lights[VU_LIGHTS + i * 6 + 4].setBrightness(vuMeter[i].getBrightness(-24, -12));
+					lights[VU_LIGHTS + i * 6 + 5].setBrightness(vuMeter[i].getBrightness(-36, -24));
+				}
 			}
-			for (int i = 0; i < NUM_AUDIO_OUTPUTS / 2; i++) {
-				bool active = numDeviceInputs >= 2 * i + 1;
-				bool clip = outputClipTimers[i] > 0.f;
-				if (clip)
-					outputClipTimers[i] -= lightTime;
-				lights[OUTPUT_LIGHTS + i * 2 + 0].setBrightness(active & !clip);
-				lights[OUTPUT_LIGHTS + i * 2 + 1].setBrightness(active & clip);
+			else {
+				int numDeviceInputs = getNumInputs();
+				int numDeviceOutputs = getNumOutputs();
+				// Turn on light if at least one port is enabled in the nearby pair.
+				for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
+					bool active = numDeviceOutputs >= 2 * i + 1;
+					bool clip = inputClipTimers[i] > 0.f;
+					if (clip)
+						inputClipTimers[i] -= lightTime;
+					lights[INPUT_LIGHTS + i * 2 + 0].setBrightness(active && !clip);
+					lights[INPUT_LIGHTS + i * 2 + 1].setBrightness(active && clip);
+				}
+				for (int i = 0; i < NUM_AUDIO_OUTPUTS / 2; i++) {
+					bool active = numDeviceInputs >= 2 * i + 1;
+					bool clip = outputClipTimers[i] > 0.f;
+					if (clip)
+						outputClipTimers[i] -= lightTime;
+					lights[OUTPUT_LIGHTS + i * 2 + 0].setBrightness(active & !clip);
+					lights[OUTPUT_LIGHTS + i * 2 + 1].setBrightness(active & clip);
+				}
 			}
 		}
 	}
@@ -362,6 +411,42 @@ struct AudioInterfaceWidget : ModuleWidget {
 			audioWidget->setAudioPort(module);
 			addChild(audioWidget);
 		}
+		else if (NUM_AUDIO_INPUTS == 2 && NUM_AUDIO_OUTPUTS == 2) {
+			setPanel(APP->window->loadSvg(asset::system("res/Core/AudioInterface2.svg")));
+
+			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
+			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+			addParam(createParamCentered<RoundBigBlackKnob>(mm2px(Vec(12.7, 74.019)), module, TAudioInterface::GAIN_PARAM));
+
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(6.697, 94.253)), module, TAudioInterface::AUDIO_INPUTS + 0));
+			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(18.703, 94.253)), module, TAudioInterface::AUDIO_INPUTS + 1));
+
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(6.699, 112.254)), module, TAudioInterface::AUDIO_OUTPUTS + 0));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.7, 112.254)), module, TAudioInterface::AUDIO_OUTPUTS + 1));
+
+			addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(6.7, 29.759)), module, TAudioInterface::VU_LIGHTS + 0 * 6 + 0));
+			addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec(18.7, 29.759)), module, TAudioInterface::VU_LIGHTS + 1 * 6 + 0));
+			addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(6.7, 34.753)), module, TAudioInterface::VU_LIGHTS + 0 * 6 + 1));
+			addChild(createLightCentered<MediumLight<YellowLight>>(mm2px(Vec(18.7, 34.753)), module, TAudioInterface::VU_LIGHTS + 1 * 6 + 1));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(6.7, 39.749)), module, TAudioInterface::VU_LIGHTS + 0 * 6 + 2));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(18.7, 39.749)), module, TAudioInterface::VU_LIGHTS + 1 * 6 + 2));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(6.7, 44.744)), module, TAudioInterface::VU_LIGHTS + 0 * 6 + 3));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(18.7, 44.744)), module, TAudioInterface::VU_LIGHTS + 1 * 6 + 3));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(6.7, 49.744)), module, TAudioInterface::VU_LIGHTS + 0 * 6 + 4));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(18.7, 49.744)), module, TAudioInterface::VU_LIGHTS + 1 * 6 + 4));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(6.7, 54.745)), module, TAudioInterface::VU_LIGHTS + 0 * 6 + 5));
+			addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(18.7, 54.745)), module, TAudioInterface::VU_LIGHTS + 1 * 6 + 5));
+
+			AudioDeviceWidget* audioWidget = createWidget<AudioDeviceWidget>(mm2px(Vec(2.135, 14.259)));
+			audioWidget->box.size = mm2px(Vec(21.128, 6.725));
+			audioWidget->setAudioPort(module);
+			// Adjust deviceChoice position
+			audioWidget->deviceChoice->box.pos = Vec(-4, -4);
+			addChild(audioWidget);
+		}
 	}
 
 	void appendContextMenu(Menu* menu) override {
@@ -378,6 +463,8 @@ struct AudioInterfaceWidget : ModuleWidget {
 };
 
 
+Model* modelAudioInterface2 = createModel<AudioInterface<2, 2>, AudioInterfaceWidget<2, 2>>("AudioInterface2");
+// Legacy name for Audio-8
 Model* modelAudioInterface = createModel<AudioInterface<8, 8>, AudioInterfaceWidget<8, 8>>("AudioInterface");
 Model* modelAudioInterface16 = createModel<AudioInterface<16, 16>, AudioInterfaceWidget<16, 16>>("AudioInterface16");
 

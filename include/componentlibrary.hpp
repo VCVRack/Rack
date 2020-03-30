@@ -236,6 +236,12 @@ struct RoundLargeBlackKnob : RoundKnob {
 	}
 };
 
+struct RoundBigBlackKnob : RoundKnob {
+	RoundBigBlackKnob() {
+		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/RoundBigBlackKnob.svg")));
+	}
+};
+
 struct RoundHugeBlackKnob : RoundKnob {
 	RoundHugeBlackKnob() {
 		setSvg(APP->window->loadSvg(asset::system("res/ComponentLibrary/RoundHugeBlackKnob.svg")));

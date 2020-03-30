@@ -304,6 +304,16 @@ void AudioWidget::setAudioPort(audio::Port* port) {
 }
 
 
+void AudioDeviceWidget::setAudioPort(audio::Port* port) {
+	AudioDeviceChoice* deviceChoice = createWidget<AudioDeviceChoice>(math::Vec());
+	deviceChoice->box.size.x = box.size.x;
+	deviceChoice->box.size.y = box.size.y;
+	deviceChoice->port = port;
+	addChild(deviceChoice);
+	this->deviceChoice = deviceChoice;
+}
+
+
 void appendAudioMenu(ui::Menu* menu, audio::Port* port) {
 	menu->addChild(createMenuLabel("Audio driver"));
 	appendAudioDriverMenu(menu, port);

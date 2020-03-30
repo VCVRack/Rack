@@ -5,6 +5,7 @@ namespace rack {
 namespace core {
 
 
+extern Model* modelAudioInterface2;
 extern Model* modelAudioInterface;
 extern Model* modelAudioInterface16;
 extern Model* modelMIDI_CV;

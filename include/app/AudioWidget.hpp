@@ -9,6 +9,7 @@ namespace rack {
 namespace app {
 
 
+/** Designed for Audio-8 and Audio-16 module. */
 struct AudioWidget : LedDisplay {
 	LedDisplayChoice* driverChoice;
 	LedDisplaySeparator* driverSeparator;
@@ -17,6 +18,13 @@ struct AudioWidget : LedDisplay {
 	LedDisplayChoice* sampleRateChoice;
 	LedDisplaySeparator* sampleRateSeparator;
 	LedDisplayChoice* bufferSizeChoice;
+	void setAudioPort(audio::Port* port);
+};
+
+
+/** Designed for Audio-2 module. */
+struct AudioDeviceWidget : LedDisplay {
+	LedDisplayChoice* deviceChoice;
 	void setAudioPort(audio::Port* port);
 };
 
