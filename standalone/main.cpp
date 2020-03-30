@@ -244,9 +244,9 @@ int main(int argc, char* argv[]) {
 		windowDestroy();
 		ui::destroy();
 	}
-	plugin::destroy();
 	midi::destroy();
 	audio::destroy();
+	plugin::destroy();
 	INFO("Destroying logger");
 	logger::destroy();
 
