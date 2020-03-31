@@ -38,19 +38,21 @@ void LightWidget::drawLight(const DrawArgs& args) {
 }
 
 void LightWidget::drawHalo(const DrawArgs& args) {
-	float radius = std::min(box.size.x, box.size.y) / 2.0;
-	float oradius = 4.0 * radius;
+	// Halo is now deprecated
 
-	nvgBeginPath(args.vg);
-	nvgRect(args.vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
+	// float radius = std::min(box.size.x, box.size.y) / 2.0;
+	// float oradius = 4.0 * radius;
 
-	NVGpaint paint;
-	NVGcolor icol = color::mult(color, 0.07);
-	NVGcolor ocol = nvgRGB(0, 0, 0);
-	paint = nvgRadialGradient(args.vg, radius, radius, radius, oradius, icol, ocol);
-	nvgFillPaint(args.vg, paint);
-	nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
-	nvgFill(args.vg);
+	// nvgBeginPath(args.vg);
+	// nvgRect(args.vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
+
+	// NVGpaint paint;
+	// NVGcolor icol = color::mult(color, 0.04);
+	// NVGcolor ocol = nvgRGB(0, 0, 0);
+	// paint = nvgRadialGradient(args.vg, radius, radius, radius, oradius, icol, ocol);
+	// nvgFillPaint(args.vg, paint);
+	// nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
+	// nvgFill(args.vg);
 }
 
 
