@@ -26,7 +26,7 @@ std::string Quantity::getDisplayValueString() {
 	else if (v == -INFINITY)
 		return "-∞";
 	else if (std::isnan(v))
-		return "?";
+		return "NaN";
 	return string::f("%.*g", getDisplayPrecision(), math::normalizeZero(v));
 }
 
