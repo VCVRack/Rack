@@ -444,7 +444,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 			audioWidget->box.size = mm2px(Vec(21.128, 6.725));
 			audioWidget->setAudioPort(module);
 			// Adjust deviceChoice position
-			audioWidget->deviceChoice->box.pos = Vec(-4, -4);
+			audioWidget->deviceChoice->textOffset = Vec(6, 14);
 			addChild(audioWidget);
 		}
 	}

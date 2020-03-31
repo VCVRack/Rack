@@ -88,7 +88,7 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 	for (int deviceId : port->driver->getDeviceIds()) {
 		int channels = std::max(port->driver->getDeviceNumInputs(deviceId), port->driver->getDeviceNumOutputs(deviceId));
 		// Prevents devices with a ridiculous number of channels from being displayed
-		const int maxTotalChannels = 128;
+		const int maxTotalChannels = port->maxChannels * 8;
 		channels = std::min(maxTotalChannels, channels);
 
 		for (int offset = 0; offset < channels; offset += port->maxChannels) {
@@ -121,7 +121,10 @@ struct AudioDeviceChoice : LedDisplayChoice {
 			color.a = 1.0;
 		}
 		else {
-			text += "(No device)";
+			if (box.size.x >= 80.0)
+				text += "(No device)";
+			else
+				text += "No device";
 			color.a = 0.5;
 		}
 	}
@@ -304,8 +307,16 @@ void AudioWidget::setAudioPort(audio::Port* port) {
 }
 
 
+struct AudioDeviceMenuChoice : AudioDeviceChoice {
+	void onAction(const event::Action& e) override {
+		ui::Menu* menu = createMenu();
+		appendAudioMenu(menu, port);
+	}
+};
+
+
 void AudioDeviceWidget::setAudioPort(audio::Port* port) {
-	AudioDeviceChoice* deviceChoice = createWidget<AudioDeviceChoice>(math::Vec());
+	AudioDeviceMenuChoice* deviceChoice = createWidget<AudioDeviceMenuChoice>(math::Vec());
 	deviceChoice->box.size.x = box.size.x;
 	deviceChoice->box.size.y = box.size.y;
 	deviceChoice->port = port;
