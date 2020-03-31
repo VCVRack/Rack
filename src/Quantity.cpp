@@ -20,7 +20,14 @@ int Quantity::getDisplayPrecision() {
 }
 
 std::string Quantity::getDisplayValueString() {
-	return string::f("%.*g", getDisplayPrecision(), math::normalizeZero(getDisplayValue()));
+	float v = getDisplayValue();
+	if (v == INFINITY)
+		return "∞";
+	else if (v == -INFINITY)
+		return "-∞";
+	else if (std::isnan(v))
+		return "?";
+	return string::f("%.*g", getDisplayPrecision(), math::normalizeZero(v));
 }
 
 void Quantity::setDisplayValueString(std::string s) {
