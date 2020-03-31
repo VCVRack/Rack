@@ -55,7 +55,7 @@ struct AudioInterface : Module, audio::Port {
 	AudioInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		if (NUM_AUDIO_INPUTS == 2)
-			configParam(GAIN_PARAM, 0.f, 2.f, 1.f, "Level", " dB", -10, 20);
+			configParam(GAIN_PARAM, 0.f, 2.f, 1.f, "Level", " dB", -10, 40);
 		for (int i = 0; i < NUM_AUDIO_INPUTS; i++)
 			configInput(AUDIO_INPUTS + i, string::f("To device %d", i + 1));
 		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++)
@@ -105,7 +105,7 @@ struct AudioInterface : Module, audio::Port {
 
 		// Apply gain from knob
 		if (NUM_AUDIO_INPUTS == 2) {
-			float gain = params[GAIN_PARAM].getValue();
+			float gain = std::pow(params[GAIN_PARAM].getValue(), 2.f);
 			for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
 				inputFrame.samples[i] *= gain;
 			}
