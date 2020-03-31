@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: VCV Community Forum
+    url: https://community.vcvrack.com/
+    about: Questions, discussions, and announcements about VCV Rack
+  - name: Other communities
+    url: https://vcvrack.com/manual/Communities
+    about: List of all VCV communities
