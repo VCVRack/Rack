@@ -15,7 +15,7 @@
    version="1.1"
    id="svg15246"
    sodipodi:docname="PJ301M.svg"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06">
+   inkscape:version="0.92.4 5da689c313, 2019-01-14">
   <defs
      id="defs15240">
     <clipPath
@@ -138,6 +138,30 @@
          d="m 0.683594,0.921875 h 22.679687 v 24.9375 H 0.683594 Z m 0,0"
          id="path17842" />
     </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath28126">
+      <path
+         d="M -18.5998,18.6061 H 18.5998 V -18.5935 H -18.5998 Z"
+         id="path28124"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath28134">
+      <path
+         d="M -11.3389,13.4081 H 11.3388 V -11.3326 H -11.3389 Z"
+         id="path28132"
+         inkscape:connector-curvature="0" />
+    </clipPath>
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath28158">
+      <path
+         d="M -8.12405,10.0023 H 8.12399 V -5.09624 H -8.12405 Z"
+         id="path28156"
+         inkscape:connector-curvature="0" />
+    </clipPath>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -147,21 +171,25 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="11.2"
-     inkscape:cx="15.763023"
-     inkscape:cy="5.9688197"
+     inkscape:cx="-0.64158077"
+     inkscape:cy="10.079379"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1274"
-     inkscape:window-height="1434"
-     inkscape:window-x="1280"
-     inkscape:window-y="0"
+     inkscape:window-width="1600"
+     inkscape:window-height="882"
+     inkscape:window-x="0"
+     inkscape:window-y="18"
      inkscape:window-maximized="0"
      units="px"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"
+     inkscape:snap-bbox="true"
+     inkscape:snap-bbox-midpoints="true"
+     inkscape:snap-nodes="false"
+     inkscape:snap-others="false" />
   <metadata
      id="metadata15243">
     <rdf:RDF>
@@ -183,12 +211,35 @@
        inkscape:connector-curvature="0"
        id="path7255"
        d="m 92.788964,127.42922 c -2.235179,0 -4.05281,-1.81762 -4.05281,-4.05282 0,-2.23516 1.817631,-4.05281 4.05281,-4.05281 2.235176,0 4.05281,1.81765 4.05281,4.05281 0,2.2352 -1.817634,4.05282 -4.05281,4.05282"
-       style="fill:#e6e6e6;fill-opacity:1;fill-rule:nonzero;stroke:#636663;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#fafafa;fill-opacity:1;fill-rule:nonzero;stroke:#666866;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    <g
+       id="g28152"
+       transform="matrix(0.35277777,0,0,0.35277777,92.788964,123.36298)">
+      <g
+         id="g28154" />
+      <g
+         id="g28166">
+        <g
+           style="opacity:0.14999402"
+           id="g28164"
+           clip-path="url(#clipPath28158)">
+          <g
+             id="g28162"
+             transform="translate(8.124,2.453)">
+            <path
+               inkscape:connector-curvature="0"
+               id="path28160"
+               style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+               d="m 0,0 c 0,4.168 -3.638,7.549 -8.124,7.549 -4.486,0 -8.124,-3.381 -8.124,-7.549 0,-4.168 3.638,-7.549 8.124,-7.549 C -3.638,-7.549 0,-4.168 0,0" />
+          </g>
+        </g>
+      </g>
+    </g>
     <path
        inkscape:connector-curvature="0"
        id="path7261"
        d="m 92.788964,126.29511 c -1.609548,0 -2.918685,-1.30916 -2.918685,-2.91871 0,-1.60954 1.309137,-2.91867 2.918685,-2.91867 1.609549,0 2.918682,1.30913 2.918682,2.91867 0,1.60955 -1.309133,2.91871 -2.918682,2.91871"
-       style="fill:#e6e6e6;fill-opacity:1;fill-rule:nonzero;stroke:#636663;stroke-width:0.25;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#fafafa;fill-opacity:1;fill-rule:nonzero;stroke:#666866;stroke-width:0.2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        inkscape:connector-curvature="0"
        id="path7265"
