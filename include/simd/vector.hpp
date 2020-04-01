@@ -30,7 +30,7 @@ struct Vector;
 */
 template <>
 struct Vector<float, 4> {
-	typedef float type;
+	using type = float;
 	constexpr static int size = 4;
 
 	union {
@@ -56,35 +56,38 @@ struct Vector<float, 4> {
 		v = _mm_setr_ps(x1, x2, x3, x4);
 	}
 
-	/** Returns a vector initialized to zero. */
+	/** Returns a vector with all 0 bits. */
 	static Vector zero() {
-		return Vector();
+		return Vector(_mm_setzero_ps());
 	}
 
 	/** Returns a vector with all 1 bits. */
 	static Vector mask() {
-		return _mm_castsi128_ps(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
+		return Vector(_mm_castsi128_ps(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128())));
 	}
 
 	/** Reads an array of 4 values.
-	On little-endian machines (e.g. x86), the order is reversed, so `x[0]` corresponds to `vector.s[3]`.
+	On little-endian machines (e.g. x86_64), the order is reversed, so `x[0]` corresponds to `vector.s[3]`.
 	*/
 	static Vector load(const float* x) {
 		/*
 		My benchmarks show that _mm_loadu_ps() performs equally as fast as _mm_load_ps() when data is actually aligned.
 		This post seems to agree. https://stackoverflow.com/a/20265193/272642
-		So use _mm_loadu_ps() for generality, so you can load unaligned arrays using the same function (although it will be slower).
+		I therefore use _mm_loadu_ps() for generality, so you can load unaligned arrays using the same function (although load aligned arrays if you can for best performance).
 		*/
 		return Vector(_mm_loadu_ps(x));
 	}
 
 	/** Writes an array of 4 values.
-	On little-endian machines (e.g. x86), the order is reversed, so `x[0]` corresponds to `vector.s[3]`.
+	On little-endian machines (e.g. x86_64), the order is reversed, so `x[0]` corresponds to `vector.s[3]`.
 	*/
 	void store(float* x) {
 		_mm_storeu_ps(x, v);
 	}
 
+	/** Accessing vector elements individually is slow and defeats the purpose of vectorizing.
+	However, this operator is convenient when writing simple serial code in a non-bottlenecked section.
+	*/
 	float& operator[](int i) {
 		return s[i];
 	}
@@ -101,7 +104,7 @@ struct Vector<float, 4> {
 
 template <>
 struct Vector<int32_t, 4> {
-	typedef int32_t type;
+	using type = int32_t;
 	constexpr static int size = 4;
 
 	union {
@@ -118,7 +121,7 @@ struct Vector<int32_t, 4> {
 		v = _mm_setr_epi32(x1, x2, x3, x4);
 	}
 	static Vector zero() {
-		return Vector();
+		return Vector(_mm_setzero_si128());
 	}
 	static Vector mask() {
 		return Vector(_mm_cmpeq_epi32(_mm_setzero_si128(), _mm_setzero_si128()));
@@ -126,7 +129,7 @@ struct Vector<int32_t, 4> {
 	static Vector load(const int32_t* x) {
 		// HACK
 		// Use _mm_loadu_si128() because GCC doesn't support _mm_loadu_si32()
-		return Vector(_mm_loadu_si128((__m128i*) x));
+		return Vector(_mm_loadu_si128((const __m128i*) x));
 	}
 	void store(int32_t* x) {
 		// HACK
@@ -179,11 +182,11 @@ inline int movemask(const Vector<float, 4>& a) {
 	return _mm_movemask_ps(a.v);
 }
 
-/** Returns an integer with each bit corresponding to the most significant bit of each byte.
-For example, `movemask(int32_4::mask())` returns 0xffff.
+/** Returns an integer with each bit corresponding to the most significant bit of each element.
+For example, `movemask(int32_4::mask())` returns 0xf.
 */
 inline int movemask(const Vector<int32_t, 4>& a) {
-	return _mm_movemask_epi8(a.v);
+	return _mm_movemask_ps(_mm_castsi128_ps(a.v));
 }
 
 
@@ -295,22 +298,18 @@ inline Vector<int32_t, 4> operator-(const Vector<int32_t, 4>& a) {
 
 /** `++a` */
 inline Vector<float, 4>& operator++(Vector<float, 4>& a) {
-	a += 1.f;
-	return a;
+	return a += 1.f;
 }
 inline Vector<int32_t, 4>& operator++(Vector<int32_t, 4>& a) {
-	a += 1;
-	return a;
+	return a += 1;
 }
 
 /** `--a` */
 inline Vector<float, 4>& operator--(Vector<float, 4>& a) {
-	a -= 1.f;
-	return a;
+	return a -= 1.f;
 }
 inline Vector<int32_t, 4>& operator--(Vector<int32_t, 4>& a) {
-	a -= 1;
-	return a;
+	return a -= 1;
 }
 
 /** `a++` */
@@ -359,8 +358,8 @@ inline Vector<int32_t, 4> operator>>(const Vector<int32_t, 4>& a, const int& b) 
 // Typedefs
 
 
-typedef Vector<float, 4> float_4;
-typedef Vector<int32_t, 4> int32_4;
+using float_4 = Vector<float, 4>;
+using int32_4 = Vector<int32_t, 4>;
 
 
 } // namespace simd
