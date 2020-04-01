@@ -167,29 +167,6 @@ inline Vector<int32_t, 4> Vector<int32_t, 4>::cast(Vector<float, 4> a) {
 }
 
 
-// Instructions not available as operators
-
-
-/** `~a & b` */
-inline Vector<float, 4> andnot(const Vector<float, 4>& a, const Vector<float, 4>& b) {
-	return Vector<float, 4>(_mm_andnot_ps(a.v, b.v));
-}
-
-/** Returns an integer with each bit corresponding to the most significant bit of each element.
-For example, `movemask(float_4::mask())` returns 0xf.
-*/
-inline int movemask(const Vector<float, 4>& a) {
-	return _mm_movemask_ps(a.v);
-}
-
-/** Returns an integer with each bit corresponding to the most significant bit of each element.
-For example, `movemask(int32_4::mask())` returns 0xf.
-*/
-inline int movemask(const Vector<int32_t, 4>& a) {
-	return _mm_movemask_ps(_mm_castsi128_ps(a.v));
-}
-
-
 // Operator overloads
 
 

@@ -9,15 +9,25 @@ namespace rack {
 namespace simd {
 
 
-// Nonstandard functions
+// Functions based on instructions
 
-inline float ifelse(bool cond, float a, float b) {
-	return cond ? a : b;
+/** `~a & b` */
+inline float_4 andnot(float_4 a, float_4 b) {
+	return float_4(_mm_andnot_ps(a.v, b.v));
 }
 
-/** Given a mask, returns a if mask is 0xffffffff per element, b if mask is 0x00000000 */
-inline float_4 ifelse(float_4 mask, float_4 a, float_4 b) {
-	return (a & mask) | andnot(mask, b);
+/** Returns an integer with each bit corresponding to the most significant bit of each element.
+For example, `movemask(float_4::mask())` returns 0xf.
+*/
+inline int movemask(float_4 a) {
+	return _mm_movemask_ps(a.v);
+}
+
+/** Returns an integer with each bit corresponding to the most significant bit of each element.
+For example, `movemask(int32_4::mask())` returns 0xf.
+*/
+inline int movemask(int32_4 a) {
+	return _mm_movemask_ps(_mm_castsi128_ps(a.v));
 }
 
 /** Returns the approximate reciprocal square root.
@@ -34,6 +44,18 @@ inline float_4 rcp(float_4 x) {
 	return float_4(_mm_rcp_ps(x.v));
 }
 
+
+// Nonstandard convenience functions
+
+inline float ifelse(bool cond, float a, float b) {
+	return cond ? a : b;
+}
+
+/** Given a mask, returns a if mask is 0xffffffff per element, b if mask is 0x00000000 */
+inline float_4 ifelse(float_4 mask, float_4 a, float_4 b) {
+	return (a & mask) | andnot(mask, b);
+}
+
 /** Returns a vector where element N is all 1's if the N'th bit of `a` is 1, or all 0's if the N'th bit of `a` is 0.
 */
 template <typename T>
@@ -41,8 +63,9 @@ T movemaskInverse(int a);
 
 template <>
 inline int32_4 movemaskInverse<int32_4>(int a) {
-	int32_4 msk8421 = int32_4(1, 2, 4, 8);
-	return (msk8421 & int32_4(a)) == msk8421;
+	// Pick out N'th bit of `a` and check if it's 1.
+	int32_4 mask1234 = int32_4(1, 2, 4, 8);
+	return (mask1234 & int32_4(a)) == mask1234;
 }
 
 template <>
