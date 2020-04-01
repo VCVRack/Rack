@@ -262,11 +262,13 @@ void ParamWidget::createContextMenu() {
 		menu->addChild(paramField);
 	}
 
-	ParamResetItem* resetItem = new ParamResetItem;
-	resetItem->text = "Initialize";
-	resetItem->rightText = "Double-click";
-	resetItem->paramWidget = this;
-	menu->addChild(resetItem);
+	if (pq && pq->resetEnabled && pq->isBounded()) {
+		ParamResetItem* resetItem = new ParamResetItem;
+		resetItem->text = "Initialize";
+		resetItem->rightText = "Double-click";
+		resetItem->paramWidget = this;
+		menu->addChild(resetItem);
+	}
 
 	// ParamFineItem *fineItem = new ParamFineItem;
 	// fineItem->text = "Fine adjust";

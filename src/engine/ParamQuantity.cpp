@@ -123,8 +123,7 @@ std::string ParamQuantity::getUnit() {
 }
 
 void ParamQuantity::reset() {
-	// Same as Quantity::reset
-	setValue(getDefaultValue());
+	Quantity::reset();
 }
 
 void ParamQuantity::randomize() {
