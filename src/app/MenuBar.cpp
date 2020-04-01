@@ -478,28 +478,16 @@ struct CpuMeterItem : ui::MenuItem {
 	}
 };
 
-struct EnginePauseItem : ui::MenuItem {
-	void onAction(const event::Action& e) override {
-		APP->engine->setPaused(!APP->engine->isPaused());
-	}
-};
-
 struct SampleRateValueItem : ui::MenuItem {
 	float sampleRate;
 	void onAction(const event::Action& e) override {
 		settings::sampleRate = sampleRate;
-		APP->engine->setPaused(false);
 	}
 };
 
 struct SampleRateItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
-
-		EnginePauseItem* enginePauseItem = new EnginePauseItem;
-		enginePauseItem->text = "Pause";
-		enginePauseItem->rightText = CHECKMARK(APP->engine->isPaused());
-		menu->addChild(enginePauseItem);
 
 		for (int i = -2; i <= 4; i++) {
 			for (int j = 0; j < 2; j++) {

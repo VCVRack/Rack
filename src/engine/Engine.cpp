@@ -147,7 +147,6 @@ struct Engine::Internal {
 	std::vector<Cable*> cables;
 	std::set<ParamHandle*> paramHandles;
 	std::map<std::tuple<int, int>, ParamHandle*> paramHandleCache;
-	bool paused = false;
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
@@ -454,28 +453,20 @@ void Engine::step(int frames) {
 		}
 	}
 
-	if (!internal->paused) {
-		// Launch workers
-		if (internal->threadCount != settings::threadCount) {
-			Engine_relaunchWorkers(this, settings::threadCount);
-		}
-
-		// Update expander pointers
-		for (Module* module : internal->modules) {
-			Engine_updateExpander(this, &module->leftExpander);
-			Engine_updateExpander(this, &module->rightExpander);
-		}
-
-		// Step modules
-		for (int i = 0; i < frames; i++) {
-			Engine_stepModules(this);
-		}
+	// Launch workers
+	if (internal->threadCount != settings::threadCount) {
+		Engine_relaunchWorkers(this, settings::threadCount);
 	}
-	else {
-		// Stop workers while paused
-		if (internal->threadCount != 1) {
-			Engine_relaunchWorkers(this, 1);
-		}
+
+	// Update expander pointers
+	for (Module* module : internal->modules) {
+		Engine_updateExpander(this, &module->leftExpander);
+		Engine_updateExpander(this, &module->rightExpander);
+	}
+
+	// Step modules
+	for (int i = 0; i < frames; i++) {
+		Engine_stepModules(this);
 	}
 
 	yieldWorkers();
@@ -491,18 +482,6 @@ void Engine::setPrimaryModule(Module* module) {
 Module* Engine::getPrimaryModule() {
 	// No lock, for performance
 	return internal->primaryModule;
-}
-
-
-void Engine::setPaused(bool paused) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-	internal->paused = paused;
-}
-
-
-bool Engine::isPaused() {
-	// No lock, for performance
-	return internal->paused;
 }
 
 

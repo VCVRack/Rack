@@ -26,8 +26,6 @@ struct Engine {
 	void setPrimaryModule(Module* module);
 	Module* getPrimaryModule();
 
-	void setPaused(bool paused);
-	bool isPaused();
 	float getSampleRate();
 	/** Returns the inverse of the current sample rate.
 	*/
