@@ -12,6 +12,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add "Primary module" context menu item to VCV Audio modules to select which audio device clocks the engine.
 	- Allow other modules such as VCV Recorder to be the primary module, to render audio faster than real-time.
 	- Remove "Real-time priority" menu item, since the thread priority is now managed elsewhere (RtAudio, etc).
+	- Remove engine pausing as it no longer makes sense with the new engine architecture.
 - Replace module disabling with bypassing, which directly routes certain inputs to outputs if specified by the plugin.
 - Duplicate cables patched to inputs when a module is duplicated.
 - Add module tags to module context menu.
@@ -19,19 +20,33 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add quick access to user module patches from `<Rack user dir>/presets/<plugin slug>/<module slug>` to module context menu.
 - Add infinity and NaN protection to cables, so they won't propagate non-finite values from badly behaving modules.
 - Add basic headless support with the `-h` flag.
-- Add multiple knob modes: scaled linear, absolute rotary, and relative rotary.
+- Add multiple parameter dragging modes: scaled linear, absolute rotary, and relative rotary.
 - Add "knobLinearSensitivity" property to settings.
 - Add timestamps to MIDI messages.
 - Allow sending and receiving SysEx messages through MIDI drivers.
-- Add ability to scroll the rack and other scroll containers using the left mouse button.
+- Add ability to scroll the rack and other scroll containers using the left mouse button. This allows touch devices to scroll by dragging.
+- Add "File > Open recent" menu item for opening recent patches.
+- Add "Preset > Save template" to module context menu which saves the default module preset to load when a new instance is added to the rack.
+- Break Rack executable into libRack shared library and lightweight standalone Rack executable.
+- Add support for 1/2x and 1/4x low-fidelity sample rates to engine and "Engine > Sample rates" menu.
+- Add Escape key command for existing fullscreen, in case F11 doesn't work.
+- Allow RtAudio device block size to be as low as 16.
+- Copy cable color when cloning cables with Ctrl+click.
 - Core
+	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
+	- Add MPE mode to MIDI-CC and MIDI-Gate.
+	- Add mode to MIDI-CC to process 14-bit MIDI CC via MSB/LSB.
+	- Use MIDI timestamps in MIDI-CV, MIDI-CC, MIDI-Gate, and MIDI-Map to improve overall timing and drastically reduce clock jitter.
 	- Add red clip lights to VCV Audio-8/16 when signal reaches beyond ±10V.
+	- Reset notes in MIDI-CV and MIDI-Gate if an "all notes off" MIDI message is received.
 - API
 	- Add `Module::configInput()` and `Module::configOutput()` for adding names to ports.
 	- Replace `ParamWidget::paramQuantity` with `ParamWidget::getParamQuantity()`.
 	- Add `.modules[].manualUrl` to plugin manifest schema.
 	- Add `appendAudioMenu()` and `appendMidiMenu()` so plugin developers can develop custom audio/MIDI interfaces without adding an `AudioWidget/MidiWidget` to their panel.
-	- Use MIDI timestamps in MIDI-CV, MIDI-CC, MIDI-Gate, and MIDI-Map to improve overall timing and drastically reduce clock jitter.
+	- Make `Module::toJson()` and `fromJson()` virtual.
+	- Add `Module::paramsToJson()` and `paramsFromJson()` virtual methods.
+	- Add `SwitchQuantity` and a helper method `Module::configSwitch()` for displaying named values in the parameter context menu.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
