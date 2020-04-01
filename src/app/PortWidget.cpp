@@ -193,6 +193,7 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 			CableWidget* topCw = APP->scene->rack->getTopCable(this);
 			if (topCw) {
 				cw = new CableWidget;
+				cw->color = topCw->color;
 				cw->outputPort = topCw->outputPort;
 				cw->updateCable();
 			}
@@ -221,6 +222,7 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 	if (!cw) {
 		// Create a new cable
 		cw = new CableWidget;
+		cw->setNextCableColor();
 		if (type == engine::Port::OUTPUT)
 			cw->outputPort = this;
 		else

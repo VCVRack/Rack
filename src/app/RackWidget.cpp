@@ -279,6 +279,8 @@ void RackWidget::fromJson(json_t* rootJ) {
 			continue;
 
 		CableWidget* cw = new CableWidget;
+		// Legacy: Before v1, cable colors were not serialized. So we need to initialize the color here.
+		cw->setNextCableColor();
 		cw->setCable(cable);
 		cw->fromJson(cableJ);
 		addCable(cw);

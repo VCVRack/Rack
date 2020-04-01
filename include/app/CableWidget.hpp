@@ -22,6 +22,7 @@ struct CableWidget : widget::OpaqueWidget {
 
 	CableWidget();
 	~CableWidget();
+	void setNextCableColor();
 	bool isComplete();
 	/** Based on the input/output ports, re-creates the cable and removes/adds it to the Engine. */
 	void updateCable();

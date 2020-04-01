@@ -14,15 +14,18 @@ namespace app {
 
 CableWidget::CableWidget() {
 	color = color::BLACK_TRANSPARENT;
+}
+
+CableWidget::~CableWidget() {
+	setCable(NULL);
+}
+
+void CableWidget::setNextCableColor() {
 	if (!settings::cableColors.empty()) {
 		int id = APP->scene->rack->nextCableColorId++;
 		APP->scene->rack->nextCableColorId %= settings::cableColors.size();
 		color = settings::cableColors[id];
 	}
-}
-
-CableWidget::~CableWidget() {
-	setCable(NULL);
 }
 
 bool CableWidget::isComplete() {
