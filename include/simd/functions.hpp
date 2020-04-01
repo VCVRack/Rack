@@ -34,17 +34,20 @@ inline float_4 rcp(float_4 x) {
 	return float_4(_mm_rcp_ps(x.v));
 }
 
-/** Given a mask `a`, returns a vector with each element either 0's or 1's depending on the mask bit.
+/** Returns a vector where element N is all 1's if the N'th bit of `a` is 1, or all 0's if the N'th bit of `a` is 0.
 */
 template <typename T>
 T movemaskInverse(int a);
 
 template <>
-inline float_4 movemaskInverse<float_4>(int x) {
-	__m128i msk8421 = _mm_set_epi32(8, 4, 2, 1);
-	__m128i x_bc = _mm_set1_epi32(x);
-	__m128i t = _mm_and_si128(x_bc, msk8421);
-	return float_4(_mm_castsi128_ps(_mm_cmpeq_epi32(x_bc, t)));
+inline int32_4 movemaskInverse<int32_4>(int a) {
+	int32_4 msk8421 = int32_4(1, 2, 4, 8);
+	return (msk8421 & int32_4(a)) == msk8421;
+}
+
+template <>
+inline float_4 movemaskInverse<float_4>(int a) {
+	return float_4::cast(movemaskInverse<int32_4>(a));
 }
 
 
