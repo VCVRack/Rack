@@ -428,7 +428,7 @@ struct ViewButton : MenuButton {
 		menu->addChild(paramTooltipItem);
 
 		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
-		allowCursorLockItem->text = "Allow cursor lock";
+		allowCursorLockItem->text = "Lock cursor when dragging parameters";
 		allowCursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
 		menu->addChild(allowCursorLockItem);
 
