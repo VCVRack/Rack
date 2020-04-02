@@ -76,7 +76,7 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 			}
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_DELETE && (e.mods & RACK_MOD_MASK) == 0) {
+		if (e.key == GLFW_KEY_DELETE && (e.mods & RACK_MOD_MASK) == 0) {
 			if (cursor == selection) {
 				text.erase(cursor, 1);
 				event::Change eChange;
@@ -91,7 +91,7 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 			}
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_LEFT) {
+		if (e.key == GLFW_KEY_LEFT) {
 			if (e.mods & RACK_MOD_CTRL) {
 				while (--cursor > 0) {
 					if (text[cursor - 1] == ' ')
@@ -106,7 +106,7 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 			}
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_RIGHT) {
+		if (e.key == GLFW_KEY_RIGHT) {
 			if (e.mods & RACK_MOD_CTRL) {
 				while (++cursor < (int) text.size()) {
 					if (text[cursor] == ' ')
@@ -121,29 +121,29 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 			}
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == 0) {
+		if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == 0) {
 			selection = cursor = 0;
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+		if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
 			cursor = 0;
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_END && (e.mods & RACK_MOD_MASK) == 0) {
+		if (e.key == GLFW_KEY_END && (e.mods & RACK_MOD_MASK) == 0) {
 			selection = cursor = text.size();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_END && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+		if (e.key == GLFW_KEY_END && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
 			cursor = text.size();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_V && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			const char* newText = glfwGetClipboardString(APP->window->win);
 			if (newText)
 				insertText(newText);
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_X && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "x" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			if (cursor != selection) {
 				int begin = std::min(cursor, selection);
 				std::string selectedText = text.substr(begin, std::abs(selection - cursor));
@@ -152,7 +152,7 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 			}
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_C && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "c" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			if (cursor != selection) {
 				int begin = std::min(cursor, selection);
 				std::string selectedText = text.substr(begin, std::abs(selection - cursor));
@@ -160,11 +160,11 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 			}
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_A && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			selectAll();
 			e.consume(this);
 		}
-		else if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && (e.mods & RACK_MOD_MASK) == 0) {
+		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && (e.mods & RACK_MOD_MASK) == 0) {
 			if (multiline) {
 				insertText("\n");
 			}
@@ -175,10 +175,10 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 			e.consume(this);
 		}
 		// Consume all printable keys
-		else if ((GLFW_KEY_SPACE <= e.key && e.key <= GLFW_KEY_WORLD_2) || (GLFW_KEY_KP_0 <= e.key && e.key <= GLFW_KEY_KP_EQUAL)) {
+		if (e.keyName != "") {
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
+		if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
 			APP->event->setSelected(NULL);
 			e.consume(this);
 		}

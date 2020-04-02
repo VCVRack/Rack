@@ -108,23 +108,21 @@ void RackScrollWidget::onHoverKey(const event::HoverKey& e) {
 		arrowSpeed /= 4.0;
 
 	if (e.action == RACK_HELD) {
-		switch (e.key) {
-			case GLFW_KEY_LEFT: {
-				offset.x -= arrowSpeed;
-				e.consume(this);
-			} break;
-			case GLFW_KEY_RIGHT: {
-				offset.x += arrowSpeed;
-				e.consume(this);
-			} break;
-			case GLFW_KEY_UP: {
-				offset.y -= arrowSpeed;
-				e.consume(this);
-			} break;
-			case GLFW_KEY_DOWN: {
-				offset.y += arrowSpeed;
-				e.consume(this);
-			} break;
+		if (e.key == GLFW_KEY_LEFT) {
+			offset.x -= arrowSpeed;
+			e.consume(this);
+		}
+		if (e.key == GLFW_KEY_RIGHT) {
+			offset.x += arrowSpeed;
+			e.consume(this);
+		}
+		if (e.key == GLFW_KEY_UP) {
+			offset.y -= arrowSpeed;
+			e.consume(this);
+		}
+		if (e.key == GLFW_KEY_DOWN) {
+			offset.y += arrowSpeed;
+			e.consume(this);
 		}
 	}
 }

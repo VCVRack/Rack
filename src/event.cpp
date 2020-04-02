@@ -303,6 +303,9 @@ bool State::handleKey(math::Vec pos, int key, int scancode, int action, int mods
 		eSelectKey.context = &cSelectKey;
 		eSelectKey.key = key;
 		eSelectKey.scancode = scancode;
+		const char* keyName = glfwGetKeyName(key, scancode);
+		if (keyName)
+			eSelectKey.keyName = keyName;
 		eSelectKey.action = action;
 		eSelectKey.mods = mods;
 		selectedWidget->onSelectKey(eSelectKey);
@@ -317,6 +320,9 @@ bool State::handleKey(math::Vec pos, int key, int scancode, int action, int mods
 	eHoverKey.pos = pos;
 	eHoverKey.key = key;
 	eHoverKey.scancode = scancode;
+	const char* keyName = glfwGetKeyName(key, scancode);
+	if (keyName)
+		eHoverKey.keyName = keyName;
 	eHoverKey.action = action;
 	eHoverKey.mods = mods;
 	rootWidget->onHoverKey(eHoverKey);

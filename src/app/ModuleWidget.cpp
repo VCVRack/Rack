@@ -397,61 +397,40 @@ void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 		return;
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		switch (e.key) {
-			case GLFW_KEY_I: {
-				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					resetAction();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_R: {
-				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					randomizeAction();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_C: {
-				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					copyClipboard();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_V: {
-				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					pasteClipboardAction();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_D: {
-				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					cloneAction();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_U: {
-				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					disconnectAction();
-					e.consume(this);
-				}
-			} break;
-			case GLFW_KEY_E: {
-				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					bypassAction();
-					e.consume(this);
-				}
-			} break;
+		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			resetAction();
+			e.consume(this);
+		}
+		if (e.keyName == "r" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			randomizeAction();
+			e.consume(this);
+		}
+		if (e.keyName == "c" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			copyClipboard();
+			e.consume(this);
+		}
+		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			pasteClipboardAction();
+			e.consume(this);
+		}
+		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			cloneAction();
+			e.consume(this);
+		}
+		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			disconnectAction();
+			e.consume(this);
+		}
+		if (e.keyName == "e" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			bypassAction();
+			e.consume(this);
 		}
 	}
 
 	if (e.action == RACK_HELD) {
-		switch (e.key) {
-			case GLFW_KEY_DELETE:
-			case GLFW_KEY_BACKSPACE: {
-				if ((e.mods & RACK_MOD_MASK) == 0) {
-					removeAction();
-					e.consume(NULL);
-				}
-			} break;
+		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
+			removeAction();
+			e.consume(NULL);
 		}
 	}
 }

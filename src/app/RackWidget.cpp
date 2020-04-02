@@ -121,13 +121,9 @@ void RackWidget::onHoverKey(const event::HoverKey& e) {
 		return;
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		switch (e.key) {
-			case GLFW_KEY_V: {
-				if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-					pastePresetClipboardAction();
-					e.consume(this);
-				}
-			} break;
+		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			pastePresetClipboardAction();
+			e.consume(this);
 		}
 	}
 }

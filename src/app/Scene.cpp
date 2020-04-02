@@ -97,39 +97,40 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 		return;
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		if (e.key == GLFW_KEY_N && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
+		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			APP->patch->loadTemplateDialog();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_Q && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "q" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			APP->window->close();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_O && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			APP->patch->loadDialog();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_O && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
+		if (e.keyName == "o" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 			APP->patch->revertDialog();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_S && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			APP->patch->saveDialog();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_S && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
+		if (e.keyName == "s" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 			APP->patch->saveAsDialog();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_Z && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			APP->history->undo();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_Z && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
+		if (e.keyName == "z" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 			APP->history->redo();
 			e.consume(this);
 		}
-		else if ((e.key == GLFW_KEY_MINUS || e.key == GLFW_KEY_KP_SUBTRACT) && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if (e.keyName == "-" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			float zoom = settings::zoom;
 			zoom *= 2;
 			zoom = std::ceil(zoom - 0.01f) - 1;
@@ -137,7 +138,8 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 			settings::zoom = zoom;
 			e.consume(this);
 		}
-		else if ((e.key == GLFW_KEY_EQUAL || e.key == GLFW_KEY_KP_ADD) && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		// Numpad has a "+" key, but the main keyboard section hides it under "="
+		if ((e.keyName == "=" || e.keyName == "+") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			float zoom = settings::zoom;
 			zoom *= 2;
 			zoom = std::floor(zoom + 0.01f) + 1;
@@ -145,31 +147,31 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 			settings::zoom = zoom;
 			e.consume(this);
 		}
-		else if ((e.key == GLFW_KEY_0 || e.key == GLFW_KEY_KP_0) && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if ((e.keyName == "0") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			settings::zoom = 0.f;
 			e.consume(this);
 		}
-		else if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && (e.mods & RACK_MOD_MASK) == 0) {
+		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && (e.mods & RACK_MOD_MASK) == 0) {
 			moduleBrowser->show();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
+		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
 			std::thread t([] {
 				system::openBrowser("https://vcvrack.com/manual/");
 			});
 			t.detach();
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_F3 && (e.mods & RACK_MOD_MASK) == 0) {
+		if (e.key == GLFW_KEY_F3 && (e.mods & RACK_MOD_MASK) == 0) {
 			settings::cpuMeter ^= true;
 			e.consume(this);
 		}
-		else if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
+		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
 			APP->window->setFullScreen(!APP->window->isFullScreen());
 			e.consume(this);
 		}
 		// Alternate key command for exiting fullscreen, since F11 doesn't work reliably on Mac due to "Show desktop" OS binding.
-		else if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
+		if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
 			if (APP->window->isFullScreen())
 				APP->window->setFullScreen(false);
 			e.consume(this);

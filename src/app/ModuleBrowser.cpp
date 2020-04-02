@@ -623,19 +623,17 @@ inline void TagItem::step() {
 
 inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		switch (e.key) {
-			case GLFW_KEY_ESCAPE: {
-				BrowserOverlay* overlay = getAncestorOfType<BrowserOverlay>();
-				overlay->hide();
+		if (e.key == GLFW_KEY_ESCAPE) {
+			BrowserOverlay* overlay = getAncestorOfType<BrowserOverlay>();
+			overlay->hide();
+			e.consume(this);
+		}
+		if (e.key == GLFW_KEY_BACKSPACE) {
+			if (text == "") {
+				ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
+				browser->clear();
 				e.consume(this);
-			} break;
-			case GLFW_KEY_BACKSPACE: {
-				if (text == "") {
-					ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-					browser->clear();
-					e.consume(this);
-				}
-			} break;
+			}
 		}
 	}
 
