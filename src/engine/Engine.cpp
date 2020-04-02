@@ -559,6 +559,34 @@ int Engine::getStepFrames() {
 }
 
 
+size_t Engine::getNumModules() {
+	return internal->modules.size();
+}
+
+
+void Engine::getModuleIds(int* moduleIds, int len) {
+	SharedLock lock(internal->mutex);
+	int i = 0;
+	for (Module* m : internal->modules) {
+		if (i >= len)
+			break;
+		moduleIds[i] = m->id;
+		i++;
+	}
+}
+
+
+std::vector<int> Engine::getModuleIds() {
+	SharedLock lock(internal->mutex);
+	std::vector<int> moduleIds;
+	moduleIds.reserve(internal->modules.size());
+	for (Module* m : internal->modules) {
+		moduleIds.push_back(m->id);
+	}
+	return moduleIds;
+}
+
+
 void Engine::addModule(Module* module) {
 	ExclusiveSharedLock lock(internal->mutex);
 	assert(module);

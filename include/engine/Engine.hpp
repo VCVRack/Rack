@@ -58,6 +58,9 @@ struct Engine {
 	int getStepFrames();
 
 	// Modules
+	size_t getNumModules();
+	void getModuleIds(int* moduleIds, int len);
+	std::vector<int> getModuleIds();
 	/** Adds a module to the rack engine.
 	The module ID must not be taken by another module.
 	If the module ID is -1, an ID is automatically assigned.
