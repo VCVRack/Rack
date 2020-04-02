@@ -572,12 +572,12 @@ PortWidget* ModuleWidget::getOutput(int portId) {
 }
 
 json_t* ModuleWidget::toJson() {
-	json_t* moduleJ = module->toJson();
+	json_t* moduleJ = APP->engine->moduleToJson(module);
 	return moduleJ;
 }
 
 void ModuleWidget::fromJson(json_t* rootJ) {
-	module->fromJson(rootJ);
+	APP->engine->moduleFromJson(module, rootJ);
 }
 
 void ModuleWidget::copyClipboard() {
@@ -843,6 +843,7 @@ void ModuleWidget::cloneAction() {
 	engine::Module* clonedModule = model->createModule();
 	// JSON serialization is the obvious way to do this
 	json_t* moduleJ = toJson();
+	// This doesn't need a lock (via Engine::moduleFromJson()) because the Module is not added to the Engine yet.
 	clonedModule->fromJson(moduleJ);
 	json_decref(moduleJ);
 	// Reset ID so the Engine automatically assigns a new one

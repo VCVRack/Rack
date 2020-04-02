@@ -11,6 +11,13 @@ namespace rack {
 namespace engine {
 
 
+/** Manages Modules and Cables and steps them in time.
+
+All methods are thread-safe and can safely be called from anywhere.
+
+The methods clear, addModule, removeModule, moduleToJson, moduleFromJson, addCable, removeCable, addParamHandle, removeParamHandle, toJson, and fromJson cannot be run simultaneously with any other Engine method.
+Calling these methods inside any Engine method will result in a deadlock.
+*/
 struct Engine {
 	struct Internal;
 	Internal* internal;
@@ -18,6 +25,7 @@ struct Engine {
 	Engine();
 	~Engine();
 
+	/** Removes all modules and cables. */
 	void clear();
 	/** Advances the engine by `frames` frames.
 	Only call this method from the primary module.
@@ -26,6 +34,8 @@ struct Engine {
 	void setPrimaryModule(Module* module);
 	Module* getPrimaryModule();
 
+	/** Returns the sample rate used by the engine for stepping each module.
+	*/
 	float getSampleRate();
 	/** Returns the inverse of the current sample rate.
 	*/
@@ -37,11 +47,14 @@ struct Engine {
 	/** Returns the number of audio samples since the Engine's first sample.
 	*/
 	int64_t getFrame();
-	/** Returns the frame when step() was last called. */
+	/** Returns the frame when step() was last called.
+	*/
 	int64_t getStepFrame();
-	/** Returns the timestamp in nanoseconds when step() was last called. */
+	/** Returns the timestamp in nanoseconds when step() was last called.
+	*/
 	int64_t getStepTime();
-	/** Returns the total number of frames in the current step() call. */
+	/** Returns the total number of frames in the current step() call.
+	*/
 	int getStepFrames();
 
 	// Modules
@@ -56,6 +69,10 @@ struct Engine {
 	void resetModule(Module* module);
 	void randomizeModule(Module* module);
 	void bypassModule(Module* module, bool bypassed);
+	/** Serializes/deserializes with locking, ensuring that Module::process() is not called during toJson()/fromJson().
+	*/
+	json_t* moduleToJson(Module* module);
+	void moduleFromJson(Module* module, json_t* rootJ);
 
 	// Cables
 	/** Adds a cable to the rack engine.
@@ -70,17 +87,21 @@ struct Engine {
 	// Params
 	void setParam(Module* module, int paramId, float value);
 	float getParam(Module* module, int paramId);
-	/** Requests the parameter to smoothly change toward `value`. */
+	/** Requests the parameter to smoothly change toward `value`.
+	*/
 	void setSmoothParam(Module* module, int paramId, float value);
-	/** Returns the target value before smoothing. */
+	/** Returns the target value before smoothing.
+	*/
 	float getSmoothParam(Module* module, int paramId);
 
 	// ParamHandles
 	void addParamHandle(ParamHandle* paramHandle);
 	void removeParamHandle(ParamHandle* paramHandle);
-	/** Returns the unique ParamHandle for the given paramId */
+	/** Returns the unique ParamHandle for the given paramId
+	*/
 	ParamHandle* getParamHandle(int moduleId, int paramId);
-	/** Use getParamHandle(int, int) instead. */
+	/** Use getParamHandle(int, int) instead.
+	*/
 	DEPRECATED ParamHandle* getParamHandle(Module* module, int paramId);
 	/** Sets the ParamHandle IDs and module pointer.
 	If `overwrite` is true and another ParamHandle points to the same param, unsets that one and replaces it with the given handle.

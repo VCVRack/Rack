@@ -500,7 +500,7 @@ Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
 }
 
 
-engine::Module* moduleFromJson(json_t* moduleJ) {
+Model* modelFromJson(json_t* moduleJ) {
 	// Get slugs
 	json_t* pluginSlugJ = json_object_get(moduleJ, "plugin");
 	if (!pluginSlugJ)
@@ -518,12 +518,7 @@ engine::Module* moduleFromJson(json_t* moduleJ) {
 	Model* model = getModel(pluginSlug, modelSlug);
 	if (!model)
 		throw Exception(string::f("Could not find module \"%s\" of plugin \"%s\"", modelSlug.c_str(), pluginSlug.c_str()));
-
-	// Create Module
-	engine::Module* module = model->createModule();
-	assert(module);
-	module->fromJson(moduleJ);
-	return module;
+	return model;
 }
 
 

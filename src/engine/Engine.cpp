@@ -5,6 +5,7 @@
 #include <atomic>
 #include <tuple>
 #include <pmmintrin.h>
+#include <pthread.h>
 
 #include <engine/Engine.hpp>
 #include <settings.hpp>
@@ -27,6 +28,44 @@ static void initMXCSR() {
 	// Reset other flags
 	_MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
 }
+
+
+/** Allows multiple "reader" threads to obtain a lock simultaneously, but only one "writer" thread.
+This implementation is just a wrapper for pthreads.
+This is available in C++14 as std::shared_mutex, but unfortunately we're using C++11.
+*/
+struct SharedMutex {
+	pthread_rwlock_t rwlock;
+	SharedMutex() {
+		if (pthread_rwlock_init(&rwlock, NULL))
+			throw Exception("pthread_rwlock_init failed");
+	}
+	~SharedMutex() {
+		pthread_rwlock_destroy(&rwlock);
+	}
+};
+
+struct SharedLock {
+	SharedMutex& m;
+	SharedLock(SharedMutex& m) : m(m) {
+		if (pthread_rwlock_rdlock(&m.rwlock))
+			throw Exception("pthread_rwlock_rdlock failed");
+	}
+	~SharedLock() {
+		pthread_rwlock_unlock(&m.rwlock);
+	}
+};
+
+struct ExclusiveSharedLock {
+	SharedMutex& m;
+	ExclusiveSharedLock(SharedMutex& m) : m(m) {
+		if (pthread_rwlock_wrlock(&m.rwlock))
+			throw Exception("pthread_rwlock_wrlock failed");
+	}
+	~ExclusiveSharedLock() {
+		pthread_rwlock_unlock(&m.rwlock);
+	}
+};
 
 
 struct Barrier {
@@ -164,7 +203,7 @@ struct Engine::Internal {
 	int smoothParamId = 0;
 	float smoothValue = 0.f;
 
-	std::recursive_mutex mutex;
+	SharedMutex mutex;
 
 	int threadCount = 0;
 	std::vector<EngineWorker> workers;
@@ -408,7 +447,8 @@ Engine::~Engine() {
 
 
 void Engine::clear() {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	// TODO This needs a lock that doesn't interfere with removeParamHandle, removeCable, and removeModule.
+
 	// Copy lists because we'll be removing while iterating
 	std::set<ParamHandle*> paramHandles = internal->paramHandles;
 	for (ParamHandle* paramHandle : paramHandles) {
@@ -432,7 +472,7 @@ void Engine::clear() {
 
 
 void Engine::step(int frames) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	SharedLock lock(internal->mutex);
 	// Configure thread
 	initMXCSR();
 	random::init();
@@ -474,25 +514,22 @@ void Engine::step(int frames) {
 
 
 void Engine::setPrimaryModule(Module* module) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	SharedLock lock(internal->mutex);
 	internal->primaryModule = module;
 }
 
 
 Module* Engine::getPrimaryModule() {
-	// No lock, for performance
 	return internal->primaryModule;
 }
 
 
 float Engine::getSampleRate() {
-	// No lock, for performance
 	return internal->sampleRate;
 }
 
 
 float Engine::getSampleTime() {
-	// No lock, for performance
 	return internal->sampleTime;
 }
 
@@ -503,31 +540,27 @@ void Engine::yieldWorkers() {
 
 
 int64_t Engine::getFrame() {
-	// No lock, for performance
 	return internal->frame;
 }
 
 
 int64_t Engine::getStepFrame() {
-	// No lock, for performance
 	return internal->stepFrame;
 }
 
 
 int64_t Engine::getStepTime() {
-	// No lock, for performance
 	return internal->stepTime;
 }
 
 
 int Engine::getStepFrames() {
-	// No lock, for performance
 	return internal->stepFrames;
 }
 
 
 void Engine::addModule(Module* module) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	ExclusiveSharedLock lock(internal->mutex);
 	assert(module);
 	// Check that the module is not already added
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -557,12 +590,11 @@ void Engine::addModule(Module* module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = module;
 	}
-	// DEBUG("Added module %d to engine", module->id);
 }
 
 
 void Engine::removeModule(Module* module) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	ExclusiveSharedLock lock(internal->mutex);
 	assert(module);
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -600,13 +632,12 @@ void Engine::removeModule(Module* module) {
 		internal->primaryModule = NULL;
 	// Remove module
 	internal->modules.erase(it);
-	// DEBUG("Removed module %d to engine", module->id);
 }
 
 
 Module* Engine::getModule(int moduleId) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-	// Find module
+	SharedLock lock(internal->mutex);
+	// Find module by id
 	for (Module* module : internal->modules) {
 		if (module->id == moduleId)
 			return module;
@@ -616,7 +647,7 @@ Module* Engine::getModule(int moduleId) {
 
 
 void Engine::resetModule(Module* module) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	SharedLock lock(internal->mutex);
 	assert(module);
 
 	Module::ResetEvent eReset;
@@ -625,7 +656,7 @@ void Engine::resetModule(Module* module) {
 
 
 void Engine::randomizeModule(Module* module) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	SharedLock lock(internal->mutex);
 	assert(module);
 
 	Module::RandomizeEvent eRandomize;
@@ -634,7 +665,7 @@ void Engine::randomizeModule(Module* module) {
 
 
 void Engine::bypassModule(Module* module, bool bypassed) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	SharedLock lock(internal->mutex);
 	assert(module);
 	if (module->bypassed() == bypassed)
 		return;
@@ -653,6 +684,18 @@ void Engine::bypassModule(Module* module, bool bypassed) {
 		Module::UnBypassEvent eUnBypass;
 		module->onUnBypass(eUnBypass);
 	}
+}
+
+
+json_t* Engine::moduleToJson(Module* module) {
+	ExclusiveSharedLock lock(internal->mutex);
+	return module->toJson();
+}
+
+
+void Engine::moduleFromJson(Module* module, json_t* rootJ) {
+	ExclusiveSharedLock lock(internal->mutex);
+	module->fromJson(rootJ);
 }
 
 
@@ -704,7 +747,7 @@ static void Engine_updateConnected(Engine* that) {
 
 
 void Engine::addCable(Cable* cable) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	ExclusiveSharedLock lock(internal->mutex);
 	assert(cable);
 	// Check cable properties
 	assert(cable->inputModule);
@@ -754,12 +797,11 @@ void Engine::addCable(Cable* cable) {
 		e.portId = cable->outputId;
 		cable->outputModule->onPortChange(e);
 	}
-	// DEBUG("Added cable %d to engine", cable->id);
 }
 
 
 void Engine::removeCable(Cable* cable) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	ExclusiveSharedLock lock(internal->mutex);
 	assert(cable);
 	// Check that the cable is already added
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
@@ -790,13 +832,12 @@ void Engine::removeCable(Cable* cable) {
 		e.portId = cable->outputId;
 		cable->outputModule->onPortChange(e);
 	}
-	// DEBUG("Removed cable %d to engine", cable->id);
 }
 
 
 Cable* Engine::getCable(int cableId) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-	// Find Cable
+	SharedLock lock(internal->mutex);
+	// Find cable by id
 	for (Cable* cable : internal->cables) {
 		if (cable->id == cableId)
 			return cable;
@@ -806,7 +847,7 @@ Cable* Engine::getCable(int cableId) {
 
 
 void Engine::setParam(Module* module, int paramId, float value) {
-	// No lock, for performance
+	SharedLock lock(internal->mutex);
 	// If param is being smoothed, cancel smoothing.
 	if (internal->smoothModule == module && internal->smoothParamId == paramId) {
 		internal->smoothModule = NULL;
@@ -817,13 +858,13 @@ void Engine::setParam(Module* module, int paramId, float value) {
 
 
 float Engine::getParam(Module* module, int paramId) {
-	// No lock, for performance
+	SharedLock lock(internal->mutex);
 	return module->params[paramId].value;
 }
 
 
 void Engine::setSmoothParam(Module* module, int paramId, float value) {
-	// No lock, for performance
+	SharedLock lock(internal->mutex);
 	// If another param is being smoothed, jump value
 	if (internal->smoothModule && !(internal->smoothModule == module && internal->smoothParamId == paramId)) {
 		internal->smoothModule->params[internal->smoothParamId].value = internal->smoothValue;
@@ -836,10 +877,10 @@ void Engine::setSmoothParam(Module* module, int paramId, float value) {
 
 
 float Engine::getSmoothParam(Module* module, int paramId) {
-	// No lock, for performance
+	SharedLock lock(internal->mutex);
 	if (internal->smoothModule == module && internal->smoothParamId == paramId)
 		return internal->smoothValue;
-	return getParam(module, paramId);
+	return module->params[paramId].value;
 }
 
 
@@ -856,8 +897,7 @@ static void Engine_refreshParamHandleCache(Engine* that) {
 
 
 void Engine::addParamHandle(ParamHandle* paramHandle) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-
+	ExclusiveSharedLock lock(internal->mutex);
 	// New ParamHandles must be blank.
 	// This means we don't have to refresh the cache.
 	assert(paramHandle->moduleId < 0);
@@ -872,8 +912,7 @@ void Engine::addParamHandle(ParamHandle* paramHandle) {
 
 
 void Engine::removeParamHandle(ParamHandle* paramHandle) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-
+	ExclusiveSharedLock lock(internal->mutex);
 	// Check that the ParamHandle is already added
 	auto it = internal->paramHandles.find(paramHandle);
 	assert(it != internal->paramHandles.end());
@@ -886,7 +925,7 @@ void Engine::removeParamHandle(ParamHandle* paramHandle) {
 
 
 ParamHandle* Engine::getParamHandle(int moduleId, int paramId) {
-	// No lock, for performance
+	SharedLock lock(internal->mutex);
 	auto it = internal->paramHandleCache.find(std::make_tuple(moduleId, paramId));
 	if (it == internal->paramHandleCache.end())
 		return NULL;
@@ -895,14 +934,12 @@ ParamHandle* Engine::getParamHandle(int moduleId, int paramId) {
 
 
 ParamHandle* Engine::getParamHandle(Module* module, int paramId) {
-	// No lock, for performance
 	return getParamHandle(module->id, paramId);
 }
 
 
 void Engine::updateParamHandle(ParamHandle* paramHandle, int moduleId, int paramId, bool overwrite) {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-
+	SharedLock lock(internal->mutex);
 	// Check that it exists
 	auto it = internal->paramHandles.find(paramHandle);
 	assert(it != internal->paramHandles.end());
@@ -940,7 +977,7 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int moduleId, int param
 
 
 json_t* Engine::toJson() {
-	std::lock_guard<std::recursive_mutex> lock(internal->mutex);
+	ExclusiveSharedLock lock(internal->mutex);
 	json_t* rootJ = json_object();
 
 	// modules
@@ -966,9 +1003,10 @@ json_t* Engine::toJson() {
 
 
 void Engine::fromJson(json_t* rootJ) {
-	// Don't lock here because Module::fromJson for example might deadlock, and we actually don't really need thread safety other than the addModule() and addCable() calls, which are already behind locks.
-	// std::lock_guard<std::recursive_mutex> lock(internal->mutex);
-
+	// We can't lock here because addModule() and addCable() are called inside.
+	// Also, AudioInterface::fromJson() might call Engine::step() due to RtAudio drivers.
+	// ExclusiveSharedLock lock(internal->mutex);
+	clear();
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)
@@ -977,13 +1015,18 @@ void Engine::fromJson(json_t* rootJ) {
 	json_t* moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
 		try {
-			Module* module = plugin::moduleFromJson(moduleJ);
+			plugin::Model* model = plugin::modelFromJson(moduleJ);
+			Module* module = model->createModule();
+			assert(module);
+			// This doesn't need a lock because the Module is not added to the Engine yet.
+			module->fromJson(moduleJ);
 
 			// Before 1.0, the module ID was the index in the "modules" array
 			if (APP->patch->isLegacy(2)) {
 				module->id = moduleIndex;
 			}
 
+			// This method locks
 			addModule(module);
 		}
 		catch (Exception& e) {
@@ -1005,6 +1048,7 @@ void Engine::fromJson(json_t* rootJ) {
 		Cable* cable = new Cable;
 		try {
 			cable->fromJson(cableJ);
+			// This method locks
 			addCable(cable);
 		}
 		catch (Exception& e) {
