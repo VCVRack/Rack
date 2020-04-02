@@ -52,7 +52,7 @@ static const int levelColors[] = {
 	31
 };
 
-static void logVa(Level level, const char* filename, int line, const char* format, va_list args) {
+static void logVa(Level level, const char* filename, int line, const char* func, const char* format, va_list args) {
 	std::lock_guard<std::mutex> lock(logMutex);
 	if (!outputFile)
 		return;
@@ -61,7 +61,7 @@ static void logVa(Level level, const char* filename, int line, const char* forma
 	double duration = (nowTime - startTime) / 1e9;
 	if (outputFile == stderr)
 		std::fprintf(outputFile, "\x1B[%dm", levelColors[level]);
-	std::fprintf(outputFile, "[%.03f %s %s:%d] ", duration, levelLabels[level], filename, line);
+	std::fprintf(outputFile, "[%.03f %s %s:%d %s] ", duration, levelLabels[level], filename, line, func);
 	if (outputFile == stderr)
 		std::fprintf(outputFile, "\x1B[0m");
 	std::vfprintf(outputFile, format, args);
@@ -69,10 +69,10 @@ static void logVa(Level level, const char* filename, int line, const char* forma
 	std::fflush(outputFile);
 }
 
-void log(Level level, const char* filename, int line, const char* format, ...) {
+void log(Level level, const char* filename, int line, const char* func, const char* format, ...) {
 	va_list args;
 	va_start(args, format);
-	logVa(level, filename, line, format, args);
+	logVa(level, filename, line, func, format, args);
 	va_end(args);
 }
 
