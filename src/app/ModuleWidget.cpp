@@ -552,6 +552,8 @@ PortWidget* ModuleWidget::getOutput(int portId) {
 
 json_t* ModuleWidget::toJson() {
 	json_t* moduleJ = APP->engine->moduleToJson(module);
+	// When serializing ModuleWidget, don't include the ID. This ID is only meaningful when serializing the entire rack.
+	json_object_del(moduleJ, "id");
 	return moduleJ;
 }
 
