@@ -107,7 +107,7 @@ $(jansson): jansson-2.12
 	$(MAKE) -C jansson-2.12 install
 
 openssl-1.1.1d:
-	$(WGET) "https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
+	$(WGET) "https://www.openssl.org/source/old/1.1.1/openssl-1.1.1d.tar.gz"
 	$(SHA256) openssl-1.1.1d.tar.gz 1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2
 	$(UNTAR) openssl-1.1.1d.tar.gz
 	rm openssl-1.1.1d.tar.gz
