@@ -12,6 +12,7 @@
 
 namespace rack {
 
+static const int VIRTUAL_PORT_ID = INT_MAX;
 
 struct RtMidiInputDevice : midi::InputDevice {
 	RtMidiIn* rtMidiIn;
@@ -21,7 +22,11 @@ struct RtMidiInputDevice : midi::InputDevice {
 		assert(rtMidiIn);
 		rtMidiIn->ignoreTypes(false, false, false);
 		rtMidiIn->setCallback(midiInputCallback, this);
-		rtMidiIn->openPort(deviceId, "VCV Rack input");
+		if (deviceId == VIRTUAL_PORT_ID) {
+			rtMidiIn->openVirtualPort("VCV Rack input");
+		} else {
+			rtMidiIn->openPort(deviceId, "VCV Rack input");
+		}
 	}
 
 	~RtMidiInputDevice() {
@@ -59,7 +64,11 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	RtMidiOutputDevice(int driverId, int deviceId) {
 		rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
 		assert(rtMidiOut);
-		rtMidiOut->openPort(deviceId, "VCV Rack output");
+		if (deviceId == VIRTUAL_PORT_ID) {
+			rtMidiOut->openVirtualPort("VCV Rack output");
+		} else {
+			rtMidiOut->openPort(deviceId, "VCV Rack output");
+		}
 	}
 
 	~RtMidiOutputDevice() {
@@ -105,24 +114,33 @@ struct RtMidiDriver : midi::Driver {
 			default: return "";
 		}
 	}
+
+	bool supportsVirtualPorts() {
+		return driverId == RtMidi::MACOSX_CORE || driverId == RtMidi::LINUX_ALSA || driverId == RtMidi::UNIX_JACK;
+	}
+
 	std::vector<int> getInputDeviceIds() override {
 		// TODO The IDs unfortunately jump around in RtMidi. Is there a way to keep them constant when a MIDI device is added/removed?
 		int count = rtMidiIn->getPortCount();
 		std::vector<int> deviceIds;
+		if (supportsVirtualPorts())
+			deviceIds.push_back(VIRTUAL_PORT_ID);
 		for (int i = 0; i < count; i++)
 			deviceIds.push_back(i);
 		return deviceIds;
 	}
 
 	std::string getInputDeviceName(int deviceId) override {
-		if (deviceId >= 0) {
+		if (deviceId == VIRTUAL_PORT_ID) {
+			return "(Virtual port)";
+		} else if (deviceId >= 0) {
 			return rtMidiIn->getPortName(deviceId);
 		}
 		return "";
 	}
 
 	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
-		if (!(0 <= deviceId && deviceId < (int) rtMidiIn->getPortCount()))
+		if (!(0 <= deviceId && deviceId < (int) rtMidiIn->getPortCount()) && !(supportsVirtualPorts() && deviceId == VIRTUAL_PORT_ID))
 			return NULL;
 		RtMidiInputDevice* device = inputDevices[deviceId];
 		if (!device) {
@@ -150,20 +168,24 @@ struct RtMidiDriver : midi::Driver {
 	std::vector<int> getOutputDeviceIds() override {
 		int count = rtMidiOut->getPortCount();
 		std::vector<int> deviceIds;
+		if (supportsVirtualPorts())
+			deviceIds.push_back(VIRTUAL_PORT_ID);
 		for (int i = 0; i < count; i++)
 			deviceIds.push_back(i);
 		return deviceIds;
 	}
 
 	std::string getOutputDeviceName(int deviceId) override {
-		if (deviceId >= 0) {
+		if (deviceId == VIRTUAL_PORT_ID) {
+			return "(Virtual port)";
+		} else if (deviceId >= 0) {
 			return rtMidiOut->getPortName(deviceId);
 		}
 		return "";
 	}
 
 	midi::OutputDevice* subscribeOutput(int deviceId, midi::Output* output) override {
-		if (!(0 <= deviceId && deviceId < (int) rtMidiOut->getPortCount()))
+		if (!(0 <= deviceId && deviceId < (int) rtMidiOut->getPortCount()) && !(supportsVirtualPorts() && deviceId == VIRTUAL_PORT_ID))
 			return NULL;
 		RtMidiOutputDevice* device = outputDevices[deviceId];
 		if (!device) {
