@@ -515,6 +515,13 @@ void Engine::step(int frames) {
 
 void Engine::setPrimaryModule(Module* module) {
 	SharedLock lock(internal->mutex);
+	// Don't allow module to be set if not added to the Engine.
+	// NULL will unset the primary module.
+	if (module) {
+		auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
+		if (it == internal->modules.end())
+			return;
+	}
 	internal->primaryModule = module;
 }
 
@@ -1032,7 +1039,7 @@ json_t* Engine::toJson() {
 
 void Engine::fromJson(json_t* rootJ) {
 	// We can't lock here because addModule() and addCable() are called inside.
-	// Also, AudioInterface::fromJson() might call Engine::step() due to RtAudio drivers.
+	// Also, AudioInterface::fromJson() can open the audio device, which can call Engine::step() before this method exits.
 	// ExclusiveSharedLock lock(internal->mutex);
 	clear();
 	// modules
@@ -1054,7 +1061,7 @@ void Engine::fromJson(json_t* rootJ) {
 				module->id = moduleIndex;
 			}
 
-			// This method locks
+			// This method exclusively locks
 			addModule(module);
 		}
 		catch (Exception& e) {
@@ -1076,7 +1083,7 @@ void Engine::fromJson(json_t* rootJ) {
 		Cable* cable = new Cable;
 		try {
 			cable->fromJson(cableJ);
-			// This method locks
+			// This method exclusively locks
 			addCable(cable);
 		}
 		catch (Exception& e) {
