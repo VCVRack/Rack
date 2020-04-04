@@ -1,6 +1,6 @@
 # VCV Rack Licenses
 
-All VCV Rack **source code** is copyright © 2019 Andrew Belt and licensed under the [GNU General Public License v3.0](LICENSE-GPLv3.txt) with the "VCV Rack Non-Commercial Plugin License Exception", allowed under section 7 of GPLv3, and a commercial licensing option.
+All VCV Rack **source code** is copyright © 2016-2020 Andrew Belt and licensed under the [GNU General Public License v3.0](LICENSE-GPLv3.txt) with the "VCV Rack Non-Commercial Plugin License Exception", allowed under section 7 of GPLv3, and a commercial licensing option.
 
 >#### VCV Rack Non-Commercial Plugin License Exception
 >
