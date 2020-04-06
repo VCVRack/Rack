@@ -39,6 +39,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Use MIDI timestamps in MIDI-CV, MIDI-CC, MIDI-Gate, and MIDI-Map to improve overall timing and drastically reduce clock jitter.
 	- Add red clip lights to VCV Audio-8/16 when signal reaches beyond ±10V.
 	- Reset notes in MIDI-CV and MIDI-Gate if an "all notes off" MIDI message is received.
+	- Allow disabling smoothing for MIDI-CV (pitch and mod wheel), MIDI-CC, and MIDI-Map.
 - API
 	- Add `Module::configInput()` and `Module::configOutput()` for adding names to ports.
 	- Replace `ParamWidget::paramQuantity` with `ParamWidget::getParamQuantity()`.

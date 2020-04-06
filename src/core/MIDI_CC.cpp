@@ -31,6 +31,7 @@ struct MIDI_CC : Module {
 	int learnedCcs[16];
 	/** [cell][channel] */
 	dsp::ExponentialFilter valueFilters[16][16];
+	bool smooth;
 	bool mpeMode;
 	bool lsbEnabled;
 
@@ -63,6 +64,7 @@ struct MIDI_CC : Module {
 			learnedCcs[i] = i;
 		}
 		midiInput.reset();
+		smooth = true;
 		mpeMode = false;
 		lsbEnabled = false;
 	}
@@ -88,22 +90,22 @@ struct MIDI_CC : Module {
 			int cc = learnedCcs[i];
 
 			for (int c = 0; c < channels; c++) {
-				int16_t cellValue = ccValues[cc][c] * 128;
+				int16_t cellValue = int16_t(ccValues[cc][c]) * 128;
 				if (lsbEnabled && cc < 32)
 					cellValue += ccValues[cc + 32][c];
-				// Maximum value for 14-bit CC should be MSB=127 LSB=0, not MSB=127 LSB=127.
-				float value = cellValue / float(128 * 127);
+				// Maximum value for 14-bit CC should be MSB=127 LSB=0, not MSB=127 LSB=127, because this is the maximum value that 7-bit controllers can send.
+				float value = float(cellValue) / (128 * 127);
 				// Support negative values because the gamepad MIDI driver generates nonstandard 8-bit CC values.
 				value = clamp(value, -1.f, 1.f);
 
 				// Detect behavior from MIDI buttons.
-				if (std::fabs(valueFilters[i][c].out - value) >= 1.f) {
-					// Jump value
-					valueFilters[i][c].out = value;
-				}
-				else {
+				if (smooth && std::fabs(valueFilters[i][c].out - value) < 1.f) {
 					// Smooth value with filter
 					valueFilters[i][c].process(args.sampleTime, value);
+				}
+				else {
+					// Jump value
+					valueFilters[i][c].out = value;
 				}
 				outputs[CC_OUTPUT + i].setVoltage(valueFilters[i][c].out * 10.f, c);
 			}
@@ -168,6 +170,7 @@ struct MIDI_CC : Module {
 
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 
+		json_object_set_new(rootJ, "smooth", json_boolean(smooth));
 		json_object_set_new(rootJ, "mpeMode", json_boolean(mpeMode));
 		json_object_set_new(rootJ, "lsbEnabled", json_boolean(lsbEnabled));
 		return rootJ;
@@ -196,6 +199,10 @@ struct MIDI_CC : Module {
 		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
 			midiInput.fromJson(midiJ);
+
+		json_t* smoothJ = json_object_get(rootJ, "smooth");
+		if (smoothJ)
+			smooth = json_boolean_value(smoothJ);
 
 		json_t* mpeModeJ = json_object_get(rootJ, "mpeMode");
 		if (mpeModeJ)
@@ -247,6 +254,19 @@ struct MIDI_CCWidget : ModuleWidget {
 		MIDI_CC* module = dynamic_cast<MIDI_CC*>(this->module);
 
 		menu->addChild(new MenuSeparator);
+
+		struct SmoothItem : MenuItem {
+			MIDI_CC* module;
+			void onAction(const event::Action& e) override {
+				module->smooth ^= true;
+			}
+		};
+
+		SmoothItem* smoothItem = new SmoothItem;
+		smoothItem->text = "Smooth CC";
+		smoothItem->rightText = CHECKMARK(module->smooth);
+		smoothItem->module = module;
+		menu->addChild(smoothItem);
 
 		struct MpeModeItem : MenuItem {
 			MIDI_CC* module;

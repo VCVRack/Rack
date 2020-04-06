@@ -24,6 +24,7 @@ struct MIDI_Map : Module {
 
 	midi::InputQueue midiInput;
 
+	bool smooth;
 	/** Number of maps */
 	int mapLen = 0;
 	/** The mapped CC number of each channel */
@@ -65,6 +66,7 @@ struct MIDI_Map : Module {
 	}
 
 	void onReset() override {
+		smooth = true;
 		learningId = -1;
 		learnedCc = false;
 		learnedParam = false;
@@ -116,13 +118,13 @@ struct MIDI_Map : Module {
 					continue;
 				float value = values[cc] / 127.f;
 				// Detect behavior from MIDI buttons.
-				if (std::fabs(valueFilters[id].out - value) >= 1.f) {
-					// Jump value
-					valueFilters[id].out = value;
-				}
-				else {
+				if (smooth && std::fabs(valueFilters[id].out - value) < 1.f) {
 					// Smooth value with filter
 					valueFilters[id].process(args.sampleTime * divider.getDivision(), value);
+				}
+				else {
+					// Jump value
+					valueFilters[id].out = value;
 				}
 				paramQuantity->setScaledValue(valueFilters[id].out);
 			}
@@ -153,6 +155,9 @@ struct MIDI_Map : Module {
 			updateMapLen();
 			refreshParamHandleText(learningId);
 		}
+		// Ignore negative values generated using the nonstandard 8-bit MIDI extension from the gamepad driver
+		if (values[cc] < 0)
+			return;
 		values[cc] = value;
 	}
 
@@ -250,13 +255,13 @@ struct MIDI_Map : Module {
 		}
 		json_object_set_new(rootJ, "maps", mapsJ);
 
+		json_object_set_new(rootJ, "smooth", json_boolean(smooth));
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
 		return rootJ;
 	}
 
 	void dataFromJson(json_t* rootJ) override {
 		clearMaps();
-
 		json_t* mapsJ = json_object_get(rootJ, "maps");
 		if (mapsJ) {
 			json_t* mapJ;
@@ -276,6 +281,10 @@ struct MIDI_Map : Module {
 		}
 
 		updateMapLen();
+
+		json_t* smoothJ = json_object_get(rootJ, "smooth");
+		if (smoothJ)
+			smooth = json_boolean_value(smoothJ);
 
 		json_t* midiJ = json_object_get(rootJ, "midi");
 		if (midiJ)
@@ -481,6 +490,25 @@ struct MIDI_MapWidget : ModuleWidget {
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
+	}
+
+	void appendContextMenu(Menu* menu) override {
+		MIDI_Map* module = dynamic_cast<MIDI_Map*>(this->module);
+
+		menu->addChild(new MenuSeparator);
+
+		struct SmoothItem : MenuItem {
+			MIDI_Map* module;
+			void onAction(const event::Action& e) override {
+				module->smooth ^= true;
+			}
+		};
+
+		SmoothItem* smoothItem = new SmoothItem;
+		smoothItem->text = "Smooth CC";
+		smoothItem->rightText = CHECKMARK(module->smooth);
+		smoothItem->module = module;
+		menu->addChild(smoothItem);
 	}
 };
 
