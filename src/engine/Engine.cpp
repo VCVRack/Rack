@@ -185,7 +185,13 @@ struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
 	std::set<ParamHandle*> paramHandles;
-	std::map<std::tuple<int, int>, ParamHandle*> paramHandleCache;
+
+	// moduleId
+	std::map<int, Module*> modulesCache;
+	// cableId
+	std::map<int, Cable*> cablesCache;
+	// (moduleId, paramId)
+	std::map<std::tuple<int, int>, ParamHandle*> paramHandlesCache;
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
@@ -195,6 +201,7 @@ struct Engine::Internal {
 	int stepFrames = 0;
 	Module* primaryModule = NULL;
 
+	// For generating new IDs for added objects
 	int nextModuleId = 0;
 	int nextCableId = 0;
 
@@ -212,6 +219,59 @@ struct Engine::Internal {
 	std::atomic<int> workerModuleIndex;
 	Context* context;
 };
+
+
+static void Engine_updateExpander(Engine* that, Module::Expander* expander) {
+	if (expander->moduleId >= 0) {
+		if (!expander->module || expander->module->id != expander->moduleId) {
+			expander->module = that->getModule(expander->moduleId);
+		}
+	}
+	else {
+		if (expander->module) {
+			expander->module = NULL;
+		}
+	}
+}
+
+
+static void Engine_relaunchWorkers(Engine* that, int threadCount) {
+	Engine::Internal* internal = that->internal;
+	if (threadCount == internal->threadCount)
+		return;
+
+	if (internal->threadCount > 0) {
+		// Stop engine workers
+		for (EngineWorker& worker : internal->workers) {
+			worker.requestStop();
+		}
+		internal->engineBarrier.wait();
+
+		// Join and destroy engine workers
+		for (EngineWorker& worker : internal->workers) {
+			worker.join();
+		}
+		internal->workers.resize(0);
+	}
+
+	// Configure engine
+	internal->threadCount = threadCount;
+
+	// Set barrier counts
+	internal->engineBarrier.total = threadCount;
+	internal->workerBarrier.total = threadCount;
+
+	if (threadCount > 0) {
+		// Create and start engine workers
+		internal->workers.resize(threadCount - 1);
+		for (int id = 1; id < threadCount; id++) {
+			EngineWorker& worker = internal->workers[id - 1];
+			worker.id = id;
+			worker.engine = that;
+			worker.start();
+		}
+	}
+}
 
 
 static void Port_step(Port* that, float deltaTime) {
@@ -371,52 +431,60 @@ static void Engine_stepModules(Engine* that) {
 }
 
 
-static void Engine_updateExpander(Engine* that, Module::Expander* expander) {
-	if (expander->moduleId >= 0) {
-		if (!expander->module || expander->module->id != expander->moduleId) {
-			expander->module = that->getModule(expander->moduleId);
-		}
-	}
-	else {
-		if (expander->module) {
-			expander->module = NULL;
-		}
+static void Port_setDisconnected(Port* that) {
+	that->channels = 0;
+	for (int c = 0; c < PORT_MAX_CHANNELS; c++) {
+		that->voltages[c] = 0.f;
 	}
 }
 
 
-static void Engine_relaunchWorkers(Engine* that, int threadCount) {
-	Engine::Internal* internal = that->internal;
+static void Port_setConnected(Port* that) {
+	if (that->channels > 0)
+		return;
+	that->channels = 1;
+}
 
-	if (internal->threadCount > 0) {
-		// Stop engine workers
-		for (EngineWorker& worker : internal->workers) {
-			worker.requestStop();
-		}
-		internal->engineBarrier.wait();
 
-		// Join and destroy engine workers
-		for (EngineWorker& worker : internal->workers) {
-			worker.join();
+static void Engine_updateConnected(Engine* that) {
+	// Find disconnected ports
+	std::set<Port*> disconnectedPorts;
+	for (Module* module : that->internal->modules) {
+		for (Input& input : module->inputs) {
+			disconnectedPorts.insert(&input);
 		}
-		internal->workers.resize(0);
+		for (Output& output : module->outputs) {
+			disconnectedPorts.insert(&output);
+		}
 	}
+	for (Cable* cable : that->internal->cables) {
+		// Connect input
+		Input& input = cable->inputModule->inputs[cable->inputId];
+		auto inputIt = disconnectedPorts.find(&input);
+		if (inputIt != disconnectedPorts.end())
+			disconnectedPorts.erase(inputIt);
+		Port_setConnected(&input);
+		// Connect output
+		Output& output = cable->outputModule->outputs[cable->outputId];
+		auto outputIt = disconnectedPorts.find(&output);
+		if (outputIt != disconnectedPorts.end())
+			disconnectedPorts.erase(outputIt);
+		Port_setConnected(&output);
+	}
+	// Disconnect ports that have no cable
+	for (Port* port : disconnectedPorts) {
+		Port_setDisconnected(port);
+	}
+}
 
-	// Configure engine
-	internal->threadCount = threadCount;
 
-	// Set barrier counts
-	internal->engineBarrier.total = threadCount;
-	internal->workerBarrier.total = threadCount;
-
-	if (threadCount > 0) {
-		// Create and start engine workers
-		internal->workers.resize(threadCount - 1);
-		for (int id = 1; id < threadCount; id++) {
-			EngineWorker& worker = internal->workers[id - 1];
-			worker.id = id;
-			worker.engine = that;
-			worker.start();
+static void Engine_refreshParamHandleCache(Engine* that) {
+	// Clear cache
+	that->internal->paramHandlesCache.clear();
+	// Add active ParamHandles to cache
+	for (ParamHandle* paramHandle : that->internal->paramHandles) {
+		if (paramHandle->moduleId >= 0) {
+			that->internal->paramHandlesCache[std::make_tuple(paramHandle->moduleId, paramHandle->paramId)] = paramHandle;
 		}
 	}
 }
@@ -440,7 +508,10 @@ Engine::~Engine() {
 	assert(internal->cables.empty());
 	assert(internal->modules.empty());
 	assert(internal->paramHandles.empty());
-	assert(internal->paramHandleCache.empty());
+
+	assert(internal->modulesCache.empty());
+	assert(internal->cablesCache.empty());
+	assert(internal->paramHandlesCache.empty());
 
 	delete internal;
 }
@@ -484,7 +555,7 @@ void Engine::step(int frames) {
 	// Set sample rate
 	if (internal->sampleRate != settings::sampleRate) {
 		internal->sampleRate = settings::sampleRate;
-		internal->sampleTime = 1 / internal->sampleRate;
+		internal->sampleTime = 1.f / internal->sampleRate;
 		Module::SampleRateChangeEvent e;
 		e.sampleRate = internal->sampleRate;
 		e.sampleTime = internal->sampleTime;
@@ -493,16 +564,14 @@ void Engine::step(int frames) {
 		}
 	}
 
-	// Launch workers
-	if (internal->threadCount != settings::threadCount) {
-		Engine_relaunchWorkers(this, settings::threadCount);
-	}
-
 	// Update expander pointers
 	for (Module* module : internal->modules) {
 		Engine_updateExpander(this, &module->leftExpander);
 		Engine_updateExpander(this, &module->rightExpander);
 	}
+
+	// Launch workers
+	Engine_relaunchWorkers(this, settings::threadCount);
 
 	// Step modules
 	for (int i = 0; i < frames; i++) {
@@ -608,15 +677,16 @@ void Engine::addModule(Module* module) {
 	else {
 		// Manual ID
 		// Check that the ID is not already taken
-		for (Module* m : internal->modules) {
-			assert(module->id != m->id);
-		}
+		auto it = internal->modulesCache.find(module->id);
+		assert(it == internal->modulesCache.end());
+		// If ID is higher than engine's next assigned ID, enlarge it.
 		if (module->id >= internal->nextModuleId) {
 			internal->nextModuleId = module->id + 1;
 		}
 	}
 	// Add module
 	internal->modules.push_back(module);
+	internal->modulesCache[module->id] = module;
 	// Trigger Add event
 	Module::AddEvent eAdd;
 	module->onAdd(eAdd);
@@ -666,23 +736,22 @@ void Engine::removeModule(Module* module) {
 	if (internal->primaryModule == module)
 		internal->primaryModule = NULL;
 	// Remove module
+	internal->modulesCache.erase(module->id);
 	internal->modules.erase(it);
 }
 
 
 Module* Engine::getModule(int moduleId) {
 	SharedLock lock(internal->mutex);
-	// Find module by id
-	for (Module* module : internal->modules) {
-		if (module->id == moduleId)
-			return module;
-	}
-	return NULL;
+	auto it = internal->modulesCache.find(moduleId);
+	if (it == internal->modulesCache.end())
+		return NULL;
+	return it->second;
 }
 
 
 void Engine::resetModule(Module* module) {
-	SharedLock lock(internal->mutex);
+	ExclusiveSharedLock lock(internal->mutex);
 	assert(module);
 
 	Module::ResetEvent eReset;
@@ -691,7 +760,7 @@ void Engine::resetModule(Module* module) {
 
 
 void Engine::randomizeModule(Module* module) {
-	SharedLock lock(internal->mutex);
+	ExclusiveSharedLock lock(internal->mutex);
 	assert(module);
 
 	Module::RandomizeEvent eRandomize;
@@ -700,8 +769,9 @@ void Engine::randomizeModule(Module* module) {
 
 
 void Engine::bypassModule(Module* module, bool bypassed) {
-	SharedLock lock(internal->mutex);
+	ExclusiveSharedLock lock(internal->mutex);
 	assert(module);
+
 	if (module->bypassed() == bypassed)
 		return;
 	// Clear outputs and set to 1 channel
@@ -709,6 +779,7 @@ void Engine::bypassModule(Module* module, bool bypassed) {
 		// This zeros all voltages, but the channel is set to 1 if connected
 		output.setChannels(0);
 	}
+	// Set bypassed
 	module->bypassed() = bypassed;
 	// Trigger event
 	if (bypassed) {
@@ -731,53 +802,6 @@ json_t* Engine::moduleToJson(Module* module) {
 void Engine::moduleFromJson(Module* module, json_t* rootJ) {
 	ExclusiveSharedLock lock(internal->mutex);
 	module->fromJson(rootJ);
-}
-
-
-static void Port_setDisconnected(Port* that) {
-	that->channels = 0;
-	for (int c = 0; c < PORT_MAX_CHANNELS; c++) {
-		that->voltages[c] = 0.f;
-	}
-}
-
-
-static void Port_setConnected(Port* that) {
-	if (that->channels > 0)
-		return;
-	that->channels = 1;
-}
-
-
-static void Engine_updateConnected(Engine* that) {
-	// Find disconnected ports
-	std::set<Port*> disconnectedPorts;
-	for (Module* module : that->internal->modules) {
-		for (Input& input : module->inputs) {
-			disconnectedPorts.insert(&input);
-		}
-		for (Output& output : module->outputs) {
-			disconnectedPorts.insert(&output);
-		}
-	}
-	for (Cable* cable : that->internal->cables) {
-		// Connect input
-		Input& input = cable->inputModule->inputs[cable->inputId];
-		auto inputIt = disconnectedPorts.find(&input);
-		if (inputIt != disconnectedPorts.end())
-			disconnectedPorts.erase(inputIt);
-		Port_setConnected(&input);
-		// Connect output
-		Output& output = cable->outputModule->outputs[cable->outputId];
-		auto outputIt = disconnectedPorts.find(&output);
-		if (outputIt != disconnectedPorts.end())
-			disconnectedPorts.erase(outputIt);
-		Port_setConnected(&output);
-	}
-	// Disconnect ports that have no cable
-	for (Port* port : disconnectedPorts) {
-		Port_setDisconnected(port);
-	}
 }
 
 
@@ -815,6 +839,7 @@ void Engine::addCable(Cable* cable) {
 	}
 	// Add the cable
 	internal->cables.push_back(cable);
+	internal->cablesCache[cable->id] = cable;
 	Engine_updateConnected(this);
 	// Trigger input port event
 	{
@@ -842,6 +867,7 @@ void Engine::removeCable(Cable* cable) {
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
 	assert(it != internal->cables.end());
 	// Remove the cable
+	internal->cablesCache.erase(cable->id);
 	internal->cables.erase(it);
 	Engine_updateConnected(this);
 	bool outputIsConnected = false;
@@ -872,17 +898,14 @@ void Engine::removeCable(Cable* cable) {
 
 Cable* Engine::getCable(int cableId) {
 	SharedLock lock(internal->mutex);
-	// Find cable by id
-	for (Cable* cable : internal->cables) {
-		if (cable->id == cableId)
-			return cable;
-	}
-	return NULL;
+	auto it = internal->cablesCache.find(cableId);
+	if (it == internal->cablesCache.end())
+		return NULL;
+	return it->second;
 }
 
 
 void Engine::setParam(Module* module, int paramId, float value) {
-	SharedLock lock(internal->mutex);
 	// If param is being smoothed, cancel smoothing.
 	if (internal->smoothModule == module && internal->smoothParamId == paramId) {
 		internal->smoothModule = NULL;
@@ -893,13 +916,11 @@ void Engine::setParam(Module* module, int paramId, float value) {
 
 
 float Engine::getParam(Module* module, int paramId) {
-	SharedLock lock(internal->mutex);
 	return module->params[paramId].value;
 }
 
 
 void Engine::setSmoothParam(Module* module, int paramId, float value) {
-	SharedLock lock(internal->mutex);
 	// If another param is being smoothed, jump value
 	if (internal->smoothModule && !(internal->smoothModule == module && internal->smoothParamId == paramId)) {
 		internal->smoothModule->params[internal->smoothParamId].value = internal->smoothValue;
@@ -912,22 +933,9 @@ void Engine::setSmoothParam(Module* module, int paramId, float value) {
 
 
 float Engine::getSmoothParam(Module* module, int paramId) {
-	SharedLock lock(internal->mutex);
 	if (internal->smoothModule == module && internal->smoothParamId == paramId)
 		return internal->smoothValue;
 	return module->params[paramId].value;
-}
-
-
-static void Engine_refreshParamHandleCache(Engine* that) {
-	// Clear cache
-	that->internal->paramHandleCache.clear();
-	// Add active ParamHandles to cache
-	for (ParamHandle* paramHandle : that->internal->paramHandles) {
-		if (paramHandle->moduleId >= 0) {
-			that->internal->paramHandleCache[std::make_tuple(paramHandle->moduleId, paramHandle->paramId)] = paramHandle;
-		}
-	}
 }
 
 
@@ -943,6 +951,7 @@ void Engine::addParamHandle(ParamHandle* paramHandle) {
 
 	// Add it
 	internal->paramHandles.insert(paramHandle);
+	// No need to refresh the cache because the moduleId is not set.
 }
 
 
@@ -961,8 +970,8 @@ void Engine::removeParamHandle(ParamHandle* paramHandle) {
 
 ParamHandle* Engine::getParamHandle(int moduleId, int paramId) {
 	SharedLock lock(internal->mutex);
-	auto it = internal->paramHandleCache.find(std::make_tuple(moduleId, paramId));
-	if (it == internal->paramHandleCache.end())
+	auto it = internal->paramHandlesCache.find(std::make_tuple(moduleId, paramId));
+	if (it == internal->paramHandlesCache.end())
 		return NULL;
 	return it->second;
 }

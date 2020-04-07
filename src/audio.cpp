@@ -87,8 +87,8 @@ void Device::onCloseStream() {
 ////////////////////
 
 Port::Port() {
-	reset();
 	context = contextGet();
+	reset();
 }
 
 Port::~Port() {

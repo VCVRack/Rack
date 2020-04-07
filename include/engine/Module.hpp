@@ -303,8 +303,9 @@ struct Module {
 	/** DEPRECATED. Override `onSampleRateChange(e)` instead. */
 	virtual void onSampleRateChange() {}
 
-	// private
+	/** private */
 	float& cpuTime();
+	/** private */
 	bool& bypassed();
 };
 
