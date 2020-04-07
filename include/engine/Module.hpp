@@ -134,6 +134,12 @@ struct Module {
 		return sq;
 	}
 
+	template <class TSwitchQuantity = SwitchQuantity>
+	TSwitchQuantity* configButton(int paramId, std::string name = "") {
+		TSwitchQuantity* sq = configParam<TSwitchQuantity>(paramId, 0.f, 1.f, 0.f, name);
+		return sq;
+	}
+
 	/** Helper for creating a PortInfo for an input port and setting its properties.
 	See PortInfo for documentation of arguments.
 	*/

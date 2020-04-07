@@ -40,10 +40,11 @@ void Quantity::setDisplayValueString(std::string s) {
 std::string Quantity::getString() {
 	std::string s;
 	std::string label = getLabel();
-	if (!label.empty())
-		s += label + ": ";
-	s += getDisplayValueString();
-	s += getUnit();
+	std::string valueString = getDisplayValueString() + getUnit();
+	s += label;
+	if (label != "" && valueString != "")
+		s += ": ";
+	s += valueString;
 	return s;
 }
 
