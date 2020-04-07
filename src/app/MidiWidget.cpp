@@ -1,4 +1,5 @@
 #include <app/MidiWidget.hpp>
+#include <ui/MenuSeparator.hpp>
 #include <helpers.hpp>
 
 
@@ -197,13 +198,26 @@ void MidiWidget::setMidiPort(midi::Port* port) {
 
 
 void appendMidiMenu(ui::Menu* menu, midi::Port* port) {
-	MidiDriverItem* driverItem = createMenuItem<MidiDriverItem>("MIDI driver", RIGHT_ARROW);
-	driverItem->port = port;
-	menu->addChild(driverItem);
+	menu->addChild(createMenuLabel("MIDI driver"));
+	appendMidiDriverMenu(menu, port);
 
-	MidiDeviceItem* deviceItem = createMenuItem<MidiDeviceItem>("MIDI device", RIGHT_ARROW);
-	deviceItem->port = port;
-	menu->addChild(deviceItem);
+	menu->addChild(new ui::MenuSeparator);
+	menu->addChild(createMenuLabel("MIDI device"));
+	appendMidiDeviceMenu(menu, port);
+
+	menu->addChild(new ui::MenuSeparator);
+	// menu->addChild(createMenuLabel("MIDI channel"));
+	// appendMidiChannelMenu(menu, port);
+
+	// Uncomment this to use sub-menus instead of one big menu.
+
+	// MidiDriverItem* driverItem = createMenuItem<MidiDriverItem>("MIDI driver", RIGHT_ARROW);
+	// driverItem->port = port;
+	// menu->addChild(driverItem);
+
+	// MidiDeviceItem* deviceItem = createMenuItem<MidiDeviceItem>("MIDI device", RIGHT_ARROW);
+	// deviceItem->port = port;
+	// menu->addChild(deviceItem);
 
 	MidiChannelItem* channelItem = createMenuItem<MidiChannelItem>("MIDI channel", RIGHT_ARROW);
 	channelItem->port = port;
