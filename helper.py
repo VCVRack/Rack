@@ -182,6 +182,7 @@ def create_manifest(slug, plugin_dir="."):
 	# Dump JSON
 	with open(manifest_filename, "w") as f:
 		json.dump(manifest, f, indent="  ")
+	print("")
 	print(f"Manifest written to {manifest_filename}")
 
 
@@ -226,8 +227,6 @@ def create_module(slug, panel_filename=None, source_filename=None):
 		if not os.path.exists(panel_filename):
 			raise UserException(f"Panel not found at {panel_filename}.")
 
-		print(f"Panel found at {panel_filename}. Generating source file.")
-
 		if os.path.exists(source_filename):
 			if input_default(f"{source_filename} already exists. Overwrite?", "n").lower() != "y":
 				return
@@ -236,7 +235,6 @@ def create_module(slug, panel_filename=None, source_filename=None):
 		tree = xml.etree.ElementTree.parse(panel_filename)
 
 		components = panel_to_components(tree)
-		print(f"Components extracted from {panel_filename}")
 
 		# Write source
 		source = components_to_source(components, slug)
@@ -251,9 +249,13 @@ def create_module(slug, panel_filename=None, source_filename=None):
 		# Tell user to add model to plugin.hpp and plugin.cpp
 		print(f"""
 To enable the module, add
-extern Model* model{identifier};
+
+	extern Model* model{identifier};
+
 to plugin.hpp, and add
-p->addModel(model{identifier});
+
+	p->addModel(model{identifier});
+
 to the init() function in plugin.cpp.""")
 
 
@@ -336,7 +338,7 @@ def panel_to_components(tree):
 	components['lights'] = sorted(components['lights'], key=top_left_sort)
 	components['widgets'] = sorted(components['widgets'], key=top_left_sort)
 
-	print(f"Found {len(components['params'])} params, {len(components['inputs'])} inputs, {len(components['outputs'])} outputs, {len(components['lights'])} lights, and {len(components['widgets'])} custom widgets.")
+	print(f"Found {len(components['params'])} params, {len(components['inputs'])} inputs, {len(components['outputs'])} outputs, {len(components['lights'])} lights, and {len(components['widgets'])} custom widgets in \"components\" layer.")
 	return components
 
 
