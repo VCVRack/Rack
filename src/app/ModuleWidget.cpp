@@ -62,10 +62,17 @@ struct ModuleInfoItem : ui::MenuItem {
 			menu->addChild(tagLabel);
 		}
 
+		if (model->plugin->pluginUrl != "") {
+			ModuleUrlItem* websiteItem = new ModuleUrlItem;
+			websiteItem->text = "Plugin website";
+			websiteItem->url = model->plugin->pluginUrl;
+			menu->addChild(websiteItem);
+		}
+
 		if (model->plugin->author != "") {
 			if (model->plugin->authorUrl != "") {
 				ModuleUrlItem* authorItem = new ModuleUrlItem;
-				authorItem->text = model->plugin->author;
+				authorItem->text = model->plugin->author + " website";
 				authorItem->url = model->plugin->authorUrl;
 				menu->addChild(authorItem);
 			}
@@ -88,13 +95,6 @@ struct ModuleInfoItem : ui::MenuItem {
 			manualItem->text = "Plugin manual";
 			manualItem->url = model->plugin->manualUrl;
 			menu->addChild(manualItem);
-		}
-
-		if (model->plugin->pluginUrl != "") {
-			ModuleUrlItem* websiteItem = new ModuleUrlItem;
-			websiteItem->text = "Plugin website";
-			websiteItem->url = model->plugin->pluginUrl;
-			menu->addChild(websiteItem);
 		}
 
 		if (model->plugin->sourceUrl != "") {
