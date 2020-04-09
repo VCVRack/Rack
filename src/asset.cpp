@@ -33,7 +33,9 @@ static void initSystemDir() {
 		return;
 
 	if (settings::devMode) {
-		systemDir = ".";
+		char buf[4096] = ".";
+		getcwd(buf, sizeof(buf));
+		systemDir = buf;
 		return;
 	}
 
@@ -69,8 +71,10 @@ static void initSystemDir() {
 	systemDir = string::fromWstring(moduleBufW);
 #endif
 #if defined ARCH_LIN
-	// Users should launch Rack from their terminal in the system directory
-	systemDir = ".";
+	// Use the current working directory as the default path on Linux.
+	char buf[4096] = ".";
+	getcwd(buf, sizeof(buf));
+	systemDir = buf;
 #endif
 }
 
@@ -80,7 +84,7 @@ static void initUserDir() {
 		return;
 
 	if (settings::devMode) {
-		userDir = ".";
+		userDir = systemDir;
 		return;
 	}
 

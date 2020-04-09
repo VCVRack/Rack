@@ -55,8 +55,7 @@ static void* loadLibrary(std::string libraryPath) {
 		}
 	#else
 		// Plugin uses -rpath=. so change working directory so it can find libRack.
-		char cwd[PATH_MAX];
-		cwd[0] = '\0';
+		char cwd[PATH_MAX] = "";
 		getcwd(cwd, sizeof(cwd));
 		chdir(asset::systemDir.c_str());
 		// And then change it back
@@ -113,7 +112,8 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 static Plugin* loadPlugin(std::string path) {
 	Plugin* plugin = new Plugin;
 	try {
-		plugin->path = path;
+		// Set plugin path
+		plugin->path = (path == "") ? asset::systemDir : path;
 
 		// Get modified timestamp
 		if (path != "") {
@@ -167,7 +167,7 @@ static Plugin* loadPlugin(std::string path) {
 			throw Exception(string::f("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str()));
 		}
 
-		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), path.c_str());
+		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), plugin->path.c_str());
 		plugins.push_back(plugin);
 	}
 	catch (Exception& e) {
