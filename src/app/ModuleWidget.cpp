@@ -1,4 +1,5 @@
 #include <thread>
+#include <regex>
 
 #include <osdialog.h>
 
@@ -243,8 +244,13 @@ struct ModulePresetItem : ui::MenuItem {
 					continue;
 				hasPresets = true;
 
+				std::string presetName = string::filenameBase(presetFilename);
+				// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
+				std::regex r("^\\d*_");
+				presetName = std::regex_replace(presetName, r, "");
+
 				ModulePresetPathItem* presetItem = new ModulePresetPathItem;
-				presetItem->text = string::filenameBase(presetFilename);
+				presetItem->text = presetName;
 				presetItem->presetPath = presetPath;
 				presetItem->moduleWidget = moduleWidget;
 				menu->addChild(presetItem);
