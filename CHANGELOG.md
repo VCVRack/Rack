@@ -32,6 +32,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add Escape key command for existing fullscreen, in case F11 doesn't work.
 - Allow RtAudio device block size to be as low as 16.
 - Copy cable color when cloning cables with Ctrl+click.
+- Fix key commands on AZERTY, Dvorak, and all other keyboard layouts.
+
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
 	- Add MPE mode to MIDI-CC and MIDI-Gate.
@@ -40,6 +42,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add red clip lights to VCV Audio-8/16 when signal reaches beyond ±10V.
 	- Reset notes in MIDI-CV and MIDI-Gate if an "all notes off" MIDI message is received.
 	- Allow disabling smoothing for MIDI-CV (pitch and mod wheel), MIDI-CC, and MIDI-Map.
+	- Add several module presets for many Core modules.
+
 - API
 	- Add `Module::configInput()` and `Module::configOutput()` for adding names to ports.
 	- Replace `ParamWidget::paramQuantity` with `ParamWidget::getParamQuantity()`.
@@ -47,7 +51,11 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add `appendAudioMenu()` and `appendMidiMenu()` so plugin developers can develop custom audio/MIDI interfaces without adding an `AudioWidget/MidiWidget` to their panel.
 	- Make `Module::toJson()` and `fromJson()` virtual.
 	- Add `Module::paramsToJson()` and `paramsFromJson()` virtual methods.
-	- Add `SwitchQuantity` and a helper method `Module::configSwitch()` for displaying named values in the parameter context menu.
+	- Add `SwitchQuantity` and a helper method `Module::configSwitch()` for displaying named values in the parameter context menu. Also add `Module::configButton()` recommended for momentary switches with no value labels.
+	- Overhaul Engine threading model to allow as many Engine methods to be called simultaneously as possible, while ensuring that Module events are mutually exclusive to module processing.
+	- Add `Engine::getNumModules()` and `Engine::getModuleIds()`.
+	- Add `event::KeyBase::keyName`. Plugins should use this instead of `key` for alphanumeric keys in order to support all keyboard layouts.
+	- Improve thread safety of `dsp::RingBuffer`.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
