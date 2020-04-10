@@ -1,0 +1,25 @@
+{
+  "plugin": "Core",
+  "version": "2.0.0",
+  "model": "MIDITriggerToCVInterface",
+  "data": {
+    "notes": [
+      96,
+      97,
+      98,
+      99,
+      92,
+      93,
+      94,
+      95,
+      88,
+      89,
+      90,
+      91,
+      84,
+      85,
+      86,
+      87
+    ]
+  }
+}
