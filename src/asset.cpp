@@ -33,9 +33,7 @@ static void initSystemDir() {
 		return;
 
 	if (settings::devMode) {
-		char buf[4096] = ".";
-		getcwd(buf, sizeof(buf));
-		systemDir = buf;
+		systemDir = system::getWorkingDirectory();
 		return;
 	}
 
@@ -72,9 +70,7 @@ static void initSystemDir() {
 #endif
 #if defined ARCH_LIN
 	// Use the current working directory as the default path on Linux.
-	char buf[4096] = ".";
-	getcwd(buf, sizeof(buf));
-	systemDir = buf;
+	systemDir = system::getWorkingDirectory();
 #endif
 }
 

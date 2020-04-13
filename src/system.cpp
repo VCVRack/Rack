@@ -168,6 +168,28 @@ void removeDirectories(const std::string& path) {
 }
 
 
+std::string getWorkingDirectory() {
+#if defined ARCH_WIN
+	wchar_t buf[4096] = L"";
+	GetCurrentDirectory(sizeof(buf), buf);
+	return string::fromWstring(buf);
+#else
+	char buf[4096] = "";
+	getcwd(buf, sizeof(buf));
+	return buf;
+#endif
+}
+
+
+void setWorkingDirectory(const std::string& path) {
+#if defined ARCH_WIN
+	std::wstring pathW = string::toWstring(path);
+	SetCurrentDirectory(pathW.c_str());
+#else
+	chdir(path.c_str());
+#endif
+}
+
 int getLogicalCoreCount() {
 	return std::thread::hardware_concurrency();
 }

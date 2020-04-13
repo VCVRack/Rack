@@ -36,7 +36,11 @@ void createDirectories(const std::string& path);
 The directory must be empty. Fails silently.
 */
 void removeDirectory(const std::string& path);
+/** Deletes a directory if empty and all parent directories that are then empty.
+*/
 void removeDirectories(const std::string& path);
+std::string getWorkingDirectory();
+void setWorkingDirectory(const std::string& path);
 /** Returns the number of logical simultaneous multithreading (SMT) (e.g. Intel Hyperthreaded) threads on the CPU. */
 int getLogicalCoreCount();
 /** Sets a name of the current thread for debuggers and OS-specific process viewers. */

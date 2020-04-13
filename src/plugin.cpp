@@ -55,12 +55,11 @@ static void* loadLibrary(std::string libraryPath) {
 		}
 	#else
 		// Plugin uses -rpath=. so change working directory so it can find libRack.
-		char cwd[PATH_MAX] = "";
-		getcwd(cwd, sizeof(cwd));
-		chdir(asset::systemDir.c_str());
+		std::string cwd = system::getWorkingDirectory();
+		system::setWorkingDirectory(asset::systemDir);
 		// And then change it back
 		DEFER({
-			chdir(cwd);
+			system::setWorkingDirectory(cwd);
 		});
 		// Load library with dlopen
 		void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
