@@ -210,7 +210,15 @@ struct Engine::Internal {
 	int smoothParamId = 0;
 	float smoothValue = 0.f;
 
+	/** Engine mutex
+	Writers lock when mutating the engine's Modules, Cables, etc.
+	Readers lock when using the engine's Modules, Cables, etc.
+	*/
 	SharedMutex mutex;
+	/** Step mutex
+	step() locks to guarantee its exclusivity.
+	*/
+	std::mutex stepMutex;
 
 	int threadCount = 0;
 	std::vector<EngineWorker> workers;
@@ -380,27 +388,29 @@ static void Cable_step(Cable* that) {
 }
 
 
-static void Engine_stepModules(Engine* that) {
+/** Steps a single frame
+*/
+static void Engine_stepFrame(Engine* that) {
 	Engine::Internal* internal = that->internal;
 
 	// Param smoothing
 	Module* smoothModule = internal->smoothModule;
-	int smoothParamId = internal->smoothParamId;
-	float smoothValue = internal->smoothValue;
 	if (smoothModule) {
-		Param* param = &smoothModule->params[smoothParamId];
-		float value = param->value;
-		// Decay rate is 1 graphics frame
+		int smoothParamId = internal->smoothParamId;
+		float smoothValue = internal->smoothValue;
+		Param* smoothParam = &smoothModule->params[smoothParamId];
+		float value = smoothParam->value;
+		// Use decay rate of roughly 1 graphics frame
 		const float smoothLambda = 60.f;
 		float newValue = value + (smoothValue - value) * smoothLambda * internal->sampleTime;
 		if (value == newValue) {
 			// Snap to actual smooth value if the value doesn't change enough (due to the granularity of floats)
-			param->setValue(smoothValue);
+			smoothParam->setValue(smoothValue);
 			internal->smoothModule = NULL;
 			internal->smoothParamId = 0;
 		}
 		else {
-			param->value = newValue;
+			smoothParam->setValue(newValue);
 		}
 	}
 
@@ -543,6 +553,7 @@ void Engine::clear() {
 
 
 void Engine::step(int frames) {
+	std::lock_guard<std::mutex> stepLock(internal->stepMutex);
 	SharedLock lock(internal->mutex);
 	// Configure thread
 	initMXCSR();
@@ -573,9 +584,9 @@ void Engine::step(int frames) {
 	// Launch workers
 	Engine_relaunchWorkers(this, settings::threadCount);
 
-	// Step modules
+	// Step individual frames
 	for (int i = 0; i < frames; i++) {
-		Engine_stepModules(this);
+		Engine_stepFrame(this);
 	}
 
 	yieldWorkers();
@@ -620,6 +631,12 @@ int64_t Engine::getFrame() {
 }
 
 
+int64_t Engine::getFrameTime() {
+	double timeSinceStep = (internal->frame - internal->stepFrame) * internal->sampleTime;
+	return internal->stepTime + int64_t(timeSinceStep * 1e9);
+}
+
+
 int64_t Engine::getStepFrame() {
 	return internal->stepFrame;
 }
@@ -632,6 +649,12 @@ int64_t Engine::getStepTime() {
 
 int Engine::getStepFrames() {
 	return internal->stepFrames;
+}
+
+
+int64_t Engine::getStepDuration() {
+	double duration = internal->stepFrames * internal->sampleTime;
+	return int64_t(duration * 1e9);
 }
 
 

@@ -47,6 +47,10 @@ struct Engine {
 	/** Returns the number of audio samples since the Engine's first sample.
 	*/
 	int64_t getFrame();
+	/** Returns the estimated timestamp corresponding to the current frame, based on the timestamp of when step() was last called.
+	Calculated by `stepTime + framesSinceStep / sampleRate`.
+	*/
+	int64_t getFrameTime();
 	/** Returns the frame when step() was last called.
 	*/
 	int64_t getStepFrame();
@@ -56,6 +60,10 @@ struct Engine {
 	/** Returns the total number of frames in the current step() call.
 	*/
 	int getStepFrames();
+	/** Returns the total time that step() is advancing, in nanoseconds.
+	Calculated by `stepFrames / sampleRate`.
+	*/
+	int64_t getStepDuration();
 
 	// Modules
 	size_t getNumModules();
