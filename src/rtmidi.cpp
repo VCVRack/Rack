@@ -1,4 +1,9 @@
+#include <vector>
 #include <map>
+#include <queue>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #pragma GCC diagnostic push
 #ifndef __clang__
@@ -9,6 +14,7 @@
 
 #include <rtmidi.hpp>
 #include <midi.hpp>
+#include <system.hpp>
 
 
 namespace rack {
@@ -53,18 +59,34 @@ struct RtMidiInputDevice : midi::InputDevice {
 };
 
 
+/** Makes priority_queue prioritize by the earliest MIDI message. */
+static auto messageEarlier = [](const midi::Message& a, const midi::Message& b) {
+	return a.timestamp > b.timestamp;
+};
+
+
 struct RtMidiOutputDevice : midi::OutputDevice {
 	RtMidiOut* rtMidiOut;
 	std::string name;
 
-	RtMidiOutputDevice(int driverId, int deviceId) {
+	std::priority_queue<midi::Message, std::vector<midi::Message>, decltype(messageEarlier)> messageQueue;
+
+	std::thread thread;
+	std::mutex mutex;
+	std::condition_variable cv;
+	bool stopped = false;
+
+	RtMidiOutputDevice(int driverId, int deviceId) : messageQueue(messageEarlier) {
 		rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
 		assert(rtMidiOut);
 		name = rtMidiOut->getPortName(deviceId);
 		rtMidiOut->openPort(deviceId, "VCV Rack output");
+
+		start();
 	}
 
 	~RtMidiOutputDevice() {
+		stop();
 		rtMidiOut->closePort();
 		delete rtMidiOut;
 	}
@@ -74,8 +96,58 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	}
 
 	void sendMessage(const midi::Message &message) override {
-		std::vector<unsigned char> bytes(message.bytes.begin(), message.bytes.end());
-		rtMidiOut->sendMessage(&bytes);
+		// sendMessageNow(message);
+		std::lock_guard<decltype(mutex)> lock(mutex);
+		messageQueue.push(message);
+		cv.notify_one();
+	}
+
+	// Consumer thread methods
+
+	void start() {
+		thread = std::thread(&RtMidiOutputDevice::run, this);
+	}
+
+	void run() {
+		std::unique_lock<decltype(mutex)> lock(mutex);
+		while (!stopped) {
+			if (messageQueue.empty()) {
+				// No messages. Wait on the CV to be notified.
+				cv.wait(lock);
+			}
+			else {
+				// Get earliest message
+				const midi::Message& message = messageQueue.top();
+				int64_t duration = message.timestamp - system::getNanoseconds();
+
+				// If we need to wait, release the lock and wait for the timeout, or if the CV is notified.
+				// This correctly handles MIDI messages with no timestamp, because duration will be negative.
+				if ((duration > 0) && cv.wait_for(lock, std::chrono::nanoseconds(duration)) != std::cv_status::timeout)
+					continue;
+
+				// Send and remove from queue
+				sendMessageNow(message);
+				messageQueue.pop();
+			}
+		}
+	}
+
+	void sendMessageNow(const midi::Message &message) {
+		try {
+			rtMidiOut->sendMessage(message.bytes.data(), message.bytes.size());
+		}
+		catch (RtMidiError& e) {
+			// Ignore error
+		}
+	}
+
+	void stop() {
+		{
+			std::lock_guard<decltype(mutex)> lock(mutex);
+			stopped = true;
+			cv.notify_one();
+		}
+		thread.join();
 	}
 };
 
