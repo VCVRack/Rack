@@ -1,6 +1,10 @@
 # VCV Rack Licenses
 
-All VCV Rack **source code** is copyright © 2016-2020 Andrew Belt and licensed under the [GNU General Public License v3.0](LICENSE-GPLv3.txt) with the "VCV Rack Non-Commercial Plugin License Exception", allowed under section 7 of GPLv3, and a commercial licensing option.
+VCV Rack **source code** is copyright © 2016-2020 Andrew Belt.
+
+This program is free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html) as published by the [Free Software Foundation](https://www.fsf.org/), either version 3 of the License, or (at your option) any later version.
+
+In addition, you are granted the "VCV Rack Non-Commercial Plugin License Exception", allowed under section 7 of GPLv3, and a commercial licensing option.
 
 >#### VCV Rack Non-Commercial Plugin License Exception
 >
@@ -10,9 +14,9 @@ All VCV Rack **source code** is copyright © 2016-2020 Andrew Belt and licensed 
 >
 >Derived works of this software may keep or omit this Exception.
 
-This means that non-commercial plugins do not need to be licensed under the GPLv3 and can be released under any license of your choice (open-source or proprietary freeware). However, plugins that copy a significant portion of non-API source code from Rack must be licensed under GPLv3.
+This means that non-commercial plugins do not need to be licensed under the GPLv3 and can be released under any license of your choice (e.g. open-source or proprietary freeware). However, plugins that copy a significant portion of non-API source code from Rack must be licensed under GPLv3.
 
-If you wish to release a proprietary commercial plugin, email contact@vcvrack.com for commercial licensing. A commercial license is included for plugins sold in the [VCV Library](https://vcvrack.com/plugins.html).
+If you wish to release a proprietary commercial plugin, email contact@vcvrack.com for commercial licensing. A commercial license is included for plugins sold on the [VCV Library](https://library.vcvrack.com/).
 
 ---
 
