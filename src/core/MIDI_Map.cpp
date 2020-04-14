@@ -79,55 +79,54 @@ struct MIDI_Map : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		if (divider.process()) {
-			// Process MIDI messages only if they arrived `stepFrames` frames ago.
-			while (!midiInput.queue.empty()) {
-				midi::Message& msg = midiInput.queue.front();
-				int64_t msgTime = msg.timestamp + int64_t(APP->engine->getStepFrames() * APP->engine->getSampleTime() * 1e9);
-				int64_t frameTime = APP->engine->getStepTime() + int64_t((APP->engine->getFrame() - APP->engine->getStepFrame()) * APP->engine->getSampleTime() * 1e9);
-				if (msgTime > frameTime)
-					break;
-				processMessage(msg);
-				midiInput.queue.pop();
-			}
+		if (!divider.process())
+			return;
 
-			// Step channels
-			for (int id = 0; id < mapLen; id++) {
-				int cc = ccs[id];
-				if (cc < 0)
-					continue;
-				// Get Module
-				Module* module = paramHandles[id].module;
-				if (!module)
-					continue;
-				// Get ParamQuantity from ParamHandle
-				int paramId = paramHandles[id].paramId;
-				ParamQuantity* paramQuantity = module->paramQuantities[paramId];
-				if (!paramQuantity)
-					continue;
-				if (!paramQuantity->isBounded())
-					continue;
-				// Set filter from param value if filter is uninitialized
-				if (!filterInitialized[id]) {
-					valueFilters[id].out = paramQuantity->getScaledValue();
-					filterInitialized[id] = true;
-					continue;
-				}
-				// Check if CC has been set by the MIDI device
-				if (values[cc] < 0)
-					continue;
-				float value = values[cc] / 127.f;
-				// Detect behavior from MIDI buttons.
-				if (smooth && std::fabs(valueFilters[id].out - value) < 1.f) {
-					// Smooth value with filter
-					valueFilters[id].process(args.sampleTime * divider.getDivision(), value);
-				}
-				else {
-					// Jump value
-					valueFilters[id].out = value;
-				}
-				paramQuantity->setScaledValue(valueFilters[id].out);
+		while (!midiInput.queue.empty()) {
+			midi::Message& msg = midiInput.queue.front();
+			// Don't process MIDI message until its timestamp corresponds with the audio frame time when played back in the next block.
+			if (msg.timestamp + APP->engine->getStepDuration() > APP->engine->getFrameTime())
+				break;
+			processMessage(msg);
+			midiInput.queue.pop();
+		}
+
+		// Step channels
+		for (int id = 0; id < mapLen; id++) {
+			int cc = ccs[id];
+			if (cc < 0)
+				continue;
+			// Get Module
+			Module* module = paramHandles[id].module;
+			if (!module)
+				continue;
+			// Get ParamQuantity from ParamHandle
+			int paramId = paramHandles[id].paramId;
+			ParamQuantity* paramQuantity = module->paramQuantities[paramId];
+			if (!paramQuantity)
+				continue;
+			if (!paramQuantity->isBounded())
+				continue;
+			// Set filter from param value if filter is uninitialized
+			if (!filterInitialized[id]) {
+				valueFilters[id].out = paramQuantity->getScaledValue();
+				filterInitialized[id] = true;
+				continue;
 			}
+			// Check if CC has been set by the MIDI device
+			if (values[cc] < 0)
+				continue;
+			float value = values[cc] / 127.f;
+			// Detect behavior from MIDI buttons.
+			if (smooth && std::fabs(valueFilters[id].out - value) < 1.f) {
+				// Smooth value with filter
+				valueFilters[id].process(args.sampleTime * divider.getDivision(), value);
+			}
+			else {
+				// Jump value
+				valueFilters[id].out = value;
+			}
+			paramQuantity->setScaledValue(valueFilters[id].out);
 		}
 	}
 

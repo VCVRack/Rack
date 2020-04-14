@@ -64,12 +64,10 @@ struct MIDI_Gate : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		// Process MIDI messages only if they arrived `stepFrames` frames ago.
 		while (!midiInput.queue.empty()) {
 			midi::Message& msg = midiInput.queue.front();
-			int64_t msgTime = msg.timestamp + int64_t(APP->engine->getStepFrames() * APP->engine->getSampleTime() * 1e9);
-			int64_t frameTime = APP->engine->getStepTime() + int64_t((APP->engine->getFrame() - APP->engine->getStepFrame()) * APP->engine->getSampleTime() * 1e9);
-			if (msgTime > frameTime)
+			// Don't process MIDI message until its timestamp corresponds with the audio frame time when played back in the next block.
+			if (msg.timestamp + APP->engine->getStepDuration() > APP->engine->getFrameTime())
 				break;
 			processMessage(msg);
 			midiInput.queue.pop();
