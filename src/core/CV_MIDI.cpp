@@ -44,7 +44,7 @@ struct CV_MIDI : Module {
 	};
 
 	MidiOutput midiOutput;
-	float rateLimiterPhase = 0.f;
+	dsp::Timer rateLimiterTimer;
 
 	CV_MIDI() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -68,14 +68,15 @@ struct CV_MIDI : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		const float rateLimiterPeriod = 0.005f;
-		rateLimiterPhase += args.sampleTime / rateLimiterPeriod;
-		if (rateLimiterPhase >= 1.f) {
-			rateLimiterPhase -= 1.f;
-		}
-		else {
-			return;
-		}
+		// MIDI baud rate is 31250 b/s, or 3125 B/s.
+		// CC messages are 3 bytes, so we can send a maximum of 1041 CC messages per second.
+		// Since multiple CCs can be generated, play it safe and limit the CC rate to 200 Hz.
+		const float rateLimiterPeriod = 1 / 200.f;
+		bool rateLimiterTriggered = (rateLimiterTimer.process(args.sampleTime) >= rateLimiterPeriod);
+		if (rateLimiterTriggered)
+			rateLimiterTimer.time -= rateLimiterPeriod;
+
+		midiOutput.setTimestamp(APP->engine->getFrameTime());
 
 		for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
 			int vel = (int) std::round(inputs[VEL_INPUT].getNormalPolyVoltage(10.f * 100 / 127, c) / 10.f * 127);
