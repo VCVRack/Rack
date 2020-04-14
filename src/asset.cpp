@@ -116,7 +116,6 @@ void init() {
 	initSystemDir();
 	initUserDir();
 
-	system::createDirectory(systemDir);
 	system::createDirectory(userDir);
 
 	// Set paths

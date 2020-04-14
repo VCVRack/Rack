@@ -4,6 +4,7 @@
 #include <asset.hpp>
 #include <settings.hpp>
 #include <system.hpp>
+#include <unistd.h> // for dup2
 
 
 namespace rack {
@@ -17,6 +18,7 @@ static std::mutex logMutex;
 
 void init() {
 	startTime = system::getNanoseconds();
+	// Don't open a file in development mode.
 	if (settings::devMode) {
 		outputFile = stderr;
 		return;
@@ -27,6 +29,10 @@ void init() {
 	if (!outputFile) {
 		std::fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
 	}
+
+	// Redirect stdout and stderr to the file
+	dup2(fileno(outputFile), fileno(stdout));
+	dup2(fileno(outputFile), fileno(stderr));
 }
 
 void destroy() {
@@ -77,7 +83,7 @@ void log(Level level, const char* filename, int line, const char* func, const ch
 }
 
 static bool fileEndsWith(FILE* file, std::string str) {
-	// Seek to last 3 characters
+	// Seek to last `len` characters
 	size_t len = str.size();
 	std::fseek(file, -long(len), SEEK_END);
 	char actual[len];
