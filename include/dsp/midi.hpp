@@ -23,6 +23,7 @@ struct MidiGenerator {
 	bool start;
 	bool stop;
 	bool cont;
+	int64_t timestamp = -1;
 
 	MidiGenerator() {
 		reset();
@@ -55,6 +56,7 @@ struct MidiGenerator {
 			m.setStatus(0x8);
 			m.setNote(note);
 			m.setValue(0);
+			m.timestamp = timestamp;
 			onMessage(m);
 		}
 	}
@@ -74,6 +76,7 @@ struct MidiGenerator {
 			m.setStatus(0x8);
 			m.setNote(notes[c]);
 			m.setValue(vels[c]);
+			m.timestamp = timestamp;
 			onMessage(m);
 		}
 		if (changedNote || enabledGate) {
@@ -82,6 +85,7 @@ struct MidiGenerator {
 			m.setStatus(0x9);
 			m.setNote(note);
 			m.setValue(vels[c]);
+			m.timestamp = timestamp;
 			onMessage(m);
 		}
 		notes[c] = note;
@@ -97,6 +101,7 @@ struct MidiGenerator {
 		m.setStatus(0xa);
 		m.setNote(notes[c]);
 		m.setValue(val);
+		m.timestamp = timestamp;
 		onMessage(m);
 	}
 
@@ -109,6 +114,7 @@ struct MidiGenerator {
 		m.setSize(2);
 		m.setStatus(0xd);
 		m.setNote(val);
+		m.timestamp = timestamp;
 		onMessage(m);
 	}
 
@@ -121,6 +127,7 @@ struct MidiGenerator {
 		m.setStatus(0xb);
 		m.setNote(id);
 		m.setValue(cc);
+		m.timestamp = timestamp;
 		onMessage(m);
 	}
 
@@ -153,6 +160,7 @@ struct MidiGenerator {
 		m.setStatus(0xe);
 		m.setNote(pw & 0x7f);
 		m.setValue((pw >> 7) & 0x7f);
+		m.timestamp = timestamp;
 		onMessage(m);
 	}
 
@@ -166,6 +174,7 @@ struct MidiGenerator {
 			m.setSize(1);
 			m.setStatus(0xf);
 			m.setChannel(0x8);
+			m.timestamp = timestamp;
 			onMessage(m);
 		}
 	}
@@ -180,6 +189,7 @@ struct MidiGenerator {
 			m.setSize(1);
 			m.setStatus(0xf);
 			m.setChannel(0xa);
+			m.timestamp = timestamp;
 			onMessage(m);
 		}
 	}
@@ -194,6 +204,7 @@ struct MidiGenerator {
 			m.setSize(1);
 			m.setStatus(0xf);
 			m.setChannel(0xb);
+			m.timestamp = timestamp;
 			onMessage(m);
 		}
 	}
@@ -208,8 +219,13 @@ struct MidiGenerator {
 			m.setSize(1);
 			m.setStatus(0xf);
 			m.setChannel(0xc);
+			m.timestamp = timestamp;
 			onMessage(m);
 		}
+	}
+
+	void setTimestamp(int64_t timestamp) {
+		this->timestamp = timestamp;
 	}
 
 	virtual void onMessage(const midi::Message &message) {}
