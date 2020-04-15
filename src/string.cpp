@@ -12,14 +12,14 @@ namespace rack {
 namespace string {
 
 
-std::string fromWstring(const std::wstring& s) {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+std::string UTF16toUTF8(const std::u16string& s) {
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
 	return converter.to_bytes(s);
 }
 
 
-std::wstring toWstring(const std::string& s) {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+std::u16string UTF8toUTF16(const std::string& s) {
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
 	return converter.from_bytes(s);
 }
 
@@ -137,11 +137,11 @@ std::string absolutePath(const std::string& path) {
 	if (absPathC)
 		return absPathC;
 #elif defined ARCH_WIN
-	std::wstring pathW = toWstring(path);
-	wchar_t buf[PATH_MAX];
-	wchar_t* absPathC = _wfullpath(buf, pathW.c_str(), PATH_MAX);
+	std::u16string pathU16 = UTF8toUTF16(path);
+	char16_t buf[PATH_MAX];
+	char16_t* absPathC = _wfullpath(buf, pathU16.c_str(), PATH_MAX);
 	if (absPathC)
-		return fromWstring(absPathC);
+		return UTF16toUTF8(absPathC);
 #endif
 	return "";
 }

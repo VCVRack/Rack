@@ -130,8 +130,8 @@ void copyFile(const std::string& srcPath, const std::string& destPath) {
 
 void createDirectory(const std::string& path) {
 #if defined ARCH_WIN
-	std::wstring pathW = string::toWstring(path);
-	_wmkdir(pathW.c_str());
+	std::u16string pathU16 = string::UTF8toUTF16(path);
+	_wmkdir(pathU16.c_str());
 #else
 	mkdir(path.c_str(), 0755);
 #endif
@@ -150,8 +150,8 @@ void createDirectories(const std::string& path) {
 
 void removeDirectory(const std::string& path) {
 #if defined ARCH_WIN
-	std::wstring pathW = string::toWstring(path);
-	_wrmdir(pathW.c_str());
+	std::u16string pathU16 = string::UTF8toUTF16(path);
+	_wrmdir(pathU16.c_str());
 #else
 	rmdir(path.c_str());
 #endif
@@ -170,9 +170,9 @@ void removeDirectories(const std::string& path) {
 
 std::string getWorkingDirectory() {
 #if defined ARCH_WIN
-	wchar_t buf[4096] = L"";
+	char16_t buf[4096] = L"";
 	GetCurrentDirectory(sizeof(buf), buf);
-	return string::fromWstring(buf);
+	return string::UTF16toUTF8(buf);
 #else
 	char buf[4096] = "";
 	getcwd(buf, sizeof(buf));
@@ -183,8 +183,8 @@ std::string getWorkingDirectory() {
 
 void setWorkingDirectory(const std::string& path) {
 #if defined ARCH_WIN
-	std::wstring pathW = string::toWstring(path);
-	SetCurrentDirectory(pathW.c_str());
+	std::u16string pathU16 = string::UTF8toUTF16(path);
+	SetCurrentDirectory(pathU16.c_str());
 #else
 	chdir(path.c_str());
 #endif
@@ -301,7 +301,7 @@ void openBrowser(const std::string& url) {
 	std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	std::wstring urlW = string::toWstring(url);
+	std::u16string urlW = string::UTF8toUTF16(url);
 	ShellExecuteW(NULL, L"open", urlW.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
@@ -317,8 +317,8 @@ void openFolder(const std::string& path) {
 	std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	std::wstring pathW = string::toWstring(path);
-	ShellExecuteW(NULL, L"explore", pathW.c_str(), NULL, NULL, SW_SHOWDEFAULT);
+	std::u16string pathU16 = string::UTF8toUTF16(path);
+	ShellExecuteW(NULL, L"explore", pathU16.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
 
@@ -330,8 +330,8 @@ void runProcessDetached(const std::string& path) {
 	shExInfo.cbSize = sizeof(shExInfo);
 	shExInfo.lpVerb = L"runas";
 
-	std::wstring pathW = string::toWstring(path);
-	shExInfo.lpFile = pathW.c_str();
+	std::u16string pathU16 = string::UTF8toUTF16(path);
+	shExInfo.lpFile = pathU16.c_str();
 	shExInfo.nShow = SW_SHOW;
 
 	if (ShellExecuteExW(&shExInfo)) {

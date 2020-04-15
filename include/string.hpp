@@ -12,9 +12,9 @@ namespace rack {
 namespace string {
 
 
-/** Converts a UTF-16/32 string (depending on the size of wchar_t) to a UTF-8 string. */
-std::string fromWstring(const std::wstring& s);
-std::wstring toWstring(const std::string& s);
+/** Performs a Unicode string conversion from UTF-16 to UTF-8. */
+std::string UTF16toUTF8(const std::u16string& s);
+std::u16string UTF8toUTF16(const std::string& s);
 /** Converts a `printf()` format string and optional arguments into a std::string.
 Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string`s, otherwise you might get binary garbage.
 */
