@@ -93,21 +93,23 @@ struct CV_MIDI : Module {
 			midiOutput.setKeyPressure(aft, c);
 		}
 
-		int pw = (int) std::round((inputs[PW_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
-		pw = clamp(pw, 0, 0x3fff);
-		midiOutput.setPitchWheel(pw);
+		if (rateLimiterTriggered) {
+			int pw = (int) std::round((inputs[PW_INPUT].getVoltage() + 5.f) / 10.f * 0x4000);
+			pw = clamp(pw, 0, 0x3fff);
+			midiOutput.setPitchWheel(pw);
 
-		int mw = (int) std::round(inputs[MW_INPUT].getVoltage() / 10.f * 127);
-		mw = clamp(mw, 0, 127);
-		midiOutput.setModWheel(mw);
+			int mw = (int) std::round(inputs[MW_INPUT].getVoltage() / 10.f * 127);
+			mw = clamp(mw, 0, 127);
+			midiOutput.setModWheel(mw);
 
-		int vol = (int) std::round(inputs[VOL_INPUT].getNormalVoltage(10.f) / 10.f * 127);
-		vol = clamp(vol, 0, 127);
-		midiOutput.setVolume(vol);
+			int vol = (int) std::round(inputs[VOL_INPUT].getNormalVoltage(10.f) / 10.f * 127);
+			vol = clamp(vol, 0, 127);
+			midiOutput.setVolume(vol);
 
-		int pan = (int) std::round((inputs[PAN_INPUT].getVoltage() + 5.f) / 10.f * 127);
-		pan = clamp(pan, 0, 127);
-		midiOutput.setPan(pan);
+			int pan = (int) std::round((inputs[PAN_INPUT].getVoltage() + 5.f) / 10.f * 127);
+			pan = clamp(pan, 0, 127);
+			midiOutput.setPan(pan);
+		}
 
 		bool clk = inputs[CLK_INPUT].getVoltage() >= 1.f;
 		midiOutput.setClock(clk);

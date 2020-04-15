@@ -8,6 +8,7 @@ namespace core {
 struct GateMidiOutput : midi::Output {
 	int vels[128];
 	bool lastGates[128];
+	int64_t timestamp = -1;
 
 	GateMidiOutput() {
 		reset();
@@ -29,6 +30,7 @@ struct GateMidiOutput : midi::Output {
 			m.setStatus(0x8);
 			m.setNote(note);
 			m.setValue(0);
+			m.timestamp = timestamp;
 			sendMessage(m);
 			lastGates[note] = false;
 		}
@@ -45,6 +47,7 @@ struct GateMidiOutput : midi::Output {
 			m.setStatus(0x9);
 			m.setNote(note);
 			m.setValue(vels[note]);
+			m.timestamp = timestamp;
 			sendMessage(m);
 		}
 		else if (!gate && lastGates[note]) {
@@ -53,9 +56,14 @@ struct GateMidiOutput : midi::Output {
 			m.setStatus(0x8);
 			m.setNote(note);
 			m.setValue(vels[note]);
+			m.timestamp = timestamp;
 			sendMessage(m);
 		}
 		lastGates[note] = gate;
+	}
+
+	void setTimestamp(int64_t timestamp) {
+		this->timestamp = timestamp;
 	}
 };
 
@@ -99,6 +107,8 @@ struct CV_Gate : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
+		midiOutput.setTimestamp(APP->engine->getFrameTime());
+
 		for (int i = 0; i < 16; i++) {
 			int note = learnedNotes[i];
 			if (velocityMode) {

@@ -560,10 +560,8 @@ void Engine::step(int frames) {
 	random::init();
 
 	internal->stepFrame = internal->frame;
-	int64_t oldStepTime = internal->stepTime;
 	internal->stepTime = system::getNanoseconds();
 	internal->stepFrames = frames;
-	DEBUG("time %ld", internal->stepTime - oldStepTime);
 
 	// Set sample rate
 	if (internal->sampleRate != settings::sampleRate) {

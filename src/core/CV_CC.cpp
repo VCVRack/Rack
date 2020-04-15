@@ -7,6 +7,7 @@ namespace core {
 
 struct CCMidiOutput : midi::Output {
 	int lastValues[128];
+	int64_t timestamp = -1;
 
 	CCMidiOutput() {
 		reset();
@@ -28,7 +29,12 @@ struct CCMidiOutput : midi::Output {
 		m.setStatus(0xb);
 		m.setNote(cc);
 		m.setValue(value);
+		m.timestamp = timestamp;
 		sendMessage(m);
+	}
+
+	void setTimestamp(int64_t timestamp) {
+		this->timestamp = timestamp;
 	}
 };
 
@@ -49,7 +55,7 @@ struct CV_CC : Module {
 	};
 
 	CCMidiOutput midiOutput;
-	float rateLimiterPhase = 0.f;
+	dsp::Timer rateLimiterTimer;
 	int learningId = -1;
 	int learnedCcs[16] = {};
 
@@ -70,14 +76,14 @@ struct CV_CC : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		const float rateLimiterPeriod = 0.010f;
-		rateLimiterPhase += args.sampleTime / rateLimiterPeriod;
-		if (rateLimiterPhase >= 1.f) {
-			rateLimiterPhase -= 1.f;
-		}
-		else {
+		const float rateLimiterPeriod = 1 / 200.f;
+		bool rateLimiterTriggered = (rateLimiterTimer.process(args.sampleTime) >= rateLimiterPeriod);
+		if (rateLimiterTriggered)
+			rateLimiterTimer.time -= rateLimiterPeriod;
+		else
 			return;
-		}
+
+		midiOutput.setTimestamp(APP->engine->getFrameTime());
 
 		for (int i = 0; i < 16; i++) {
 			int value = (int) std::round(inputs[CC_INPUTS + i].getVoltage() / 10.f * 127);
