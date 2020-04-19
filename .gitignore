@@ -10,6 +10,8 @@
 /build
 /dist
 /patches
+/presets
+/licenses
 .DS_Store
 /autosave.vcv
 /settings.json
