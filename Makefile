@@ -17,13 +17,13 @@ SOURCES += $(wildcard dep/jpommier-pffft-*/pffft.c) $(wildcard dep/jpommier-pfff
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 ifdef ARCH_LIN
-	SOURCES += dep/osdialog/osdialog_gtk2.c
-build/dep/osdialog/osdialog_gtk2.c.o: FLAGS += $(shell pkg-config --cflags gtk+-2.0)
+	SOURCES += dep/osdialog/osdialog_gtk3.c
+build/dep/osdialog/osdialog_gtk3.c.o: FLAGS += $(shell pkg-config --cflags gtk+-3.0)
 
 	LDFLAGS += -rdynamic \
 		dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a \
 		-lpthread -lGL -ldl -lX11 -lasound -ljack \
-		$(shell pkg-config --libs gtk+-2.0)
+		$(shell pkg-config --libs gtk+-3.0)
 	TARGET := Rack
 endif
 
