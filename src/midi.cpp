@@ -28,17 +28,19 @@ void InputDevice::unsubscribe(Input* input) {
 }
 
 void InputDevice::onMessage(const Message &message) {
-	// Set timestamp if unset
+	// Set timestamp to now if unset
 	Message msg = message;
 	if (msg.timestamp < 0)
 		msg.timestamp = system::getNanoseconds();
 
 	for (Input* input : subscribed) {
+		// We're probably in the MIDI driver's thread, so set the Rack context.
 		contextSet(input->context);
-		// Filter channel
-		if (input->channel < 0 || msg.getStatus() == 0xf || msg.getChannel() == input->channel) {
-			input->onMessage(msg);
-		}
+		// Filter channel if message is not a system MIDI message
+		if (msg.getStatus() != 0xf && input->channel >= 0 && msg.getChannel() != input->channel)
+			continue;
+		// Pass message to Input port
+		input->onMessage(msg);
 	}
 }
 
@@ -223,9 +225,9 @@ void Output::sendMessage(const Message &message) {
 	if (!outputDevice)
 		return;
 
-	// Set channel
+	// Set channel if message is not a system MIDI message
 	Message msg = message;
-	if (msg.getStatus() != 0xf) {
+	if (msg.getStatus() != 0xf && channel >= 0) {
 		msg.setChannel(channel);
 	}
 	// DEBUG("sendMessage %02x %02x %02x", msg.cmd, msg.data1, msg.data2);

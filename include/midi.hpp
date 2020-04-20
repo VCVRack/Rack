@@ -144,10 +144,11 @@ struct OutputDevice : Device {
 ////////////////////
 
 struct Port {
-	/* For MIDI output, the channel to output messages.
-	For MIDI input, the channel to filter.
-	Set to -1 to allow all MIDI channels (for input).
-	Zero indexed.
+	/** For MIDI output, the channel to automatically set outbound messages.
+	If -1, the channel is not overwritten and must be set by MIDI generator.
+
+	For MIDI input, messages will be filtered by the channel.
+	If -1, all MIDI channels pass through.
 	*/
 	int channel = -1;
 
