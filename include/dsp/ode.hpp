@@ -46,9 +46,9 @@ void stepRK2(T t, T dt, T x[], int len, F f) {
 	f(t, x, k1);
 
 	for (int i = 0; i < len; i++) {
-		yi[i] = x[i] + k1[i] * dt / 2.f;
+		yi[i] = x[i] + k1[i] * dt / T(2);
 	}
-	f(t + dt / 2.f, yi, k2);
+	f(t + dt / T(2), yi, k2);
 
 	for (int i = 0; i < len; i++) {
 		x[i] += dt * k2[i];
@@ -67,14 +67,14 @@ void stepRK4(T t, T dt, T x[], int len, F f) {
 	f(t, x, k1);
 
 	for (int i = 0; i < len; i++) {
-		yi[i] = x[i] + k1[i] * dt / 2.f;
+		yi[i] = x[i] + k1[i] * dt / T(2);
 	}
-	f(t + dt / 2.f, yi, k2);
+	f(t + dt / T(2), yi, k2);
 
 	for (int i = 0; i < len; i++) {
-		yi[i] = x[i] + k2[i] * dt / 2.f;
+		yi[i] = x[i] + k2[i] * dt / T(2);
 	}
-	f(t + dt / 2.f, yi, k3);
+	f(t + dt / T(2), yi, k3);
 
 	for (int i = 0; i < len; i++) {
 		yi[i] = x[i] + k3[i] * dt;
@@ -82,7 +82,7 @@ void stepRK4(T t, T dt, T x[], int len, F f) {
 	f(t + dt, yi, k4);
 
 	for (int i = 0; i < len; i++) {
-		x[i] += dt * (k1[i] + 2.f * k2[i] + 2.f * k3[i] + k4[i]) / 6.f;
+		x[i] += dt * (k1[i] + T(2) * k2[i] + T(2) * k3[i] + k4[i]) / T(6);
 	}
 }
 
