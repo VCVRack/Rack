@@ -33,6 +33,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Allow RtAudio device block size to be as low as 16.
 - Copy cable color when cloning cables with Ctrl+click.
 - Fix key commands on AZERTY, Dvorak, and all other keyboard layouts.
+- Add Mouse device to Computer keyboard/mouse MIDI driver.
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.

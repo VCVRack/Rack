@@ -155,6 +155,12 @@ static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 	window->internal->lastMousePos = mousePos;
 
 	APP->event->handleHover(mousePos, mouseDelta);
+
+	// Keyboard/mouse MIDI driver
+	int width, height;
+	glfwGetWindowSize(win, &width, &height);
+	math::Vec scaledPos(xpos / width, ypos / height);
+	keyboard::mouseMove(scaledPos);
 }
 
 static void cursorEnterCallback(GLFWwindow* win, int entered) {
@@ -186,7 +192,7 @@ static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int 
 	if (APP->event->handleKey(window->internal->lastMousePos, key, scancode, action, mods))
 		return;
 
-	// Keyboard MIDI driver
+	// Keyboard/mouse MIDI driver
 	if (action == GLFW_PRESS && (mods & RACK_MOD_MASK) == 0) {
 		keyboard::press(key);
 	}

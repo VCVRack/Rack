@@ -14,6 +14,7 @@ struct Driver;
 
 static const int DRIVER = -11;
 static Driver* driver = NULL;
+static const int MOUSE_DEVICE_ID = 1000;
 
 enum {
 	CMD_OCTAVE_DOWN = -1,
@@ -106,6 +107,14 @@ struct InputDevice : midi::InputDevice {
 	int octave = 5;
 	std::map<int, int> pressedNotes;
 
+	void setDeviceId(int deviceId) {
+		this->deviceId = deviceId;
+		// Default lowest key of numpad is C1.
+		if (deviceId == 1) {
+			octave = 3;
+		}
+	}
+
 	std::string getName() override {
 		return deviceInfos[deviceId].name;
 	}
@@ -114,7 +123,7 @@ struct InputDevice : midi::InputDevice {
 		// Do nothing if no ports are subscribed
 		if (subscribed.empty())
 			return;
-		auto keyMap = deviceInfos[deviceId].keyMap;
+		const auto& keyMap = deviceInfos[deviceId].keyMap;
 		auto it = keyMap.find(key);
 		if (it == keyMap.end())
 			return;
@@ -164,18 +173,52 @@ struct InputDevice : midi::InputDevice {
 };
 
 
+struct MouseInputDevice : midi::InputDevice {
+	int16_t lastValues[2] = {};
+
+	std::string getName() override {
+		return "Mouse";
+	}
+
+	void onMouseMove(math::Vec pos) {
+		int16_t values[2];
+		values[0] = math::clamp((int) std::round(pos.x * 0x3f80), 0, 0x3f80);
+		// Flip Y values
+		values[1] = math::clamp((int) std::round((1.f - pos.y) * 0x3f80), 0, 0x3f80);
+
+		for (int id = 0; id < 2; id++) {
+			if (values[id] != lastValues[id]) {
+				// Continuous controller MSB
+				midi::Message m;
+				m.setStatus(0xb);
+				m.setNote(id);
+				m.setValue(values[id] >> 7);
+				onMessage(m);
+				// Continuous controller LSB
+				midi::Message m2;
+				m2.setStatus(0xb);
+				m2.setNote(id + 32);
+				m2.setValue(values[id] & 0x7f);
+				onMessage(m2);
+				lastValues[id] = values[id];
+			}
+		}
+	}
+};
+
+
 struct Driver : midi::Driver {
 	InputDevice devices[deviceCount];
+	MouseInputDevice mouseDevice;
 
 	Driver() {
 		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
-			devices[deviceId].deviceId = deviceId;
+			devices[deviceId].setDeviceId(deviceId);
 		}
-		devices[1].octave = 3;
 	}
 
 	std::string getName() override {
-		return "Computer keyboard";
+		return "Computer keyboard/mouse";
 	}
 
 	std::vector<int> getInputDeviceIds() override {
@@ -183,25 +226,41 @@ struct Driver : midi::Driver {
 		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
 			deviceIds.push_back(deviceId);
 		}
+		deviceIds.push_back(MOUSE_DEVICE_ID);
 		return deviceIds;
 	}
 
+	midi::InputDevice* getInputDevice(int deviceId) {
+		if (deviceId == MOUSE_DEVICE_ID)
+			return &mouseDevice;
+		if (0 <= deviceId && deviceId < deviceCount)
+			return &devices[deviceId];
+		return NULL;
+	}
+
 	std::string getInputDeviceName(int deviceId) override {
-		return deviceInfos[deviceId].name;
+		midi::InputDevice* inputDevice = getInputDevice(deviceId);
+		if (!inputDevice)
+			return "";
+		return inputDevice->getName();
 	}
 
 	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
-		if (!(0 <= deviceId && deviceId < deviceCount))
+		midi::InputDevice* inputDevice = getInputDevice(deviceId);
+		if (!inputDevice)
 			return NULL;
-		devices[deviceId].subscribe(input);
-		return &devices[deviceId];
+		inputDevice->subscribe(input);
+		return inputDevice;
 	}
 
 	void unsubscribeInput(int deviceId, midi::Input* input) override {
-		if (!(0 <= deviceId && deviceId < deviceCount))
+		midi::InputDevice* inputDevice = getInputDevice(deviceId);
+		if (!inputDevice)
 			return;
-		devices[deviceId].unsubscribe(input);
+		inputDevice->unsubscribe(input);
 	}
+
+	// Events that forward to InputDevices
 
 	void onKeyPress(int key) {
 		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
@@ -213,6 +272,10 @@ struct Driver : midi::Driver {
 		for (int deviceId = 0; deviceId < deviceCount; deviceId++) {
 			devices[deviceId].onKeyRelease(key);
 		}
+	}
+
+	void onMouseMove(math::Vec pos) {
+		mouseDevice.onMouseMove(pos);
 	}
 };
 
@@ -232,6 +295,13 @@ void release(int key) {
 	if (!driver)
 		return;
 	driver->onKeyRelease(key);
+}
+
+
+void mouseMove(math::Vec pos) {
+	if (!driver)
+		return;
+	driver->onMouseMove(pos);
 }
 
 
