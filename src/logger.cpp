@@ -31,8 +31,9 @@ void init() {
 	}
 
 	// Redirect stdout and stderr to the file
-	dup2(fileno(outputFile), fileno(stdout));
-	dup2(fileno(outputFile), fileno(stderr));
+	// Actually, disable this because we don't want to steal stdout/stderr from the DAW in Rack for DAWs.
+	// dup2(fileno(outputFile), fileno(stdout));
+	// dup2(fileno(outputFile), fileno(stderr));
 }
 
 void destroy() {
