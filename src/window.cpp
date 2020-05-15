@@ -214,7 +214,7 @@ static void errorCallback(int error, const char* description) {
 	WARN("GLFW error %d: %s", error, description);
 }
 
-Window::Window(void* handle) {
+Window::Window() {
 	internal = new Internal;
 	int err;
 
@@ -234,9 +234,6 @@ Window::Window(void* handle) {
 #if defined ARCH_MAC
 	glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
 #endif
-
-	if (handle)
-		glfwWindowHintPointer(GLFW_NATIVE_PARENT_HANDLE, handle);
 
 	// Create window
 	win = glfwCreateWindow(800, 600, "", NULL, NULL);

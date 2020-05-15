@@ -75,7 +75,7 @@ struct Window {
 	std::map<std::string, std::weak_ptr<Image>> imageCache;
 	std::map<std::string, std::weak_ptr<Svg>> svgCache;
 
-	Window(void* handle = NULL);
+	Window();
 	~Window();
 	void run();
 	/** Takes a screenshot of each module */
