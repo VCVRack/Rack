@@ -14,11 +14,16 @@ Widget::~Widget() {
 	clearChildren();
 }
 
+void Widget::setBox(math::Rect box) {
+	setPosition(box.pos);
+	setSize(box.size);
+}
+
 void Widget::setPosition(math::Vec pos) {
 	if (pos.isEqual(box.pos))
 		return;
 	box.pos = pos;
-	// event::Reposition
+	// Trigger Reposition event
 	event::Reposition eReposition;
 	onReposition(eReposition);
 }
@@ -27,7 +32,7 @@ void Widget::setSize(math::Vec size) {
 	if (size.isEqual(box.size))
 		return;
 	box.size = size;
-	// event::Resize
+	// Trigger Resize event
 	event::Resize eResize;
 	onResize(eResize);
 }
@@ -36,7 +41,7 @@ void Widget::show() {
 	if (visible)
 		return;
 	visible = true;
-	// event::Show
+	// Trigger Show event
 	event::Show eShow;
 	onShow(eShow);
 }
@@ -45,7 +50,7 @@ void Widget::hide() {
 	if (!visible)
 		return;
 	visible = false;
-	// event::Hide
+	// Trigger Hide event
 	event::Hide eHide;
 	onHide(eHide);
 }
@@ -94,7 +99,7 @@ void Widget::addChild(Widget* child) {
 	assert(!child->parent);
 	child->parent = this;
 	children.push_back(child);
-	// event::Add
+	// Trigger Add event
 	event::Add eAdd;
 	child->onAdd(eAdd);
 }
@@ -104,7 +109,7 @@ void Widget::addChildBottom(Widget* child) {
 	assert(!child->parent);
 	child->parent = this;
 	children.push_front(child);
-	// event::Add
+	// Trigger Add event
 	event::Add eAdd;
 	child->onAdd(eAdd);
 }
@@ -113,7 +118,7 @@ void Widget::removeChild(Widget* child) {
 	assert(child);
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
-	// event::Remove
+	// Trigger Remove event
 	event::Remove eRemove;
 	child->onRemove(eRemove);
 	// Prepare to remove widget from the event state
@@ -128,7 +133,7 @@ void Widget::removeChild(Widget* child) {
 
 void Widget::clearChildren() {
 	for (Widget* child : children) {
-		// event::Remove
+		// Trigger Remove event
 		event::Remove eRemove;
 		child->onRemove(eRemove);
 		APP->event->finalizeWidget(child);
@@ -143,7 +148,7 @@ void Widget::step() {
 		Widget* child = *it;
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
-			// event::Remove
+			// Trigger Remove event
 			event::Remove eRemove;
 			child->onRemove(eRemove);
 			APP->event->finalizeWidget(child);

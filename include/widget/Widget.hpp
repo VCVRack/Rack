@@ -33,6 +33,10 @@ struct Widget {
 
 	virtual ~Widget();
 
+	void setBox(math::Rect box);
+	math::Rect getBox() {
+		return box;
+	}
 	void setPosition(math::Vec pos);
 	math::Vec getPosition() {
 		return box.pos;

@@ -442,20 +442,21 @@ void Window::screenshot(float zoom) {
 			INFO("Screenshotting %s %s to %s", p->slug.c_str(), model->slug.c_str(), filename.c_str());
 
 			// Create widgets
+			widget::FramebufferWidget* fbw = new widget::FramebufferWidget;
+			fbw->oversample = 2;
+			fbw->setScale(math::Vec(zoom, zoom));
+
 			app::ModuleWidget* mw = model->createModuleWidget(NULL);
-			widget::FramebufferWidget* fb = new widget::FramebufferWidget;
-			fb->oversample = 2;
-			fb->addChild(mw);
-			fb->scale = math::Vec(zoom, zoom);
+			fbw->addChild(mw);
 
 			// Draw to framebuffer
 			frameTimeStart = glfwGetTime();
-			fb->step();
-			nvgluBindFramebuffer(fb->fb);
+			fbw->step();
+			nvgluBindFramebuffer(fbw->getFramebuffer());
 
 			// Read pixels
 			int width, height;
-			nvgImageSize(vg, fb->getImageHandle(), &width, &height);
+			nvgImageSize(vg, fbw->getImageHandle(), &width, &height);
 			uint8_t* data = new uint8_t[height * width * 4];
 			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
@@ -474,7 +475,7 @@ void Window::screenshot(float zoom) {
 			// Cleanup
 			delete[] data;
 			nvgluBindFramebuffer(NULL);
-			delete fb;
+			delete fbw;
 		}
 	}
 }
