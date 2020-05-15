@@ -15,6 +15,8 @@ Widget::~Widget() {
 }
 
 void Widget::setPosition(math::Vec pos) {
+	if (pos.isEqual(box.pos))
+		return;
 	box.pos = pos;
 	// event::Reposition
 	event::Reposition eReposition;
@@ -22,6 +24,8 @@ void Widget::setPosition(math::Vec pos) {
 }
 
 void Widget::setSize(math::Vec size) {
+	if (size.isEqual(box.size))
+		return;
 	box.size = size;
 	// event::Resize
 	event::Resize eResize;

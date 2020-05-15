@@ -402,13 +402,12 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 		if (!w2->visible)
 			continue;
 		// Check intersection
-		if (mwBox.isIntersecting(w2->box)) {
+		if (mwBox.isIntersecting(w2->box))
 			return false;
-		}
 	}
 
 	// Accept requested position
-	mw->box = mwBox;
+	mw->setPosition(mwBox.pos);
 	RackWidget_updateAdjacent(this);
 	return true;
 }
@@ -459,11 +458,11 @@ void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
 	}
 
 	// We failed to find a box. This shouldn't happen on an infinite rack.
-	assert(0);
+	assert(false);
 }
 
 void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
-	mw->box.pos = pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
+	mw->setPosition(pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE));
 
 	// Comparison of center X coordinates
 	auto cmp = [&](const widget::Widget * a, const widget::Widget * b) {
@@ -489,24 +488,26 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 	float xLimit = mw->box.pos.x;
 	for (auto it = leftModules.rbegin(); it != leftModules.rend(); it++) {
 		widget::Widget* w = *it;
-		float x = xLimit - w->box.size.x;
-		x = std::round(x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
-		if (w->box.pos.x < x)
+		math::Vec newPos = w->box.pos;
+		newPos.x = xLimit - w->box.size.x;
+		newPos.x = std::round(newPos.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+		if (w->box.pos.x < newPos.x)
 			break;
-		w->box.pos.x = x;
-		xLimit = x;
+		w->setPosition(newPos);
+		xLimit = newPos.x;
 	}
 
 	// Shove right modules
 	xLimit = mw->box.pos.x + mw->box.size.x;
 	for (auto it = rightModules.begin(); it != rightModules.end(); it++) {
 		widget::Widget* w = *it;
-		float x = xLimit;
-		x = std::round(x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
-		if (w->box.pos.x > x)
+		math::Vec newPos = w->box.pos;
+		newPos.x = xLimit;
+		newPos.x = std::round(newPos.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+		if (w->box.pos.x > newPos.x)
 			break;
-		w->box.pos.x = x;
-		xLimit = x + w->box.size.x;
+		w->setPosition(newPos);
+		xLimit = newPos.x + w->box.size.x;
 	}
 
 	RackWidget_updateAdjacent(this);

@@ -346,10 +346,10 @@ struct Change : Base {
 };
 
 
-/** Occurs after the zoom level of a Widget is changed.
+/** Occurs when the pixel buffer of this module must be refreshed.
 Recurses.
 */
-struct Zoom : Base {
+struct Dirty : Base {
 };
 
 
@@ -436,7 +436,7 @@ struct State {
 	bool handleText(math::Vec pos, int codepoint);
 	bool handleKey(math::Vec pos, int key, int scancode, int action, int mods);
 	bool handleDrop(math::Vec pos, const std::vector<std::string>& paths);
-	bool handleZoom();
+	bool handleDirty();
 };
 
 

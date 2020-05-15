@@ -15,6 +15,11 @@ FramebufferWidget::~FramebufferWidget() {
 		nvgluDeleteFramebuffer(fb);
 }
 
+void FramebufferWidget::onDirty(const event::Dirty& e) {
+	dirty = true;
+	Widget::onDirty(e);
+}
+
 void FramebufferWidget::step() {
 	Widget::step();
 

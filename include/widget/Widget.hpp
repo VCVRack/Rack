@@ -34,9 +34,18 @@ struct Widget {
 	virtual ~Widget();
 
 	void setPosition(math::Vec pos);
+	math::Vec getPosition() {
+		return box.pos;
+	}
 	void setSize(math::Vec size);
+	math::Vec getSize() {
+		return box.size;
+	}
 	void show();
 	void hide();
+	bool isVisible() {
+		return visible;
+	}
 	void requestDelete();
 
 	virtual math::Rect getChildrenBoundingBox();
@@ -180,8 +189,8 @@ struct Widget {
 	}
 	virtual void onAction(const event::Action& e) {}
 	virtual void onChange(const event::Change& e) {}
-	virtual void onZoom(const event::Zoom& e) {
-		recurseEvent(&Widget::onZoom, e);
+	virtual void onDirty(const event::Dirty& e) {
+		recurseEvent(&Widget::onDirty, e);
 	}
 	virtual void onReposition(const event::Reposition& e) {}
 	virtual void onResize(const event::Resize& e) {}

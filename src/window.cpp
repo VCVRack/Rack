@@ -384,7 +384,7 @@ void Window::run() {
 		glfwGetWindowContentScale(win, &newPixelRatio, NULL);
 		newPixelRatio = std::floor(newPixelRatio + 0.5);
 		if (newPixelRatio != pixelRatio) {
-			APP->event->handleZoom();
+			APP->event->handleDirty();
 			pixelRatio = newPixelRatio;
 		}
 

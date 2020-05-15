@@ -23,10 +23,11 @@ void ZoomWidget::setZoom(float zoom) {
 		return;
 	this->zoom = zoom;
 
-	event::Context cZoom;
-	event::Zoom eZoom;
-	eZoom.context = &cZoom;
-	Widget::onZoom(eZoom);
+	// Trigger Dirty event
+	event::Context cDirty;
+	event::Dirty eDirty;
+	eDirty.context = &cDirty;
+	Widget::onDirty(eDirty);
 }
 
 void ZoomWidget::draw(const DrawArgs& args) {
