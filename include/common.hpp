@@ -179,6 +179,9 @@ extern const std::string API_VERSION;
 
 
 #if defined ARCH_WIN
+// wchar_t on Windows should be 2 bytes
+static_assert(sizeof(char16_t) == sizeof(wchar_t));
+
 // Windows C standard functions are ASCII-8 instead of UTF-8, so redirect these functions to wrappers which convert to UTF-8
 #define fopen fopen_utf8
 #define remove remove_utf8

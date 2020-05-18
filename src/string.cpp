@@ -139,7 +139,7 @@ std::string absolutePath(const std::string& path) {
 #elif defined ARCH_WIN
 	std::u16string pathU16 = UTF8toUTF16(path);
 	char16_t buf[PATH_MAX];
-	char16_t* absPathC = _wfullpath(buf, pathU16.c_str(), PATH_MAX);
+	char16_t* absPathC = (char16_t*) _wfullpath((wchar_t*) buf, (wchar_t*) pathU16.c_str(), PATH_MAX);
 	if (absPathC)
 		return UTF16toUTF8(absPathC);
 #endif

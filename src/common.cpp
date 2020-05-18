@@ -28,15 +28,15 @@ const std::string API_VERSION = "2";
 #include <windows.h>
 
 FILE* fopen_utf8(const char* filename, const char* mode) {
-	return _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str());
+	return _wfopen((wchar_t*) rack::string::UTF8toUTF16(filename).c_str(), (wchar_t*) rack::string::UTF8toUTF16(mode).c_str());
 }
 
 int remove_utf8(const char* path) {
-	return _wremove(rack::string::UTF8toUTF16(path).c_str());
+	return _wremove((wchar_t*) rack::string::UTF8toUTF16(path).c_str());
 }
 
 int rename_utf8(const char* oldname, const char* newname) {
-	return _wrename(rack::string::UTF8toUTF16(oldname).c_str(), rack::string::UTF8toUTF16(newname).c_str());
+	return _wrename((wchar_t*) rack::string::UTF8toUTF16(oldname).c_str(), (wchar_t*) rack::string::UTF8toUTF16(newname).c_str());
 }
 
 #endif

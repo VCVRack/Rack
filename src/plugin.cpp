@@ -47,7 +47,7 @@ static void* loadLibrary(std::string libraryPath) {
 	#if defined ARCH_WIN
 		SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
 		std::u16string libraryFilenameU16 = string::UTF8toUTF16(libraryPath);
-		HINSTANCE handle = LoadLibraryW(libraryFilenameU16.c_str());
+		HINSTANCE handle = LoadLibraryW((wchar_t*) libraryFilenameU16.c_str());
 		SetErrorMode(0);
 		if (!handle) {
 			int error = GetLastError();

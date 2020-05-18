@@ -131,7 +131,7 @@ void copyFile(const std::string& srcPath, const std::string& destPath) {
 void createDirectory(const std::string& path) {
 #if defined ARCH_WIN
 	std::u16string pathU16 = string::UTF8toUTF16(path);
-	_wmkdir(pathU16.c_str());
+	_wmkdir((wchar_t*) pathU16.c_str());
 #else
 	mkdir(path.c_str(), 0755);
 #endif
@@ -151,7 +151,7 @@ void createDirectories(const std::string& path) {
 void removeDirectory(const std::string& path) {
 #if defined ARCH_WIN
 	std::u16string pathU16 = string::UTF8toUTF16(path);
-	_wrmdir(pathU16.c_str());
+	_wrmdir((wchar_t*) pathU16.c_str());
 #else
 	rmdir(path.c_str());
 #endif
@@ -170,8 +170,8 @@ void removeDirectories(const std::string& path) {
 
 std::string getWorkingDirectory() {
 #if defined ARCH_WIN
-	char16_t buf[4096] = L"";
-	GetCurrentDirectory(sizeof(buf), buf);
+	char16_t buf[4096] = u"";
+	GetCurrentDirectory(sizeof(buf), (wchar_t*) buf);
 	return string::UTF16toUTF8(buf);
 #else
 	char buf[4096] = "";
@@ -184,7 +184,7 @@ std::string getWorkingDirectory() {
 void setWorkingDirectory(const std::string& path) {
 #if defined ARCH_WIN
 	std::u16string pathU16 = string::UTF8toUTF16(path);
-	SetCurrentDirectory(pathU16.c_str());
+	SetCurrentDirectory((wchar_t*) pathU16.c_str());
 #else
 	chdir(path.c_str());
 #endif
@@ -302,7 +302,7 @@ void openBrowser(const std::string& url) {
 #endif
 #if defined ARCH_WIN
 	std::u16string urlW = string::UTF8toUTF16(url);
-	ShellExecuteW(NULL, L"open", urlW.c_str(), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecuteW(NULL, L"open", (wchar_t*) urlW.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
 
@@ -318,7 +318,7 @@ void openFolder(const std::string& path) {
 #endif
 #if defined ARCH_WIN
 	std::u16string pathU16 = string::UTF8toUTF16(path);
-	ShellExecuteW(NULL, L"explore", pathU16.c_str(), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecuteW(NULL, L"explore", (wchar_t*) pathU16.c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
 
@@ -331,7 +331,7 @@ void runProcessDetached(const std::string& path) {
 	shExInfo.lpVerb = L"runas";
 
 	std::u16string pathU16 = string::UTF8toUTF16(path);
-	shExInfo.lpFile = pathU16.c_str();
+	shExInfo.lpFile = (wchar_t*) pathU16.c_str();
 	shExInfo.nShow = SW_SHOW;
 
 	if (ShellExecuteExW(&shExInfo)) {

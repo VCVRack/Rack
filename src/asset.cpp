@@ -61,11 +61,11 @@ static void initSystemDir() {
 #endif
 #if defined ARCH_WIN
 	// Get path to executable
-	char16_t moduleBufU16[MAX_PATH];
-	DWORD length = GetModuleFileNameW(NULL, moduleBufU16, LENGTHOF(moduleBufU16));
+	char16_t moduleBufU16[MAX_PATH] = u"";
+	DWORD length = GetModuleFileNameW(NULL, (wchar_t*) moduleBufU16, LENGTHOF(moduleBufU16));
 	assert(length > 0);
 	// Get folder of executable
-	PathRemoveFileSpecW(moduleBufU16);
+	PathRemoveFileSpecW((wchar_t*) moduleBufU16);
 	systemDir = string::UTF16toUTF8(moduleBufU16);
 #endif
 #if defined ARCH_LIN
@@ -86,8 +86,8 @@ static void initUserDir() {
 
 #if defined ARCH_WIN
 	// Get "My Documents" folder
-	char16_t documentsBufU16[MAX_PATH] = L".";
-	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufU16);
+	char16_t documentsBufU16[MAX_PATH] = u".";
+	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, (wchar_t*) documentsBufU16);
 	assert(result == S_OK);
 	userDir = string::UTF16toUTF8(documentsBufU16);
 	userDir += "/Rack";
