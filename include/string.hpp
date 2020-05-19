@@ -12,9 +12,6 @@ namespace rack {
 namespace string {
 
 
-/** Performs a Unicode string conversion from UTF-16 to UTF-8. */
-std::string UTF16toUTF8(const std::u16string& s);
-std::u16string UTF8toUTF16(const std::string& s);
 /** Converts a `printf()` format string and optional arguments into a std::string.
 Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string`s, otherwise you might get binary garbage.
 */
@@ -88,6 +85,14 @@ struct CaseInsensitiveCompare {
 	bool operator()(const std::string& a, const std::string& b) const;
 };
 
+
+#if defined ARCH_WIN
+/** Performs a Unicode string conversion from UTF-16 to UTF-8.
+These are only defined on Windows because the implementation uses Windows' API, and conversion is not needed on other OS's (since everything on Mac and Linux is UTF-8).
+*/
+std::string UTF16toUTF8(const std::u16string& s);
+std::u16string UTF8toUTF16(const std::string& s);
+#endif
 
 } // namespace string
 } // namespace rack

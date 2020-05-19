@@ -1,27 +1,17 @@
-#include <locale> // for wstring_convert
-#include <codecvt> // for codecvt_utf8_utf16
 #include <cctype> // for tolower and toupper
 #include <algorithm> // for transform
 #include <libgen.h> // for dirname and basename
 #include <zlib.h>
+
+#if defined ARCH_WIN
+	#include <windows.h> // for MultiByteToWideChar
+#endif
 
 #include <string.hpp>
 
 
 namespace rack {
 namespace string {
-
-
-std::string UTF16toUTF8(const std::u16string& s) {
-	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-	return converter.to_bytes(s);
-}
-
-
-std::u16string UTF8toUTF16(const std::string& s) {
-	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-	return converter.from_bytes(s);
-}
 
 
 std::string f(const char* format, ...) {
@@ -298,6 +288,37 @@ bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string&
 	return lowercase(a) < lowercase(b);
 }
 
+
+#if defined ARCH_WIN
+std::string UTF16toUTF8(const std::u16string& sU16) {
+	if (sU16.empty())
+		return "";
+	// Compute length of output buffer
+	int len = WideCharToMultiByte(CP_UTF8, 0, (wchar_t*) &sU16[0], sU16.size(), NULL, 0, NULL, NULL);
+	assert(len > 0);
+	std::string s;
+	// Allocate enough space for null character
+	s.resize(len);
+	len = WideCharToMultiByte(CP_UTF8, 0, (wchar_t*) &sU16[0], sU16.size(), &s[0], len, 0, 0);
+	assert(len > 0);
+	return s;
+}
+
+
+std::u16string UTF8toUTF16(const std::string& s) {
+	if (s.empty())
+		return u"";
+	// Compute length of output buffer
+	int len = MultiByteToWideChar(CP_UTF8, 0, &s[0], s.size(), NULL, 0);
+	assert(len > 0);
+	std::u16string sU16;
+	// Allocate enough space for null character
+	sU16.resize(len);
+	len = MultiByteToWideChar(CP_UTF8, 0, &s[0], s.size(), (wchar_t*) &sU16[0], len);
+	assert(len > 0);
+	return sU16;
+}
+#endif
 
 } // namespace string
 } // namespace rack
