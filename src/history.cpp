@@ -42,6 +42,7 @@ ModuleAdd::~ModuleAdd() {
 }
 
 void ModuleAdd::setModule(app::ModuleWidget* mw) {
+	assert(mw);
 	model = mw->model;
 	assert(mw->module);
 	moduleId = mw->module->id;
@@ -53,7 +54,8 @@ void ModuleAdd::setModule(app::ModuleWidget* mw) {
 
 void ModuleAdd::undo() {
 	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
+	if (!mw)
+		return;
 	APP->scene->rack->removeModule(mw);
 	delete mw;
 }
@@ -72,26 +74,30 @@ void ModuleAdd::redo() {
 
 void ModuleMove::undo() {
 	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
+	if (!mw)
+		return;
 	mw->box.pos = oldPos;
 }
 
 void ModuleMove::redo() {
 	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
-	assert(mw);
+	if (!mw)
+		return;
 	mw->box.pos = newPos;
 }
 
 
 void ModuleBypass::undo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
-	assert(module);
+	if (!module)
+		return;
 	APP->engine->bypassModule(module, !bypassed);
 }
 
 void ModuleBypass::redo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
-	assert(module);
+	if (!module)
+		return;
 	APP->engine->bypassModule(module, bypassed);
 }
 
@@ -103,26 +109,30 @@ ModuleChange::~ModuleChange() {
 
 void ModuleChange::undo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
-	assert(module);
+	if (!module)
+		return;
 	APP->engine->moduleFromJson(module, oldModuleJ);
 }
 
 void ModuleChange::redo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
-	assert(module);
+	if (!module)
+		return;
 	APP->engine->moduleFromJson(module, newModuleJ);
 }
 
 
 void ParamChange::undo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
-	assert(module);
+	if (!module)
+		return;
 	APP->engine->setParam(module, paramId, oldValue);
 }
 
 void ParamChange::redo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
-	assert(module);
+	if (!module)
+		return;
 	APP->engine->setParam(module, paramId, newValue);
 }
 
@@ -143,7 +153,8 @@ void CableAdd::setCable(app::CableWidget* cw) {
 
 void CableAdd::undo() {
 	app::CableWidget* cw = APP->scene->rack->getCable(cableId);
-	assert(cw);
+	if (!cw)
+		return;
 	APP->scene->rack->removeCable(cw);
 	delete cw;
 }
@@ -152,8 +163,16 @@ void CableAdd::redo() {
 	engine::Cable* cable = new engine::Cable;
 	cable->id = cableId;
 	cable->inputModule = APP->engine->getModule(inputModuleId);
+	if (!cable->inputModule) {
+		delete cable;
+		return;
+	}
 	cable->inputId = inputId;
 	cable->outputModule = APP->engine->getModule(outputModuleId);
+	if (!cable->outputModule) {
+		delete cable;
+		return;
+	}
 	cable->outputId = outputId;
 	APP->engine->addCable(cable);
 
