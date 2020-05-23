@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <plugin/Model.hpp>
 #include <plugin.hpp>
 #include <asset.hpp>
@@ -32,6 +34,12 @@ void Model::fromJson(json_t* rootJ) {
 		json_array_foreach(tagsJ, i, tagJ) {
 			std::string tag = json_string_value(tagJ);
 			int tagId = tag::findId(tag);
+
+			// Omit duplicates
+			auto it = std::find(tags.begin(), tags.end(), tagId);
+			if (it != tags.end())
+				continue;
+
 			if (tagId >= 0)
 				tags.push_back(tagId);
 		}
