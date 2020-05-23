@@ -980,5 +980,12 @@ math::Vec& ModuleWidget::oldPos() {
 }
 
 
+engine::Module* ModuleWidget::releaseModule() {
+	engine::Module* module = this->module;
+	this->module = NULL;
+	return module;
+}
+
+
 } // namespace app
 } // namespace rack

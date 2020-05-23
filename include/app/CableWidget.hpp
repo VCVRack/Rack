@@ -37,6 +37,7 @@ struct CableWidget : widget::OpaqueWidget {
 	void fromJson(json_t* rootJ);
 	void draw(const DrawArgs& args) override;
 	void drawPlugs(const DrawArgs& args);
+	engine::Cable* releaseCable();
 };
 
 

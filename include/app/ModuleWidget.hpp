@@ -98,6 +98,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 
 	math::Vec& dragPos();
 	math::Vec& oldPos();
+	engine::Module* releaseModule();
 };
 
 

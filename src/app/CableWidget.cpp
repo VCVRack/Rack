@@ -241,5 +241,12 @@ void CableWidget::drawPlugs(const DrawArgs& args) {
 }
 
 
+engine::Cable* CableWidget::releaseCable() {
+	engine::Cable* cable = this->cable;
+	this->cable = NULL;
+	return cable;
+}
+
+
 } // namespace app
 } // namespace rack
