@@ -184,6 +184,18 @@ struct Vec {
 	Vec() {}
 	Vec(float x, float y) : x(x), y(y) {}
 
+	float get(int index) const {
+		return (index == 0) ? x : y;
+	}
+	float& get(int index) {
+		return (index == 0) ? x : y;
+	}
+	void set(int index, float value) {
+		if (index == 0)
+			x = value;
+		else
+			y = value;
+	}
 	/** Negates the vector.
 	Equivalent to a reflection across the `y = -x` line.
 	*/

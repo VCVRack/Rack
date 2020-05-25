@@ -14,10 +14,22 @@ Widget::~Widget() {
 	clearChildren();
 }
 
+
+math::Rect Widget::getBox() {
+	return box;
+}
+
+
 void Widget::setBox(math::Rect box) {
 	setPosition(box.pos);
 	setSize(box.size);
 }
+
+
+math::Vec Widget::getPosition() {
+	return box.pos;
+}
+
 
 void Widget::setPosition(math::Vec pos) {
 	if (pos.isEqual(box.pos))
@@ -28,6 +40,12 @@ void Widget::setPosition(math::Vec pos) {
 	onReposition(eReposition);
 }
 
+
+math::Vec Widget::getSize() {
+	return box.size;
+}
+
+
 void Widget::setSize(math::Vec size) {
 	if (size.isEqual(box.size))
 		return;
@@ -37,27 +55,33 @@ void Widget::setSize(math::Vec size) {
 	onResize(eResize);
 }
 
-void Widget::show() {
-	if (visible)
-		return;
-	visible = true;
-	// Trigger Show event
-	event::Show eShow;
-	onShow(eShow);
+
+bool Widget::isVisible() {
+	return visible;
 }
 
-void Widget::hide() {
-	if (!visible)
+
+void Widget::setVisible(bool visible) {
+	if (visible == this->visible)
 		return;
-	visible = false;
-	// Trigger Hide event
-	event::Hide eHide;
-	onHide(eHide);
+	this->visible = visible;
+	if (visible) {
+		// Trigger Show event
+		event::Show eShow;
+		onShow(eShow);
+	}
+	else {
+		// Trigger Hide event
+		event::Hide eHide;
+		onHide(eHide);
+	}
 }
+
 
 void Widget::requestDelete() {
 	requestedDelete = true;
 }
+
 
 math::Rect Widget::getChildrenBoundingBox() {
 	math::Vec min = math::Vec(INFINITY, INFINITY);
@@ -71,6 +95,7 @@ math::Rect Widget::getChildrenBoundingBox() {
 	return math::Rect::fromMinMax(min, max);
 }
 
+
 math::Vec Widget::getRelativeOffset(math::Vec v, Widget* relative) {
 	if (this == relative) {
 		return v;
@@ -81,6 +106,7 @@ math::Vec Widget::getRelativeOffset(math::Vec v, Widget* relative) {
 	}
 	return v;
 }
+
 
 math::Rect Widget::getViewport(math::Rect r) {
 	math::Rect bound;
@@ -94,6 +120,7 @@ math::Rect Widget::getViewport(math::Rect r) {
 	return r.clamp(bound);
 }
 
+
 void Widget::addChild(Widget* child) {
 	assert(child);
 	assert(!child->parent);
@@ -104,6 +131,7 @@ void Widget::addChild(Widget* child) {
 	child->onAdd(eAdd);
 }
 
+
 void Widget::addChildBottom(Widget* child) {
 	assert(child);
 	assert(!child->parent);
@@ -113,6 +141,7 @@ void Widget::addChildBottom(Widget* child) {
 	event::Add eAdd;
 	child->onAdd(eAdd);
 }
+
 
 void Widget::removeChild(Widget* child) {
 	assert(child);
@@ -131,6 +160,7 @@ void Widget::removeChild(Widget* child) {
 	child->parent = NULL;
 }
 
+
 void Widget::clearChildren() {
 	for (Widget* child : children) {
 		// Trigger Remove event
@@ -142,6 +172,7 @@ void Widget::clearChildren() {
 	}
 	children.clear();
 }
+
 
 void Widget::step() {
 	for (auto it = children.begin(); it != children.end();) {
@@ -162,6 +193,7 @@ void Widget::step() {
 		it++;
 	}
 }
+
 
 void Widget::draw(const DrawArgs& args) {
 	// Iterate children

@@ -33,23 +33,21 @@ struct Widget {
 
 	virtual ~Widget();
 
+	math::Rect getBox();
 	void setBox(math::Rect box);
-	math::Rect getBox() {
-		return box;
-	}
+	math::Vec getPosition();
 	void setPosition(math::Vec pos);
-	math::Vec getPosition() {
-		return box.pos;
-	}
+	math::Vec getSize();
 	void setSize(math::Vec size);
-	math::Vec getSize() {
-		return box.size;
+	bool isVisible();
+	void setVisible(bool visible);
+	void show() {
+		setVisible(true);
 	}
-	void show();
-	void hide();
-	bool isVisible() {
-		return visible;
+	void hide() {
+		setVisible(false);
 	}
+
 	void requestDelete();
 
 	virtual math::Rect getChildrenBoundingBox();

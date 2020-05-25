@@ -6,25 +6,30 @@ namespace rack {
 namespace ui {
 
 
+// Internal not currently used
+
+
 ScrollWidget::ScrollWidget() {
 	container = new widget::Widget;
 	addChild(container);
 
 	horizontalScrollBar = new ScrollBar;
-	horizontalScrollBar->orientation = ScrollBar::HORIZONTAL;
-	horizontalScrollBar->visible = false;
+	horizontalScrollBar->vertical = false;
+	horizontalScrollBar->hide();
 	addChild(horizontalScrollBar);
 
 	verticalScrollBar = new ScrollBar;
-	verticalScrollBar->orientation = ScrollBar::VERTICAL;
-	verticalScrollBar->visible = false;
+	verticalScrollBar->vertical = true;
+	verticalScrollBar->hide();
 	addChild(verticalScrollBar);
 }
+
 
 void ScrollWidget::scrollTo(math::Rect r) {
 	math::Rect bound = math::Rect::fromMinMax(r.getBottomRight().minus(box.size), r.pos);
 	offset = offset.clampSafe(bound);
 }
+
 
 void ScrollWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
@@ -32,11 +37,12 @@ void ScrollWidget::draw(const DrawArgs& args) {
 	nvgResetScissor(args.vg);
 }
 
+
 void ScrollWidget::step() {
 	Widget::step();
 
 	// Clamp scroll offset
-	math::Rect containerBox = container->getChildrenBoundingBox();
+	containerBox = container->getChildrenBoundingBox();
 	math::Rect offsetBounds = containerBox;
 	offsetBounds.size = offsetBounds.size.minus(box.size);
 	offset = offset.clamp(offsetBounds);
@@ -44,24 +50,18 @@ void ScrollWidget::step() {
 	// Update the container's position from the offset
 	container->box.pos = offset.neg().round();
 
-	// Update scrollbar offsets and sizes
-	math::Vec scrollbarOffset = offset.minus(containerBox.pos).div(offsetBounds.size);
-	math::Vec scrollbarSize = box.size.div(containerBox.size);
-
-	horizontalScrollBar->visible = (0.0 < scrollbarSize.x && scrollbarSize.x < 1.0);
-	verticalScrollBar->visible = (0.0 < scrollbarSize.y && scrollbarSize.y < 1.0);
-	horizontalScrollBar->offset = scrollbarOffset.x;
-	verticalScrollBar->offset = scrollbarOffset.y;
-	horizontalScrollBar->size = scrollbarSize.x;
-	verticalScrollBar->size = scrollbarSize.y;
+	// Make scrollbars visible only if there is a positive range to scroll.
+	horizontalScrollBar->setVisible(offsetBounds.size.x > 0.f);
+	verticalScrollBar->setVisible(offsetBounds.size.y > 0.f);
 
 	// Reposition and resize scroll bars
 	math::Vec inner = box.size.minus(math::Vec(verticalScrollBar->box.size.x, horizontalScrollBar->box.size.y));
 	horizontalScrollBar->box.pos.y = inner.y;
 	verticalScrollBar->box.pos.x = inner.x;
-	horizontalScrollBar->box.size.x = verticalScrollBar->visible ? inner.x : box.size.x;
-	verticalScrollBar->box.size.y = horizontalScrollBar->visible ? inner.y : box.size.y;
+	horizontalScrollBar->box.size.x = verticalScrollBar->isVisible() ? inner.x : box.size.x;
+	verticalScrollBar->box.size.y = horizontalScrollBar->isVisible() ? inner.y : box.size.y;
 }
+
 
 void ScrollWidget::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
@@ -77,11 +77,13 @@ void ScrollWidget::onButton(const event::Button& e) {
 	}
 }
 
+
 void ScrollWidget::onDragStart(const event::DragStart& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
 		e.consume(this);
 	}
 }
+
 
 void ScrollWidget::onDragMove(const event::DragMove& e) {
 	// Scroll only if the scrollbars are visible
@@ -90,6 +92,7 @@ void ScrollWidget::onDragMove(const event::DragMove& e) {
 
 	offset = offset.minus(e.mouseDelta);
 }
+
 
 void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	OpaqueWidget::onHoverScroll(e);
@@ -111,6 +114,7 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	offset = offset.minus(scrollDelta);
 	e.consume(this);
 }
+
 
 void ScrollWidget::onHoverKey(const event::HoverKey& e) {
 	OpaqueWidget::onHoverKey(e);

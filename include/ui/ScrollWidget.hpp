@@ -10,10 +10,15 @@ namespace ui {
 
 /** Handles a container with ScrollBar */
 struct ScrollWidget : widget::OpaqueWidget {
+	struct Internal;
+	Internal* internal;
+
 	widget::Widget* container;
 	ScrollBar* horizontalScrollBar;
 	ScrollBar* verticalScrollBar;
+
 	math::Vec offset;
+	math::Rect containerBox;
 
 	ScrollWidget();
 	void scrollTo(math::Rect r);
