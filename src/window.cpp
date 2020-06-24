@@ -226,6 +226,11 @@ Window::Window() {
 	glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
 #endif
 
+	if (settings::windowSize.isZero()) {
+		// must be called before glfwCreateWindow
+		glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+	}
+
 	// Create window
 	win = glfwCreateWindow(800, 600, "", NULL, NULL);
 	if (!win) {
@@ -238,10 +243,7 @@ Window::Window() {
 	INFO("Window content scale: %f", contentScale);
 
 	glfwSetWindowSizeLimits(win, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
-	if (settings::windowSize.isZero()) {
-		glfwMaximizeWindow(win);
-	}
-	else {
+	if (!settings::windowSize.isZero()) {
 		glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
 		glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
 	}
