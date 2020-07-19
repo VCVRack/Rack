@@ -193,7 +193,11 @@ struct Module {
 	}
 
 	struct ProcessArgs {
+		/** The current sample rate in Hz. */
 		float sampleRate;
+		/** The timestep of process() in seconds.
+		Defined by `1 / sampleRate`.
+		*/
 		float sampleTime;
 	};
 	/** Advances the module by one audio sample.
