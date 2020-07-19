@@ -39,6 +39,10 @@ struct Plugin {
 	If blank, `name` is used.
 	*/
 	std::string brand;
+	/** A one-line summary of the plugin's purpose.
+	If your plugin doesn't follow a theme, it’s probably best to omit this.
+	*/
+	std::string description;
 	/** Your name, company, alias, or GitHub username.
 	*/
 	std::string author;
@@ -60,6 +64,9 @@ struct Plugin {
 	/** Link to donation page for users who wish to donate. E.g. PayPal URL.
 	*/
 	std::string donateUrl;
+	/** Link to the changelog of the plugin.
+	*/
+	std::string changelogUrl;
 	/** Last modified timestamp of the plugin directory.
 	*/
 	double modifiedTimestamp = -INFINITY;

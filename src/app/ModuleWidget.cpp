@@ -49,55 +49,69 @@ struct ModuleInfoItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
 
-		ui::MenuLabel* pluginLabel = new ui::MenuLabel;
-		pluginLabel->text = model->plugin->name;
-		menu->addChild(pluginLabel);
-
-		ui::MenuLabel* versionLabel = new ui::MenuLabel;
-		versionLabel->text = "v" + model->plugin->version;
-		menu->addChild(versionLabel);
-
-		for (int tagId : model->tags) {
-			ui::MenuLabel* tagLabel = new ui::MenuLabel;
-			tagLabel->text = tag::getTag(tagId);
-			menu->addChild(tagLabel);
-		}
-
+		// plugin
 		if (model->plugin->pluginUrl != "") {
-			ModuleUrlItem* websiteItem = new ModuleUrlItem;
-			websiteItem->text = "Plugin website";
-			websiteItem->url = model->plugin->pluginUrl;
-			menu->addChild(websiteItem);
+			ModuleUrlItem* pluginItem = new ModuleUrlItem;
+			pluginItem->text = model->plugin->name;
+			pluginItem->url = model->plugin->pluginUrl;
+			menu->addChild(pluginItem);
+		}
+		else {
+			ui::MenuLabel* pluginLabel = new ui::MenuLabel;
+			pluginLabel->text = model->plugin->name;
+			menu->addChild(pluginLabel);
 		}
 
+		// author
 		if (model->plugin->author != "") {
 			if (model->plugin->authorUrl != "") {
 				ModuleUrlItem* authorItem = new ModuleUrlItem;
-				authorItem->text = model->plugin->author + " website";
+				authorItem->text = "by " + model->plugin->author;
 				authorItem->url = model->plugin->authorUrl;
 				menu->addChild(authorItem);
 			}
 			else {
 				ui::MenuLabel* authorLabel = new ui::MenuLabel;
-				authorLabel->text = model->plugin->author;
+				authorLabel->text = "by " + model->plugin->author;
 				menu->addChild(authorLabel);
 			}
 		}
 
-		if (model->manualUrl != "") {
+		// version
+		ui::MenuLabel* versionLabel = new ui::MenuLabel;
+		versionLabel->text = "v" + model->plugin->version;
+		menu->addChild(versionLabel);
+
+		// tags
+		if (!model->tags.empty()) {
+			ui::MenuLabel* tagsLabel = new ui::MenuLabel;
+			tagsLabel->text = "Tags:";
+			menu->addChild(tagsLabel);
+			for (int tagId : model->tags) {
+				ui::MenuLabel* tagLabel = new ui::MenuLabel;
+				tagLabel->text = tag::getTag(tagId);
+				menu->addChild(tagLabel);
+			}
+		}
+
+		menu->addChild(new ui::MenuSeparator);
+
+		// library
+		ModuleUrlItem* libraryItem = new ModuleUrlItem;
+		libraryItem->text = "VCV Library page";
+		libraryItem->url = "https://library.vcvrack.com/" + model->plugin->slug + "/" + model->slug;
+		menu->addChild(libraryItem);
+
+		// manual
+		std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;
+		if (manualUrl != "") {
 			ModuleUrlItem* manualItem = new ModuleUrlItem;
-			manualItem->text = "Module manual";
-			manualItem->url = model->manualUrl;
+			manualItem->text = "User manual";
+			manualItem->url = manualUrl;
 			menu->addChild(manualItem);
 		}
 
-		if (model->plugin->manualUrl != "") {
-			ModuleUrlItem* manualItem = new ModuleUrlItem;
-			manualItem->text = "Plugin manual";
-			manualItem->url = model->plugin->manualUrl;
-			menu->addChild(manualItem);
-		}
-
+		// source code
 		if (model->plugin->sourceUrl != "") {
 			ModuleUrlItem* sourceItem = new ModuleUrlItem;
 			sourceItem->text = "Source code";
@@ -105,6 +119,7 @@ struct ModuleInfoItem : ui::MenuItem {
 			menu->addChild(sourceItem);
 		}
 
+		// donate
 		if (model->plugin->donateUrl != "") {
 			ModuleUrlItem* donateItem = new ModuleUrlItem;
 			donateItem->text = "Donate";
@@ -112,6 +127,15 @@ struct ModuleInfoItem : ui::MenuItem {
 			menu->addChild(donateItem);
 		}
 
+		// changelog
+		if (model->plugin->changelogUrl != "") {
+			ModuleUrlItem* changelogItem = new ModuleUrlItem;
+			changelogItem->text = "Changelog";
+			changelogItem->url = model->plugin->changelogUrl;
+			menu->addChild(changelogItem);
+		}
+
+		// plugin folder
 		if (model->plugin->path != "") {
 			ModuleFolderItem* pathItem = new ModuleFolderItem;
 			pathItem->text = "Open plugin folder";

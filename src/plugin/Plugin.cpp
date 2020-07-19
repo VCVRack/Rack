@@ -61,9 +61,13 @@ void Plugin::fromJson(json_t* rootJ) {
 	json_t* brandJ = json_object_get(rootJ, "brand");
 	if (brandJ)
 		brand = json_string_value(brandJ);
-	// Use name for brand name by default
+	// If brand is not set, fall back to the plugin name
 	if (brand == "")
 		brand = name;
+
+	json_t* descriptionJ = json_object_get(rootJ, "description");
+	if (descriptionJ)
+		description = json_string_value(descriptionJ);
 
 	json_t* authorJ = json_object_get(rootJ, "author");
 	if (authorJ)
@@ -96,6 +100,10 @@ void Plugin::fromJson(json_t* rootJ) {
 	json_t* donateUrlJ = json_object_get(rootJ, "donateUrl");
 	if (donateUrlJ)
 		donateUrl = json_string_value(donateUrlJ);
+
+	json_t* changelogUrlJ = json_object_get(rootJ, "changelogUrl");
+	if (changelogUrlJ)
+		changelogUrl = json_string_value(changelogUrlJ);
 
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (modulesJ) {
