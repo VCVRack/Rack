@@ -88,7 +88,7 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 	for (int deviceId : port->driver->getDeviceIds()) {
 		int channels = std::max(port->driver->getDeviceNumInputs(deviceId), port->driver->getDeviceNumOutputs(deviceId));
 		// Prevents devices with a ridiculous number of channels from being displayed
-		const int maxTotalChannels = port->maxChannels * 8;
+		const int maxTotalChannels = port->maxChannels * 16;
 		channels = std::min(maxTotalChannels, channels);
 
 		for (int offset = 0; offset < channels; offset += port->maxChannels) {
