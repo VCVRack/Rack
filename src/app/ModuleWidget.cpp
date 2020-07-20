@@ -96,12 +96,6 @@ struct ModuleInfoItem : ui::MenuItem {
 
 		menu->addChild(new ui::MenuSeparator);
 
-		// library
-		ModuleUrlItem* libraryItem = new ModuleUrlItem;
-		libraryItem->text = "VCV Library page";
-		libraryItem->url = "https://library.vcvrack.com/" + model->plugin->slug + "/" + model->slug;
-		menu->addChild(libraryItem);
-
 		// manual
 		std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;
 		if (manualUrl != "") {
@@ -134,6 +128,12 @@ struct ModuleInfoItem : ui::MenuItem {
 			changelogItem->url = model->plugin->changelogUrl;
 			menu->addChild(changelogItem);
 		}
+
+		// library
+		ModuleUrlItem* libraryItem = new ModuleUrlItem;
+		libraryItem->text = "VCV Library page";
+		libraryItem->url = "https://library.vcvrack.com/" + model->plugin->slug + "/" + model->slug;
+		menu->addChild(libraryItem);
 
 		// plugin folder
 		if (model->plugin->path != "") {
