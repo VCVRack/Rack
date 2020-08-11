@@ -87,8 +87,6 @@ math::Rect Widget::getChildrenBoundingBox() {
 	math::Vec min = math::Vec(INFINITY, INFINITY);
 	math::Vec max = math::Vec(-INFINITY, -INFINITY);
 	for (Widget* child : children) {
-		if (!child->visible)
-			continue;
 		min = min.min(child->box.getTopLeft());
 		max = max.max(child->box.getBottomRight());
 	}
@@ -97,14 +95,22 @@ math::Rect Widget::getChildrenBoundingBox() {
 
 
 math::Vec Widget::getRelativeOffset(math::Vec v, Widget* relative) {
-	if (this == relative) {
+	if (this == relative)
 		return v;
-	}
+	// Translate offset
 	v = v.plus(box.pos);
-	if (parent) {
-		v = parent->getRelativeOffset(v, relative);
-	}
-	return v;
+	if (!parent)
+		return v;
+	return parent->getRelativeOffset(v, relative);
+}
+
+
+float Widget::getRelativeZoom(Widget* relative) {
+	if (this == relative)
+		return 1.f;
+	if (!parent)
+		return 1.f;
+	return parent->getRelativeZoom(relative);
 }
 
 

@@ -50,14 +50,27 @@ struct Widget {
 
 	void requestDelete();
 
+	/** Returns the smallest rectangle containing this widget's children (visible and invisible) in its local coordinates.
+	Returns `Rect(Vec(inf, inf), Vec(-inf, -inf))` if there are no children.
+	*/
 	virtual math::Rect getChildrenBoundingBox();
-	/**  Returns `v` transformed into the coordinate system of `relative` */
+	/**  Returns `v` (given in local coordinates) transformed into the coordinate system of `relative`.
+	*/
 	virtual math::Vec getRelativeOffset(math::Vec v, Widget* relative);
-	/** Returns `v` transformed into world coordinates */
+	/** Returns `v` transformed into world/root/global/absolute coordinates.
+	*/
 	math::Vec getAbsoluteOffset(math::Vec v) {
 		return getRelativeOffset(v, NULL);
 	}
-	/** Returns a subset of the given math::Rect bounded by the box of this widget and all ancestors */
+	/** Returns the zoom level in the coordinate system of `relative`.
+	Only `ZoomWidget` should override this to return value other than 1.
+	*/
+	virtual float getRelativeZoom(Widget* relative);
+	float getAbsoluteZoom() {
+		return getRelativeZoom(NULL);
+	}
+	/** Returns a subset of the given Rect bounded by the box of this widget and all ancestors.
+	*/
 	virtual math::Rect getViewport(math::Rect r);
 
 	template <class T>
