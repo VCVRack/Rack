@@ -109,7 +109,8 @@ void ScrollWidget::onDragMove(const event::DragMove& e) {
 	if (!(horizontalScrollBar->isVisible() || verticalScrollBar->isVisible()))
 		return;
 
-	offset = offset.minus(e.mouseDelta);
+	math::Vec offsetDelta = e.mouseDelta.div(getAbsoluteZoom());
+	offset = offset.minus(offsetDelta);
 }
 
 

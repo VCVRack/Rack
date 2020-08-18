@@ -34,6 +34,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Copy cable color when cloning cables with Ctrl+click.
 - Fix key commands on AZERTY, Dvorak, and all other keyboard layouts.
 - Add Mouse device to Computer keyboard/mouse MIDI driver.
+- Make scrollbar mouse interaction similar to modern OS behavior.
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
