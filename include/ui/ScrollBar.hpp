@@ -17,6 +17,7 @@ struct ScrollBar : widget::OpaqueWidget {
 	ScrollBar();
 	~ScrollBar();
 	void draw(const DrawArgs& args) override;
+	void onButton(const event::Button& e) override;
 	void onDragStart(const event::DragStart& e) override;
 	void onDragEnd(const event::DragEnd& e) override;
 	void onDragMove(const event::DragMove& e) override;

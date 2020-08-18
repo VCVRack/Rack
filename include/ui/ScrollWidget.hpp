@@ -22,6 +22,12 @@ struct ScrollWidget : widget::OpaqueWidget {
 
 	ScrollWidget();
 	void scrollTo(math::Rect r);
+	/** Returns the bound of allowed `offset` values in pixels. */
+	math::Rect getContainerOffsetBound();
+	/** Returns the handle position relative to the scrollbar. [0, 1]. */
+	math::Vec getHandleOffset();
+	/** Returns the handle size relative to the scrollbar. [0, 1]. */
+	math::Vec getHandleSize();
 	void draw(const DrawArgs& args) override;
 	void step() override;
 	void onButton(const event::Button& e) override;

@@ -31,6 +31,24 @@ void ScrollWidget::scrollTo(math::Rect r) {
 }
 
 
+math::Rect ScrollWidget::getContainerOffsetBound() {
+	math::Rect r;
+	r.pos = containerBox.pos;
+	r.size = containerBox.size.minus(box.size);
+	return r;
+}
+
+
+math::Vec ScrollWidget::getHandleOffset() {
+	return offset.minus(containerBox.pos).div(getContainerOffsetBound().size);
+}
+
+
+math::Vec ScrollWidget::getHandleSize() {
+	return box.size.div(containerBox.size);
+}
+
+
 void ScrollWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 	Widget::draw(args);
@@ -41,10 +59,11 @@ void ScrollWidget::draw(const DrawArgs& args) {
 void ScrollWidget::step() {
 	Widget::step();
 
-	// Clamp scroll offset
+	// Set containerBox cache
 	containerBox = container->getChildrenBoundingBox();
-	math::Rect offsetBounds = containerBox;
-	offsetBounds.size = offsetBounds.size.minus(box.size);
+
+	// Clamp scroll offset
+	math::Rect offsetBounds = getContainerOffsetBound();
 	offset = offset.clamp(offsetBounds);
 
 	// Update the container's position from the offset
@@ -69,7 +88,7 @@ void ScrollWidget::onButton(const event::Button& e) {
 		return;
 
 	// Consume right button only if the scrollbars are visible
-	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
+	if (!(horizontalScrollBar->isVisible() || verticalScrollBar->isVisible()))
 		return;
 
 	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
@@ -87,7 +106,7 @@ void ScrollWidget::onDragStart(const event::DragStart& e) {
 
 void ScrollWidget::onDragMove(const event::DragMove& e) {
 	// Scroll only if the scrollbars are visible
-	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
+	if (!(horizontalScrollBar->isVisible() || verticalScrollBar->isVisible()))
 		return;
 
 	offset = offset.minus(e.mouseDelta);
@@ -100,7 +119,7 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 		return;
 
 	// Scroll only if the scrollbars are visible
-	if (!(horizontalScrollBar->visible || verticalScrollBar->visible))
+	if (!(horizontalScrollBar->isVisible() || verticalScrollBar->isVisible()))
 		return;
 
 	math::Vec scrollDelta = e.scrollDelta;
