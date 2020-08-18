@@ -153,7 +153,7 @@ void Knob::onDragMove(const event::DragMove& e) {
 			if (km == settings::KNOB_MODE_SCALED_LINEAR) {
 				float deltaY = (horizontal ? -e.mouseDelta.y : -e.mouseDelta.x);
 				const float pixelTau = 200.f;
-				internal->linearScale *= std::pow(2.f, deltaY / pixelTau);
+				internal->linearScale *= std::pow(2.f, -deltaY / pixelTau);
 				delta *= internal->linearScale;
 			}
 
