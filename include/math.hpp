@@ -143,10 +143,14 @@ inline float chop(float x, float epsilon = 1e-6f) {
 	return std::fabs(x) <= epsilon ? 0.f : x;
 }
 
+/** Rescales `x` from the range `[xMin, xMax]` to `[yMin, yMax]`.
+*/
 inline float rescale(float x, float xMin, float xMax, float yMin, float yMax) {
 	return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
 }
 
+/** Linearly interpolates between `a` and `b`, from `p = 0` to `p = 1`.
+*/
 inline float crossfade(float a, float b, float p) {
 	return a + (b - a) * p;
 }
@@ -177,6 +181,8 @@ inline void complexMult(float ar, float ai, float br, float bi, float* cr, float
 
 struct Rect;
 
+/** 2-dimensional vector of floats, representing a point in 2D space.
+*/
 struct Vec {
 	float x = 0.f;
 	float y = 0.f;
@@ -282,6 +288,8 @@ struct Vec {
 };
 
 
+/** 2-dimensional rectangle of floats.
+*/
 struct Rect {
 	Vec pos;
 	Vec size;
