@@ -23,6 +23,7 @@ struct MenuItem : MenuEntry {
 	virtual Menu* createChildMenu() {
 		return NULL;
 	}
+	void onAction(const event::Action& e) override;
 };
 
 

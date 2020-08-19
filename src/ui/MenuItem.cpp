@@ -76,13 +76,17 @@ void MenuItem::doAction() {
 	// Consume event by default, but allow action to un-consume it to prevent the menu from being removed.
 	eAction.consume(this);
 	onAction(eAction);
-	if (!cAction.target)
+	if (!cAction.consumed)
 		return;
 
 	MenuOverlay* overlay = getAncestorOfType<MenuOverlay>();
 	if (overlay) {
 		overlay->requestDelete();
 	}
+}
+
+
+void MenuItem::onAction(const event::Action& e) {
 }
 
 

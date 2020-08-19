@@ -91,6 +91,11 @@ struct Base {
 		context->consumed = true;
 		context->target = w;
 	}
+	void unconsume() const {
+		if (!context)
+			return;
+		context->consumed = false;
+	}
 	bool isConsumed() const {
 		if (!context)
 			return false;
