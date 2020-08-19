@@ -235,18 +235,18 @@ $(oui-blendish): $(wildcard oui-blendish/*.h)
 $(osdialog): $(wildcard osdialog/*.h)
 	cp $^ include/
 
-jpommier-pffft-29e4f76ac53b:
-	$(WGET) "https://bitbucket.org/jpommier/pffft/get/29e4f76ac53b.zip"
-	$(SHA256) 29e4f76ac53b.zip bb10afba127904a0c6c553fa445082729b7d72373511bda1b12a5be0e03f318a
-	$(UNZIP) 29e4f76ac53b.zip
-	rm 29e4f76ac53b.zip
+pffft:
+	$(WGET) "https://vcvrack.com/downloads/dep/pffft.zip"
+	$(SHA256) pffft.zip fd3ebe4f3843675a79912167a4e74415ed0ad302ed8adc90e1af23a7c67654b4
+	$(UNZIP) pffft.zip
+	rm pffft.zip
 
-$(pffft): jpommier-pffft-29e4f76ac53b
-	cp jpommier-pffft-29e4f76ac53b/*.h include/
+$(pffft): pffft
+	cp pffft/*.h include/
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1d curl-7.66.0 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog jpommier-pffft-29e4f76ac53b
+src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1d curl-7.66.0 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog pffft
 
 clean:
 	git clean -fdx

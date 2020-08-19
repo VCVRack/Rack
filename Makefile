@@ -13,7 +13,7 @@ SED := perl -pi -e
 
 SOURCES += dep/nanovg/src/nanovg.c
 SOURCES += dep/osdialog/osdialog.c
-SOURCES += $(wildcard dep/jpommier-pffft-*/pffft.c) $(wildcard dep/jpommier-pffft-*/fftpack.c)
+SOURCES += dep/pffft/pffft.c dep/pffft/fftpack.c
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 ifdef ARCH_LIN
