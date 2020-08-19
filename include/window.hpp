@@ -66,9 +66,7 @@ struct Window {
 	This is not equal to gPixelRatio in general.
 	*/
 	float windowRatio = 1.f;
-	int frame = 0;
 	std::shared_ptr<Font> uiFont;
-	double frameTimeStart = 0.f;
 
 	/** Use load*() instead of modifying these directly. */
 	std::map<std::string, std::weak_ptr<Font>> fontCache;
@@ -90,9 +88,10 @@ struct Window {
 	int getMods();
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();
-	bool isFrameOverdue();
-	float getMonitorRefreshRate();
-	float getLastFrameRate();
+	double getMonitorRefreshRate();
+	double getLastFrameTime();
+	double getLastFrameDuration();
+	double getFrameTimeOverdue();
 
 	std::shared_ptr<Font> loadFont(const std::string& filename);
 	std::shared_ptr<Image> loadImage(const std::string& filename);

@@ -398,7 +398,7 @@ struct FrameRateItem : ui::MenuItem {
 		ui::Menu* menu = new ui::Menu;
 
 		for (int i = 1; i <= 6; i++) {
-			float frameRate = APP->window->getMonitorRefreshRate() / i;
+			double frameRate = APP->window->getMonitorRefreshRate() / i;
 
 			FrameRateValueItem* item = new FrameRateValueItem;
 			item->frameSwapInterval = i;

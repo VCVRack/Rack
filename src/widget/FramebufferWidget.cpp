@@ -54,7 +54,7 @@ void FramebufferWidget::step() {
 	Widget::step();
 
 	// It's more important to not lag the frame than to draw the framebuffer
-	if (APP->window->isFrameOverdue())
+	if (APP->window->getFrameTimeOverdue() > 0.0)
 		return;
 
 	// Check that scale has been set by `draw()` yet.

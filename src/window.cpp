@@ -94,10 +94,12 @@ struct Window::Internal {
 	int lastWindowWidth = 0;
 	int lastWindowHeight = 0;
 
+	int frame = 0;
 	bool ignoreNextMouseDelta = false;
 	int frameSwapInterval = -1;
-	float monitorRefreshRate = 0.f;
-	float lastFrameRate = 0.f;
+	double monitorRefreshRate = 0.0;
+	double lastFrameDuration = 0.0;
+	double lastFrameTime = 0.0;
 
 	math::Vec lastMousePos;
 };
@@ -337,12 +339,12 @@ Window::~Window() {
 }
 
 void Window::run() {
-	frame = 0;
+	internal->frame = 0;
 	while (!glfwWindowShouldClose(win)) {
 		double frameTime = glfwGetTime();
-		internal->lastFrameRate = 1.f / float(frameTime - frameTimeStart);
-		// DEBUG("%.2f Hz", internal->lastFrameRate);
-		frameTimeStart = frameTime;
+		internal->lastFrameDuration = frameTime - internal->lastFrameTime;
+		// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
+		internal->lastFrameTime = frameTime;
 
 		// Make event handlers and step() have a clean nanovg context
 		nvgReset(vg);
@@ -354,8 +356,8 @@ void Window::run() {
 		// In case glfwPollEvents() sets another OpenGL context
 		glfwMakeContextCurrent(win);
 		if (settings::frameSwapInterval != internal->frameSwapInterval) {
-			internal->frameSwapInterval = settings::frameSwapInterval;
 			glfwSwapInterval(settings::frameSwapInterval);
+			internal->frameSwapInterval = settings::frameSwapInterval;
 		}
 
 		// Call cursorPosCallback every frame, not just when the mouse moves
@@ -423,7 +425,7 @@ void Window::run() {
 
 		glfwSwapBuffers(win);
 
-		frame++;
+		internal->frame++;
 	}
 }
 
@@ -449,8 +451,10 @@ void Window::screenshot(float zoom) {
 			app::ModuleWidget* mw = model->createModuleWidget(NULL);
 			fbw->addChild(mw);
 
+			// Reset the frame time so FramebufferWidgets are guaranteed to draw
+			internal->lastFrameTime = 0.0;
+
 			// Draw to framebuffer
-			frameTimeStart = glfwGetTime();
 			fbw->step();
 			nvgluBindFramebuffer(fbw->getFramebuffer());
 
@@ -539,20 +543,22 @@ bool Window::isFullScreen() {
 	return monitor != NULL;
 }
 
-bool Window::isFrameOverdue() {
-	if (settings::frameSwapInterval == 0)
-		return false;
-	double frameDuration = glfwGetTime() - frameTimeStart;
-	double frameDeadline = settings::frameSwapInterval / internal->monitorRefreshRate;
-	return frameDuration > frameDeadline;
-}
-
-float Window::getMonitorRefreshRate() {
+double Window::getMonitorRefreshRate() {
 	return internal->monitorRefreshRate;
 }
 
-float Window::getLastFrameRate() {
-	return internal->lastFrameRate;
+double Window::getLastFrameTime() {
+	return internal->lastFrameTime;
+}
+
+double Window::getLastFrameDuration() {
+	return internal->lastFrameDuration;
+}
+
+double Window::getFrameTimeOverdue() {
+	double desiredFrameDuration = internal->frameSwapInterval / internal->monitorRefreshRate;
+	double frameDuration = glfwGetTime() - internal->lastFrameTime;
+	return frameDuration - desiredFrameDuration;
 }
 
 std::shared_ptr<Font> Window::loadFont(const std::string& filename) {

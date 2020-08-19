@@ -23,7 +23,7 @@ struct Scene::Internal {
 
 struct FrameRateWidget : widget::TransparentWidget {
 	void draw(const DrawArgs& args) override {
-		std::string text = string::f("%.2f Hz", APP->window->getLastFrameRate());
+		std::string text = string::f("%.2lf Hz", 1.0 / APP->window->getLastFrameDuration());
 		bndLabel(args.vg, 0.0, 0.0, INFINITY, INFINITY, -1, text.c_str());
 	}
 };
