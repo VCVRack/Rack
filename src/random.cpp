@@ -57,8 +57,8 @@ uint64_t u64() {
 }
 
 float uniform() {
-	// Make sure to only use 24 bits so it's impossible to round up to 1.f.
-	return (xoroshiro128plus_next() >> (64 - 24)) / std::pow(2.f, 24);
+	// The multiplier is 2f7fffff in hex. This gives maximum precision of uint32_t -> float conversion and its image is [0, 1).
+	return u32() * 2.32830629e-10f;
 }
 
 float normal() {
