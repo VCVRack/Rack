@@ -51,7 +51,7 @@ struct ModuleInfoItem : ui::MenuItem {
 
 		// plugin
 		ModuleUrlItem* pluginItem = new ModuleUrlItem;
-		pluginItem->text = "Plugin: " + model->plugin->name;;
+		pluginItem->text = "Plugin: " + model->plugin->name + " v" + model->plugin->version;
 		if (model->plugin->pluginUrl != "") {
 			pluginItem->url = model->plugin->pluginUrl;
 		}
@@ -60,9 +60,9 @@ struct ModuleInfoItem : ui::MenuItem {
 		}
 		menu->addChild(pluginItem);
 
-		ui::MenuLabel* versionLabel = new ui::MenuLabel;
-		versionLabel->text = "v" + model->plugin->version;
-		menu->addChild(versionLabel);
+		// ui::MenuLabel* versionLabel = new ui::MenuLabel;
+		// versionLabel->text = "v" + model->plugin->version;
+		// menu->addChild(versionLabel);
 
 		// author
 		if (model->plugin->author != "") {
