@@ -30,8 +30,8 @@ void ScrollBar::draw(const DrawArgs& args) {
 	if (APP->event->getDraggedWidget() == this)
 		state = BND_ACTIVE;
 
-	float handleOffset = sw->getHandleOffset().get(vertical);
-	float handleSize = sw->getHandleSize().get(vertical);
+	float handleOffset = sw->getHandleOffset()[vertical];
+	float handleSize = sw->getHandleSize()[vertical];
 	bndScrollBar(args.vg, 0.0, 0.0, box.size.x, box.size.y, state, handleOffset, handleSize);
 }
 
@@ -41,18 +41,17 @@ void ScrollBar::onButton(const event::Button& e) {
 		ScrollWidget* sw = dynamic_cast<ScrollWidget*>(parent);
 		assert(sw);
 
-		float pos = e.pos.get(vertical);
-		pos /= box.size.get(vertical);
-		float handleOffset = sw->getHandleOffset().get(vertical);
-		float handleSize = sw->getHandleSize().get(vertical);
+		float pos = e.pos[vertical];
+		pos /= box.size[vertical];
+		float handleOffset = sw->getHandleOffset()[vertical];
+		float handleSize = sw->getHandleSize()[vertical];
 		float handlePos = math::rescale(handleOffset, 0.f, 1.f, handleSize / 2.f, 1.f - handleSize / 2.f);
-		math::Rect offsetBound = sw->getContainerOffsetBound();
 
 		// Check if user clicked on handle
 		if (std::fabs(pos - handlePos) > handleSize / 2.f) {
 			// Jump to absolute position of the handle
 			float offset = math::rescale(pos, handleSize / 2.f, 1.f - handleSize / 2.f, 0.f, 1.f);
-			sw->offset.get(vertical) = sw->containerBox.pos.get(vertical) + offset * (sw->containerBox.size.get(vertical) - sw->box.size.get(vertical));
+			sw->offset[vertical] = sw->containerBox.pos[vertical] + offset * (sw->containerBox.size[vertical] - sw->box.size[vertical]);
 		}
 	}
 	OpaqueWidget::onButton(e);
@@ -72,14 +71,14 @@ void ScrollBar::onDragMove(const event::DragMove& e) {
 	assert(sw);
 
 	// Move handle absolutely.
-	float mouseDelta = e.mouseDelta.get(vertical);
+	float mouseDelta = e.mouseDelta[vertical];
 	mouseDelta /= getAbsoluteZoom();
 
-	float handleSize = sw->getHandleSize().get(vertical);
-	float handleBound = (1.f - handleSize) * box.size.get(vertical);
-	float offsetBound = sw->getContainerOffsetBound().size.get(vertical);
+	float handleSize = sw->getHandleSize()[vertical];
+	float handleBound = (1.f - handleSize) * box.size[vertical];
+	float offsetBound = sw->getContainerOffsetBound().size[vertical];
 	float offsetDelta = mouseDelta * offsetBound / handleBound;
-	sw->offset.get(vertical) += offsetDelta;
+	sw->offset[vertical] += offsetDelta;
 }
 
 

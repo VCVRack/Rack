@@ -190,17 +190,11 @@ struct Vec {
 	Vec() {}
 	Vec(float x, float y) : x(x), y(y) {}
 
-	float get(int index) const {
-		return (index == 0) ? x : y;
+	float& operator[](int i) {
+		return (i == 0) ? x : y;
 	}
-	float& get(int index) {
-		return (index == 0) ? x : y;
-	}
-	void set(int index, float value) {
-		if (index == 0)
-			x = value;
-		else
-			y = value;
+	const float& operator[](int i) const {
+		return (i == 0) ? x : y;
 	}
 	/** Negates the vector.
 	Equivalent to a reflection across the `y = -x` line.
@@ -418,6 +412,54 @@ inline Vec Vec::clampSafe(Rect bound) const {
 	return Vec(
 	         math::clampSafe(x, bound.pos.x, bound.pos.x + bound.size.x),
 	         math::clampSafe(y, bound.pos.y, bound.pos.y + bound.size.y));
+}
+
+
+// Operator overloads for Vec
+inline Vec operator+(const Vec& a, const Vec& b) {
+	return a.plus(b);
+}
+inline Vec operator-(const Vec& a, const Vec& b) {
+	return a.minus(b);
+}
+inline Vec operator*(const Vec& a, const Vec& b) {
+	return a.mult(b);
+}
+inline Vec operator*(const Vec& a, const float& b) {
+	return a.mult(b);
+}
+inline Vec operator*(const float& a, const Vec& b) {
+	return b.mult(a);
+}
+inline Vec operator/(const Vec& a, const Vec& b) {
+	return a.div(b);
+}
+inline Vec operator/(const Vec& a, const float& b) {
+	return a.div(b);
+}
+inline Vec operator+=(Vec& a, const Vec& b) {
+	return a = a.plus(b);
+}
+inline Vec operator-=(Vec& a, const Vec& b) {
+	return a = a.minus(b);
+}
+inline Vec operator*=(Vec& a, const Vec& b) {
+	return a = a.mult(b);
+}
+inline Vec operator*=(Vec& a, const float& b) {
+	return a = a.mult(b);
+}
+inline Vec operator/=(Vec& a, const Vec& b) {
+	return a = a.div(b);
+}
+inline Vec operator/=(Vec& a, const float& b) {
+	return a = a.div(b);
+}
+inline bool operator==(const Vec& a, const Vec& b) {
+	return a.isEqual(b);
+}
+inline bool operator!=(const Vec& a, const Vec& b) {
+	return !a.isEqual(b);
 }
 
 
