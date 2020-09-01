@@ -96,11 +96,27 @@ Port::~Port() {
 }
 
 void Port::reset() {
-	setDriverId(-1);
+	// Get default driver
+	int firstDriverId = -1;
+	std::vector<int> driverIds = getDriverIds();
+	if (!driverIds.empty())
+		firstDriverId = driverIds[0];
+
+	setDriverId(firstDriverId);
 	offset = 0;
 }
 
+Driver* Port::getDriver() {
+	return driver;
+}
+
+int Port::getDriverId() {
+	return driverId;
+}
+
 void Port::setDriverId(int driverId) {
+	if (driverId == this->driverId)
+		return;
 	// Unset device and driver
 	setDeviceId(-1);
 	driver = NULL;
@@ -118,31 +134,206 @@ void Port::setDriverId(int driverId) {
 	}
 }
 
+std::string Port::getDriverName() {
+	if (!driver)
+		return "";
+	try {
+		return driver->getName();
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get driver name: %s", e.what());
+		return "";
+	}
+}
+
+Device* Port::getDevice() {
+	return device;
+}
+
+std::vector<int> Port::getDeviceIds() {
+	if (!driver)
+		return {};
+	try {
+		return driver->getDeviceIds();
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device IDs: %s", e.what());
+		return {};
+	}
+}
+
+int Port::getDeviceId() {
+	return deviceId;
+}
+
 void Port::setDeviceId(int deviceId) {
+	if (deviceId == this->deviceId)
+		return;
 	// Destroy device
 	if (driver && this->deviceId >= 0) {
-		driver->unsubscribe(this->deviceId, this);
+		try {
+			driver->unsubscribe(this->deviceId, this);
+		}
+		catch (Exception& e) {
+			WARN("Audio port could not unsubscribe from device: %s", e.what());
+		}
 	}
 	device = NULL;
 	this->deviceId = -1;
 
 	// Create device
 	if (driver && deviceId >= 0) {
-		device = driver->subscribe(deviceId, this);
-		this->deviceId = deviceId;
+		try {
+			device = driver->subscribe(deviceId, this);
+			this->deviceId = deviceId;
+		}
+		catch (Exception& e) {
+			WARN("Audio port could not subscribe to device: %s", e.what());
+		}
+	}
+}
+
+int Port::getDeviceNumInputs(int deviceId) {
+	if (!driver)
+		return 0;
+	try {
+		return driver->getDeviceNumInputs(deviceId);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device number of inputs: %s", e.what());
+		return 0;
+	}
+}
+
+int Port::getDeviceNumOutputs(int deviceId) {
+	if (!driver)
+		return 0;
+	try {
+		return driver->getDeviceNumOutputs(deviceId);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device number of outputs: %s", e.what());
+		return 0;
+	}
+}
+
+std::string Port::getDeviceName(int deviceId) {
+	if (!driver)
+		return "";
+	try {
+		return driver->getDeviceName(deviceId);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device name: %s", e.what());
+		return 0;
+	}
+}
+
+std::string Port::getDeviceDetail(int deviceId, int offset) {
+	if (!driver)
+		return "";
+	try {
+		// Use maxChannels from Port.
+		return driver->getDeviceDetail(deviceId, offset, maxChannels);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device detail: %s", e.what());
+		return 0;
+	}
+}
+
+std::vector<int> Port::getSampleRates() {
+	if (!device)
+		return {};
+	try {
+		return device->getSampleRates();
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device sample rates: %s", e.what());
+		return {};
+	}
+}
+
+int Port::getSampleRate() {
+	if (!device)
+		return 0;
+	try {
+		return device->getSampleRate();
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device sample rate: %s", e.what());
+		return 0;
+	}
+}
+
+void Port::setSampleRate(int sampleRate) {
+	if (!device)
+		return;
+	try {
+		device->setSampleRate(sampleRate);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not set device sample rate: %s", e.what());
+	}
+}
+
+std::vector<int> Port::getBlockSizes() {
+	if (!device)
+		return {};
+	try {
+		return device->getBlockSizes();
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device block sizes: %s", e.what());
+		return {};
+	}
+}
+
+int Port::getBlockSize() {
+	if (!device)
+		return 0;
+	try {
+		return device->getBlockSize();
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device block size: %s", e.what());
+		return 0;
+	}
+}
+
+void Port::setBlockSize(int blockSize) {
+	if (!device)
+		return;
+	try {
+		device->setBlockSize(blockSize);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not set device block size: %s", e.what());
 	}
 }
 
 int Port::getNumInputs() {
 	if (!device)
 		return 0;
-	return std::min(device->getNumInputs() - offset, maxChannels);
+	try {
+		return std::min(device->getNumInputs() - offset, maxChannels);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device number of inputs: %s", e.what());
+		return 0;
+	}
 }
 
 int Port::getNumOutputs() {
 	if (!device)
 		return 0;
-	return std::min(device->getNumOutputs() - offset, maxChannels);
+	try {
+		return std::min(device->getNumOutputs() - offset, maxChannels);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get device number of outputs: %s", e.what());
+		return 0;
+	}
 }
 
 json_t* Port::toJson() {
@@ -172,8 +363,11 @@ void Port::fromJson(json_t* rootJ) {
 		if (deviceNameJ) {
 			std::string deviceName = json_string_value(deviceNameJ);
 			// Search for device ID with equal name
-			for (int deviceId : driver->getDeviceIds()) {
-				if (driver->getDeviceName(deviceId) == deviceName) {
+			for (int deviceId : getDeviceIds()) {
+				std::string deviceNameCurr = getDeviceName(deviceId);
+				if (deviceNameCurr == "")
+					continue;
+				if (deviceNameCurr == deviceName) {
 					setDeviceId(deviceId);
 					break;
 				}
@@ -193,7 +387,6 @@ void Port::fromJson(json_t* rootJ) {
 	if (offsetJ)
 		offset = json_integer_value(offsetJ);
 }
-
 
 ////////////////////
 // audio
@@ -223,6 +416,7 @@ std::vector<int> getDriverIds() {
 }
 
 Driver* getDriver(int driverId) {
+	// Search for driver by ID
 	for (auto& pair : drivers) {
 		if (pair.first == driverId)
 			return pair.second;

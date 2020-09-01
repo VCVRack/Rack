@@ -22,30 +22,45 @@ namespace audio {
 struct Device;
 struct Port;
 
+/** An audio driver API containing any number of audio devices.
+*/
 struct Driver {
 	virtual ~Driver() {}
+	/** Returns the name of the driver. E.g. "ALSA". */
 	virtual std::string getName() {
 		return "";
 	}
+	/** Returns a list of all device IDs that can be subscribed to. */
 	virtual std::vector<int> getDeviceIds() {
 		return {};
 	}
-
-	/** Gets the name of a device without subscribing to it. */
+	/** Returns the name of a device without obtaining it. */
 	virtual std::string getDeviceName(int deviceId) {
 		return "";
 	}
+	/** Returns the number of inputs of a device without obtaining it. */
 	virtual int getDeviceNumInputs(int deviceId) {
 		return 0;
 	}
+	/** Returns the number of output of a device without obtaining it. */
 	virtual int getDeviceNumOutputs(int deviceId) {
 		return 0;
 	}
+	/** Returns a detailed description of the device without obtaining it.
+	`offset` specifies the first channel (zero-indexed).
+	E.g. "MySoundcard (1-2 in, 1-2 out)"
+	*/
 	std::string getDeviceDetail(int deviceId, int offset, int maxChannels);
 
+	/** Adds the given port as a reference holder of a device and returns the it.
+	Creates the Device if no ports are subscribed before calling.
+	*/
 	virtual Device* subscribe(int deviceId, Port* port) {
 		return NULL;
 	}
+	/** Removes the give port as a reference holder of a device.
+	Deletes the Device if no ports are subscribed after calling.
+	*/
 	virtual void unsubscribe(int deviceId, Port* port) {}
 };
 
@@ -53,6 +68,12 @@ struct Driver {
 // Device
 ////////////////////
 
+/** A single audio device of a driver API.
+
+Modules should
+
+Methods throw `rack::Exception` if the driver API has an exception.
+*/
 struct Device {
 	std::set<Port*> subscribed;
 	virtual ~Device() {}
@@ -69,22 +90,36 @@ struct Device {
 	virtual int getNumOutputs() {
 		return 0;
 	}
+	/** Returns a detailed description of the device.
+	`offset` specifies the first channel (zero-indexed).
+	E.g. "MySoundcard (1-2 in, 1-2 out)"
+	*/
 	std::string getDetail(int offset, int maxChannels);
 
+	/** Returns a list of all valid (user-selectable) sample rates.
+	The device may accept sample rates not in this list, but it *must* accept sample rates in the list.
+	*/
 	virtual std::vector<int> getSampleRates() {
 		return {};
 	}
+	/** Returns the current sample rate. */
 	virtual int getSampleRate() {
 		return 0;
 	}
+	/** Sets the sample rate of the device, re-opening it if needed. */
 	virtual void setSampleRate(int sampleRate) {}
 
+	/** Returns a list of all valid (user-selectable) block sizes.
+	The device may accept block sizes not in this list, but it *must* accept block sizes in the list.
+	*/
 	virtual std::vector<int> getBlockSizes() {
 		return {};
 	}
+	/** Returns the current block size. */
 	virtual int getBlockSize() {
 		return 0;
 	}
+	/** Sets the block size of the device, re-opening it if needed. */
 	virtual void setBlockSize(int blockSize) {}
 
 	// Called by this Device class, forwards to subscribed Ports.
@@ -97,6 +132,11 @@ struct Device {
 // Port
 ////////////////////
 
+/** A handle to a Device, typically owned by modules to have shared access to a single Device.
+
+All Port methods safely wrap Drivers methods.
+That is, if the active Device thrown a `rack::Exception`, it is caught and logged inside all Port methods, so you can consider them nothrow.
+*/
 struct Port {
 	/** The first channel index of the device to process. */
 	int offset = 0;
@@ -115,51 +155,27 @@ struct Port {
 	virtual ~Port();
 	void reset();
 
-	Driver* getDriver() {
-		return driver;
-	}
-	int getDriverId() {
-		return driverId;
-	}
+	Driver* getDriver();
+	int getDriverId();
 	void setDriverId(int driverId);
+	std::string getDriverName();
 
-	Device* getDevice() {
-		return device;
-	}
-	int getDeviceId() {
-		return deviceId;
-	}
+	Device* getDevice();
+	std::vector<int> getDeviceIds();
+	int getDeviceId();
 	void setDeviceId(int deviceId);
+	int getDeviceNumInputs(int deviceId);
+	int getDeviceNumOutputs(int deviceId);
+	std::string getDeviceName(int deviceId);
+	std::string getDeviceDetail(int deviceId, int offset);
 
-	std::vector<int> getSampleRates() {
-		if (!device)
-			return {};
-		return device->getSampleRates();
-	}
-	int getSampleRate() {
-		if (!device)
-			return 0;
-		return device->getSampleRate();
-	}
-	void setSampleRate(int sampleRate) {
-		if (device)
-			device->setSampleRate(sampleRate);
-	}
+	std::vector<int> getSampleRates();
+	int getSampleRate();
+	void setSampleRate(int sampleRate);
 
-	std::vector<int> getBlockSizes() {
-		if (!device)
-			return {};
-		return device->getBlockSizes();
-	}
-	int getBlockSize() {
-		if (!device)
-			return 0;
-		return device->getBlockSize();
-	}
-	void setBlockSize(int blockSize) {
-		if (device)
-			device->setBlockSize(blockSize);
-	}
+	std::vector<int> getBlockSizes();
+	int getBlockSize();
+	void setBlockSize(int blockSize);
 
 	int getNumInputs();
 	int getNumOutputs();

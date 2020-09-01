@@ -40,7 +40,8 @@ struct AudioDriverChoice : LedDisplayChoice {
 		text = "";
 		if (box.size.x >= 200.0)
 			text += "Driver: ";
-		std::string driverName = (port && port->driver) ? port->getDriver()->getName() : "";
+		audio::Driver* driver = port ? port->getDriver() : NULL;
+		std::string driverName = driver ? driver->getName() : "";
 		if (driverName != "") {
 			text += driverName;
 			color.a = 1.0;
@@ -73,7 +74,7 @@ struct AudioDeviceValueItem : ui::MenuItem {
 };
 
 static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
-	if (!port || !port->driver)
+	if (!port)
 		return;
 
 	{
@@ -85,8 +86,8 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 		menu->addChild(item);
 	}
 
-	for (int deviceId : port->driver->getDeviceIds()) {
-		int channels = std::max(port->driver->getDeviceNumInputs(deviceId), port->driver->getDeviceNumOutputs(deviceId));
+	for (int deviceId : port->getDeviceIds()) {
+		int channels = std::max(port->getDeviceNumInputs(deviceId), port->getDeviceNumOutputs(deviceId));
 		// Prevents devices with a ridiculous number of channels from being displayed
 		const int maxTotalChannels = port->maxChannels * 16;
 		channels = std::min(maxTotalChannels, channels);
@@ -96,7 +97,7 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 			item->port = port;
 			item->deviceId = deviceId;
 			item->offset = offset;
-			item->text = port->driver->getDeviceDetail(deviceId, offset, port->maxChannels);
+			item->text = port->getDeviceDetail(deviceId, offset);
 			item->rightText = CHECKMARK(item->deviceId == port->getDeviceId() && item->offset == port->offset);
 			menu->addChild(item);
 		}

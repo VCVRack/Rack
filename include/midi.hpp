@@ -88,19 +88,30 @@ struct Output;
 
 struct Driver {
 	virtual ~Driver() {}
+	/** Returns the name of the driver. E.g. "ALSA". */
 	virtual std::string getName() {
 		return "";
 	}
+	/** Returns a list of all input device IDs that can be subscribed to. */
 	virtual std::vector<int> getInputDeviceIds() {
 		return {};
 	}
+	/** Returns the name of an input device without obtaining it. */
 	virtual std::string getInputDeviceName(int deviceId) {
 		return "";
 	}
+	/** Adds the given port as a reference holder of a device and returns the it.
+	Creates the Device if no ports are subscribed before calling.
+	*/
 	virtual InputDevice* subscribeInput(int deviceId, Input* input) {
 		return NULL;
 	}
+	/** Removes the give port as a reference holder of a device.
+	Deletes the Device if no ports are subscribed after calling.
+	*/
 	virtual void unsubscribeInput(int deviceId, Input* input) {}
+
+	// The following behave identically as the above methods except for outputs.
 
 	virtual std::vector<int> getOutputDeviceIds() {
 		return {};
@@ -127,15 +138,21 @@ struct Device {
 
 struct InputDevice : Device {
 	std::set<Input*> subscribed;
+	/** Not public. Use Driver::subscribeInput(). */
 	void subscribe(Input* input);
+	/** Not public. Use Driver::unsubscribeInput(). */
 	void unsubscribe(Input* input);
+	/** Called when a MIDI message is received from the device. */
 	void onMessage(const Message &message);
 };
 
 struct OutputDevice : Device {
 	std::set<Output*> subscribed;
-	void subscribe(Output* input);
-	void unsubscribe(Output* input);
+	/** Not public. Use Driver::subscribeOutput(). */
+	void subscribe(Output* output);
+	/** Not public. Use Driver::unsubscribeOutput(). */
+	void unsubscribe(Output* output);
+	/** Sends a MIDI message to the device. */
 	virtual void sendMessage(const Message &message) {}
 };
 

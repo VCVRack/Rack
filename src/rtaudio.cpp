@@ -39,7 +39,6 @@ struct RtAudioDevice : audio::Device {
 			deviceInfo = rtAudio->getDeviceInfo(deviceId);
 		}
 		catch (RtAudioError& e) {
-			WARN("Failed to query RtAudio device: %s", e.what());
 			throw Exception(string::f("Failed to query RtAudio device: %s", e.what()));
 		}
 
@@ -55,8 +54,7 @@ struct RtAudioDevice : audio::Device {
 	void openStream() {
 		// Open new device
 		if (deviceInfo.outputChannels == 0 && deviceInfo.inputChannels == 0) {
-			WARN("RtAudio device %d has 0 inputs and 0 outputs", deviceId);
-			return;
+			throw Exception(string::f("RtAudio device %d has 0 inputs and 0 outputs", deviceId));
 		}
 
 		inputParameters = RtAudio::StreamParameters();
@@ -98,8 +96,7 @@ struct RtAudioDevice : audio::Device {
 			  &rtAudioCallback, this, &options, NULL);
 		}
 		catch (RtAudioError& e) {
-			WARN("Failed to open RtAudio stream: %s", e.what());
-			return;
+			throw Exception(string::f("Failed to open RtAudio stream: %s", e.what()));
 		}
 
 		INFO("Starting RtAudio stream %d", deviceId);
@@ -107,8 +104,7 @@ struct RtAudioDevice : audio::Device {
 			rtAudio->startStream();
 		}
 		catch (RtAudioError& e) {
-			WARN("Failed to start RtAudio stream: %s", e.what());
-			return;
+			throw Exception(string::f("Failed to start RtAudio stream: %s", e.what()));
 		}
 
 		// Update sample rate to actual value
@@ -124,7 +120,7 @@ struct RtAudioDevice : audio::Device {
 				rtAudio->stopStream();
 			}
 			catch (RtAudioError& e) {
-				WARN("Failed to stop RtAudio stream %s", e.what());
+				throw Exception(string::f("Failed to stop RtAudio stream %s", e.what()));
 			}
 		}
 		if (rtAudio->isStreamOpen()) {
@@ -133,7 +129,7 @@ struct RtAudioDevice : audio::Device {
 				rtAudio->closeStream();
 			}
 			catch (RtAudioError& e) {
-				WARN("Failed to close RtAudio stream %s", e.what());
+				throw Exception(string::f("Failed to close RtAudio stream %s", e.what()));
 			}
 		}
 		INFO("Closed RtAudio stream");
