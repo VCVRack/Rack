@@ -68,7 +68,7 @@ struct RtAudioDevice : audio::Device {
 		outputParameters.firstChannel = 0;
 
 		options = RtAudio::StreamOptions();
-		options.flags |= RTAUDIO_MINIMIZE_LATENCY;
+		// options.flags |= RTAUDIO_MINIMIZE_LATENCY;
 		options.flags |= RTAUDIO_SCHEDULE_REALTIME;
 		options.numberOfBuffers = 2;
 		options.streamName = "VCV Rack";
@@ -87,7 +87,7 @@ struct RtAudioDevice : audio::Device {
 			blockSize = 256;
 		}
 
-		INFO("Opening audio RtAudio device %d with %d in %d out", deviceId, inputParameters.nChannels, outputParameters.nChannels);
+		INFO("Opening audio RtAudio device %d with %d in %d out, %d sample rate %d block size", deviceId, inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
 		try {
 			rtAudio->openStream(
 			  outputParameters.nChannels > 0 ? &outputParameters : NULL,
