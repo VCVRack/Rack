@@ -22,7 +22,7 @@ namespace audio {
 struct Device;
 struct Port;
 
-/** An audio driver API containing any number of audio devices.
+/** Wraps an audio driver API containing any number of audio devices.
 */
 struct Driver {
 	virtual ~Driver() {}
@@ -70,7 +70,7 @@ struct Driver {
 
 /** A single audio device of a driver API.
 
-Modules should
+Modules and the UI should not interact with this API directly. Use Port instead.
 
 Methods throw `rack::Exception` if the driver API has an exception.
 */
@@ -135,7 +135,7 @@ struct Device {
 /** A handle to a Device, typically owned by modules to have shared access to a single Device.
 
 All Port methods safely wrap Drivers methods.
-That is, if the active Device thrown a `rack::Exception`, it is caught and logged inside all Port methods, so you can consider them nothrow.
+That is, if the active Device throws a `rack::Exception`, it is caught and logged inside all Port methods, so they do not throw exceptions.
 */
 struct Port {
 	/** The first channel index of the device to process. */

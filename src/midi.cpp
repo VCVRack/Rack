@@ -65,6 +65,14 @@ Port::Port() {
 Port::~Port() {
 }
 
+Driver* Port::getDriver() {
+	return driver;
+}
+
+int Port::getDriverId() {
+	return driverId;
+}
+
 void Port::setDriverId(int driverId) {
 	// Unset device and driver
 	setDeviceId(-1);
@@ -81,6 +89,18 @@ void Port::setDriverId(int driverId) {
 		driver = drivers[0].second;
 		this->driverId = drivers[0].first;
 	}
+}
+
+Device* Port::getDevice() {
+	return device;
+}
+
+int Port::getDeviceId() {
+	return deviceId;
+}
+
+int Port::getChannel() {
+	return channel;
 }
 
 void Port::setChannel(int channel) {
@@ -151,18 +171,52 @@ void Input::reset() {
 	channel = -1;
 }
 
+std::vector<int> Input::getDeviceIds() {
+	if (!driver)
+		return {};
+	try {
+		return driver->getInputDeviceIds();
+	}
+	catch (Exception& e) {
+		WARN("MIDI port could not get input device IDs: %s", e.what());
+		return {};
+	}
+}
+
 void Input::setDeviceId(int deviceId) {
 	// Destroy device
 	if (driver && this->deviceId >= 0) {
-		driver->unsubscribeInput(this->deviceId, this);
+		try {
+			driver->unsubscribeInput(this->deviceId, this);
+		}
+		catch (Exception& e) {
+			WARN("MIDI port could not unsubscribe from input: %s", e.what());
+		}
 	}
 	device = inputDevice = NULL;
 	this->deviceId = -1;
 
 	// Create device
 	if (driver && deviceId >= 0) {
-		device = inputDevice = driver->subscribeInput(deviceId, this);
-		this->deviceId = deviceId;
+		try {
+			device = inputDevice = driver->subscribeInput(deviceId, this);
+			this->deviceId = deviceId;
+		}
+		catch (Exception& e) {
+			WARN("MIDI port could not subscribe to input: %s", e.what());
+		}
+	}
+}
+
+std::string Input::getDeviceName(int deviceId) {
+	if (!driver)
+		return "";
+	try {
+		return driver->getInputDeviceName(deviceId);
+	}
+	catch (Exception& e) {
+		WARN("MIDI port could not get input device name: %s", e.what());
+		return "";
 	}
 }
 
@@ -198,18 +252,52 @@ void Output::reset() {
 	channel = 0;
 }
 
+std::vector<int> Output::getDeviceIds() {
+	if (!driver)
+		return {};
+	try {
+		return driver->getOutputDeviceIds();
+	}
+	catch (Exception& e) {
+		WARN("MIDI port could not get output device IDs: %s", e.what());
+		return {};
+	}
+}
+
 void Output::setDeviceId(int deviceId) {
 	// Destroy device
 	if (driver && this->deviceId >= 0) {
-		driver->unsubscribeOutput(this->deviceId, this);
+		try {
+			driver->unsubscribeOutput(this->deviceId, this);
+		}
+		catch (Exception& e) {
+			WARN("MIDI port could not unsubscribe from output: %s", e.what());
+		}
 	}
 	device = outputDevice = NULL;
 	this->deviceId = -1;
 
 	// Create device
 	if (driver && deviceId >= 0) {
-		device = outputDevice = driver->subscribeOutput(deviceId, this);
-		this->deviceId = deviceId;
+		try {
+			device = outputDevice = driver->subscribeOutput(deviceId, this);
+			this->deviceId = deviceId;
+		}
+		catch (Exception& e) {
+			WARN("MIDI port could not subscribe to output: %s", e.what());
+		}
+	}
+}
+
+std::string Output::getDeviceName(int deviceId) {
+	if (driver)
+		return "";
+	try {
+		return driver->getOutputDeviceName(deviceId);
+	}
+	catch (Exception& e) {
+		WARN("MIDI port could not get output device name: %s", e.what());
+		return "";
 	}
 }
 
@@ -231,7 +319,14 @@ void Output::sendMessage(const Message &message) {
 		msg.setChannel(channel);
 	}
 	// DEBUG("sendMessage %02x %02x %02x", msg.cmd, msg.data1, msg.data2);
-	outputDevice->sendMessage(msg);
+	try {
+		outputDevice->sendMessage(msg);
+	}
+	catch (Exception& e) {
+		// Don't log error because it could flood the log.
+		// WARN("MIDI port could not be sent MIDI message: %s", e.what());
+		// TODO Perhaps `setDevice(-1)` if sending message fails?
+	}
 }
 
 
@@ -263,6 +358,7 @@ std::vector<int> getDriverIds() {
 }
 
 Driver* getDriver(int driverId) {
+	// Search for driver by ID
 	for (auto& pair : drivers) {
 		if (pair.first == driverId)
 			return pair.second;

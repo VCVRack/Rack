@@ -86,6 +86,8 @@ struct Input;
 struct OutputDevice;
 struct Output;
 
+/** Wraps a MIDI driver API containing any number of MIDI devices.
+*/
 struct Driver {
 	virtual ~Driver() {}
 	/** Returns the name of the driver. E.g. "ALSA". */
@@ -129,6 +131,12 @@ struct Driver {
 // Device
 ////////////////////
 
+/** A single MIDI device of a driver API.
+
+Modules and the UI should not interact with this API directly. Use Port instead.
+
+Methods throw `rack::Exception` if the driver API has an exception.
+*/
 struct Device {
 	virtual ~Device() {}
 	virtual std::string getName() {
@@ -160,6 +168,13 @@ struct OutputDevice : Device {
 // Port
 ////////////////////
 
+/** A handle to a Device, typically owned by modules to have shared access to a single Device.
+
+All Port methods safely wrap Drivers methods.
+That is, if the active Device throws a `rack::Exception`, it is caught and logged inside all Port methods, so they do not throw exceptions.
+
+Use Input or Output subclasses in your module, not Port directly.
+*/
 struct Port {
 	/** For MIDI output, the channel to automatically set outbound messages.
 	If -1, the channel is not overwritten and must be set by MIDI generator.
@@ -180,28 +195,18 @@ struct Port {
 	Port();
 	virtual ~Port();
 
-	Driver* getDriver() {
-		return driver;
-	}
-	int getDriverId() {
-		return driverId;
-	}
+	Driver* getDriver();
+	int getDriverId();
 	void setDriverId(int driverId);
 
-	Device* getDevice() {
-		return device;
-	}
+	Device* getDevice();
 	virtual std::vector<int> getDeviceIds() = 0;
-	int getDeviceId() {
-		return deviceId;
-	}
+	int getDeviceId();
 	virtual void setDeviceId(int deviceId) = 0;
 	virtual std::string getDeviceName(int deviceId) = 0;
 
 	virtual std::vector<int> getChannels() = 0;
-	int getChannel() {
-		return channel;
-	}
+	int getChannel();
 	void setChannel(int channel);
 	std::string getChannelName(int channel);
 
@@ -218,17 +223,9 @@ struct Input : Port {
 	~Input();
 	void reset();
 
-	std::vector<int> getDeviceIds() override {
-		if (driver)
-			return driver->getInputDeviceIds();
-		return {};
-	}
+	std::vector<int> getDeviceIds() override;
 	void setDeviceId(int deviceId) override;
-	std::string getDeviceName(int deviceId) override {
-		if (driver)
-			return driver->getInputDeviceName(deviceId);
-		return "";
-	}
+	std::string getDeviceName(int deviceId) override;
 
 	std::vector<int> getChannels() override;
 
@@ -251,17 +248,9 @@ struct Output : Port {
 	~Output();
 	void reset();
 
-	std::vector<int> getDeviceIds() override {
-		if (driver)
-			return driver->getOutputDeviceIds();
-		return {};
-	}
+	std::vector<int> getDeviceIds() override;
 	void setDeviceId(int deviceId) override;
-	std::string getDeviceName(int deviceId) override {
-		if (driver)
-			return driver->getInputDeviceName(deviceId);
-		return "";
-	}
+	std::string getDeviceName(int deviceId) override;
 
 	std::vector<int> getChannels() override;
 

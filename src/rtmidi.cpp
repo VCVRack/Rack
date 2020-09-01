@@ -14,6 +14,7 @@
 
 #include <rtmidi.hpp>
 #include <midi.hpp>
+#include <string.hpp>
 #include <system.hpp>
 
 
@@ -26,11 +27,26 @@ struct RtMidiInputDevice : midi::InputDevice {
 
 	RtMidiInputDevice(int driverId, int deviceId) {
 		rtMidiIn = new RtMidiIn((RtMidi::Api) driverId, "VCV Rack");
-		assert(rtMidiIn);
+		if (!rtMidiIn) {
+			throw Exception(string::f("Failed to create RtMidi input driver %d", driverId));
+		}
+
 		rtMidiIn->ignoreTypes(false, false, false);
 		rtMidiIn->setCallback(midiInputCallback, this);
-		name = rtMidiIn->getPortName(deviceId);
-		rtMidiIn->openPort(deviceId, "VCV Rack input");
+
+		try {
+			name = rtMidiIn->getPortName(deviceId);
+		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to get RtMidi input device name: %s", e.what()));
+		}
+
+		try {
+			rtMidiIn->openPort(deviceId, "VCV Rack input");
+		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to open RtMidi input device: %s", e.what()));
+		}
 	}
 
 	~RtMidiInputDevice() {
@@ -78,15 +94,29 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 
 	RtMidiOutputDevice(int driverId, int deviceId) : messageQueue(messageEarlier) {
 		rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
-		assert(rtMidiOut);
-		name = rtMidiOut->getPortName(deviceId);
-		rtMidiOut->openPort(deviceId, "VCV Rack output");
+		if (!rtMidiOut) {
+			throw Exception(string::f("Failed to create RtMidi output driver %d", driverId));
+		}
 
-		start();
+		try {
+			name = rtMidiOut->getPortName(deviceId);
+		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to get RtMidi output device name: %s", e.what()));
+		}
+
+		try {
+			rtMidiOut->openPort(deviceId, "VCV Rack output");
+		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to get RtMidi output device name: %s", e.what()));
+		}
+
+		startThread();
 	}
 
 	~RtMidiOutputDevice() {
-		stop();
+		stopThread();
 		rtMidiOut->closePort();
 		delete rtMidiOut;
 	}
@@ -104,11 +134,11 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 
 	// Consumer thread methods
 
-	void start() {
-		thread = std::thread(&RtMidiOutputDevice::run, this);
+	void startThread() {
+		thread = std::thread(&RtMidiOutputDevice::runThread, this);
 	}
 
-	void run() {
+	void runThread() {
 		std::unique_lock<decltype(mutex)> lock(mutex);
 		while (!stopped) {
 			if (messageQueue.empty()) {
@@ -141,7 +171,7 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 		}
 	}
 
-	void stop() {
+	void stopThread() {
 		{
 			std::lock_guard<decltype(mutex)> lock(mutex);
 			stopped = true;
@@ -163,9 +193,14 @@ struct RtMidiDriver : midi::Driver {
 	RtMidiDriver(int driverId) {
 		this->driverId = driverId;
 		rtMidiIn = new RtMidiIn((RtMidi::Api) driverId);
-		assert(rtMidiIn);
+		if (!rtMidiIn) {
+			throw Exception(string::f("Failed to create RtMidi input driver %d", driverId));
+		}
+
 		rtMidiOut = new RtMidiOut((RtMidi::Api) driverId);
-		assert(rtMidiOut);
+		if (!rtMidiOut) {
+			throw Exception(string::f("Failed to create RtMidi output driver %d", driverId));
+		}
 	}
 
 	~RtMidiDriver() {
@@ -188,7 +223,14 @@ struct RtMidiDriver : midi::Driver {
 	}
 	std::vector<int> getInputDeviceIds() override {
 		// TODO The IDs unfortunately jump around in RtMidi. Is there a way to keep them constant when a MIDI device is added/removed?
-		int count = rtMidiIn->getPortCount();
+		int count;
+		try {
+			count = rtMidiIn->getPortCount();
+		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to get RtMidi input device count: %s", e.what()));
+		}
+
 		std::vector<int> deviceIds;
 		for (int i = 0; i < count; i++)
 			deviceIds.push_back(i);
@@ -196,18 +238,27 @@ struct RtMidiDriver : midi::Driver {
 	}
 
 	std::string getInputDeviceName(int deviceId) override {
-		if (deviceId >= 0) {
+		if (deviceId < 0)
+			return "";
+		try {
 			return rtMidiIn->getPortName(deviceId);
 		}
-		return "";
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to get RtMidi input device name: %s", e.what()));
+		}
 	}
 
 	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < (int) rtMidiIn->getPortCount()))
 			return NULL;
-		RtMidiInputDevice* device = inputDevices[deviceId];
+		RtMidiInputDevice* device = getWithDefault(inputDevices, deviceId, NULL);
 		if (!device) {
-			inputDevices[deviceId] = device = new RtMidiInputDevice(driverId, deviceId);
+			try {
+				inputDevices[deviceId] = device = new RtMidiInputDevice(driverId, deviceId);
+			}
+			catch (RtMidiError& e) {
+				throw Exception(string::f("Failed to create RtMidi input device: %s", e.what()));
+			}
 		}
 
 		device->subscribe(input);
@@ -224,12 +275,25 @@ struct RtMidiDriver : midi::Driver {
 		// Destroy device if nothing is subscribed anymore
 		if (device->subscribed.empty()) {
 			inputDevices.erase(it);
-			delete device;
+			try {
+				delete device;
+			}
+			catch (RtMidiError& e) {
+				throw Exception(string::f("Failed to delete RtMidi input device: %s", e.what()));
+			}
 		}
 	}
 
 	std::vector<int> getOutputDeviceIds() override {
-		int count = rtMidiOut->getPortCount();
+		// TODO The IDs unfortunately jump around in RtMidi. Is there a way to keep them constant when a MIDI device is added/removed?
+		int count;
+		try {
+			count = rtMidiOut->getPortCount();
+		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to get RtMidi output device count: %s", e.what()));
+		}
+
 		std::vector<int> deviceIds;
 		for (int i = 0; i < count; i++)
 			deviceIds.push_back(i);
@@ -237,18 +301,27 @@ struct RtMidiDriver : midi::Driver {
 	}
 
 	std::string getOutputDeviceName(int deviceId) override {
-		if (deviceId >= 0) {
+		if (deviceId < 0)
+			return "";
+		try {
 			return rtMidiOut->getPortName(deviceId);
 		}
-		return "";
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to get RtMidi output device count: %s", e.what()));
+		}
 	}
 
 	midi::OutputDevice* subscribeOutput(int deviceId, midi::Output* output) override {
 		if (!(0 <= deviceId && deviceId < (int) rtMidiOut->getPortCount()))
 			return NULL;
-		RtMidiOutputDevice* device = outputDevices[deviceId];
+		RtMidiOutputDevice* device = getWithDefault(outputDevices, deviceId, NULL);
 		if (!device) {
-			outputDevices[deviceId] = device = new RtMidiOutputDevice(driverId, deviceId);
+			try {
+				outputDevices[deviceId] = device = new RtMidiOutputDevice(driverId, deviceId);
+			}
+			catch (RtMidiError& e) {
+				throw Exception(string::f("Failed to create RtMidi output device: %s", e.what()));
+			}
 		}
 
 		device->subscribe(output);
@@ -265,7 +338,12 @@ struct RtMidiDriver : midi::Driver {
 		// Destroy device if nothing is subscribed anymore
 		if (device->subscribed.empty()) {
 			outputDevices.erase(it);
-			delete device;
+			try {
+				delete device;
+			}
+			catch (RtMidiError& e) {
+				throw Exception(string::f("Failed to delete RtMidi output device: %s", e.what()));
+			}
 		}
 	}
 };

@@ -106,14 +106,6 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 	return moduleWidget;
 }
 
-template <typename K, typename V>
-V get_default(const std::map<K, V>& m, const K& key, const V& def) {
-	auto it = m.find(key);
-	if (it == m.end())
-		return def;
-	return it->second;
-}
-
 
 // Widgets
 
@@ -520,7 +512,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			// // Sort by score
 			// modelContainer->children.sort([&](Widget *w1, Widget *w2) {
 			// 	// If score was not computed, scores[w] returns 0, but this doesn't matter because those widgets aren't visible.
-			// 	return get_default(scores, w1, 0.f) > get_default(scores, w2, 0.f);
+			// 	return getWithDefault(scores, w1, 0.f) > getWithDefault(scores, w2, 0.f);
 			// });
 		}
 
