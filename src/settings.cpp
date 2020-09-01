@@ -49,7 +49,7 @@ std::vector<NVGcolor> cableColors = {
 	color::fromHexString("#0f8df4ff"), // blue
 	color::fromHexString("#8c1889ff"), // purple
 };
-std::map<std::string, std::vector<std::string>> moduleWhitelist = {};
+std::map<std::string, std::set<std::string>> moduleWhitelist = {};
 
 
 json_t* toJson() {
@@ -238,7 +238,7 @@ void fromJson(json_t* rootJ) {
 			json_t* moduleSlugJ;
 			json_array_foreach(moduleSlugsJ, i, moduleSlugJ) {
 				std::string moduleSlug = json_string_value(moduleSlugJ);
-				moduleSlugs.push_back(moduleSlug);
+				moduleSlugs.insert(moduleSlug);
 			}
 		}
 	}

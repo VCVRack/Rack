@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <set>
 #include <map>
 #include <list>
 #include <tuple>
@@ -51,7 +52,7 @@ extern std::string patchPath;
 extern std::list<std::string> recentPatchPaths;
 extern std::vector<NVGcolor> cableColors;
 // pluginSlug -> moduleSlugs
-extern std::map<std::string, std::vector<std::string>> moduleWhitelist;
+extern std::map<std::string, std::set<std::string>> moduleWhitelist;
 
 json_t* toJson();
 void fromJson(json_t* rootJ);
