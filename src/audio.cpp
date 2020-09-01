@@ -242,7 +242,7 @@ std::string Port::getDeviceDetail(int deviceId, int offset) {
 	}
 }
 
-std::vector<int> Port::getSampleRates() {
+std::set<int> Port::getSampleRates() {
 	if (!device)
 		return {};
 	try {
@@ -277,7 +277,7 @@ void Port::setSampleRate(int sampleRate) {
 	}
 }
 
-std::vector<int> Port::getBlockSizes() {
+std::set<int> Port::getBlockSizes() {
 	if (!device)
 		return {};
 	try {

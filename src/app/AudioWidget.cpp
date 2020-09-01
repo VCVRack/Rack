@@ -154,15 +154,14 @@ static void appendAudioSampleRateMenu(ui::Menu* menu, audio::Port* port) {
 	if (!port)
 		return;
 
-	std::vector<int> sampleRates = port->getSampleRates();
-	std::set<int> sampleRatesSet(sampleRates.begin(), sampleRates.end());
+	std::set<int> sampleRates = port->getSampleRates();
 	// Add current sample rate in case it's not in the list
-	sampleRatesSet.insert(port->getSampleRate());
+	sampleRates.insert(port->getSampleRate());
 
-	if (sampleRatesSet.empty()) {
+	if (sampleRates.empty()) {
 		menu->addChild(createMenuLabel("(Locked by device)"));
 	}
-	for (int sampleRate : sampleRatesSet) {
+	for (int sampleRate : sampleRates) {
 		if (sampleRate <= 0)
 			continue;
 		AudioSampleRateValueItem* item = new AudioSampleRateValueItem;
@@ -220,15 +219,14 @@ static void appendAudioBlockSizeMenu(ui::Menu* menu, audio::Port* port) {
 	if (!port)
 		return;
 
-	std::vector<int> blockSizes = port->getBlockSizes();
-	std::set<int> blockSizesSet(blockSizes.begin(), blockSizes.end());
+	std::set<int> blockSizes = port->getBlockSizes();
 	// Add current block size in case it's not in the list
-	blockSizesSet.insert(port->getBlockSize());
+	blockSizes.insert(port->getBlockSize());
 
-	if (blockSizesSet.empty()) {
+	if (blockSizes.empty()) {
 		menu->addChild(createMenuLabel("(Locked by device)"));
 	}
-	for (int blockSize : blockSizesSet) {
+	for (int blockSize : blockSizes) {
 		if (blockSize <= 0)
 			continue;
 		AudioBlockSizeValueItem* item = new AudioBlockSizeValueItem;

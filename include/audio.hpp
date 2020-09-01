@@ -99,7 +99,7 @@ struct Device {
 	/** Returns a list of all valid (user-selectable) sample rates.
 	The device may accept sample rates not in this list, but it *must* accept sample rates in the list.
 	*/
-	virtual std::vector<int> getSampleRates() {
+	virtual std::set<int> getSampleRates() {
 		return {};
 	}
 	/** Returns the current sample rate. */
@@ -112,7 +112,7 @@ struct Device {
 	/** Returns a list of all valid (user-selectable) block sizes.
 	The device may accept block sizes not in this list, but it *must* accept block sizes in the list.
 	*/
-	virtual std::vector<int> getBlockSizes() {
+	virtual std::set<int> getBlockSizes() {
 		return {};
 	}
 	/** Returns the current block size. */
@@ -169,11 +169,11 @@ struct Port {
 	std::string getDeviceName(int deviceId);
 	std::string getDeviceDetail(int deviceId, int offset);
 
-	std::vector<int> getSampleRates();
+	std::set<int> getSampleRates();
 	int getSampleRate();
 	void setSampleRate(int sampleRate);
 
-	std::vector<int> getBlockSizes();
+	std::set<int> getBlockSizes();
 	int getBlockSize();
 	void setBlockSize(int blockSize);
 

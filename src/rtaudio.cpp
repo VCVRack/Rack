@@ -146,8 +146,8 @@ struct RtAudioDevice : audio::Device {
 		return outputParameters.nChannels;
 	}
 
-	std::vector<int> getSampleRates() override {
-		std::vector<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
+	std::set<int> getSampleRates() override {
+		std::set<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
 		return sampleRates;
 	}
 	int getSampleRate() override {
@@ -159,11 +159,11 @@ struct RtAudioDevice : audio::Device {
 		openStream();
 	}
 
-	std::vector<int> getBlockSizes() override {
-		std::vector<int> blockSizes;
+	std::set<int> getBlockSizes() override {
+		std::set<int> blockSizes;
 		// 32 to 4096
 		for (int i = 5; i <= 12; i++) {
-			blockSizes.push_back(1 << i);
+			blockSizes.insert(1 << i);
 		}
 		return blockSizes;
 	}
