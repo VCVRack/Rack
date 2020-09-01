@@ -80,7 +80,7 @@ void FramebufferWidget::step() {
 		localBox = getChildrenBoundingBox();
 	}
 
-	// DEBUG("%g %g %g %g, %g %g, %g %g", RECT_ARGS(localBox), VEC_ARGS(internal->fbOffsetF), VEC_ARGS(internal->fbScale));
+	// DEBUG("rendering FramebufferWidget localBox (%g %g %g %g) fbOffset (%g %g) fbScale (%g %g)", RECT_ARGS(localBox), VEC_ARGS(internal->fbOffsetF), VEC_ARGS(internal->fbScale));
 	// Transform to world coordinates, then expand to nearest integer coordinates
 	math::Vec min = localBox.getTopLeft().mult(internal->fbScale).plus(internal->fbOffsetF).floor();
 	math::Vec max = localBox.getBottomRight().mult(internal->fbScale).plus(internal->fbOffsetF).ceil();
@@ -178,7 +178,7 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	math::Vec offsetI = offset.floor();
 	internal->offsetF = offset.minus(offsetI);
 
-	if (!math::isNear(internal->offsetF.x, internal->fbOffsetF.x, 0.01f) || !math::isNear(internal->offsetF.y, internal->fbOffsetF.y, 0.01f)) {
+	if (dirtyOnSubpixelChange && !(math::isNear(internal->offsetF.x, internal->fbOffsetF.x, 0.01f) && math::isNear(internal->offsetF.y, internal->fbOffsetF.y, 0.01f))) {
 		// If drawing to a new subpixel location, rerender in the next frame.
 		// DEBUG("%p dirty subpixel", this);
 		dirty = true;

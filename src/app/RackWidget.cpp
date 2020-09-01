@@ -71,6 +71,8 @@ RackWidget::RackWidget() {
 	railFb = new widget::FramebufferWidget;
 	railFb->box.size = math::Vec();
 	railFb->oversample = 1.0;
+	// Don't redraw when the world offset of the rail FramebufferWidget changes its fractional value.
+	railFb->dirtyOnSubpixelChange = false;
 	{
 		RackRail* rail = new RackRail;
 		rail->box.size = math::Vec();

@@ -18,6 +18,8 @@ struct FramebufferWidget : Widget {
 	bool dirty = true;
 	bool bypass = false;
 	float oversample = 1.0;
+	/** Redraw when the world offset of the FramebufferWidget changes its fractional value. */
+	bool dirtyOnSubpixelChange = true;
 
 	FramebufferWidget();
 	~FramebufferWidget();
