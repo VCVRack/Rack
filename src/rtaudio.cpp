@@ -161,7 +161,8 @@ struct RtAudioDevice : audio::Device {
 
 	std::vector<int> getBlockSizes() override {
 		std::vector<int> blockSizes;
-		for (int i = 4; i <= 12; i++) {
+		// 32 to 4096
+		for (int i = 5; i <= 12; i++) {
 			blockSizes.push_back(1 << i);
 		}
 		return blockSizes;

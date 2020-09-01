@@ -1,6 +1,7 @@
 #include <app/AudioWidget.hpp>
 #include <ui/MenuSeparator.hpp>
 #include <helpers.hpp>
+#include <set>
 
 
 namespace rack {
@@ -154,10 +155,16 @@ static void appendAudioSampleRateMenu(ui::Menu* menu, audio::Port* port) {
 		return;
 
 	std::vector<int> sampleRates = port->getSampleRates();
-	if (sampleRates.empty()) {
+	std::set<int> sampleRatesSet(sampleRates.begin(), sampleRates.end());
+	// Add current sample rate in case it's not in the list
+	sampleRatesSet.insert(port->getSampleRate());
+
+	if (sampleRatesSet.empty()) {
 		menu->addChild(createMenuLabel("(Locked by device)"));
 	}
-	for (int sampleRate : sampleRates) {
+	for (int sampleRate : sampleRatesSet) {
+		if (sampleRate <= 0)
+			continue;
 		AudioSampleRateValueItem* item = new AudioSampleRateValueItem;
 		item->port = port;
 		item->sampleRate = sampleRate;
@@ -214,10 +221,16 @@ static void appendAudioBlockSizeMenu(ui::Menu* menu, audio::Port* port) {
 		return;
 
 	std::vector<int> blockSizes = port->getBlockSizes();
-	if (blockSizes.empty()) {
+	std::set<int> blockSizesSet(blockSizes.begin(), blockSizes.end());
+	// Add current block size in case it's not in the list
+	blockSizesSet.insert(port->getBlockSize());
+
+	if (blockSizesSet.empty()) {
 		menu->addChild(createMenuLabel("(Locked by device)"));
 	}
-	for (int blockSize : blockSizes) {
+	for (int blockSize : blockSizesSet) {
+		if (blockSize <= 0)
+			continue;
 		AudioBlockSizeValueItem* item = new AudioBlockSizeValueItem;
 		item->port = port;
 		item->blockSize = blockSize;

@@ -30,7 +30,6 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Break Rack executable into libRack shared library and lightweight standalone Rack executable.
 - Add support for 1/2x and 1/4x low-fidelity sample rates to engine and "Engine > Sample rates" menu.
 - Add Escape key command for existing fullscreen, in case F11 doesn't work.
-- Allow RtAudio device block size to be as low as 16.
 - Copy cable color when cloning cables with Ctrl+click.
 - Fix key commands on AZERTY, Dvorak, and all other keyboard layouts.
 - Add Mouse device to Computer keyboard/mouse MIDI driver.
