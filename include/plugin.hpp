@@ -9,7 +9,7 @@
 namespace rack {
 
 
-/** Plugin loader and plugin manager
+/** Plugin loader and VCV Library synchronizer
 */
 namespace plugin {
 
