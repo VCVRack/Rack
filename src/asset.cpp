@@ -122,14 +122,14 @@ void init() {
 	if (settings::devMode) {
 		pluginsPath = userDir + "/plugins";
 		settingsPath = userDir + "/settings.json";
-		autosavePath = userDir + "/autosave.vcv";
+		autosavePath = userDir + "/autosave";
 		templatePath = userDir + "/template.vcv";
 	}
 	else {
 		logPath = userDir + "/log.txt";
 		pluginsPath = userDir + "/plugins-v" + ABI_VERSION;
 		settingsPath = userDir + "/settings-v" + ABI_VERSION + ".json";
-		autosavePath = userDir + "/autosave-v" + ABI_VERSION + ".vcv";
+		autosavePath = userDir + "/autosave-v" + ABI_VERSION;
 		templatePath = userDir + "/template-v" + ABI_VERSION + ".vcv";
 	}
 }

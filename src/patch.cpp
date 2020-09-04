@@ -53,24 +53,9 @@ static bool promptClear(std::string text) {
 
 void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
-	json_t* rootJ = toJson();
-	if (!rootJ)
-		return;
-	DEFER({
-		json_decref(rootJ);
-	});
+	saveAutosave();
 
-	// Write to temporary path and then rename it to the correct path
-	std::string tmpPath = path + ".tmp";
-	FILE* file = std::fopen(tmpPath.c_str(), "w");
-	if (!file) {
-		// Fail silently
-		return;
-	}
-
-	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-	std::fclose(file);
-	system::moveFile(tmpPath, path);
+	// TODO Archive autosave folder
 }
 
 void PatchManager::saveDialog() {
@@ -130,33 +115,34 @@ void PatchManager::saveTemplateDialog() {
 }
 
 void PatchManager::saveAutosave() {
-	save(asset::autosavePath);
-}
-
-bool PatchManager::load(std::string path) {
-	INFO("Loading patch %s", path.c_str());
-	FILE* file = std::fopen(path.c_str(), "r");
-	if (!file) {
-		// Exit silently
-		return false;
-	}
-	DEFER({
-		std::fclose(file);
-	});
-
-	json_error_t error;
-	json_t* rootJ = json_loadf(file, 0, &error);
-	if (!rootJ) {
-		std::string message = string::f("Failed to load patch. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
-		return false;
-	}
+	INFO("Saving autosave");
+	json_t* rootJ = toJson();
+	if (!rootJ)
+		return;
 	DEFER({
 		json_decref(rootJ);
 	});
 
-	clear();
-	fromJson(rootJ);
+	// Write to temporary path and then rename it to the correct path
+	system::createDirectories(asset::autosavePath);
+	std::string patchPath = asset::autosavePath + "/patch.json";
+	std::string tmpPath = patchPath + ".tmp";
+	FILE* file = std::fopen(tmpPath.c_str(), "w");
+	if (!file) {
+		// Fail silently
+		return;
+	}
+
+	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	std::fclose(file);
+	system::moveFile(tmpPath, patchPath);
+}
+
+bool PatchManager::load(std::string path) {
+	INFO("Loading patch %s", path.c_str());
+
+	// TODO Extract archive to autosave
+
 	return true;
 }
 
@@ -183,10 +169,30 @@ void PatchManager::loadTemplateDialog() {
 }
 
 void PatchManager::loadAutosave() {
-	if (load(asset::autosavePath)) {
+	INFO("Loading autosave");
+	std::string patchPath = asset::autosavePath + "/patch.json";
+	FILE* file = std::fopen(patchPath.c_str(), "r");
+	if (!file) {
+		// Exit silently
+		// TODO Load autosave
 		return;
 	}
-	loadTemplate();
+	DEFER({
+		std::fclose(file);
+	});
+
+	json_error_t error;
+	json_t* rootJ = json_loadf(file, 0, &error);
+	if (!rootJ) {
+		std::string message = string::f("Failed to load patch. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+		return;
+	}
+	DEFER({
+		json_decref(rootJ);
+	});
+
+	fromJson(rootJ);
 }
 
 void PatchManager::loadAction(std::string path) {
@@ -279,6 +285,7 @@ json_t* PatchManager::toJson() {
 }
 
 void PatchManager::fromJson(json_t* rootJ) {
+	clear();
 	legacy = 0;
 
 	// version
