@@ -12,6 +12,8 @@ ifdef ARCH_LIN
 	jansson = lib/libjansson.a
 	openssl = lib/libssl.a
 	libcurl = lib/libcurl.a
+	zstd = lib/libzstd.a
+	libarchive = lib/libarchive.a
 	libzip = lib/libzip.a
 	zlib = lib/libz.a
 	libspeexdsp = lib/libspeexdsp.a
@@ -26,6 +28,8 @@ ifdef ARCH_MAC
 	jansson = lib/libjansson.a
 	openssl = lib/libssl.a
 	libcurl = lib/libcurl.a
+	zstd = lib/libzstd.a
+	libarchive = lib/libarchive.a
 	libzip = lib/libzip.a
 	zlib = lib/libz.a
 	libspeexdsp = lib/libspeexdsp.a
@@ -40,6 +44,8 @@ ifdef ARCH_WIN
 	jansson = lib/libjansson.a
 	openssl = lib/libssl.a
 	libcurl = lib/libcurl.a
+	zstd = lib/libzstd.a
+	libarchive = lib/libarchive.a
 	libzip = lib/libzip.a
 	zlib = lib/libz.a
 	libspeexdsp = lib/libspeexdsp.a
@@ -58,6 +64,8 @@ DEPS += $(glew)
 DEPS += $(glfw)
 DEPS += $(jansson)
 DEPS += $(libcurl)
+DEPS += $(zstd)
+DEPS += $(libarchive)
 DEPS += $(libzip)
 DEPS += $(libspeexdsp)
 DEPS += $(libsamplerate)
@@ -133,6 +141,29 @@ $(libcurl): | $(openssl) curl-7.66.0
 	cd curl-7.66.0 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
 	$(MAKE) -C curl-7.66.0
 	$(MAKE) -C curl-7.66.0 install
+
+zstd-1.4.5:
+	$(WGET) "https://github.com/facebook/zstd/releases/download/v1.4.5/zstd-1.4.5.tar.gz"
+	$(SHA256) zstd-1.4.5.tar.gz 98e91c7c6bf162bf90e4e70fdbc41a8188b9fa8de5ad840c401198014406ce9e
+	$(UNTAR) zstd-1.4.5.tar.gz
+	rm zstd-1.4.5.tar.gz
+
+$(zstd): | zstd-1.4.5
+	cd zstd-1.4.5/build/cmake && $(CMAKE) -DZSTD_BUILD_PROGRAMS=ON -DZSTD_BUILD_SHARED=ON -DZSTD_BUILD_STATIC=ON -DZSTD_MULTITHREAD_SUPPORT=OFF .
+	$(MAKE) -C zstd-1.4.5/build/cmake
+	$(MAKE) -C zstd-1.4.5/build/cmake install
+
+libarchive-3.4.3:
+	$(WGET) "https://libarchive.org/downloads/libarchive-3.4.3.tar.gz"
+	$(SHA256) libarchive-3.4.3.tar.gz ee1e749213c108cb60d53147f18c31a73d6717d7e3d2481c157e1b34c881ea39
+	$(UNTAR) libarchive-3.4.3.tar.gz
+	rm libarchive-3.4.3.tar.gz
+
+$(libarchive): | $(zstd) libarchive-3.4.3
+	cd libarchive-3.4.3 && $(CONFIGURE) --enable-shared=no --enable-static=yes --disable-bsdtar --disable-bsdcat --disable-bsdcpio --disable-posix-regex-lib --disable-xattr --disable-acl --without-zlib --without-bz2lib  --without-libb2 --without-iconv --without-lz4 --without-lzma --without-cng --without-openssl --without-xml2 --without-expat
+# 	cd libarchive-3.4.3 && $(CMAKE) -DENABLE_ACL:BOOL=OFF -DENABLE_BZip2:BOOL=OFF -DENABLE_CAT:BOOL=OFF -DENABLE_CNG:BOOL=OFF -DENABLE_COVERAGE:BOOL=OFF -DENABLE_CPIO:BOOL=OFF -DENABLE_EXPAT:BOOL=OFF -DENABLE_ICONV:BOOL=OFF -DENABLE_LIBB2:BOOL=OFF -DENABLE_LIBXML2:BOOL=OFF -DENABLE_LZ4:BOOL=OFF -DENABLE_LZMA:BOOL=OFF -DENABLE_LZO:BOOL=OFF -DENABLE_MBEDTLS:BOOL=OFF -DENABLE_NETTLE:BOOL=OFF -DENABLE_OPENSSL:BOOL=OFF -DENABLE_TAR:BOOL=OFF -DENABLE_TEST:BOOL=OFF -DENABLE_WERROR:BOOL=OFF -DENABLE_XATTR:BOOL=OFF -DENABLE_ZLIB:BOOL=OFF -DENABLE_ZSTD:BOOL=ON -DZSTD_INCLUDE_DIR:PATH=$(DEP_PATH)/include .
+	$(MAKE) -C libarchive-3.4.3
+	$(MAKE) -C libarchive-3.4.3 install
 
 libzip-1.5.2:
 	$(WGET) "https://libzip.org/download/libzip-1.5.2.tar.gz"
@@ -252,7 +283,7 @@ $(pffft): | pffft
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1d curl-7.66.0 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog pffft
+src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1d curl-7.66.0 zstd-1.4.5 libarchive-3.4.3 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog pffft
 
 clean:
 	git clean -fdx
