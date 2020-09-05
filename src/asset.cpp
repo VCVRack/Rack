@@ -61,12 +61,12 @@ static void initSystemDir() {
 #endif
 #if defined ARCH_WIN
 	// Get path to executable
-	char16_t moduleBufU16[MAX_PATH] = u"";
-	DWORD length = GetModuleFileNameW(NULL, (wchar_t*) moduleBufU16, LENGTHOF(moduleBufU16));
+	wchar_t moduleBufW[MAX_PATH] = L"";
+	DWORD length = GetModuleFileNameW(NULL, moduleBufW, LENGTHOF(moduleBufW));
 	assert(length > 0);
 	// Get folder of executable
-	PathRemoveFileSpecW((wchar_t*) moduleBufU16);
-	systemDir = string::UTF16toUTF8(moduleBufU16);
+	PathRemoveFileSpecW(moduleBufW);
+	systemDir = string::U16toU8(moduleBufW);
 #endif
 #if defined ARCH_LIN
 	// Use the current working directory as the default path on Linux.
@@ -86,10 +86,10 @@ static void initUserDir() {
 
 #if defined ARCH_WIN
 	// Get "My Documents" folder
-	char16_t documentsBufU16[MAX_PATH] = u".";
-	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, (wchar_t*) documentsBufU16);
+	wchar_t documentsBufW[MAX_PATH] = L".";
+	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufW);
 	assert(result == S_OK);
-	userDir = string::UTF16toUTF8(documentsBufU16);
+	userDir = string::U16toU8(documentsBufW);
 	userDir += "/Rack";
 #endif
 #if defined ARCH_MAC

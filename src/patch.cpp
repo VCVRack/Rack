@@ -55,17 +55,24 @@ void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
 	saveAutosave();
 
-	system::archiveFolder(path, asset::autosavePath);
+	system::archiveFolder(filesystem::u8path(path), asset::autosavePath);
 }
 
 void PatchManager::saveDialog() {
 	if (path == "") {
 		saveAsDialog();
+		return;
 	}
-	else {
+
+	try {
 		save(path);
-		APP->history->setSaved();
 	}
+	catch (Exception& e) {
+		WARN("Could not save patch: %s", e.what());
+		return;
+	}
+
+	APP->history->setSaved();
 }
 
 void PatchManager::saveAsDialog() {
@@ -100,7 +107,14 @@ void PatchManager::saveAsDialog() {
 		path += ".vcv";
 	}
 
-	save(path);
+	try {
+		save(path);
+	}
+	catch (Exception& e) {
+		WARN("Could not save patch: %s", e.what());
+		return;
+	}
+
 	this->path = path;
 	APP->history->setSaved();
 	pushRecentPath(path);
@@ -111,7 +125,13 @@ void PatchManager::saveTemplateDialog() {
 	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Overwrite template patch?"))
 		return;
 
-	save(asset::templatePath);
+	try {
+		save(asset::templatePath);
+	}
+	catch (Exception& e) {
+		WARN("Could not save template patch: %s", e.what());
+		return;
+	}
 }
 
 void PatchManager::saveAutosave() {
@@ -138,27 +158,34 @@ void PatchManager::saveAutosave() {
 	system::moveFile(tmpPath, patchPath);
 }
 
-bool PatchManager::load(std::string path) {
+void PatchManager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
 	filesystem::remove_all(asset::autosavePath);
 	filesystem::create_directories(asset::autosavePath);
-	system::unarchiveToFolder(path, asset::autosavePath);
+	system::unarchiveToFolder(filesystem::u8path(path), asset::autosavePath);
 
 	loadAutosave();
-	return true;
 }
 
 void PatchManager::loadTemplate() {
 	this->path = "";
 	APP->history->setSaved();
 
-	if (load(asset::templatePath)) {
+	try {
+		load(asset::templatePath);
 		return;
 	}
+	catch (Exception& e) {
+		INFO("Could not load user template patch, attempting system template patch: %s", e.what());
+	}
 
-	if (load(asset::system("template.vcv"))) {
+	try {
+		load(asset::system("template.vcv"));
 		return;
+	}
+	catch (Exception& e) {
+		WARN("Could not load system template patch, clearing rack: %s", e.what());
 	}
 
 	clear();
@@ -199,9 +226,14 @@ void PatchManager::loadAutosave() {
 }
 
 void PatchManager::loadAction(std::string path) {
-	if (!load(path)) {
+	try {
+		load(path);
+	}
+	catch (Exception& e) {
+		WARN("Could not load patch: %s", e.what());
 		return;
 	}
+
 	this->path = path;
 	APP->history->setSaved();
 	pushRecentPath(path);
@@ -249,7 +281,14 @@ void PatchManager::revertDialog() {
 	if (!promptClear("Revert patch to the last saved state?"))
 		return;
 
-	load(path);
+	try {
+		load(path);
+	}
+	catch (Exception& e) {
+		WARN("Could not load patch: %s", e.what());
+		return;
+	}
+
 	APP->history->setSaved();
 }
 

@@ -27,16 +27,16 @@ const std::string API_VERSION = "2";
 #if defined ARCH_WIN
 #include <windows.h>
 
-FILE* fopen_utf8(const char* filename, const char* mode) {
-	return _wfopen((wchar_t*) rack::string::UTF8toUTF16(filename).c_str(), (wchar_t*) rack::string::UTF8toUTF16(mode).c_str());
+FILE* fopen_u8(const char* filename, const char* mode) {
+	return _wfopen(rack::string::U8toU16(filename).c_str(), rack::string::U8toU16(mode).c_str());
 }
 
-int remove_utf8(const char* path) {
-	return _wremove((wchar_t*) rack::string::UTF8toUTF16(path).c_str());
+int remove_u8(const char* path) {
+	return _wremove(rack::string::U8toU16(path).c_str());
 }
 
-int rename_utf8(const char* oldname, const char* newname) {
-	return _wrename((wchar_t*) rack::string::UTF8toUTF16(oldname).c_str(), (wchar_t*) rack::string::UTF8toUTF16(newname).c_str());
+int rename_u8(const char* oldname, const char* newname) {
+	return _wrename(rack::string::U8toU16(oldname).c_str(), rack::string::U8toU16(newname).c_str());
 }
 
 #endif

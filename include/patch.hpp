@@ -29,7 +29,7 @@ struct PatchManager {
 	/** Loads a patch and nothing else.
 	Returns whether the patch was loaded successfully.
 	*/
-	bool load(std::string path);
+	void load(std::string path);
 	/** Loads the template patch. */
 	void loadTemplate();
 	void loadTemplateDialog();

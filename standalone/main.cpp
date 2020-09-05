@@ -56,11 +56,12 @@ static void fatalSignalHandler(int sig) {
 }
 
 
+// TODO Use -municode on Windows and change this to wmain. Convert argv to UTF-8.
 int main(int argc, char* argv[]) {
 #if defined ARCH_WIN
 	// Windows global mutex to prevent multiple instances
 	// Handle will be closed by Windows when the process ends
-	HANDLE instanceMutex = CreateMutexW(NULL, true, (wchar_t*) string::UTF8toUTF16(APP_NAME).c_str());
+	HANDLE instanceMutex = CreateMutexW(NULL, true, string::U8toU16(APP_NAME).c_str());
 	if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Rack is already running. Multiple Rack instances are not supported.");
 		exit(1);

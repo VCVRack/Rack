@@ -201,22 +201,22 @@ extern const std::string API_VERSION;
 
 #if defined ARCH_WIN
 // wchar_t on Windows should be 2 bytes
-static_assert(sizeof(char16_t) == sizeof(wchar_t));
+static_assert(sizeof(wchar_t) == 2);
 
 // Windows C standard functions are ASCII-8 instead of UTF-8, so redirect these functions to wrappers which convert to UTF-8
-#define fopen fopen_utf8
-#define remove remove_utf8
-#define rename rename_utf8
+#define fopen fopen_u8
+#define remove remove_u8
+#define rename rename_u8
 
 extern "C" {
-FILE* fopen_utf8(const char* filename, const char* mode);
-int remove_utf8(const char* path);
-int rename_utf8(const char* oldname, const char* newname);
+FILE* fopen_u8(const char* filename, const char* mode);
+int remove_u8(const char* path);
+int rename_u8(const char* oldname, const char* newname);
 }
 
 namespace std {
-	using ::fopen_utf8;
-	using ::remove_utf8;
-	using ::rename_utf8;
+	using ::fopen_u8;
+	using ::remove_u8;
+	using ::rename_u8;
 }
 #endif

@@ -127,11 +127,11 @@ std::string absolutePath(const std::string& path) {
 	if (absPathC)
 		return absPathC;
 #elif defined ARCH_WIN
-	std::u16string pathU16 = UTF8toUTF16(path);
-	char16_t buf[PATH_MAX];
-	char16_t* absPathC = (char16_t*) _wfullpath((wchar_t*) buf, (wchar_t*) pathU16.c_str(), PATH_MAX);
+	std::wstring pathW = U8toU16(path);
+	wchar_t buf[PATH_MAX];
+	wchar_t* absPathC = _wfullpath(buf, pathW.c_str(), PATH_MAX);
 	if (absPathC)
-		return UTF16toUTF8(absPathC);
+		return U16toU8(absPathC);
 #endif
 	return "";
 }
@@ -290,33 +290,33 @@ bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string&
 
 
 #if defined ARCH_WIN
-std::string UTF16toUTF8(const std::u16string& sU16) {
-	if (sU16.empty())
+std::string U16toU8(const std::wstring& w) {
+	if (w.empty())
 		return "";
 	// Compute length of output buffer
-	int len = WideCharToMultiByte(CP_UTF8, 0, (wchar_t*) &sU16[0], sU16.size(), NULL, 0, NULL, NULL);
+	int len = WideCharToMultiByte(CP_UTF8, 0, &w[0], w.size(), NULL, 0, NULL, NULL);
 	assert(len > 0);
 	std::string s;
 	// Allocate enough space for null character
 	s.resize(len);
-	len = WideCharToMultiByte(CP_UTF8, 0, (wchar_t*) &sU16[0], sU16.size(), &s[0], len, 0, 0);
+	len = WideCharToMultiByte(CP_UTF8, 0, &w[0], w.size(), &s[0], len, 0, 0);
 	assert(len > 0);
 	return s;
 }
 
 
-std::u16string UTF8toUTF16(const std::string& s) {
+std::wstring U8toU16(const std::string& s) {
 	if (s.empty())
-		return u"";
+		return L"";
 	// Compute length of output buffer
 	int len = MultiByteToWideChar(CP_UTF8, 0, &s[0], s.size(), NULL, 0);
 	assert(len > 0);
-	std::u16string sU16;
+	std::wstring w;
 	// Allocate enough space for null character
-	sU16.resize(len);
-	len = MultiByteToWideChar(CP_UTF8, 0, &s[0], s.size(), (wchar_t*) &sU16[0], len);
+	w.resize(len);
+	len = MultiByteToWideChar(CP_UTF8, 0, &s[0], s.size(), &w[0], len);
 	assert(len > 0);
-	return sU16;
+	return w;
 }
 #endif
 

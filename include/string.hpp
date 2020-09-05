@@ -89,9 +89,12 @@ struct CaseInsensitiveCompare {
 #if defined ARCH_WIN
 /** Performs a Unicode string conversion from UTF-16 to UTF-8.
 These are only defined on Windows because the implementation uses Windows' API, and conversion is not needed on other OS's (since everything on Mac and Linux is UTF-8).
+
+std::string and char* variables are considered UTF-8, anywhere in the program.
+See https://utf8everywhere.org/ for more information about VCV Rack's philosophy on string encoding, especially section 10 for rules VCV follows for handling text on Windows.
 */
-std::string UTF16toUTF8(const std::u16string& s);
-std::u16string UTF8toUTF16(const std::string& s);
+std::string U16toU8(const std::wstring& w);
+std::wstring U8toU16(const std::string& s);
 #endif
 
 } // namespace string

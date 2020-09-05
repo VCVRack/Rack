@@ -61,10 +61,11 @@ ifdef ARCH_WIN
 	TARGET := libRack.dll
 
 	SOURCES += dep/osdialog/osdialog_win.c
+	LDFLAGS += -municode
 	LDFLAGS += -Wl,--export-all-symbols
 	LDFLAGS += -Wl,--out-implib,$(TARGET).a
 	LDFLAGS += -Wl,-Bstatic -Wl,--whole-archive
-	LDFLAGS += dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/libarchive.a dep/lib/libzstd.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a
+	LDFLAGS += dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/libarchive.a dep/lib/libzstd.a dep/lib/libzip.a dep/lib/libz.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a -lstdc++fs
 	LDFLAGS += -Wl,-Bdynamic -Wl,--no-whole-archive
 	LDFLAGS += -lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp
 
