@@ -13,6 +13,8 @@
 #include <history.hpp>
 #include <settings.hpp>
 
+#include <fstream>
+
 
 namespace rack {
 
@@ -23,8 +25,10 @@ static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 PatchManager::PatchManager() {
 }
 
+
 PatchManager::~PatchManager() {
 }
+
 
 void PatchManager::reset() {
 	if (APP->history) {
@@ -35,6 +39,7 @@ void PatchManager::reset() {
 	}
 }
 
+
 void PatchManager::clear() {
 	if (APP->scene) {
 		APP->scene->rack->clear();
@@ -42,6 +47,7 @@ void PatchManager::clear() {
 	APP->engine->clear();
 	reset();
 }
+
 
 static bool promptClear(std::string text) {
 	if (APP->history->isSaved())
@@ -51,12 +57,14 @@ static bool promptClear(std::string text) {
 	return osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, text.c_str());
 }
 
+
 void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
 	saveAutosave();
 
 	system::archiveFolder(filesystem::u8path(path), asset::autosavePath);
 }
+
 
 void PatchManager::saveDialog() {
 	if (path == "") {
@@ -74,6 +82,7 @@ void PatchManager::saveDialog() {
 
 	APP->history->setSaved();
 }
+
 
 void PatchManager::saveAsDialog() {
 	std::string dir;
@@ -120,6 +129,7 @@ void PatchManager::saveAsDialog() {
 	pushRecentPath(path);
 }
 
+
 void PatchManager::saveTemplateDialog() {
 	// Even if <user>/template.vcv doesn't exist, this message is still valid because it overrides the <system>/template.vcv patch.
 	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Overwrite template patch?"))
@@ -133,6 +143,7 @@ void PatchManager::saveTemplateDialog() {
 		return;
 	}
 }
+
 
 void PatchManager::saveAutosave() {
 	INFO("Saving autosave");
@@ -158,15 +169,39 @@ void PatchManager::saveAutosave() {
 	system::moveFile(tmpPath, patchPath);
 }
 
+
+static bool isPatchLegacyPre2(std::string path) {
+	FILE* f = std::fopen(path.c_str(), "rb");
+	if (!f)
+		return false;
+	DEFER({std::fclose(f);});
+	// Read first byte and check if it's a "{" character.
+	// TODO Is it possible for .tar.zst files to start with the same character?
+	char buf[1] = {};
+	std::fread(buf, 1, sizeof(buf), f);
+	return std::memcmp(buf, "{", 1) == 0;
+}
+
+
 void PatchManager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
 	filesystem::remove_all(asset::autosavePath);
 	filesystem::create_directories(asset::autosavePath);
-	system::unarchiveToFolder(filesystem::u8path(path), asset::autosavePath);
+
+	if (isPatchLegacyPre2(path)) {
+		// Move the .vcv file directly to "patch.json".
+		filesystem::path autosavePath = filesystem::u8path(asset::autosavePath);
+		filesystem::copy(filesystem::u8path(path), autosavePath / "patch.json");
+	}
+	else {
+		// Extract the .vcv file as a .tar.zst archive.
+		system::unarchiveToFolder(filesystem::u8path(path), asset::autosavePath);
+	}
 
 	loadAutosave();
 }
+
 
 void PatchManager::loadTemplate() {
 	this->path = "";
@@ -191,12 +226,14 @@ void PatchManager::loadTemplate() {
 	clear();
 }
 
+
 void PatchManager::loadTemplateDialog() {
 	if (!promptClear("The current patch is unsaved. Clear it and start a new patch?")) {
 		return;
 	}
 	loadTemplate();
 }
+
 
 void PatchManager::loadAutosave() {
 	INFO("Loading autosave");
@@ -225,6 +262,7 @@ void PatchManager::loadAutosave() {
 	fromJson(rootJ);
 }
 
+
 void PatchManager::loadAction(std::string path) {
 	try {
 		load(path);
@@ -238,6 +276,7 @@ void PatchManager::loadAction(std::string path) {
 	APP->history->setSaved();
 	pushRecentPath(path);
 }
+
 
 void PatchManager::loadDialog() {
 	if (!promptClear("The current patch is unsaved. Clear it and open a new patch?"))
@@ -268,12 +307,14 @@ void PatchManager::loadDialog() {
 	loadAction(path);
 }
 
+
 void PatchManager::loadPathDialog(std::string path) {
 	if (!promptClear("The current patch is unsaved. Clear it and open the new patch?"))
 		return;
 
 	loadAction(path);
 }
+
 
 void PatchManager::revertDialog() {
 	if (path == "")
@@ -292,6 +333,7 @@ void PatchManager::revertDialog() {
 	APP->history->setSaved();
 }
 
+
 void PatchManager::pushRecentPath(std::string path) {
 	auto& recent = settings::recentPatchPaths;
 	// Remove path from recent patches (if exists)
@@ -302,9 +344,11 @@ void PatchManager::pushRecentPath(std::string path) {
 	recent.resize(std::min((int) recent.size(), 10));
 }
 
+
 void PatchManager::disconnectDialog() {
 	APP->scene->rack->clearCablesAction();
 }
+
 
 json_t* PatchManager::toJson() {
 	// root
@@ -325,6 +369,7 @@ json_t* PatchManager::toJson() {
 
 	return rootJ;
 }
+
 
 void PatchManager::fromJson(json_t* rootJ) {
 	clear();
@@ -365,9 +410,11 @@ void PatchManager::fromJson(json_t* rootJ) {
 	warningLog = "";
 }
 
+
 bool PatchManager::isLegacy(int level) {
 	return legacy && legacy <= level;
 }
+
 
 void PatchManager::log(std::string msg) {
 	warningLog += msg;

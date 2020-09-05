@@ -70,7 +70,7 @@ The launched process will continue running if the current process is closed.
 void runProcessDetached(const std::string& path);
 std::string getOperatingSystemInfo();
 /** Compresses the contents of a folder (recursively) to an archive.
-Currently supports the "ustar zstd" format (.tar.zstd)
+Currently supports the "ustar zstd" format (.tar.zst)
 An equivalent shell command is
 
 	tar -cf archivePath --zstd -C folderPath .

@@ -69,18 +69,6 @@ Throws std::runtime_error if string is invalid.
 */
 std::vector<uint8_t> fromBase64(const std::string& str);
 
-/** Compress bytes with zlib.
-*/
-std::vector<uint8_t> compress(const uint8_t* data, size_t dataLen);
-std::vector<uint8_t> compress(const std::vector<uint8_t>& data);
-/** Uncompress bytes with zlib.
-Before calling this function, set `dataLen` to the capacity of `data`.
-After returning, `dataLen` is set to the actual number of bytes written.
-*/
-void uncompress(const uint8_t* compressed, size_t compressedLen, uint8_t* data, size_t* dataLen);
-std::vector<uint8_t> uncompress(const std::vector<uint8_t>& compressed);
-
-
 struct CaseInsensitiveCompare {
 	bool operator()(const std::string& a, const std::string& b) const;
 };

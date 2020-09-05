@@ -14,8 +14,6 @@ ifdef ARCH_LIN
 	libcurl = lib/libcurl.a
 	zstd = lib/libzstd.a
 	libarchive = lib/libarchive.a
-	libzip = lib/libzip.a
-	zlib = lib/libz.a
 	libspeexdsp = lib/libspeexdsp.a
 	libsamplerate = lib/libsamplerate.a
 	rtmidi = lib/librtmidi.a
@@ -30,8 +28,6 @@ ifdef ARCH_MAC
 	libcurl = lib/libcurl.a
 	zstd = lib/libzstd.a
 	libarchive = lib/libarchive.a
-	libzip = lib/libzip.a
-	zlib = lib/libz.a
 	libspeexdsp = lib/libspeexdsp.a
 	libsamplerate = lib/libsamplerate.a
 	rtmidi = lib/librtmidi.a
@@ -46,8 +42,6 @@ ifdef ARCH_WIN
 	libcurl = lib/libcurl.a
 	zstd = lib/libzstd.a
 	libarchive = lib/libarchive.a
-	libzip = lib/libzip.a
-	zlib = lib/libz.a
 	libspeexdsp = lib/libspeexdsp.a
 	libsamplerate = lib/libsamplerate.a
 	rtmidi = lib/librtmidi.a
@@ -64,9 +58,7 @@ DEPS += $(glew)
 DEPS += $(glfw)
 DEPS += $(jansson)
 DEPS += $(libcurl)
-DEPS += $(zstd)
 DEPS += $(libarchive)
-DEPS += $(libzip)
 DEPS += $(libspeexdsp)
 DEPS += $(libsamplerate)
 DEPS += $(rtmidi)
@@ -165,35 +157,6 @@ $(libarchive): | $(zstd) libarchive-3.4.3
 	$(MAKE) -C libarchive-3.4.3
 	$(MAKE) -C libarchive-3.4.3 install
 
-libzip-1.5.2:
-	$(WGET) "https://libzip.org/download/libzip-1.5.2.tar.gz"
-	$(SHA256) libzip-1.5.2.tar.gz be694a4abb2ffe5ec02074146757c8b56084dbcebf329123c84b205417435e15
-	$(UNTAR) libzip-1.5.2.tar.gz
-	rm libzip-1.5.2.tar.gz
-
-$(libzip): | $(zlib) libzip-1.5.2
-	cd libzip-1.5.2 && mkdir -p build
-	cd libzip-1.5.2/build && $(CMAKE) .. -DCMAKE_FIND_ROOT_PATH="$(DEP_PATH)" -DENABLE_COMMONCRYPTO=OFF -DENABLE_GNUTLS=OFF -DENABLE_MBEDTLS=OFF -DENABLE_OPENSSL=OFF -DENABLE_WINDOWS_CRYPTO=OFF -DENABLE_BZIP2=OFF -DBUILD_TOOLS=OFF -DBUILD_REGRESS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_DOC=OFF -DBUILD_SHARED_LIBS=OFF
-	$(MAKE) -C libzip-1.5.2/build
-	$(MAKE) -C libzip-1.5.2/build install
-
-zlib-1.2.11:
-	$(WGET) "https://www.zlib.net/zlib-1.2.11.tar.gz"
-	$(SHA256) zlib-1.2.11.tar.gz c3e5e9fdd5004dcb542feda5ee4f0ff0744628baf8ed2dd5d66f8ca1197cb1a1
-	$(UNTAR) zlib-1.2.11.tar.gz
-	rm zlib-1.2.11.tar.gz
-
-$(zlib): | zlib-1.2.11
-ifdef ARCH_WIN
-	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc
-	$(MAKE) -C zlib-1.2.11 -f win32/Makefile.gcc BINARY_PATH="$(DEP_PATH)/bin" INCLUDE_PATH="$(DEP_PATH)/include" LIBRARY_PATH="$(DEP_PATH)/lib" install
-else
-	# Don't use $(CONFIGURE) because this is a handwritten configure script
-	cd zlib-1.2.11 && ./configure --prefix="$(DEP_PATH)"
-	$(MAKE) -C zlib-1.2.11
-	$(MAKE) -C zlib-1.2.11 install
-endif
-
 speexdsp-SpeexDSP-1.2rc3:
 	$(WGET) "https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz"
 	$(SHA256) speexdsp-SpeexDSP-1.2rc3.tgz c8dded1454747f65956f981c95e7f89a06abdaa2a53e8aeaa66bab2a3d59cebd
@@ -283,7 +246,7 @@ $(pffft): | pffft
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1d curl-7.66.0 zstd-1.4.5 libarchive-3.4.3 libzip-1.5.2 zlib-1.2.11 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog pffft
+src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1d curl-7.66.0 zstd-1.4.5 libarchive-3.4.3 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog pffft
 
 clean:
 	git clean -fdx
