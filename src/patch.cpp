@@ -55,7 +55,7 @@ void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
 	saveAutosave();
 
-	// TODO Archive autosave folder
+	system::archiveFolder(path, asset::autosavePath);
 }
 
 void PatchManager::saveDialog() {
@@ -141,8 +141,11 @@ void PatchManager::saveAutosave() {
 bool PatchManager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
-	// TODO Extract archive to autosave
+	filesystem::remove_all(asset::autosavePath);
+	filesystem::create_directories(asset::autosavePath);
+	system::unarchiveToFolder(path, asset::autosavePath);
 
+	loadAutosave();
 	return true;
 }
 
@@ -174,7 +177,7 @@ void PatchManager::loadAutosave() {
 	FILE* file = std::fopen(patchPath.c_str(), "r");
 	if (!file) {
 		// Exit silently
-		// TODO Load autosave
+		// TODO Load template
 		return;
 	}
 	DEFER({

@@ -197,8 +197,11 @@ static void extractPackages(std::string path) {
 			continue;
 		INFO("Extracting package %s", packagePath.c_str());
 		// Extract package
-		if (system::unzipToFolder(packagePath, path)) {
-			WARN("Package %s failed to extract", packagePath.c_str());
+		try {
+			system::unarchiveToFolder(packagePath, path);
+		}
+		catch (Exception& e) {
+			WARN("Package %s failed to extract: %s", packagePath.c_str(), e.what());
 			message += string::f("Could not extract package %s\n", packagePath.c_str());
 			continue;
 		}
@@ -240,7 +243,7 @@ void init() {
 	std::string fundamentalDir = asset::pluginsPath + "/Fundamental";
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		INFO("Extracting bundled Fundamental package");
-		system::unzipToFolder(fundamentalSrc.c_str(), asset::pluginsPath.c_str());
+		system::unarchiveToFolder(fundamentalSrc.c_str(), asset::pluginsPath.c_str());
 		loadPlugin(fundamentalDir);
 	}
 
