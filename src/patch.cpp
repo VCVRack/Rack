@@ -62,7 +62,7 @@ void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
 	saveAutosave();
 
-	system::archiveFolder(filesystem::u8path(path), asset::autosavePath);
+	system::archiveFolder(path, asset::autosavePath);
 }
 
 
@@ -89,30 +89,26 @@ void PatchManager::saveAsDialog() {
 	std::string filename;
 	if (this->path == "") {
 		dir = asset::user("patches");
-		system::createDirectory(dir);
+		system::createDirectories(dir);
 	}
 	else {
-		dir = string::directory(this->path);
-		filename = string::filename(this->path);
+		dir = system::getDirectory(this->path);
+		filename = system::getFilename(this->path);
 	}
 
 	osdialog_filters* filters = osdialog_filters_parse(PATCH_FILTERS);
-	DEFER({
-		osdialog_filters_free(filters);
-	});
+	DEFER({osdialog_filters_free(filters);});
 
 	char* pathC = osdialog_file(OSDIALOG_SAVE, dir.c_str(), filename.c_str(), filters);
 	if (!pathC) {
-		// Fail silently
+		// Cancel silently
 		return;
 	}
-	DEFER({
-		std::free(pathC);
-	});
+	DEFER({std::free(pathC);});
 
 	// Append .vcv extension if no extension was given.
 	std::string path = pathC;
-	if (string::filenameExtension(string::filename(path)) == "") {
+	if (system::getExtension(path) == "") {
 		path += ".vcv";
 	}
 
@@ -150,9 +146,7 @@ void PatchManager::saveAutosave() {
 	json_t* rootJ = toJson();
 	if (!rootJ)
 		return;
-	DEFER({
-		json_decref(rootJ);
-	});
+	DEFER({json_decref(rootJ);});
 
 	// Write to temporary path and then rename it to the correct path
 	system::createDirectories(asset::autosavePath);
@@ -166,7 +160,8 @@ void PatchManager::saveAutosave() {
 
 	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 	std::fclose(file);
-	system::moveFile(tmpPath, patchPath);
+	system::remove(patchPath);
+	system::rename(tmpPath, patchPath);
 }
 
 
@@ -186,17 +181,16 @@ static bool isPatchLegacyPre2(std::string path) {
 void PatchManager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
-	filesystem::remove_all(asset::autosavePath);
-	filesystem::create_directories(asset::autosavePath);
+	system::removeRecursively(asset::autosavePath);
+	system::createDirectories(asset::autosavePath);
 
 	if (isPatchLegacyPre2(path)) {
-		// Move the .vcv file directly to "patch.json".
-		filesystem::path autosavePath = filesystem::u8path(asset::autosavePath);
-		filesystem::copy(filesystem::u8path(path), autosavePath / "patch.json");
+		// Copy the .vcv file directly to "patch.json".
+		system::copy(path, asset::autosavePath + "/patch.json");
 	}
 	else {
 		// Extract the .vcv file as a .tar.zst archive.
-		system::unarchiveToFolder(filesystem::u8path(path), asset::autosavePath);
+		system::unarchiveToFolder(path, asset::autosavePath);
 	}
 
 	loadAutosave();
@@ -241,7 +235,7 @@ void PatchManager::loadAutosave() {
 	FILE* file = std::fopen(patchPath.c_str(), "r");
 	if (!file) {
 		// Exit silently
-		// TODO Load template
+		// TODO Load template without causing infinite recursion
 		return;
 	}
 	DEFER({
@@ -255,9 +249,7 @@ void PatchManager::loadAutosave() {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 		return;
 	}
-	DEFER({
-		json_decref(rootJ);
-	});
+	DEFER({json_decref(rootJ);});
 
 	fromJson(rootJ);
 }
@@ -288,13 +280,11 @@ void PatchManager::loadDialog() {
 		system::createDirectory(dir);
 	}
 	else {
-		dir = string::directory(this->path);
+		dir = system::getDirectory(this->path);
 	}
 
 	osdialog_filters* filters = osdialog_filters_parse(PATCH_FILTERS);
-	DEFER({
-		osdialog_filters_free(filters);
-	});
+	DEFER({osdialog_filters_free(filters);});
 
 	char* pathC = osdialog_file(OSDIALOG_OPEN, dir.c_str(), NULL, filters);
 	if (!pathC) {

@@ -87,55 +87,6 @@ bool endsWith(const std::string& str, const std::string& suffix) {
 }
 
 
-std::string directory(const std::string& path) {
-	char* pathDup = strdup(path.c_str());
-	std::string directory = dirname(pathDup);
-	free(pathDup);
-	return directory;
-}
-
-
-std::string filename(const std::string& path) {
-	char* pathDup = strdup(path.c_str());
-	std::string filename = basename(pathDup);
-	free(pathDup);
-	return filename;
-}
-
-
-std::string filenameBase(const std::string& filename) {
-	size_t pos = filename.rfind('.');
-	if (pos == std::string::npos)
-		return filename;
-	return std::string(filename, 0, pos);
-}
-
-
-std::string filenameExtension(const std::string& filename) {
-	size_t pos = filename.rfind('.');
-	if (pos == std::string::npos)
-		return "";
-	return std::string(filename, pos + 1);
-}
-
-
-std::string absolutePath(const std::string& path) {
-#if defined ARCH_LIN || defined ARCH_MAC
-	char buf[PATH_MAX];
-	char* absPathC = realpath(path.c_str(), buf);
-	if (absPathC)
-		return absPathC;
-#elif defined ARCH_WIN
-	std::wstring pathW = U8toU16(path);
-	wchar_t buf[PATH_MAX];
-	wchar_t* absPathC = _wfullpath(buf, pathW.c_str(), PATH_MAX);
-	if (absPathC)
-		return U16toU8(absPathC);
-#endif
-	return "";
-}
-
-
 float fuzzyScore(const std::string& s, const std::string& query) {
 	size_t pos = s.find(query);
 	if (pos == std::string::npos)

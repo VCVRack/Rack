@@ -105,7 +105,7 @@ struct OpenRecentItem : ui::MenuItem {
 
 		for (const std::string& path : settings::recentPatchPaths) {
 			OpenPathItem* item = new OpenPathItem;
-			item->text = string::filename(path);
+			item->text = system::getFilename(path);
 			item->path = path;
 			menu->addChild(item);
 		}

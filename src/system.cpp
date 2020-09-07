@@ -1,6 +1,7 @@
 #include <thread>
 #include <regex>
 #include <chrono>
+#include <experimental/filesystem>
 
 #include <dirent.h>
 #include <sys/stat.h>
@@ -33,39 +34,31 @@
 #include <string.hpp>
 
 
+/*
+In C++17, this will be `std::filesystem`
+Important: When using `fs::path`, always convert strings to UTF-8 using
+
+	fs::path p = fs::u8path(s);
+
+In fact, it's best to work only with strings to avoid forgetting to decode a string as UTF-8.
+The need to do this is a fatal flaw of `fs::path`, but at least `std::filesystem` has some helpful operations.
+*/
+namespace fs = std::experimental::filesystem;
+
+
 namespace rack {
 namespace system {
 
 
-std::list<std::string> getEntries(const std::string& path) {
-	std::list<std::string> filenames;
-	DIR* dir = opendir(path.c_str());
-	if (dir) {
-		struct dirent* d;
-		while ((d = readdir(dir))) {
-			std::string filename = d->d_name;
-			if (filename == "." || filename == "..")
-				continue;
-			filenames.push_back(path + "/" + filename);
-		}
-		closedir(dir);
-	}
-	filenames.sort();
-	return filenames;
-}
-
-
-std::list<std::string> getEntriesRecursive(const std::string &path, int depth) {
-	std::list<std::string> entries = getEntries(path);
-	if (depth > 0) {
-		// Don't iterate using iterators because the list will be growing.
-		size_t limit = entries.size();
-		auto it = entries.begin();
-		for (size_t i = 0; i < limit; i++) {
-			const std::string &entry = *it++;
-			if (isDirectory(entry)) {
-				std::list<std::string> subEntries = getEntriesRecursive(entry, depth - 1);
-				// Append subEntries to entries
+std::list<std::string> getEntries(const std::string& dirPath, int depth) {
+	std::list<std::string> entries;
+	for (auto& entry : fs::directory_iterator(fs::u8path(dirPath))) {
+		std::string subEntry = entry.path().u8string();
+		entries.push_back(subEntry);
+		// Recurse if depth > 0 (limited recursion) or depth < 0 (infinite recursion).
+		if (depth != 0) {
+			if (fs::is_directory(entry.path())) {
+				std::list<std::string> subEntries = getEntries(subEntry, depth - 1);
 				entries.splice(entries.end(), subEntries);
 			}
 		}
@@ -74,121 +67,271 @@ std::list<std::string> getEntriesRecursive(const std::string &path, int depth) {
 }
 
 
+bool doesExist(const std::string& path) {
+	return fs::exists(fs::u8path(path));
+}
+
+
 bool isFile(const std::string& path) {
-	struct stat statbuf;
-	if (stat(path.c_str(), &statbuf))
-		return false;
-	return S_ISREG(statbuf.st_mode);
+	return fs::is_regular_file(fs::u8path(path));
 }
 
 
 bool isDirectory(const std::string& path) {
-	struct stat statbuf;
-	if (stat(path.c_str(), &statbuf))
-		return false;
-	return S_ISDIR(statbuf.st_mode);
+	return fs::is_directory(fs::u8path(path));
 }
 
 
-void moveFile(const std::string& srcPath, const std::string& destPath) {
-	std::remove(destPath.c_str());
-	// Whether this overwrites existing files is implementation-defined.
-	// i.e. Mingw64 fails to overwrite.
-	// This is why we remove the file above.
-	std::rename(srcPath.c_str(), destPath.c_str());
+uint64_t getFileSize(const std::string& path) {
+	return fs::file_size(fs::u8path(path));
 }
 
 
-void copyFile(const std::string& srcPath, const std::string& destPath) {
-	// Open source
-	FILE* source = fopen(srcPath.c_str(), "rb");
-	if (!source)
-		return;
-	DEFER({
-		fclose(source);
-	});
-	// Open destination
-	FILE* dest = fopen(destPath.c_str(), "wb");
-	if (!dest)
-		return;
-	DEFER({
-		fclose(dest);
-	});
-	// Copy buffer
-	const int bufferSize = (1 << 15);
-	char buffer[bufferSize];
-	while (1) {
-		size_t size = fread(buffer, 1, bufferSize, source);
-		if (size == 0)
-			break;
-		size = fwrite(buffer, 1, size, dest);
-		if (size == 0)
-			break;
-	}
+void rename(const std::string& srcPath, const std::string& destPath) {
+	fs::rename(fs::u8path(srcPath), fs::u8path(destPath));
 }
 
 
-void createDirectory(const std::string& path) {
-#if defined ARCH_WIN
-	std::wstring pathW = string::U8toU16(path);
-	_wmkdir(pathW.c_str());
-#else
-	mkdir(path.c_str(), 0755);
-#endif
+void copy(const std::string& srcPath, const std::string& destPath) {
+	fs::copy(fs::u8path(srcPath), fs::u8path(destPath), fs::copy_options::recursive);
 }
 
 
-void createDirectories(const std::string& path) {
-	for (size_t i = 1; i < path.size(); i++) {
-		char c = path[i];
-		if (c == '/' || c == '\\')
-			createDirectory(path.substr(0, i));
-	}
-	createDirectory(path);
+bool createDirectory(const std::string& path) {
+	return fs::create_directory(fs::u8path(path));
 }
 
 
-void removeDirectory(const std::string& path) {
-#if defined ARCH_WIN
-	std::wstring pathW = string::U8toU16(path);
-	_wrmdir(pathW.c_str());
-#else
-	rmdir(path.c_str());
-#endif
+bool createDirectories(const std::string& path) {
+	return fs::create_directories(fs::u8path(path));
 }
 
 
-void removeDirectories(const std::string& path) {
-	removeDirectory(path);
-	for (size_t i = path.size() - 1; i >= 1; i--) {
-		char c = path[i];
-		if (c == '/' || c == '\\')
-			removeDirectory(path.substr(0, i));
-	}
+bool remove(const std::string& path) {
+	return fs::remove(fs::u8path(path));
+}
+
+
+int removeRecursively(const std::string& path) {
+	return fs::remove_all(fs::u8path(path));
 }
 
 
 std::string getWorkingDirectory() {
-#if defined ARCH_WIN
-	wchar_t buf[4096] = L"";
-	GetCurrentDirectory(sizeof(buf), buf);
-	return string::U16toU8(buf);
-#else
-	char buf[4096] = "";
-	getcwd(buf, sizeof(buf));
-	return buf;
-#endif
+	return fs::current_path().u8string();
 }
 
 
 void setWorkingDirectory(const std::string& path) {
-#if defined ARCH_WIN
-	std::wstring pathW = string::U8toU16(path);
-	SetCurrentDirectory(pathW.c_str());
-#else
-	chdir(path.c_str());
-#endif
+	fs::current_path(fs::u8path(path));
 }
+
+
+std::string getTempDir() {
+	return fs::temp_directory_path().u8string();
+}
+
+
+std::string getAbsolutePath(const std::string& path) {
+	return fs::absolute(fs::u8path(path)).u8string();
+}
+
+
+std::string getDirectory(const std::string& path) {
+	return fs::u8path(path).parent_path().u8string();
+}
+
+
+std::string getFilename(const std::string& path) {
+	return fs::u8path(path).filename().u8string();
+}
+
+
+std::string getStem(const std::string& path) {
+	return fs::u8path(path).stem().u8string();
+}
+
+
+std::string getExtension(const std::string& path) {
+	return fs::u8path(path).extension().u8string();
+}
+
+
+/** Returns `p` in relative path form, relative to `base`
+Limitation: `p` must be a descendant of `base`. Doesn't support adding `../` to the return path.
+*/
+static std::string getRelativePath(std::string path, std::string base) {
+	path = fs::absolute(fs::u8path(path)).generic_u8string();
+	base = fs::absolute(fs::u8path(base)).generic_u8string();
+	if (path.size() < base.size())
+		throw Exception("getRelativePath() error: path is shorter than base");
+	if (!std::equal(base.begin(), base.end(), path.begin()))
+		throw Exception("getRelativePath() error: path does not begin with base");
+
+	// If path == base, this correctly returns "."
+	return "." + std::string(path.begin() + base.size(), path.end());
+}
+
+
+void archiveFolder(const std::string& archivePath, const std::string& folderPath) {
+	// Based on minitar.c create() in libarchive examples
+	int r;
+
+	// Open archive for writing
+	struct archive* a = archive_write_new();
+	DEFER({archive_write_free(a);});
+	archive_write_set_format_ustar(a);
+	archive_write_add_filter_zstd(a);
+#if defined ARCH_WIN
+	r = archive_write_open_filename_w(a, string::U8toU16(archivePath).c_str());
+#else
+	r = archive_write_open_filename(a, archivePath.c_str());
+#endif
+	if (r < ARCHIVE_OK)
+		throw Exception(string::f("archiveFolder() could not open archive %s for writing: %s", archivePath.c_str(), archive_error_string(a)));
+	DEFER({archive_write_close(a);});
+
+	// Open folder for reading
+	struct archive* disk = archive_read_disk_new();
+	DEFER({archive_read_free(disk);});
+#if defined ARCH_WIN
+	r = archive_read_disk_open_w(disk, string::U8toU16(folderPath).c_str());
+#else
+	r = archive_read_disk_open(disk, folderPath.c_str());
+#endif
+	if (r < ARCHIVE_OK)
+		throw Exception(string::f("archiveFolder() could not open folder %s for reading: %s", folderPath.c_str(), archive_error_string(a)));
+	DEFER({archive_read_close(a);});
+
+	// Iterate folder
+	for (;;) {
+		struct archive_entry* entry = archive_entry_new();
+		DEFER({archive_entry_free(entry);});
+
+		r = archive_read_next_header2(disk, entry);
+		if (r == ARCHIVE_EOF)
+			break;
+		if (r < ARCHIVE_OK)
+			throw Exception(string::f("archiveFolder() could not get next entry from archive: %s", archive_error_string(disk)));
+
+		// Recurse dirs
+		archive_read_disk_descend(disk);
+
+		// Convert absolute path to relative path
+		std::string entryPath;
+#if defined ARCH_WIN
+		entryPath = string::U16toU8(archive_entry_pathname_w(entry));
+#else
+		entryPath = archive_entry_pathname(entry);
+#endif
+		entryPath = getRelativePath(entryPath, folderPath);
+#if defined ARCH_WIN
+		// FIXME This doesn't seem to set UTF-8 paths on Windows.
+		archive_entry_copy_pathname_w(entry, string::U8toU16(entryPath).c_str());
+#else
+		archive_entry_set_pathname(entry, entryPath.c_str());
+#endif
+
+		// Write file to archive
+		r = archive_write_header(a, entry);
+		if (r < ARCHIVE_OK)
+			throw Exception(string::f("archiveFolder() could not write entry to archive: %s", archive_error_string(a)));
+
+		// Manually copy data
+#if defined ARCH_WIN
+		std::string entrySourcePath = string::U16toU8(archive_entry_sourcepath_w(entry));
+#else
+		std::string entrySourcePath = archive_entry_sourcepath(entry);
+#endif
+		FILE* f = std::fopen(entrySourcePath.c_str(), "rb");
+		DEFER({std::fclose(f);});
+		char buf[1 << 14];
+		ssize_t len;
+		while ((len = std::fread(buf, 1, sizeof(buf), f)) > 0) {
+			archive_write_data(a, buf, len);
+		}
+	}
+}
+
+
+void unarchiveToFolder(const std::string& archivePath, const std::string& folderPath) {
+	// Based on minitar.c extract() in libarchive examples
+	int r;
+
+	// Open archive for reading
+	struct archive* a = archive_read_new();
+	DEFER({archive_read_free(a);});
+	archive_read_support_filter_zstd(a);
+	// archive_read_support_filter_all(a);
+	archive_read_support_format_tar(a);
+	// archive_read_support_format_all(a);
+#if defined ARCH_WIN
+	r = archive_read_open_filename_w(a, string::U8toU16(archivePath).c_str(), 1 << 14);
+#else
+	r = archive_read_open_filename(a, archivePath.c_str(), 1 << 14);
+#endif
+	if (r < ARCHIVE_OK)
+		throw Exception(string::f("unzipToFolder() could not open archive %s: %s", archivePath.c_str(), archive_error_string(a)));
+	DEFER({archive_read_close(a);});
+
+	// Open folder for writing
+	struct archive* disk = archive_write_disk_new();
+	DEFER({archive_write_free(disk);});
+	int flags = ARCHIVE_EXTRACT_TIME;
+	archive_write_disk_set_options(disk, flags);
+	DEFER({archive_write_close(disk);});
+
+	// Iterate archive
+	for (;;) {
+		// Get next entry
+		struct archive_entry* entry;
+		r = archive_read_next_header(a, &entry);
+		if (r == ARCHIVE_EOF)
+			break;
+		if (r < ARCHIVE_OK)
+			throw Exception(string::f("unzipToFolder() could not read entry from archive: %s", archive_error_string(a)));
+
+		// Convert relative pathname to absolute based on folderPath
+		std::string entryPath = archive_entry_pathname(entry);
+		if (!fs::u8path(entryPath).is_relative())
+			throw Exception(string::f("unzipToFolder() does not support absolute paths: %s", entryPath.c_str()));
+		entryPath = fs::absolute(fs::u8path(entryPath), fs::u8path(folderPath)).u8string();
+#if defined ARCH_WIN
+		archive_entry_copy_pathname_w(entry, string::U8toU16(entryPath).c_str());
+#else
+		archive_entry_set_pathname(entry, entryPath.c_str());
+#endif
+
+		// Write entry to disk
+		r = archive_write_header(disk, entry);
+		if (r < ARCHIVE_OK)
+			throw Exception(string::f("unzipToFolder() could not write file to folder: %s", archive_error_string(disk)));
+
+		// Copy data to file
+		for (;;) {
+			const void* buf;
+			size_t size;
+			int64_t offset;
+			// Read data from archive
+			r = archive_read_data_block(a, &buf, &size, &offset);
+			if (r == ARCHIVE_EOF)
+				break;
+			if (r < ARCHIVE_OK)
+				throw Exception(string::f("unzipToFolder() could not read data from archive", archive_error_string(a)));
+
+			// Write data to file
+			r = archive_write_data_block(disk, buf, size, offset);
+			if (r < ARCHIVE_OK)
+				throw Exception(string::f("unzipToFolder() could not write data to file", archive_error_string(disk)));
+		}
+
+		// Close file
+		r = archive_write_finish_entry(disk);
+		if (r < ARCHIVE_OK)
+			throw Exception(string::f("unzipToFolder() could not close file", archive_error_string(disk)));
+	}
+}
+
 
 int getLogicalCoreCount() {
 	return std::thread::hardware_concurrency();
@@ -291,6 +434,22 @@ int64_t getNanoseconds() {
 }
 
 
+std::string getOperatingSystemInfo() {
+#if defined ARCH_LIN || defined ARCH_MAC
+	struct utsname u;
+	uname(&u);
+	return string::f("%s %s %s %s", u.sysname, u.release, u.version, u.machine);
+#elif defined ARCH_WIN
+	OSVERSIONINFOW info;
+	ZeroMemory(&info, sizeof(info));
+	info.dwOSVersionInfoSize = sizeof(info);
+	GetVersionExW(&info);
+	// See https://docs.microsoft.com/en-us/windows/desktop/api/winnt/ns-winnt-_osversioninfoa for a list of Windows version numbers.
+	return string::f("Windows %u.%u", info.dwMajorVersion, info.dwMinorVersion);
+#endif
+}
+
+
 void openBrowser(const std::string& url) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open \"" + url + "\"";
@@ -341,199 +500,6 @@ void runProcessDetached(const std::string& path) {
 	// Not implemented on Linux or Mac
 	assert(0);
 #endif
-}
-
-
-std::string getOperatingSystemInfo() {
-#if defined ARCH_LIN || defined ARCH_MAC
-	struct utsname u;
-	uname(&u);
-	return string::f("%s %s %s %s", u.sysname, u.release, u.version, u.machine);
-#elif defined ARCH_WIN
-	OSVERSIONINFOW info;
-	ZeroMemory(&info, sizeof(info));
-	info.dwOSVersionInfoSize = sizeof(info);
-	GetVersionExW(&info);
-	// See https://docs.microsoft.com/en-us/windows/desktop/api/winnt/ns-winnt-_osversioninfoa for a list of Windows version numbers.
-	return string::f("Windows %u.%u", info.dwMajorVersion, info.dwMinorVersion);
-#endif
-}
-
-
-/** Behaves like `std::filesystem::relative()`.
-Limitation: `p` must be a descendant of `base`. Doesn't support adding `../` to the return path.
-*/
-static filesystem::path getRelativePath(filesystem::path p, filesystem::path base = filesystem::current_path()) {
-	p = filesystem::absolute(p);
-	base = filesystem::absolute(base);
-	std::string pStr = p.generic_u8string();
-	std::string baseStr = base.generic_u8string();
-	if (pStr.size() < baseStr.size())
-		throw Exception("getRelativePath() error: path is shorter than base");
-	if (!std::equal(baseStr.begin(), baseStr.end(), pStr.begin()))
-		throw Exception("getRelativePath() error: path does not begin with base");
-
-	// If p == base, this correctly returns "."
-	return "." + std::string(pStr.begin() + baseStr.size(), pStr.end());
-}
-
-
-void archiveFolder(const filesystem::path& archivePath, const filesystem::path& folderPath) {
-	// Based on minitar.c create() in libarchive examples
-	int r;
-
-	// Open archive for writing
-	struct archive* a = archive_write_new();
-	DEFER({archive_write_free(a);});
-	archive_write_set_format_ustar(a);
-	archive_write_add_filter_zstd(a);
-#if defined ARCH_WIN
-	r = archive_write_open_filename_w(a, archivePath.generic_wstring().c_str());
-#else
-	r = archive_write_open_filename(a, archivePath.generic_u8string().c_str());
-#endif
-	if (r < ARCHIVE_OK)
-		throw Exception(string::f("archiveFolder() could not open archive %s for writing: %s", archivePath.generic_u8string().c_str(), archive_error_string(a)));
-	DEFER({archive_write_close(a);});
-
-	// Open folder for reading
-	struct archive* disk = archive_read_disk_new();
-	DEFER({archive_read_free(disk);});
-#if defined ARCH_WIN
-	r = archive_read_disk_open_w(disk, folderPath.generic_wstring().c_str());
-#else
-	r = archive_read_disk_open(disk, folderPath.generic_u8string().c_str());
-#endif
-	if (r < ARCHIVE_OK)
-		throw Exception(string::f("archiveFolder() could not open folder %s for reading: %s", folderPath.generic_u8string().c_str(), archive_error_string(a)));
-	DEFER({archive_read_close(a);});
-
-	// Iterate folder
-	for (;;) {
-		struct archive_entry* entry = archive_entry_new();
-		DEFER({archive_entry_free(entry);});
-
-		r = archive_read_next_header2(disk, entry);
-		if (r == ARCHIVE_EOF)
-			break;
-		if (r < ARCHIVE_OK)
-			throw Exception(string::f("archiveFolder() could not get next entry from archive: %s", archive_error_string(disk)));
-
-		// Recurse dirs
-		archive_read_disk_descend(disk);
-
-		// Convert absolute path to relative path
-		filesystem::path entryPath =
-#if defined ARCH_WIN
-			archive_entry_pathname_w(entry);
-#else
-			archive_entry_pathname(entry);
-#endif
-		entryPath = getRelativePath(entryPath, folderPath);
-#if defined ARCH_WIN
-		archive_entry_copy_pathname_w(entry, entryPath.generic_wstring().c_str());
-#else
-		archive_entry_set_pathname(entry, entryPath.generic_u8string().c_str());
-#endif
-
-		// Write file to archive
-		r = archive_write_header(a, entry);
-		if (r < ARCHIVE_OK)
-			throw Exception(string::f("archiveFolder() could not write entry to archive: %s", archive_error_string(a)));
-
-		// Manually copy data
-#if defined ARCH_WIN
-		filesystem::path entrySourcePath = archive_entry_sourcepath_w(entry);
-#else
-		filesystem::path entrySourcePath = archive_entry_sourcepath(entry);
-#endif
-		FILE* f = std::fopen(entrySourcePath.generic_u8string().c_str(), "rb");
-		DEFER({std::fclose(f);});
-		char buf[1 << 14];
-		ssize_t len;
-		while ((len = std::fread(buf, 1, sizeof(buf), f)) > 0) {
-			archive_write_data(a, buf, len);
-		}
-	}
-}
-
-
-void unarchiveToFolder(const filesystem::path& archivePath, const filesystem::path& folderPath) {
-	// Based on minitar.c extract() in libarchive examples
-	int r;
-
-	// Open archive for reading
-	struct archive* a = archive_read_new();
-	DEFER({archive_read_free(a);});
-	archive_read_support_filter_zstd(a);
-	// archive_read_support_filter_all(a);
-	archive_read_support_format_tar(a);
-	// archive_read_support_format_all(a);
-#if defined ARCH_WIN
-	r = archive_read_open_filename_w(a, archivePath.generic_wstring().c_str(), 1 << 14);
-#else
-	r = archive_read_open_filename(a, archivePath.generic_u8string().c_str(), 1 << 14);
-#endif
-	if (r < ARCHIVE_OK)
-		throw Exception(string::f("unzipToFolder() could not open archive %s: %s", archivePath.generic_u8string().c_str(), archive_error_string(a)));
-	DEFER({archive_read_close(a);});
-
-	// Open folder for writing
-	struct archive* disk = archive_write_disk_new();
-	DEFER({archive_write_free(disk);});
-	int flags = ARCHIVE_EXTRACT_TIME;
-	archive_write_disk_set_options(disk, flags);
-	DEFER({archive_write_close(disk);});
-
-	// Iterate archive
-	for (;;) {
-		// Get next entry
-		struct archive_entry* entry;
-		r = archive_read_next_header(a, &entry);
-		if (r == ARCHIVE_EOF)
-			break;
-		if (r < ARCHIVE_OK)
-			throw Exception(string::f("unzipToFolder() could not read entry from archive: %s", archive_error_string(a)));
-
-		// Convert relative pathname to absolute based on folderPath
-		filesystem::path entryPath = filesystem::u8path(archive_entry_pathname(entry));
-		if (!entryPath.is_relative())
-			throw Exception(string::f("unzipToFolder() does not support absolute paths: %s", entryPath.generic_u8string().c_str()));
-		entryPath = filesystem::absolute(entryPath, folderPath);
-#if defined ARCH_WIN
-		archive_entry_copy_pathname_w(entry, entryPath.generic_wstring().c_str());
-#else
-		archive_entry_set_pathname(entry, entryPath.generic_u8string().c_str());
-#endif
-
-		// Write entry to disk
-		r = archive_write_header(disk, entry);
-		if (r < ARCHIVE_OK)
-			throw Exception(string::f("unzipToFolder() could not write file to folder: %s", archive_error_string(disk)));
-
-		// Copy data to file
-		for (;;) {
-			const void* buf;
-			size_t size;
-			int64_t offset;
-			// Read data from archive
-			r = archive_read_data_block(a, &buf, &size, &offset);
-			if (r == ARCHIVE_EOF)
-				break;
-			if (r < ARCHIVE_OK)
-				throw Exception(string::f("unzipToFolder() could not read data from archive", archive_error_string(a)));
-
-			// Write data to file
-			r = archive_write_data_block(disk, buf, size, offset);
-			if (r < ARCHIVE_OK)
-				throw Exception(string::f("unzipToFolder() could not write data to file", archive_error_string(disk)));
-		}
-
-		// Close file
-		r = archive_write_finish_entry(disk);
-		if (r < ARCHIVE_OK)
-			throw Exception(string::f("unzipToFolder() could not close file", archive_error_string(disk)));
-	}
 }
 
 

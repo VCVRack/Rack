@@ -31,12 +31,5 @@ FILE* fopen_u8(const char* filename, const char* mode) {
 	return _wfopen(rack::string::U8toU16(filename).c_str(), rack::string::U8toU16(mode).c_str());
 }
 
-int remove_u8(const char* path) {
-	return _wremove(rack::string::U8toU16(path).c_str());
-}
-
-int rename_u8(const char* oldname, const char* newname) {
-	return _wrename(rack::string::U8toU16(oldname).c_str(), rack::string::U8toU16(newname).c_str());
-}
 
 #endif

@@ -28,31 +28,6 @@ std::string ellipsizePrefix(const std::string& s, size_t len);
 bool startsWith(const std::string& str, const std::string& prefix);
 bool endsWith(const std::string& str, const std::string& suffix);
 
-/** Extracts the directory of the path.
-Example: directory("dir/file.txt") // "dir"
-Calls POSIX dirname().
-*/
-std::string directory(const std::string& path);
-/** Extracts the filename of the path.
-Example: directory("dir/file.txt") // "file.txt"
-Calls POSIX basename().
-*/
-std::string filename(const std::string& path);
-/** Extracts the portion of a filename without the extension.
-Example: filenameBase("file.txt") // "file"
-Note: Only works on filenames. Call filename(path) to get the filename of the path.
-*/
-std::string filenameBase(const std::string& filename);
-/** Extracts the extension of a filename.
-Example: filenameExtension("file.txt") // "txt"
-Note: Only works on filenames. Call filename(path) to get the filename of the path.
-*/
-std::string filenameExtension(const std::string& filename);
-/** Returns the canonicalized absolute path pointed to by `path`, following symlinks.
-Returns "" if the symbol is not found.
-*/
-std::string absolutePath(const std::string& path);
-
 /** Scores how well a query matches a string.
 A score of 0 means no match.
 The score is arbitrary and is only meaningful for sorting.
@@ -84,6 +59,7 @@ See https://utf8everywhere.org/ for more information about VCV Rack's philosophy
 std::string U16toU8(const std::wstring& w);
 std::wstring U8toU16(const std::string& s);
 #endif
+
 
 } // namespace string
 } // namespace rack

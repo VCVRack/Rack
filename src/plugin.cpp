@@ -44,30 +44,27 @@ namespace plugin {
 ////////////////////
 
 static void* loadLibrary(std::string libraryPath) {
-	#if defined ARCH_WIN
-		SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
-		std::wstring libraryFilenameW = string::U8toU16(libraryPath);
-		HINSTANCE handle = LoadLibraryW(libraryFilenameW.c_str());
-		SetErrorMode(0);
-		if (!handle) {
-			int error = GetLastError();
-			throw Exception(string::f("Failed to load library %s: code %d", libraryPath.c_str(), error));
-		}
-	#else
-		// Plugin uses -rpath=. so change working directory so it can find libRack.
-		std::string cwd = system::getWorkingDirectory();
-		system::setWorkingDirectory(asset::systemDir);
-		// And then change it back
-		DEFER({
-			system::setWorkingDirectory(cwd);
-		});
-		// Load library with dlopen
-		void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
-		if (!handle) {
-			throw Exception(string::f("Failed to load library %s: %s", libraryPath.c_str(), dlerror()));
-		}
-	#endif
-		return handle;
+#if defined ARCH_WIN
+	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
+	std::wstring libraryFilenameW = string::U8toU16(libraryPath);
+	HINSTANCE handle = LoadLibraryW(libraryFilenameW.c_str());
+	SetErrorMode(0);
+	if (!handle) {
+		int error = GetLastError();
+		throw Exception(string::f("Failed to load library %s: code %d", libraryPath.c_str(), error));
+	}
+#else
+	// As of Rack v2.0, plugins are linked with `-rpath=.` so change current directory so it can find libRack.
+	std::string cwd = system::getWorkingDirectory();
+	system::setWorkingDirectory(asset::systemDir);
+	// Change it back when we're finished
+	DEFER({system::setWorkingDirectory(cwd);});
+	// Load library with dlopen
+	void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+	if (!handle)
+		throw Exception(string::f("Failed to load library %s: %s", libraryPath.c_str(), dlerror()));
+#endif
+	return handle;
 }
 
 typedef void (*InitCallback)(Plugin*);
@@ -85,9 +82,8 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 	std::string libraryPath = plugin->path + "/plugin." + libraryExt;
 
 	// Check file existence
-	if (!system::isFile(libraryPath)) {
-		throw Exception(string::f("Library %s does not exist", libraryPath.c_str()));
-	}
+	if (!system::isFile(libraryPath))
+		throw Exception(string::f("Plugin binary not found at %s", libraryPath.c_str()));
 
 	// Load dynamic/shared library
 	plugin->handle = loadLibrary(libraryPath);
@@ -99,9 +95,8 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 #else
 	initCallback = (InitCallback) dlsym(plugin->handle, "init");
 #endif
-	if (!initCallback) {
+	if (!initCallback)
 		throw Exception(string::f("Failed to read init() symbol in %s", libraryPath.c_str()));
-	}
 
 	return initCallback;
 }
@@ -130,22 +125,16 @@ static Plugin* loadPlugin(std::string path) {
 
 		// Load plugin.json
 		std::string manifestFilename = (path == "") ? asset::system("Core.json") : (path + "/plugin.json");
-		FILE* file = fopen(manifestFilename.c_str(), "r");
-		if (!file) {
+		FILE* file = std::fopen(manifestFilename.c_str(), "r");
+		if (!file)
 			throw Exception(string::f("Manifest file %s does not exist", manifestFilename.c_str()));
-		}
-		DEFER({
-			fclose(file);
-		});
+		DEFER({std::fclose(file);});
 
 		json_error_t error;
 		json_t* rootJ = json_loadf(file, 0, &error);
-		if (!rootJ) {
+		if (!rootJ)
 			throw Exception(string::f("JSON parsing error at %s %d:%d %s", manifestFilename.c_str(), error.line, error.column, error.text));
-		}
-		DEFER({
-			json_decref(rootJ);
-		});
+		DEFER({json_decref(rootJ);});
 
 		// Call init callback
 		InitCallback initCallback;
@@ -162,12 +151,11 @@ static Plugin* loadPlugin(std::string path) {
 
 		// Reject plugin if slug already exists
 		Plugin* oldPlugin = getPlugin(plugin->slug);
-		if (oldPlugin) {
+		if (oldPlugin)
 			throw Exception(string::f("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str()));
-		}
 
-		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), plugin->path.c_str());
 		plugins.push_back(plugin);
+		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), plugin->path.c_str());
 	}
 	catch (Exception& e) {
 		WARN("Could not load plugin %s: %s", path.c_str(), e.what());
@@ -193,7 +181,7 @@ static void extractPackages(std::string path) {
 	std::string message;
 
 	for (std::string packagePath : system::getEntries(path)) {
-		if (string::filenameExtension(string::filename(packagePath)) != "zip")
+		if (system::getExtension(packagePath) != ".zip")
 			continue;
 		INFO("Extracting package %s", packagePath.c_str());
 		// Extract package
@@ -201,14 +189,12 @@ static void extractPackages(std::string path) {
 			system::unarchiveToFolder(packagePath, path);
 		}
 		catch (Exception& e) {
-			WARN("Package %s failed to extract: %s", packagePath.c_str(), e.what());
-			message += string::f("Could not extract package %s\n", packagePath.c_str());
+			WARN("Plugin package %s failed to extract: %s", packagePath.c_str(), e.what());
+			message += string::f("Could not extract plugin package %s\n", packagePath.c_str());
 			continue;
 		}
 		// Remove package
-		if (remove(packagePath.c_str())) {
-			WARN("Could not delete file %s: error %d", packagePath.c_str(), errno);
-		}
+		system::remove(packagePath.c_str());
 	}
 	if (!message.empty()) {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());

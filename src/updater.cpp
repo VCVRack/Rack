@@ -64,7 +64,8 @@ void update() {
 		return;
 
 	// Download update
-	std::string filename = string::filename(network::urlPath(downloadUrl));
+	// HACK getFilename is only supposed to be used for filesystem paths, not URLs.
+	std::string filename = system::getFilename(network::urlPath(downloadUrl));
 	std::string path = asset::user(filename);
 	INFO("Downloading update %s to %s", downloadUrl.c_str(), path.c_str());
 	network::requestDownload(downloadUrl, path, &progress);

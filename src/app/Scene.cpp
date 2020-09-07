@@ -182,7 +182,7 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 void Scene::onPathDrop(const event::PathDrop& e) {
 	if (e.paths.size() >= 1) {
 		const std::string& path = e.paths[0];
-		if (string::filenameExtension(string::filename(path)) == "vcv") {
+		if (system::getExtension(path) == ".vcv") {
 			APP->patch->loadPathDialog(path);
 			e.consume(this);
 			return;

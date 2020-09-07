@@ -374,7 +374,7 @@ void Window::run() {
 			windowTitle += " - ";
 			if (!APP->history->isSaved())
 				windowTitle += "*";
-			windowTitle += string::filename(APP->patch->path);
+			windowTitle += system::getFilename(APP->patch->path);
 		}
 		if (windowTitle != internal->lastWindowTitle) {
 			glfwSetWindowTitle(win, windowTitle.c_str());

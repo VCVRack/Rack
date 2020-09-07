@@ -265,12 +265,11 @@ struct ModulePresetItem : ui::MenuItem {
 			bool hasPresets = false;
 			// Note: This is not cached, so opening this menu each time might have a bit of latency.
 			for (const std::string& presetPath : system::getEntries(presetDir)) {
-				std::string presetFilename = string::filename(presetPath);
-				if (string::filenameExtension(presetFilename) != "vcvm")
+				if (system::getExtension(presetPath) != ".vcvm")
 					continue;
 				hasPresets = true;
 
-				std::string presetName = string::filenameBase(presetFilename);
+				std::string presetName = system::getStem(presetPath);
 				// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
 				std::regex r("^\\d*_");
 				presetName = std::regex_replace(presetName, r, "");
@@ -690,25 +689,22 @@ void ModuleWidget::loadDialog() {
 
 	// Delete directories if empty
 	DEFER({
-		system::removeDirectories(presetDir);
+		system::remove(presetDir);
+		system::remove(system::getDirectory(presetDir));
 	});
 
 	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
-	DEFER({
-		osdialog_filters_free(filters);
-	});
+	DEFER({osdialog_filters_free(filters);});
 
-	char* path = osdialog_file(OSDIALOG_OPEN, presetDir.c_str(), NULL, filters);
-	if (!path) {
+	char* pathC = osdialog_file(OSDIALOG_OPEN, presetDir.c_str(), NULL, filters);
+	if (!pathC) {
 		// No path selected
 		return;
 	}
-	DEFER({
-		free(path);
-	});
+	DEFER({free(pathC);});
 
 	try {
-		loadAction(path);
+		loadAction(pathC);
 	}
 	catch (Exception& e) {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
@@ -749,30 +745,26 @@ void ModuleWidget::saveDialog() {
 
 	// Delete directories if empty
 	DEFER({
-		system::removeDirectories(presetDir);
+		// These fail silently if the directories are not empty
+		system::remove(presetDir);
+		system::remove(system::getDirectory(presetDir));
 	});
 
 	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
-	DEFER({
-		osdialog_filters_free(filters);
-	});
+	DEFER({osdialog_filters_free(filters);});
 
-	char* path = osdialog_file(OSDIALOG_SAVE, presetDir.c_str(), "Untitled.vcvm", filters);
-	if (!path) {
+	char* pathC = osdialog_file(OSDIALOG_SAVE, presetDir.c_str(), "Untitled.vcvm", filters);
+	if (!pathC) {
 		// No path selected
 		return;
 	}
-	DEFER({
-		free(path);
-	});
+	DEFER({free(pathC);});
 
-	std::string pathStr = path;
-	std::string extension = string::filenameExtension(string::filename(pathStr));
-	if (extension == "") {
-		pathStr += ".vcvm";
-	}
+	std::string path = pathC;
+	if (system::getExtension(path) == "")
+		path += ".vcvm";
 
-	save(pathStr);
+	save(path);
 }
 
 template <class T, typename F>
