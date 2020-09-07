@@ -182,6 +182,11 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 	DEFER({archive_write_free(a);});
 	archive_write_set_format_ustar(a);
 	archive_write_add_filter_zstd(a);
+	// Set compression level roughly so that a 500MB/s SSD is bottlenecked
+	r = archive_write_set_filter_option(a, NULL, "compression-level", "1");
+	if (r < ARCHIVE_OK)
+		throw Exception(string::f("archiveFolder() could not set filter option: %s", archive_error_string(a)));
+
 #if defined ARCH_WIN
 	r = archive_write_open_filename_w(a, string::U8toU16(archivePath).c_str());
 #else
@@ -245,7 +250,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 #endif
 		FILE* f = std::fopen(entrySourcePath.c_str(), "rb");
 		DEFER({std::fclose(f);});
-		char buf[1 << 14];
+		char buf[1 << 16];
 		ssize_t len;
 		while ((len = std::fread(buf, 1, sizeof(buf), f)) > 0) {
 			archive_write_data(a, buf, len);
@@ -266,7 +271,7 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 	archive_read_support_format_tar(a);
 	// archive_read_support_format_all(a);
 #if defined ARCH_WIN
-	r = archive_read_open_filename_w(a, string::U8toU16(archivePath).c_str(), 1 << 14);
+	r = archive_read_open_filename_w(a, string::U8toU16(archivePath).c_str(), 1 << 16);
 #else
 	r = archive_read_open_filename(a, archivePath.c_str(), 1 << 14);
 #endif
