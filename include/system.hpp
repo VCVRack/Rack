@@ -48,7 +48,14 @@ int removeRecursively(const std::string& path);
 std::string getWorkingDirectory();
 void setWorkingDirectory(const std::string& path);
 std::string getTempDir();
+/** Returns the absolute path beginning with "/". */
 std::string getAbsolute(const std::string& path);
+/** Returns the canonical (unique) path, following symlinks and "." and ".." fake directories.
+The path must exist on the filesystem.
+Examples:
+	getCanonical("/foo/./bar/.") // "/foo/bar"
+*/
+std::string getCanonical(const std::string& path);
 /** Extracts the parent directory of the path.
 Examples:
 	getDirectory("/var/tmp/example.txt") // "/var/tmp"
