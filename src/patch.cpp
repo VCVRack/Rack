@@ -62,7 +62,10 @@ void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
 	saveAutosave();
 
+	uint64_t startTime = system::getNanoseconds();
 	system::archiveFolder(path, asset::autosavePath);
+	uint64_t endTime = system::getNanoseconds();
+	INFO("Archived patch in %lf seconds", (endTime - startTime) / 1e9);
 }
 
 
@@ -190,7 +193,10 @@ void PatchManager::load(std::string path) {
 	}
 	else {
 		// Extract the .vcv file as a .tar.zst archive.
+		uint64_t startTime = system::getNanoseconds();
 		system::unarchiveToFolder(path, asset::autosavePath);
+		uint64_t endTime = system::getNanoseconds();
+		INFO("Unarchived patch in %lf seconds", (endTime - startTime) / 1e9);
 	}
 
 	loadAutosave();
