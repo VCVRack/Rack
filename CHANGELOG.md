@@ -5,7 +5,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 ### 2.0.0 (in development)
 - Add port tooltips with name, voltage, and list of connected ports.
 - Evaluate mathematical expressions (such as `1+2*3`) in parameter context menu fields.
-- Add module whitelist to Module Browser.
+- Add module whitelist to Module Browser which synchronizes individual modules chosen in the VCV Library.
 - Restructure engine to no longer use an "engine thread".
 	- Improve engine performance and latency by no longer requiring thread synchronization between the engine thread and audio thread. The engine now runs directly on the audio thread.
 	- Add support for multiple simultaneous audio devices.
@@ -34,6 +34,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Fix key commands on AZERTY, Dvorak, and all other keyboard layouts.
 - Add Mouse device to Computer keyboard/mouse MIDI driver.
 - Make scrollbar mouse interaction similar to modern OS behavior.
+- Re-render framebuffers when subpixel offset changes, fixing bug that makes ports and knobs appear slightly offset at certain zoom levels.
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
@@ -57,6 +58,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add `Engine::getNumModules()` and `Engine::getModuleIds()`.
 	- Add `event::KeyBase::keyName`. Plugins should use this instead of `key` for alphanumeric keys in order to support all keyboard layouts.
 	- Improve thread safety of `dsp::RingBuffer`.
+	- Add several convenient filesystem routines to `system::`.
+	- Move all `string::` functions dealing with filesystem paths to `system::`.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
