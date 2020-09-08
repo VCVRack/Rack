@@ -50,11 +50,16 @@ namespace rack {
 namespace system {
 
 
+std::string join(const std::string& path1, const std::string& path2) {
+	return (fs::u8path(path1) / fs::u8path(path2)).generic_u8string();
+}
+
+
 std::list<std::string> getEntries(const std::string& dirPath, int depth) {
 	try {
 		std::list<std::string> entries;
 		for (auto& entry : fs::directory_iterator(fs::u8path(dirPath))) {
-			std::string subEntry = entry.path().u8string();
+			std::string subEntry = entry.path().generic_u8string();
 			entries.push_back(subEntry);
 			// Recurse if depth > 0 (limited recursion) or depth < 0 (infinite recursion).
 			if (depth != 0) {
@@ -174,7 +179,7 @@ int removeRecursively(const std::string& path) {
 
 std::string getWorkingDirectory() {
 	try {
-		return fs::current_path().u8string();
+		return fs::current_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
 		throw Exception(e.what());
@@ -194,7 +199,7 @@ void setWorkingDirectory(const std::string& path) {
 
 std::string getTempDir() {
 	try {
-		return fs::temp_directory_path().u8string();
+		return fs::temp_directory_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
 		throw Exception(e.what());
@@ -204,7 +209,7 @@ std::string getTempDir() {
 
 std::string getAbsolute(const std::string& path) {
 	try {
-		return fs::absolute(fs::u8path(path)).u8string();
+		return fs::absolute(fs::u8path(path)).generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
 		throw Exception(e.what());
@@ -214,7 +219,7 @@ std::string getAbsolute(const std::string& path) {
 
 std::string getCanonical(const std::string& path) {
 	try {
-		return fs::canonical(fs::u8path(path)).u8string();
+		return fs::canonical(fs::u8path(path)).generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
 		throw Exception(e.what());
@@ -224,7 +229,7 @@ std::string getCanonical(const std::string& path) {
 
 std::string getDirectory(const std::string& path) {
 	try {
-		return fs::u8path(path).parent_path().u8string();
+		return fs::u8path(path).parent_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
 		throw Exception(e.what());
@@ -234,7 +239,7 @@ std::string getDirectory(const std::string& path) {
 
 std::string getFilename(const std::string& path) {
 	try {
-		return fs::u8path(path).filename().u8string();
+		return fs::u8path(path).filename().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
 		throw Exception(e.what());
@@ -244,7 +249,7 @@ std::string getFilename(const std::string& path) {
 
 std::string getStem(const std::string& path) {
 	try {
-		return fs::u8path(path).stem().u8string();
+		return fs::u8path(path).stem().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
 		throw Exception(e.what());
@@ -254,7 +259,7 @@ std::string getStem(const std::string& path) {
 
 std::string getExtension(const std::string& path) {
 	try {
-		return fs::u8path(path).extension().u8string();
+		return fs::u8path(path).extension().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
 		throw Exception(e.what());
@@ -410,7 +415,7 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 		std::string entryPath = archive_entry_pathname(entry);
 		if (!fs::u8path(entryPath).is_relative())
 			throw Exception(string::f("unzipToFolder() does not support absolute paths: %s", entryPath.c_str()));
-		entryPath = fs::absolute(fs::u8path(entryPath), fs::u8path(folderPath)).u8string();
+		entryPath = fs::absolute(fs::u8path(entryPath), fs::u8path(folderPath)).generic_u8string();
 #if defined ARCH_WIN
 		archive_entry_copy_pathname_w(entry, string::U8toU16(entryPath).c_str());
 #else

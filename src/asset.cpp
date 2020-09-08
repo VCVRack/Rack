@@ -21,6 +21,7 @@
 #include <settings.hpp>
 #include <string.hpp>
 #include <plugin/Plugin.hpp>
+#include <engine/Module.hpp>
 #include <app/common.hpp>
 
 
@@ -29,7 +30,7 @@ namespace asset {
 
 
 static void initSystemDir() {
-	if (systemDir != "")
+	if (!systemDir.empty())
 		return;
 
 	if (settings::devMode) {
@@ -76,7 +77,7 @@ static void initSystemDir() {
 
 
 static void initUserDir() {
-	if (userDir != "")
+	if (!userDir.empty())
 		return;
 
 	if (settings::devMode) {
@@ -89,15 +90,13 @@ static void initUserDir() {
 	wchar_t documentsBufW[MAX_PATH] = L".";
 	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufW);
 	assert(result == S_OK);
-	userDir = string::U16toU8(documentsBufW);
-	userDir += "/Rack";
+	userDir = system::join(string::U16toU8(documentsBufW), "Rack");
 #endif
 #if defined ARCH_MAC
 	// Get home directory
 	struct passwd* pw = getpwuid(getuid());
 	assert(pw);
-	userDir = pw->pw_dir;
-	userDir += "/Documents/Rack";
+	userDir = system::join(pw->pw_dir, "Documents/Rack");
 #endif
 #if defined ARCH_LIN
 	// Get home directory
@@ -107,8 +106,7 @@ static void initUserDir() {
 		assert(pw);
 		homeBuf = pw->pw_dir;
 	}
-	userDir = homeBuf;
-	userDir += "/.Rack";
+	userDir = system::join(homeBuf, ".Rack");
 #endif
 }
 
@@ -120,34 +118,40 @@ void init() {
 
 	// Set paths
 	if (settings::devMode) {
-		pluginsPath = userDir + "/plugins";
-		settingsPath = userDir + "/settings.json";
-		autosavePath = userDir + "/autosave";
-		templatePath = userDir + "/template.vcv";
+		pluginsPath = system::join(userDir, "plugins");
+		settingsPath = system::join(userDir, "settings.json");
+		autosavePath = system::join(userDir, "autosave");
+		templatePath = system::join(userDir, "template.vcv");
 	}
 	else {
-		logPath = userDir + "/log.txt";
-		pluginsPath = userDir + "/plugins-v" + ABI_VERSION;
-		settingsPath = userDir + "/settings-v" + ABI_VERSION + ".json";
-		autosavePath = userDir + "/autosave-v" + ABI_VERSION;
-		templatePath = userDir + "/template-v" + ABI_VERSION + ".vcv";
+		logPath = system::join(userDir, "log.txt");
+		pluginsPath = system::join(userDir, "plugins-v" + ABI_VERSION);
+		settingsPath = system::join(userDir, "settings-v" + ABI_VERSION + ".json");
+		autosavePath = system::join(userDir, "autosave-v" + ABI_VERSION);
+		templatePath = system::join(userDir, "template-v" + ABI_VERSION + ".vcv");
 	}
 }
 
 
 std::string system(std::string filename) {
-	return systemDir + "/" + filename;
+	return system::join(systemDir, filename);
 }
 
 
 std::string user(std::string filename) {
-	return userDir + "/" + filename;
+	return system::join(userDir, filename);
 }
 
 
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
 	assert(plugin);
-	return plugin->path + "/" + filename;
+	return system::join(plugin->path, filename);
+}
+
+
+std::string module(engine::Module* module, const std::string& filename) {
+	assert(module);
+	return system::join(autosavePath, "modules", std::to_string(module->id), filename);
 }
 
 

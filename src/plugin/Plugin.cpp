@@ -22,7 +22,7 @@ void Plugin::addModel(Model* model) {
 	models.push_back(model);
 }
 
-Model* Plugin::getModel(std::string slug) {
+Model* Plugin::getModel(const std::string& slug) {
 	for (Model* model : models) {
 		if (model->slug == slug) {
 			return model;

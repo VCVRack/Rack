@@ -14,6 +14,15 @@ namespace system {
 
 // Filesystem
 
+/** Joins two paths with a directory separator.
+If `path2` is an empty string, returns `path1`.
+*/
+std::string join(const std::string& path1, const std::string& path2 = "");
+/** Join an arbitrary number of paths, from left to right. */
+template <typename... Paths>
+std::string join(const std::string& path1, const std::string& path2, Paths... paths) {
+	return join(join(path1, path2), paths...);
+}
 /** Returns a list of all entries (directories, files, symbolic links, etc) in a directory.
 `depth` is the number of directories to recurse. 0 depth does not recurse. -1 depth recurses infinitely.
 */

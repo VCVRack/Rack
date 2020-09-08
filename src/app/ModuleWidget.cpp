@@ -674,7 +674,7 @@ void ModuleWidget::loadAction(std::string filename) {
 }
 
 void ModuleWidget::loadTemplate() {
-	std::string templatePath = model->getUserPresetDir() + "/" + "template.vcvm";
+	std::string templatePath = system::join(model->getUserPresetDir(), "template.vcvm");
 	try {
 		load(templatePath);
 	}
@@ -735,7 +735,7 @@ void ModuleWidget::saveTemplate() {
 	std::string presetDir = model->getUserPresetDir();
 	system::createDirectories(presetDir);
 
-	std::string templatePath = presetDir + "/" + "template.vcvm";
+	std::string templatePath = system::join(presetDir, "template.vcvm");
 	save(templatePath);
 }
 

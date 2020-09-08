@@ -79,7 +79,7 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 #elif ARCH_MAC
 	libraryExt = "dylib";
 #endif
-	std::string libraryPath = plugin->path + "/plugin." + libraryExt;
+	std::string libraryPath = system::join(plugin->path, "plugin." + libraryExt);
 
 	// Check file existence
 	if (!system::isFile(libraryPath))
@@ -124,7 +124,7 @@ static Plugin* loadPlugin(std::string path) {
 		}
 
 		// Load plugin.json
-		std::string manifestFilename = (path == "") ? asset::system("Core.json") : (path + "/plugin.json");
+		std::string manifestFilename = (path == "") ? asset::system("Core.json") : system::join(path, "plugin.json");
 		FILE* file = std::fopen(manifestFilename.c_str(), "r");
 		if (!file)
 			throw Exception(string::f("Manifest file %s does not exist", manifestFilename.c_str()));
@@ -226,7 +226,7 @@ void init() {
 #else
 	std::string fundamentalSrc = asset::system("Fundamental.zip");
 #endif
-	std::string fundamentalDir = asset::pluginsPath + "/Fundamental";
+	std::string fundamentalDir = system::join(asset::pluginsPath, "Fundamental");
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		INFO("Extracting bundled Fundamental package");
 		system::unarchiveToFolder(fundamentalSrc.c_str(), asset::pluginsPath.c_str());
@@ -471,7 +471,7 @@ void syncUpdate(Update* update) {
 	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), APP_ARCH.c_str());
 
 	// Download zip
-	std::string pluginDest = asset::pluginsPath + "/" + update->pluginSlug + ".zip";
+	std::string pluginDest = system::join(asset::pluginsPath, update->pluginSlug + ".zip");
 	if (!network::requestDownload(downloadUrl, pluginDest, &update->progress, cookies)) {
 		WARN("Plugin %s download was unsuccessful", update->pluginSlug.c_str());
 		return;

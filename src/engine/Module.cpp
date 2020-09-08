@@ -1,5 +1,6 @@
 #include <engine/Module.hpp>
 #include <plugin.hpp>
+#include <asset.hpp>
 
 
 namespace rack {

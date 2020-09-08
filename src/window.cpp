@@ -434,10 +434,10 @@ void Window::screenshot(float zoom) {
 	std::string screenshotsDir = asset::user("screenshots");
 	system::createDirectory(screenshotsDir);
 	for (plugin::Plugin* p : plugin::plugins) {
-		std::string dir = screenshotsDir + "/" + p->slug;
+		std::string dir = system::join(screenshotsDir, p->slug);
 		system::createDirectory(dir);
 		for (plugin::Model* model : p->models) {
-			std::string filename = dir + "/" + model->slug + ".png";
+			std::string filename = system::join(dir, model->slug + ".png");
 			// Skip model if screenshot already exists
 			if (system::isFile(filename))
 				continue;
@@ -468,9 +468,9 @@ void Window::screenshot(float zoom) {
 			for (int y = 0; y < height / 2; y++) {
 				int flipY = height - y - 1;
 				uint8_t tmp[width * 4];
-				memcpy(tmp, &data[y * width * 4], width * 4);
-				memcpy(&data[y * width * 4], &data[flipY * width * 4], width * 4);
-				memcpy(&data[flipY * width * 4], tmp, width * 4);
+				std::memcpy(tmp, &data[y * width * 4], width * 4);
+				std::memcpy(&data[y * width * 4], &data[flipY * width * 4], width * 4);
+				std::memcpy(&data[flipY * width * 4], tmp, width * 4);
 			}
 
 			// Write pixels to PNG

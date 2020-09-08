@@ -59,12 +59,12 @@ std::string Model::getFullName() {
 
 
 std::string Model::getFactoryPresetDir() {
-	return asset::plugin(plugin, "presets/" + slug);
+	return asset::plugin(plugin, system::join("presets", slug));
 }
 
 
 std::string Model::getUserPresetDir() {
-	return asset::user("presets/" + plugin->slug + "/" + slug);
+	return asset::user(system::join("presets", plugin->slug, slug));
 }
 
 

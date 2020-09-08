@@ -153,7 +153,7 @@ void PatchManager::saveAutosave() {
 
 	// Write to temporary path and then rename it to the correct path
 	system::createDirectories(asset::autosavePath);
-	std::string patchPath = asset::autosavePath + "/patch.json";
+	std::string patchPath = system::join(asset::autosavePath, "patch.json");
 	std::string tmpPath = patchPath + ".tmp";
 	FILE* file = std::fopen(tmpPath.c_str(), "w");
 	if (!file) {
@@ -189,7 +189,7 @@ void PatchManager::load(std::string path) {
 
 	if (isPatchLegacyPre2(path)) {
 		// Copy the .vcv file directly to "patch.json".
-		system::copy(path, asset::autosavePath + "/patch.json");
+		system::copy(path, system::join(asset::autosavePath, "patch.json"));
 	}
 	else {
 		// Extract the .vcv file as a .tar.zst archive.
@@ -237,7 +237,7 @@ void PatchManager::loadTemplateDialog() {
 
 void PatchManager::loadAutosave() {
 	INFO("Loading autosave");
-	std::string patchPath = asset::autosavePath + "/patch.json";
+	std::string patchPath = system::join(asset::autosavePath, "patch.json");
 	FILE* file = std::fopen(patchPath.c_str(), "r");
 	if (!file) {
 		// Exit silently

@@ -76,7 +76,7 @@ void update() {
 	system::runProcessDetached(path);
 #elif defined ARCH_MAC
 	std::string cmd;
-	// std::string appPath = asset::userDir + "/Rack.app";
+	// std::string appPath = system::join(asset::userDir, "Rack.app");
 	// cmd = "rm -rf '" + appPath + "'";
 	// std::system(cmd.c_str());
 	// // Unzip app using Apple's unzipper, since Rack's unzipper doesn't handle the metadata stuff correctly.
