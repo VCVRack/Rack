@@ -35,6 +35,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add Mouse device to Computer keyboard/mouse MIDI driver.
 - Make scrollbar mouse interaction similar to modern OS behavior.
 - Re-render framebuffers when subpixel offset changes, fixing bug that makes ports and knobs appear slightly offset at certain zoom levels.
+- Use new `.vcv` patch format, an archive (POSIX tar compressed with Zstandard) of a `patch.json` file, module patch assets, and potentially other future files.
+- Use randomly-generated 53-bit IDs to identify modules and cables in the patch.
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
