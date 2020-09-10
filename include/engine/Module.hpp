@@ -31,9 +31,10 @@ struct Module {
 
 	plugin::Model* model = NULL;
 	/** Unique ID for referring to the module in the engine.
+	Between 0 and 2^53 since this is serialized with JSON.
 	Assigned when added to the engine.
 	*/
-	int id = -1;
+	int64_t id = -1;
 
 	/** Arrays of components.
 	Initialized with config().

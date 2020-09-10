@@ -202,10 +202,6 @@ struct Engine::Internal {
 	int stepFrames = 0;
 	Module* primaryModule = NULL;
 
-	// For generating new IDs for added objects
-	int nextModuleId = 0;
-	int nextCableId = 0;
-
 	// Parameter smoothing
 	Module* smoothModule = NULL;
 	int smoothParamId = 0;
@@ -547,9 +543,6 @@ void Engine::clear() {
 		removeModule(module);
 		delete module;
 	}
-	// Reset engine state
-	internal->nextModuleId = 0;
-	internal->nextCableId = 0;
 }
 
 
@@ -693,20 +686,10 @@ void Engine::addModule(Module* module) {
 	// Check that the module is not already added
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	assert(it == internal->modules.end());
-	// Set ID
-	if (module->id < 0) {
-		// Automatically assign ID
-		module->id = internal->nextModuleId++;
-	}
-	else {
-		// Manual ID
-		// Check that the ID is not already taken
-		auto it = internal->modulesCache.find(module->id);
-		assert(it == internal->modulesCache.end());
-		// If ID is higher than engine's next assigned ID, enlarge it.
-		if (module->id >= internal->nextModuleId) {
-			internal->nextModuleId = module->id + 1;
-		}
+	// Set ID if unset or collides with an existing ID
+	while (module->id < 0 || internal->modulesCache.find(module->id) != internal->modulesCache.end()) {
+		// Randomly generate ID
+		module->id = random::u64() % (1ul << 53);
 	}
 	// Add module
 	internal->modules.push_back(module);
@@ -846,20 +829,10 @@ void Engine::addCable(Cable* cable) {
 		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
 			outputWasConnected = true;
 	}
-	// Set ID
-	if (cable->id < 0) {
-		// Automatically assign ID
-		cable->id = internal->nextCableId++;
-	}
-	else {
-		// Manual ID
-		// Check that the ID is not already taken
-		for (Cable* w : internal->cables) {
-			assert(cable->id != w->id);
-		}
-		if (cable->id >= internal->nextCableId) {
-			internal->nextCableId = cable->id + 1;
-		}
+	// Set ID if unset or collides with an existing ID
+	while (cable->id < 0 || internal->cablesCache.find(cable->id) != internal->cablesCache.end()) {
+		// Randomly generate ID
+		cable->id = random::u64() % (1ul << 53);
 	}
 	// Add the cable
 	internal->cables.push_back(cable);
