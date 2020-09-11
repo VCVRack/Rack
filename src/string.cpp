@@ -1,5 +1,5 @@
 #include <cctype> // for tolower and toupper
-#include <algorithm> // for transform
+#include <algorithm> // for transform and equal
 #include <libgen.h> // for dirname and basename
 
 #if defined ARCH_WIN
@@ -78,12 +78,16 @@ std::string ellipsizePrefix(const std::string& s, size_t len) {
 
 
 bool startsWith(const std::string& str, const std::string& prefix) {
-	return str.substr(0, prefix.size()) == prefix;
+	if (str.size() < prefix.size())
+		return false;
+	return std::equal(prefix.begin(), prefix.end(), str.begin());
 }
 
 
 bool endsWith(const std::string& str, const std::string& suffix) {
-	return str.substr(str.size() - suffix.size(), suffix.size()) == suffix;
+	if (str.size() < suffix.size())
+		return false;
+	return std::equal(suffix.begin(), suffix.end(), str.end() - suffix.size());
 }
 
 
