@@ -57,7 +57,7 @@ struct RackWidget : widget::OpaqueWidget {
 	/** Moves a module to the closest non-colliding position */
 	void setModulePosNearest(ModuleWidget* mw, math::Vec pos);
 	void setModulePosForce(ModuleWidget* mw, math::Vec pos);
-	ModuleWidget* getModule(int moduleId);
+	ModuleWidget* getModule(int64_t moduleId);
 	bool isEmpty();
 	void updateModuleOldPositions();
 	history::ComplexAction* getModuleDragAction();
@@ -78,7 +78,7 @@ struct RackWidget : widget::OpaqueWidget {
 	CableWidget* releaseIncompleteCable();
 	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack. */
 	CableWidget* getTopCable(PortWidget* port);
-	CableWidget* getCable(int cableId);
+	CableWidget* getCable(int64_t cableId);
 	/** Returns all cables attached to port, complete or not. */
 	std::list<CableWidget*> getCablesOnPort(PortWidget* port);
 };

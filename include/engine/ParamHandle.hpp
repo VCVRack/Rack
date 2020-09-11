@@ -14,7 +14,7 @@ struct ParamHandle {
 	/** Do not set these directly.
 	Use Engine ParamHandle methods.
 	*/
-	int moduleId = -1;
+	int64_t moduleId = -1;
 	int paramId = 0;
 	Module* module = NULL;
 

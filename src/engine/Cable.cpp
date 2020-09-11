@@ -23,7 +23,7 @@ void Cable::fromJson(json_t* rootJ) {
 	json_t* inputModuleIdJ = json_object_get(rootJ, "inputModuleId");
 	if (!inputModuleIdJ)
 		throw Exception("inputModuleId not found for cable");
-	int inputModuleId = json_integer_value(inputModuleIdJ);
+	int64_t inputModuleId = json_integer_value(inputModuleIdJ);
 	inputModule = APP->engine->getModule(inputModuleId);
 	if (!inputModule)
 		throw Exception("inputModule not found for cable");
@@ -38,7 +38,7 @@ void Cable::fromJson(json_t* rootJ) {
 	json_t* outputModuleIdJ = json_object_get(rootJ, "outputModuleId");
 	if (!outputModuleIdJ)
 		throw Exception("outputModuleId not found for cable");
-	int outputModuleId = json_integer_value(outputModuleIdJ);
+	int64_t outputModuleId = json_integer_value(outputModuleIdJ);
 	outputModule = APP->engine->getModule(outputModuleId);
 	if (!outputModule)
 		throw Exception("outputModule not found for cable");

@@ -188,11 +188,11 @@ struct Engine::Internal {
 	std::set<ParamHandle*> paramHandles;
 
 	// moduleId
-	std::map<int, Module*> modulesCache;
+	std::map<int64_t, Module*> modulesCache;
 	// cableId
-	std::map<int, Cable*> cablesCache;
+	std::map<int64_t, Cable*> cablesCache;
 	// (moduleId, paramId)
-	std::map<std::tuple<int, int>, ParamHandle*> paramHandlesCache;
+	std::map<std::tuple<int64_t, int>, ParamHandle*> paramHandlesCache;
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
@@ -657,21 +657,22 @@ size_t Engine::getNumModules() {
 }
 
 
-void Engine::getModuleIds(int* moduleIds, int len) {
+size_t Engine::getModuleIds(int64_t* moduleIds, size_t len) {
 	SharedLock lock(internal->mutex);
-	int i = 0;
+	size_t i = 0;
 	for (Module* m : internal->modules) {
 		if (i >= len)
 			break;
 		moduleIds[i] = m->id;
 		i++;
 	}
+	return i;
 }
 
 
-std::vector<int> Engine::getModuleIds() {
+std::vector<int64_t> Engine::getModuleIds() {
 	SharedLock lock(internal->mutex);
-	std::vector<int> moduleIds;
+	std::vector<int64_t> moduleIds;
 	moduleIds.reserve(internal->modules.size());
 	for (Module* m : internal->modules) {
 		moduleIds.push_back(m->id);
@@ -748,7 +749,7 @@ void Engine::removeModule(Module* module) {
 }
 
 
-Module* Engine::getModule(int moduleId) {
+Module* Engine::getModule(int64_t moduleId) {
 	SharedLock lock(internal->mutex);
 	auto it = internal->modulesCache.find(moduleId);
 	if (it == internal->modulesCache.end())
@@ -809,6 +810,35 @@ json_t* Engine::moduleToJson(Module* module) {
 void Engine::moduleFromJson(Module* module, json_t* rootJ) {
 	ExclusiveSharedLock lock(internal->mutex);
 	module->fromJson(rootJ);
+}
+
+
+size_t Engine::getNumCables() {
+	return internal->cables.size();
+}
+
+
+size_t Engine::getCableIds(int64_t* cableIds, size_t len) {
+	SharedLock lock(internal->mutex);
+	size_t i = 0;
+	for (Cable* c : internal->cables) {
+		if (i >= len)
+			break;
+		cableIds[i] = c->id;
+		i++;
+	}
+	return i;
+}
+
+
+std::vector<int64_t> Engine::getCableIds() {
+	SharedLock lock(internal->mutex);
+	std::vector<int64_t> cableIds;
+	cableIds.reserve(internal->cables.size());
+	for (Cable* c : internal->cables) {
+		cableIds.push_back(c->id);
+	}
+	return cableIds;
 }
 
 
@@ -893,7 +923,7 @@ void Engine::removeCable(Cable* cable) {
 }
 
 
-Cable* Engine::getCable(int cableId) {
+Cable* Engine::getCable(int64_t cableId) {
 	SharedLock lock(internal->mutex);
 	auto it = internal->cablesCache.find(cableId);
 	if (it == internal->cablesCache.end())
@@ -965,7 +995,7 @@ void Engine::removeParamHandle(ParamHandle* paramHandle) {
 }
 
 
-ParamHandle* Engine::getParamHandle(int moduleId, int paramId) {
+ParamHandle* Engine::getParamHandle(int64_t moduleId, int paramId) {
 	SharedLock lock(internal->mutex);
 	auto it = internal->paramHandlesCache.find(std::make_tuple(moduleId, paramId));
 	if (it == internal->paramHandlesCache.end())
@@ -979,7 +1009,7 @@ ParamHandle* Engine::getParamHandle(Module* module, int paramId) {
 }
 
 
-void Engine::updateParamHandle(ParamHandle* paramHandle, int moduleId, int paramId, bool overwrite) {
+void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
 	SharedLock lock(internal->mutex);
 	// Check that it exists
 	auto it = internal->paramHandles.find(paramHandle);

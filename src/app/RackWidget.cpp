@@ -182,11 +182,13 @@ void RackWidget::mergeJson(json_t* rootJ) {
 		json_t* idJ = json_object_get(moduleJ, "id");
 		if (!idJ)
 			continue;
-		int id = json_integer_value(idJ);
+		int64_t id = json_integer_value(idJ);
 		// TODO Legacy v0.6?
 		ModuleWidget* moduleWidget = getModule(id);
-		if (!moduleWidget)
+		if (!moduleWidget) {
+			WARN("Cannot find ModuleWidget with ID %ld", id);
 			continue;
+		}
 
 		// pos
 		math::Vec pos = moduleWidget->box.pos.minus(moduleOffset);
@@ -206,10 +208,12 @@ void RackWidget::mergeJson(json_t* rootJ) {
 		json_t* idJ = json_object_get(cableJ, "id");
 		if (!idJ)
 			continue;
-		int id = json_integer_value(idJ);
+		int64_t id = json_integer_value(idJ);
 		CableWidget* cw = getCable(id);
-		if (!cw)
+		if (!cw) {
+			WARN("Cannot find CableWidget with ID %ld", id);
 			continue;
+		}
 
 		json_t* cwJ = cw->toJson();
 		// Merge cable JSON object
@@ -230,10 +234,12 @@ void RackWidget::fromJson(json_t* rootJ) {
 		json_t* idJ = json_object_get(moduleJ, "id");
 		if (!idJ)
 			continue;
-		int id = json_integer_value(idJ);
+		int64_t id = json_integer_value(idJ);
 		engine::Module* module = APP->engine->getModule(id);
-		if (!module)
+		if (!module) {
+			WARN("Cannot find module with ID %ld", id);
 			continue;
+		}
 
 		ModuleWidget* moduleWidget = module->model->createModuleWidget(module);
 
@@ -273,10 +279,12 @@ void RackWidget::fromJson(json_t* rootJ) {
 		json_t* idJ = json_object_get(cableJ, "id");
 		if (!idJ)
 			continue;
-		int id = json_integer_value(idJ);
+		int64_t id = json_integer_value(idJ);
 		engine::Cable* cable = APP->engine->getCable(id);
-		if (!cable)
+		if (!cable) {
+			WARN("Cannot find cable with ID %ld", id);
 			continue;
+		}
 
 		CableWidget* cw = new CableWidget;
 		// Legacy: Before v1, cable colors were not serialized. So we need to initialize the color here.
@@ -515,7 +523,7 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 	RackWidget_updateAdjacent(this);
 }
 
-ModuleWidget* RackWidget::getModule(int moduleId) {
+ModuleWidget* RackWidget::getModule(int64_t moduleId) {
 	for (widget::Widget* w : moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
@@ -648,7 +656,7 @@ CableWidget* RackWidget::getTopCable(PortWidget* port) {
 	return NULL;
 }
 
-CableWidget* RackWidget::getCable(int cableId) {
+CableWidget* RackWidget::getCable(int64_t cableId) {
 	for (widget::Widget* w : cableContainer->children) {
 		CableWidget* cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);

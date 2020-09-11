@@ -50,7 +50,7 @@ struct Module {
 	/** Represents a message-passing channel for an adjacent module. */
 	struct Expander {
 		/** ID of the expander module, or -1 if nonexistent. */
-		int moduleId = -1;
+		int64_t moduleId = -1;
 		/** Pointer to the expander Module, or NULL if nonexistent. */
 		Module* module = NULL;
 		/** Double buffer for receiving messages from the expander module.

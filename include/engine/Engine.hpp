@@ -67,8 +67,12 @@ struct Engine {
 
 	// Modules
 	size_t getNumModules();
-	void getModuleIds(int* moduleIds, int len);
-	std::vector<int> getModuleIds();
+	/** Fills `moduleIds` with up to `len` module IDs in the rack.
+	Returns the number of IDs written.
+	This C-like method does no allocations. The vector C++ version below does.
+	*/
+	size_t getModuleIds(int64_t* moduleIds, size_t len);
+	std::vector<int64_t> getModuleIds();
 	/** Adds a module to the rack engine.
 	The module ID must not be taken by another module.
 	If the module ID is -1, an ID is automatically assigned.
@@ -76,7 +80,7 @@ struct Engine {
 	*/
 	void addModule(Module* module);
 	void removeModule(Module* module);
-	Module* getModule(int moduleId);
+	Module* getModule(int64_t moduleId);
 	void resetModule(Module* module);
 	void randomizeModule(Module* module);
 	void bypassModule(Module* module, bool bypassed);
@@ -86,6 +90,9 @@ struct Engine {
 	void moduleFromJson(Module* module, json_t* rootJ);
 
 	// Cables
+	size_t getNumCables();
+	size_t getCableIds(int64_t* cableIds, size_t len);
+	std::vector<int64_t> getCableIds();
 	/** Adds a cable to the rack engine.
 	The cable ID must not be taken by another cable.
 	If the cable ID is -1, an ID is automatically assigned.
@@ -93,7 +100,7 @@ struct Engine {
 	*/
 	void addCable(Cable* cable);
 	void removeCable(Cable* cable);
-	Cable* getCable(int cableId);
+	Cable* getCable(int64_t cableId);
 
 	// Params
 	void setParam(Module* module, int paramId, float value);
@@ -110,14 +117,13 @@ struct Engine {
 	void removeParamHandle(ParamHandle* paramHandle);
 	/** Returns the unique ParamHandle for the given paramId
 	*/
-	ParamHandle* getParamHandle(int moduleId, int paramId);
-	/** Use getParamHandle(int, int) instead.
-	*/
+	ParamHandle* getParamHandle(int64_t moduleId, int paramId);
+	/** Use getParamHandle(moduleId, paramId) instead. */
 	DEPRECATED ParamHandle* getParamHandle(Module* module, int paramId);
 	/** Sets the ParamHandle IDs and module pointer.
 	If `overwrite` is true and another ParamHandle points to the same param, unsets that one and replaces it with the given handle.
 	*/
-	void updateParamHandle(ParamHandle* paramHandle, int moduleId, int paramId, bool overwrite = true);
+	void updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite = true);
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);

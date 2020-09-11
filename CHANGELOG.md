@@ -62,6 +62,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Improve thread safety of `dsp::RingBuffer`.
 	- Add several convenient filesystem routines to `system::`.
 	- Move all `string::` functions dealing with filesystem paths to `system::`.
+	- Change type of `Module::id` and `Cable::id` from `int` to `int64_t`.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.

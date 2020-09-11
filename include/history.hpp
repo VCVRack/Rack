@@ -64,7 +64,7 @@ struct ComplexAction : Action {
 Subclass this to create your own custom actions for your module.
 */
 struct ModuleAction : Action {
-	int moduleId;
+	int64_t moduleId;
 };
 
 
@@ -135,10 +135,10 @@ struct ParamChange : ModuleAction {
 
 
 struct CableAdd : Action {
-	int cableId;
-	int inputModuleId;
+	int64_t cableId;
+	int64_t inputModuleId;
 	int inputId;
-	int outputModuleId;
+	int64_t outputModuleId;
 	int outputId;
 	NVGcolor color;
 	void setCable(app::CableWidget* cw);

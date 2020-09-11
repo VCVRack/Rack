@@ -225,7 +225,7 @@ struct MIDI_Map : Module {
 		}
 	}
 
-	void learnParam(int id, int moduleId, int paramId) {
+	void learnParam(int id, int64_t moduleId, int paramId) {
 		APP->engine->updateParamHandle(&paramHandles[id], moduleId, paramId, true);
 		learnedParam = true;
 		commitLearn();
@@ -335,7 +335,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		ParamWidget* touchedParam = APP->scene->rack->touchedParam;
 		if (touchedParam) {
 			APP->scene->rack->touchedParam = NULL;
-			int moduleId = touchedParam->module->id;
+			int64_t moduleId = touchedParam->module->id;
 			int paramId = touchedParam->paramId;
 			module->learnParam(id, moduleId, paramId);
 		}
