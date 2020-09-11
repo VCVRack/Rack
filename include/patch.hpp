@@ -26,6 +26,7 @@ struct PatchManager {
 	void saveAsDialog();
 	void saveTemplateDialog();
 	void saveAutosave();
+	void cleanAutosave();
 	/** Loads a patch and nothing else.
 	Returns whether the patch was loaded successfully.
 	*/

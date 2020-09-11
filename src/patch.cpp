@@ -27,6 +27,7 @@ PatchManager::PatchManager() {
 
 
 PatchManager::~PatchManager() {
+	cleanAutosave();
 }
 
 
@@ -60,7 +61,9 @@ static bool promptClear(std::string text) {
 
 void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
+	// TEMP
 	saveAutosave();
+	cleanAutosave();
 
 	uint64_t startTime = system::getNanoseconds();
 	// Set compression level to 1 so that a 500MB/s SSD is almost bottlenecked
@@ -169,16 +172,35 @@ void PatchManager::saveAutosave() {
 }
 
 
+void PatchManager::cleanAutosave() {
+	// Remove files and folders in the `autosave/modules` folder that doesn't match a module in the rack.
+	std::string modulesDir = system::join(asset::autosavePath, "modules");
+	for (const std::string& entry : system::getEntries(modulesDir)) {
+		try {
+			int64_t moduleId = std::stol(system::getFilename(entry));
+			// Ignore modules that exist in the rack
+			if (APP->engine->getModule(moduleId))
+				continue;
+		}
+		catch (std::invalid_argument& e) {
+		}
+		// Remove the entry.
+		system::removeRecursively(entry);
+	}
+}
+
+
 static bool isPatchLegacyPre2(std::string path) {
 	FILE* f = std::fopen(path.c_str(), "rb");
 	if (!f)
 		return false;
 	DEFER({std::fclose(f);});
-	// Read first byte and check if it's a "{" character.
-	// TODO Is it possible for .tar.zst files to start with the same character?
-	char buf[1] = {};
+	// All Zstandard frames start with this magic number.
+	char zstdMagic[] = "\x28\xb5\x2f\xfd";
+	char buf[4] = {};
 	std::fread(buf, 1, sizeof(buf), f);
-	return std::memcmp(buf, "{", 1) == 0;
+	// If the patch file doesn't begin with the magic number, it's a legacy patch.
+	return std::memcmp(buf, zstdMagic, sizeof(buf)) != 0;
 }
 
 

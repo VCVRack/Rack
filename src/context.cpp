@@ -12,23 +12,22 @@ namespace rack {
 
 Context::~Context() {
 	// Set pointers to NULL so other objects will segfault when attempting to access them
-	if (scene)
-		delete scene;
-	scene = NULL;
-	if (event)
-		delete event;
-	event = NULL;
-	if (history)
-		delete history;
-	history = NULL;
-	if (window)
-		delete window;
-	window = NULL;
-	if (patch)
-		delete patch;
+	delete patch;
 	patch = NULL;
-	if (engine)
-		delete engine;
+
+	delete scene;
+	scene = NULL;
+
+	delete window;
+	window = NULL;
+
+	delete history;
+	history = NULL;
+
+	delete event;
+	event = NULL;
+
+	delete engine;
 	engine = NULL;
 }
 
