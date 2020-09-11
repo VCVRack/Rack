@@ -111,7 +111,7 @@ An equivalent shell command is
 
 	tar -cf archivePath --zstd -C folderPath .
 */
-void archiveFolder(const std::string& archivePath, const std::string& folderPath);
+void archiveFolder(const std::string& archivePath, const std::string& folderPath, int compressionLevel = 1);
 /** Extracts an archive into a folder.
 An equivalent shell command is
 

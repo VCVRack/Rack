@@ -63,7 +63,8 @@ void PatchManager::save(std::string path) {
 	saveAutosave();
 
 	uint64_t startTime = system::getNanoseconds();
-	system::archiveFolder(path, asset::autosavePath);
+	// Set compression level to 1 so that a 500MB/s SSD is almost bottlenecked
+	system::archiveFolder(path, asset::autosavePath, 1);
 	uint64_t endTime = system::getNanoseconds();
 	INFO("Archived patch in %lf seconds", (endTime - startTime) / 1e9);
 }

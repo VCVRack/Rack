@@ -288,7 +288,7 @@ static std::string getRelativePath(std::string path, std::string base) {
 }
 
 
-void archiveFolder(const std::string& archivePath, const std::string& folderPath) {
+void archiveFolder(const std::string& archivePath, const std::string& folderPath, int compressionLevel) {
 	// Based on minitar.c create() in libarchive examples
 	int r;
 
@@ -297,8 +297,8 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 	DEFER({archive_write_free(a);});
 	archive_write_set_format_ustar(a);
 	archive_write_add_filter_zstd(a);
-	// Set compression level roughly so that a 500MB/s SSD is bottlenecked
-	r = archive_write_set_filter_option(a, NULL, "compression-level", "1");
+	assert(0 <= compressionLevel && compressionLevel <= 19);
+	r = archive_write_set_filter_option(a, NULL, "compression-level", std::to_string(compressionLevel).c_str());
 	if (r < ARCHIVE_OK)
 		throw Exception(string::f("archiveFolder() could not set filter option: %s", archive_error_string(a)));
 
