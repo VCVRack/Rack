@@ -179,17 +179,19 @@ void PatchManager::saveAutosave() {
 void PatchManager::cleanAutosave() {
 	// Remove files and folders in the `autosave/modules` folder that doesn't match a module in the rack.
 	std::string modulesDir = system::join(asset::autosavePath, "modules");
-	for (const std::string& entry : system::getEntries(modulesDir)) {
-		try {
-			int64_t moduleId = std::stol(system::getFilename(entry));
-			// Ignore modules that exist in the rack
-			if (APP->engine->getModule(moduleId))
-				continue;
+	if (system::isDirectory(modulesDir)) {
+		for (const std::string& entry : system::getEntries(modulesDir)) {
+			try {
+				int64_t moduleId = std::stol(system::getFilename(entry));
+				// Ignore modules that exist in the rack
+				if (APP->engine->getModule(moduleId))
+					continue;
+			}
+			catch (std::invalid_argument& e) {
+			}
+			// Remove the entry.
+			system::removeRecursively(entry);
 		}
-		catch (std::invalid_argument& e) {
-		}
-		// Remove the entry.
-		system::removeRecursively(entry);
 	}
 }
 
