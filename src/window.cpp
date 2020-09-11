@@ -37,13 +37,16 @@ void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 	}
 }
 
+
 Font::~Font() {
 	// There is no NanoVG deleteFont() function yet, so do nothing
 }
 
+
 std::shared_ptr<Font> Font::load(const std::string& filename) {
 	return APP->window->loadFont(filename);
 }
+
 
 void Image::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
@@ -56,15 +59,18 @@ void Image::loadFile(const std::string& filename, NVGcontext* vg) {
 	}
 }
 
+
 Image::~Image() {
 	// TODO What if handle is invalid?
 	if (handle >= 0)
 		nvgDeleteImage(vg, handle);
 }
 
+
 std::shared_ptr<Image> Image::load(const std::string& filename) {
 	return APP->window->loadImage(filename);
 }
+
 
 void Svg::loadFile(const std::string& filename) {
 	handle = nsvgParseFromFile(filename.c_str(), "px", app::SVG_DPI);
@@ -76,10 +82,12 @@ void Svg::loadFile(const std::string& filename) {
 	}
 }
 
+
 Svg::~Svg() {
 	if (handle)
 		nsvgDelete(handle);
 }
+
 
 std::shared_ptr<Svg> Svg::load(const std::string& filename) {
 	return APP->window->loadSvg(filename);
@@ -109,6 +117,7 @@ static void windowSizeCallback(GLFWwindow* win, int width, int height) {
 	// Do nothing. Window size is reset each frame anyway.
 }
 
+
 static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
 #if defined ARCH_MAC
@@ -126,6 +135,7 @@ static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mod
 
 	APP->event->handleButton(window->internal->lastMousePos, button, action, mods);
 }
+
 
 static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
@@ -165,11 +175,13 @@ static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 	keyboard::mouseMove(scaledPos);
 }
 
+
 static void cursorEnterCallback(GLFWwindow* win, int entered) {
 	if (!entered) {
 		APP->event->handleLeave();
 	}
 }
+
 
 static void scrollCallback(GLFWwindow* win, double x, double y) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
@@ -183,11 +195,13 @@ static void scrollCallback(GLFWwindow* win, double x, double y) {
 	APP->event->handleScroll(window->internal->lastMousePos, scrollDelta);
 }
 
+
 static void charCallback(GLFWwindow* win, unsigned int codepoint) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	if (APP->event->handleText(window->internal->lastMousePos, codepoint))
 		return;
 }
+
 
 static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
@@ -203,6 +217,7 @@ static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int 
 	}
 }
 
+
 static void dropCallback(GLFWwindow* win, int count, const char** paths) {
 	Window* window = (Window*) glfwGetWindowUserPointer(win);
 	std::vector<std::string> pathsVec;
@@ -212,9 +227,11 @@ static void dropCallback(GLFWwindow* win, int count, const char** paths) {
 	APP->event->handleDrop(window->internal->lastMousePos, pathsVec);
 }
 
+
 static void errorCallback(int error, const char* description) {
 	WARN("GLFW error %d: %s", error, description);
 }
+
 
 Window::Window() {
 	internal = new Internal;
@@ -312,6 +329,7 @@ Window::Window() {
 	bndSetFont(uiFont->handle);
 }
 
+
 Window::~Window() {
 	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED)) {
 		settings::windowSize = math::Vec();
@@ -337,6 +355,7 @@ Window::~Window() {
 	glfwDestroyWindow(win);
 	delete internal;
 }
+
 
 void Window::run() {
 	internal->frame = 0;
@@ -429,10 +448,41 @@ void Window::run() {
 	}
 }
 
-void Window::screenshot(float zoom) {
+
+static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
+	for (int y = 0; y < height / 2; y++) {
+		int flipY = height - y - 1;
+		uint8_t tmp[width * depth];
+		std::memcpy(tmp, &pixels[y * width * depth], width * depth);
+		std::memcpy(&pixels[y * width * depth], &pixels[flipY * width * depth], width * depth);
+		std::memcpy(&pixels[flipY * width * depth], tmp, width * depth);
+	}
+}
+
+
+void Window::screenshot(const std::string& screenshotPath) {
+	// Get window framebuffer size
+	int width, height;
+	glfwGetFramebufferSize(APP->window->win, &width, &height);
+
+	// Allocate pixel color buffer
+	uint8_t* pixels = new uint8_t[height * width * 4];
+
+	// glReadPixels defaults to GL_BACK, but the back-buffer is unstable, so use the front buffer (what the user sees)
+	glReadBuffer(GL_FRONT);
+	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	// Write pixels to PNG
+	flipBitmap(pixels, width, height, 4);
+	stbi_write_png(screenshotPath.c_str(), width, height, 4, pixels, width * 4);
+
+	delete[] pixels;
+}
+
+
+void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 	// Iterate plugins and create directories
-	std::string screenshotsDir = asset::user("screenshots");
-	system::createDirectory(screenshotsDir);
+	system::createDirectories(screenshotsDir);
 	for (plugin::Plugin* p : plugin::plugins) {
 		std::string dir = system::join(screenshotsDir, p->slug);
 		system::createDirectory(dir);
@@ -461,32 +511,26 @@ void Window::screenshot(float zoom) {
 			// Read pixels
 			int width, height;
 			nvgImageSize(vg, fbw->getImageHandle(), &width, &height);
-			uint8_t* data = new uint8_t[height * width * 4];
-			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-			// Flip image vertically
-			for (int y = 0; y < height / 2; y++) {
-				int flipY = height - y - 1;
-				uint8_t tmp[width * 4];
-				std::memcpy(tmp, &data[y * width * 4], width * 4);
-				std::memcpy(&data[y * width * 4], &data[flipY * width * 4], width * 4);
-				std::memcpy(&data[flipY * width * 4], tmp, width * 4);
-			}
+			uint8_t* pixels = new uint8_t[height * width * 4];
+			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 			// Write pixels to PNG
-			stbi_write_png(filename.c_str(), width, height, 4, data, width * 4);
+			flipBitmap(pixels, width, height, 4);
+			stbi_write_png(filename.c_str(), width, height, 4, pixels, width * 4);
 
 			// Cleanup
-			delete[] data;
+			delete[] pixels;
 			nvgluBindFramebuffer(NULL);
 			delete fbw;
 		}
 	}
 }
 
+
 void Window::close() {
 	glfwSetWindowShouldClose(win, GLFW_TRUE);
 }
+
 
 void Window::cursorLock() {
 	if (!settings::allowCursorLock)
@@ -500,6 +544,7 @@ void Window::cursorLock() {
 	internal->ignoreNextMouseDelta = true;
 }
 
+
 void Window::cursorUnlock() {
 	if (!settings::allowCursorLock)
 		return;
@@ -508,9 +553,11 @@ void Window::cursorUnlock() {
 	internal->ignoreNextMouseDelta = true;
 }
 
+
 bool Window::isCursorLocked() {
 	return glfwGetInputMode(win, GLFW_CURSOR) != GLFW_CURSOR_NORMAL;
 }
+
 
 int Window::getMods() {
 	int mods = 0;
@@ -525,6 +572,7 @@ int Window::getMods() {
 	return mods;
 }
 
+
 void Window::setFullScreen(bool fullScreen) {
 	if (!fullScreen) {
 		glfwSetWindowMonitor(win, NULL, internal->lastWindowX, internal->lastWindowY, internal->lastWindowWidth, internal->lastWindowHeight, GLFW_DONT_CARE);
@@ -538,28 +586,34 @@ void Window::setFullScreen(bool fullScreen) {
 	}
 }
 
+
 bool Window::isFullScreen() {
 	GLFWmonitor* monitor = glfwGetWindowMonitor(win);
 	return monitor != NULL;
 }
 
+
 double Window::getMonitorRefreshRate() {
 	return internal->monitorRefreshRate;
 }
+
 
 double Window::getLastFrameTime() {
 	return internal->lastFrameTime;
 }
 
+
 double Window::getLastFrameDuration() {
 	return internal->lastFrameDuration;
 }
+
 
 double Window::getFrameTimeOverdue() {
 	double desiredFrameDuration = internal->frameSwapInterval / internal->monitorRefreshRate;
 	double frameDuration = glfwGetTime() - internal->lastFrameTime;
 	return frameDuration - desiredFrameDuration;
 }
+
 
 std::shared_ptr<Font> Window::loadFont(const std::string& filename) {
 	auto sp = fontCache[filename].lock();
@@ -570,6 +624,7 @@ std::shared_ptr<Font> Window::loadFont(const std::string& filename) {
 	return sp;
 }
 
+
 std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 	auto sp = imageCache[filename].lock();
 	if (!sp) {
@@ -578,6 +633,7 @@ std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 	}
 	return sp;
 }
+
 
 std::shared_ptr<Svg> Window::loadSvg(const std::string& filename) {
 	auto sp = svgCache[filename].lock();
@@ -606,10 +662,10 @@ void windowInit() {
 	}
 }
 
+
 void windowDestroy() {
 	glfwTerminate();
 }
-
 
 
 } // namespace rack

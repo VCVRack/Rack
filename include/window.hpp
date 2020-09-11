@@ -76,8 +76,12 @@ struct Window {
 	Window();
 	~Window();
 	void run();
-	/** Takes a screenshot of each module */
-	void screenshot(float zoom);
+	/** Takes a screenshot of the screen and saves it to a PNG file. */
+	void screenshot(const std::string& screenshotPath);
+	/** Saves a PNG image of all modules to `screenshotsDir/<plugin slug>/<module slug>.png`.
+	Skips screenshot if the file already exists.
+	*/
+	void screenshotModules(const std::string& screenshotsDir, float zoom = 1.f);
 	void close();
 	void cursorLock();
 	void cursorUnlock();

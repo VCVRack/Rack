@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
 	}
 	else if (screenshot) {
 		INFO("Taking screenshots of all modules at %gx zoom", screenshotZoom);
-		APP->window->screenshot(screenshotZoom);
+		APP->window->screenshotModules(asset::user("screenshots"), screenshotZoom);
 	}
 	else {
 		INFO("Running window");

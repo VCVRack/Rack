@@ -61,9 +61,13 @@ static bool promptClear(std::string text) {
 
 void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
-	// TEMP
+	// Save patch.json
 	saveAutosave();
+	// Clean up autosave directory (e.g. removed modules)
 	cleanAutosave();
+
+	// Take screenshot (disabled because there is currently no way to quickly view them on any OS or website.)
+	// APP->window->screenshot(system::join(asset::autosavePath, "screenshot.png"));
 
 	uint64_t startTime = system::getNanoseconds();
 	// Set compression level to 1 so that a 500MB/s SSD is almost bottlenecked
