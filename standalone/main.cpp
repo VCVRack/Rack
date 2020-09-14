@@ -245,6 +245,7 @@ int main(int argc, char* argv[]) {
 		windowDestroy();
 		ui::destroy();
 	}
+	library::destroy();
 	midi::destroy();
 	audio::destroy();
 	plugin::destroy();

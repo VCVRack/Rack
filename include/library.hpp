@@ -21,25 +21,24 @@ struct Update {
 };
 
 
-extern std::string version;
-extern std::string changelogUrl;
-extern float progress;
-
 void init();
+void destroy();
+
+bool isAppUpdateAvailable();
+
 bool isLoggedIn();
 void logIn(const std::string& email, const std::string& password);
 void logOut();
-bool isUpdateAvailable();
 void queryUpdates();
 bool hasUpdates();
 void syncUpdate(Update* update);
 void syncUpdates();
 bool isSyncing();
-/** Updates Rack automatically or opens the browser to the URL.
-Blocking. Call on a detached thread.
-*/
-void update();
 
+
+extern std::string appVersion;
+extern std::string appDownloadUrl;
+extern std::string appChangelogUrl;
 
 extern std::string loginStatus;
 extern std::vector<Update> updates;

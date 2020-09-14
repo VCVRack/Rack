@@ -817,30 +817,21 @@ struct LibraryButton : MenuButton {
 // Help
 ////////////////////
 
-struct UpdateItem : ui::MenuItem {
+struct AppUpdateItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
 
-		UrlItem* changelogUrl = new UrlItem;
-		changelogUrl->text = "Changelog";
-		changelogUrl->url = library::changelogUrl;
-		menu->addChild(changelogUrl);
+		UrlItem* changelogItem = new UrlItem;
+		changelogItem->text = "Changelog";
+		changelogItem->url = library::appChangelogUrl;
+		menu->addChild(changelogItem);
 
 		return menu;
 	}
 
-	void step() override {
-		if (library::progress > 0) {
-			rightText = string::f("%.0f%%", library::progress * 100.f);
-		}
-		MenuItem::step();
-	}
-
 	void onAction(const event::Action& e) override {
-		std::thread t([ = ] {
-			library::update();
-		});
-		t.detach();
+		system::openBrowser(library::appDownloadUrl);
+		APP->window->close();
 		e.consume(NULL);
 	}
 };
@@ -859,11 +850,11 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		if (library::isUpdateAvailable()) {
-			UpdateItem* updateItem = new UpdateItem;
-			updateItem->text = "Update " + APP_NAME;
-			updateItem->rightText = APP_VERSION + " → " + library::version;
-			menu->addChild(updateItem);
+		if (library::isAppUpdateAvailable()) {
+			AppUpdateItem* appUpdateItem = new AppUpdateItem;
+			appUpdateItem->text = "Update " + APP_NAME;
+			appUpdateItem->rightText = APP_VERSION + " → " + library::appVersion;
+			menu->addChild(appUpdateItem);
 		}
 
 		UrlItem* manualItem = new UrlItem;
@@ -885,7 +876,7 @@ struct HelpButton : MenuButton {
 
 	void step() override {
 		notification->box.pos = math::Vec(0, 0);
-		notification->visible = library::isUpdateAvailable();
+		notification->visible = library::isAppUpdateAvailable();
 		MenuButton::step();
 	}
 };
