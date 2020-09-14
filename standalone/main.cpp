@@ -19,7 +19,7 @@
 #include <ui.hpp>
 #include <system.hpp>
 #include <string.hpp>
-#include <updater.hpp>
+#include <library.hpp>
 #include <network.hpp>
 
 #include <osdialog.h>
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 	keyboard::init();
 	gamepad::init();
 	plugin::init();
-	updater::init();
+	library::init();
 	if (!settings::headless) {
 		ui::init();
 		windowInit();

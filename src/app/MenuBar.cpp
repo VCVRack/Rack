@@ -21,7 +21,7 @@
 #include <system.hpp>
 #include <plugin.hpp>
 #include <patch.hpp>
-#include <updater.hpp>
+#include <library.hpp>
 
 
 namespace rack {
@@ -608,7 +608,7 @@ struct LogInItem : ui::MenuItem {
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
 		std::thread t([ = ] {
-			plugin::logIn(email, password);
+			library::logIn(email, password);
 			isLoggingIn = false;
 		});
 		t.detach();
@@ -618,7 +618,7 @@ struct LogInItem : ui::MenuItem {
 	void step() override {
 		disabled = isLoggingIn;
 		text = "Log in";
-		rightText = plugin::loginStatus;
+		rightText = library::loginStatus;
 		MenuItem::step();
 	}
 };
@@ -626,13 +626,13 @@ struct LogInItem : ui::MenuItem {
 struct SyncItem : ui::MenuItem {
 	void step() override {
 		disabled = true;
-		if (plugin::updateStatus != "") {
-			text = plugin::updateStatus;
+		if (library::updateStatus != "") {
+			text = library::updateStatus;
 		}
-		else if (plugin::isSyncing()) {
+		else if (library::isSyncing()) {
 			text = "Updating...";
 		}
-		else if (!plugin::hasUpdates()) {
+		else if (!library::hasUpdates()) {
 			text = "Up-to-date";
 		}
 		else {
@@ -644,7 +644,7 @@ struct SyncItem : ui::MenuItem {
 
 	void onAction(const event::Action& e) override {
 		std::thread t([ = ] {
-			plugin::syncUpdates();
+			library::syncUpdates();
 		});
 		t.detach();
 		e.consume(NULL);
@@ -652,9 +652,9 @@ struct SyncItem : ui::MenuItem {
 };
 
 struct PluginSyncItem : ui::MenuItem {
-	plugin::Update* update;
+	library::Update* update;
 
-	void setUpdate(plugin::Update* update) {
+	void setUpdate(library::Update* update) {
 		this->update = update;
 		text = update->pluginName;
 		plugin::Plugin* p = plugin::getPlugin(update->pluginSlug);
@@ -679,7 +679,7 @@ struct PluginSyncItem : ui::MenuItem {
 	}
 
 	void step() override {
-		disabled = plugin::isSyncing();
+		disabled = library::isSyncing();
 		if (update->progress >= 1) {
 			rightText = CHECKMARK_STRING;
 			disabled = true;
@@ -692,7 +692,7 @@ struct PluginSyncItem : ui::MenuItem {
 
 	void onAction(const event::Action& e) override {
 		std::thread t([ = ] {
-			plugin::syncUpdate(update);
+			library::syncUpdate(update);
 		});
 		t.detach();
 		e.consume(NULL);
@@ -701,7 +701,7 @@ struct PluginSyncItem : ui::MenuItem {
 
 struct LogOutItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
-		plugin::logOut();
+		library::logOut();
 	}
 };
 
@@ -714,7 +714,7 @@ struct LibraryMenu : ui::Menu {
 
 	void step() override {
 		// Refresh menu when appropriate
-		if (!loggedIn && plugin::isLoggedIn())
+		if (!loggedIn && library::isLoggedIn())
 			refresh();
 		Menu::step();
 	}
@@ -726,7 +726,7 @@ struct LibraryMenu : ui::Menu {
 		if (settings::devMode) {
 			addChild(createMenuLabel("Disabled in development mode"));
 		}
-		else if (!plugin::isLoggedIn()) {
+		else if (!library::isLoggedIn()) {
 			UrlItem* registerItem = new UrlItem;
 			registerItem->text = "Register VCV account";
 			registerItem->url = "https://vcvrack.com/";
@@ -765,14 +765,14 @@ struct LibraryMenu : ui::Menu {
 			syncItem->text = "Update all";
 			addChild(syncItem);
 
-			if (plugin::hasUpdates()) {
+			if (library::hasUpdates()) {
 				addChild(new ui::MenuSeparator);
 
 				ui::MenuLabel* updatesLabel = new ui::MenuLabel;
 				updatesLabel->text = "Updates";
 				addChild(updatesLabel);
 
-				for (plugin::Update& update : plugin::updates) {
+				for (library::Update& update : library::updates) {
 					PluginSyncItem* updateItem = new PluginSyncItem;
 					updateItem->setUpdate(&update);
 					addChild(updateItem);
@@ -799,11 +799,11 @@ struct LibraryButton : MenuButton {
 
 	void step() override {
 		notification->box.pos = math::Vec(0, 0);
-		notification->visible = plugin::hasUpdates();
+		notification->visible = library::hasUpdates();
 
 		// Popup when updates finish downloading
-		if (plugin::restartRequested) {
-			plugin::restartRequested = false;
+		if (library::restartRequested) {
+			library::restartRequested = false;
 			if (osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "All plugins have been downloaded. Close and re-launch Rack to load new updates.")) {
 				APP->window->close();
 			}
@@ -823,22 +823,22 @@ struct UpdateItem : ui::MenuItem {
 
 		UrlItem* changelogUrl = new UrlItem;
 		changelogUrl->text = "Changelog";
-		changelogUrl->url = updater::changelogUrl;
+		changelogUrl->url = library::changelogUrl;
 		menu->addChild(changelogUrl);
 
 		return menu;
 	}
 
 	void step() override {
-		if (updater::progress > 0) {
-			rightText = string::f("%.0f%%", updater::progress * 100.f);
+		if (library::progress > 0) {
+			rightText = string::f("%.0f%%", library::progress * 100.f);
 		}
 		MenuItem::step();
 	}
 
 	void onAction(const event::Action& e) override {
 		std::thread t([ = ] {
-			updater::update();
+			library::update();
 		});
 		t.detach();
 		e.consume(NULL);
@@ -859,10 +859,10 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		if (updater::isUpdateAvailable()) {
+		if (library::isUpdateAvailable()) {
 			UpdateItem* updateItem = new UpdateItem;
 			updateItem->text = "Update " + APP_NAME;
-			updateItem->rightText = APP_VERSION + " → " + updater::version;
+			updateItem->rightText = APP_VERSION + " → " + library::version;
 			menu->addChild(updateItem);
 		}
 
@@ -885,7 +885,7 @@ struct HelpButton : MenuButton {
 
 	void step() override {
 		notification->box.pos = math::Vec(0, 0);
-		notification->visible = updater::isUpdateAvailable();
+		notification->visible = library::isUpdateAvailable();
 		MenuButton::step();
 	}
 };
