@@ -23,10 +23,12 @@ void init() {
 	if (settings::devMode)
 		return;
 
-	std::thread t([&]() {
-		queryAppUpdate();
-	});
-	t.detach();
+	if (settings::checkAppUpdates) {
+		std::thread t([&]() {
+			queryAppUpdate();
+		});
+		t.detach();
+	}
 
 	std::thread t2([&] {
 		queryUpdates();
