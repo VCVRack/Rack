@@ -6,6 +6,7 @@
 #include <window.hpp>
 #include <color.hpp>
 #include <event.hpp>
+#include <weakptr.hpp>
 
 
 namespace rack {
@@ -20,7 +21,7 @@ namespace widget {
 The bounding box of a Widget is a rectangle specified by `box` relative to their parent.
 The appearance is defined by overriding `draw()`, and the behavior is defined by overriding `step()` and `on*()` event handlers.
 */
-struct Widget {
+struct Widget : WeakBase {
 	/** Stores position and size */
 	math::Rect box = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
 	/** Automatically set when Widget is added as a child to another Widget */

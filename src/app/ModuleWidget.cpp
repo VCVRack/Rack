@@ -151,73 +151,91 @@ struct ModuleInfoItem : ui::MenuItem {
 
 
 struct ModuleDisconnectItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->disconnectAction();
 	}
 };
 
 
 struct ModuleResetItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->resetAction();
 	}
 };
 
 
 struct ModuleRandomizeItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->randomizeAction();
 	}
 };
 
 
 struct ModuleCopyItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->copyClipboard();
 	}
 };
 
 
 struct ModulePasteItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->pasteClipboardAction();
 	}
 };
 
 
 struct ModuleSaveItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->saveDialog();
 	}
 };
 
 
 struct ModuleSaveTemplateItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->saveTemplate();
 	}
 };
 
 
 struct ModuleLoadItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->loadDialog();
 	}
 };
 
 
 struct ModulePresetPathItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	std::string presetPath;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		try {
 			moduleWidget->loadAction(presetPath);
 		}
@@ -229,8 +247,10 @@ struct ModulePresetPathItem : ui::MenuItem {
 
 
 struct ModulePresetItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	ui::Menu* createChildMenu() override {
+		if (!moduleWidget)
+			return NULL;
 		ui::Menu* menu = new ui::Menu;
 
 		ModuleCopyItem* copyItem = new ModuleCopyItem;
@@ -264,21 +284,23 @@ struct ModulePresetItem : ui::MenuItem {
 		auto createPresetItems = [&](std::string presetDir) {
 			bool hasPresets = false;
 			// Note: This is not cached, so opening this menu each time might have a bit of latency.
-			for (const std::string& presetPath : system::getEntries(presetDir)) {
-				if (system::getExtension(presetPath) != ".vcvm")
-					continue;
-				hasPresets = true;
+			if (system::isDirectory(presetDir)) {
+				for (const std::string& presetPath : system::getEntries(presetDir)) {
+					if (system::getExtension(presetPath) != ".vcvm")
+						continue;
+					hasPresets = true;
 
-				std::string presetName = system::getStem(presetPath);
-				// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
-				std::regex r("^\\d*_");
-				presetName = std::regex_replace(presetName, r, "");
+					std::string presetName = system::getStem(presetPath);
+					// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
+					std::regex r("^\\d*_");
+					presetName = std::regex_replace(presetName, r, "");
 
-				ModulePresetPathItem* presetItem = new ModulePresetPathItem;
-				presetItem->text = presetName;
-				presetItem->presetPath = presetPath;
-				presetItem->moduleWidget = moduleWidget;
-				menu->addChild(presetItem);
+					ModulePresetPathItem* presetItem = new ModulePresetPathItem;
+					presetItem->text = presetName;
+					presetItem->presetPath = presetPath;
+					presetItem->moduleWidget = moduleWidget;
+					menu->addChild(presetItem);
+				}
 			}
 			if (!hasPresets) {
 				menu->addChild(createMenuLabel("(None)"));
@@ -301,24 +323,30 @@ struct ModulePresetItem : ui::MenuItem {
 
 
 struct ModuleCloneItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->cloneAction();
 	}
 };
 
 
 struct ModuleBypassItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->bypassAction();
 	}
 };
 
 
 struct ModuleDeleteItem : ui::MenuItem {
-	ModuleWidget* moduleWidget;
+	WeakPtr<ModuleWidget> moduleWidget;
 	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
 		moduleWidget->removeAction();
 	}
 };
