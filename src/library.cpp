@@ -282,9 +282,10 @@ void syncUpdate(const std::string& slug) {
 
 	INFO("Downloading plugin %s v%s for %s", slug.c_str(), update.version.c_str(), APP_ARCH.c_str());
 
-	// Download zip
-	std::string pluginDest = system::join(asset::pluginsPath, slug + ".zip");
-	if (!network::requestDownload(downloadUrl, pluginDest, &update.progress, cookies)) {
+	// Download plugin package
+	std::string packageFilename = slug + "-" + update.version + "-" + APP_ARCH + ".vcvplugin";
+	std::string packagePath = system::join(asset::pluginsPath, packageFilename);
+	if (!network::requestDownload(downloadUrl, packagePath, &update.progress, cookies)) {
 		WARN("Plugin %s download was unsuccessful", slug.c_str());
 		return;
 	}

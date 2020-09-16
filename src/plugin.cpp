@@ -178,10 +178,13 @@ static void extractPackages(std::string path) {
 	std::string message;
 
 	for (std::string packagePath : system::getEntries(path)) {
-		if (system::getExtension(packagePath) != ".zip")
+		if (!system::isFile(packagePath))
 			continue;
-		INFO("Extracting package %s", packagePath.c_str());
+		if (system::getExtension(packagePath) != ".vcvplugin")
+			continue;
+
 		// Extract package
+		INFO("Extracting package %s", packagePath.c_str());
 		try {
 			system::unarchiveToFolder(packagePath, path);
 		}
@@ -218,11 +221,7 @@ void init() {
 	loadPlugins(asset::pluginsPath);
 
 	// If Fundamental wasn't loaded, copy the bundled Fundamental package and load it
-#if defined ARCH_MAC
-	std::string fundamentalSrc = asset::system("Fundamental.txt");
-#else
-	std::string fundamentalSrc = asset::system("Fundamental.zip");
-#endif
+	std::string fundamentalSrc = asset::system("Fundamental.vcvplugin");
 	std::string fundamentalDir = system::join(asset::pluginsPath, "Fundamental");
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		INFO("Extracting bundled Fundamental package");

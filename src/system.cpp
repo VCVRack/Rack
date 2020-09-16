@@ -300,7 +300,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 	assert(0 <= compressionLevel && compressionLevel <= 19);
 	r = archive_write_set_filter_option(a, NULL, "compression-level", std::to_string(compressionLevel).c_str());
 	if (r < ARCHIVE_OK)
-		throw Exception(string::f("archiveFolder() could not set filter option: %s", archive_error_string(a)));
+		throw Exception(string::f("Archiver could not set filter option: %s", archive_error_string(a)));
 
 #if defined ARCH_WIN
 	r = archive_write_open_filename_w(a, string::U8toU16(archivePath).c_str());
@@ -308,7 +308,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 	r = archive_write_open_filename(a, archivePath.c_str());
 #endif
 	if (r < ARCHIVE_OK)
-		throw Exception(string::f("archiveFolder() could not open archive %s for writing: %s", archivePath.c_str(), archive_error_string(a)));
+		throw Exception(string::f("Archiver could not open archive %s for writing: %s", archivePath.c_str(), archive_error_string(a)));
 	DEFER({archive_write_close(a);});
 
 	// Open folder for reading
@@ -320,7 +320,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 	r = archive_read_disk_open(disk, folderPath.c_str());
 #endif
 	if (r < ARCHIVE_OK)
-		throw Exception(string::f("archiveFolder() could not open folder %s for reading: %s", folderPath.c_str(), archive_error_string(a)));
+		throw Exception(string::f("Archiver could not open folder %s for reading: %s", folderPath.c_str(), archive_error_string(a)));
 	DEFER({archive_read_close(a);});
 
 	// Iterate folder
@@ -332,7 +332,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 		if (r == ARCHIVE_EOF)
 			break;
 		if (r < ARCHIVE_OK)
-			throw Exception(string::f("archiveFolder() could not get next entry from archive: %s", archive_error_string(disk)));
+			throw Exception(string::f("Archiver could not get next entry from archive: %s", archive_error_string(disk)));
 
 		// Recurse dirs
 		archive_read_disk_descend(disk);
@@ -355,7 +355,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 		// Write file to archive
 		r = archive_write_header(a, entry);
 		if (r < ARCHIVE_OK)
-			throw Exception(string::f("archiveFolder() could not write entry to archive: %s", archive_error_string(a)));
+			throw Exception(string::f("Archiver could not write entry to archive: %s", archive_error_string(a)));
 
 		// Manually copy data
 #if defined ARCH_WIN
@@ -391,7 +391,7 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 	r = archive_read_open_filename(a, archivePath.c_str(), 1 << 14);
 #endif
 	if (r < ARCHIVE_OK)
-		throw Exception(string::f("unzipToFolder() could not open archive %s: %s", archivePath.c_str(), archive_error_string(a)));
+		throw Exception(string::f("Unarchiver could not open archive %s: %s", archivePath.c_str(), archive_error_string(a)));
 	DEFER({archive_read_close(a);});
 
 	// Open folder for writing
@@ -409,12 +409,12 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 		if (r == ARCHIVE_EOF)
 			break;
 		if (r < ARCHIVE_OK)
-			throw Exception(string::f("unzipToFolder() could not read entry from archive: %s", archive_error_string(a)));
+			throw Exception(string::f("Unarchiver could not read entry from archive: %s", archive_error_string(a)));
 
 		// Convert relative pathname to absolute based on folderPath
 		std::string entryPath = archive_entry_pathname(entry);
 		if (!fs::u8path(entryPath).is_relative())
-			throw Exception(string::f("unzipToFolder() does not support absolute paths: %s", entryPath.c_str()));
+			throw Exception(string::f("Unarchiver does not support absolute tar paths: %s", entryPath.c_str()));
 		entryPath = fs::absolute(fs::u8path(entryPath), fs::u8path(folderPath)).generic_u8string();
 #if defined ARCH_WIN
 		archive_entry_copy_pathname_w(entry, string::U8toU16(entryPath).c_str());
@@ -425,7 +425,7 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 		// Write entry to disk
 		r = archive_write_header(disk, entry);
 		if (r < ARCHIVE_OK)
-			throw Exception(string::f("unzipToFolder() could not write file to folder: %s", archive_error_string(disk)));
+			throw Exception(string::f("Unarchiver could not write file to folder: %s", archive_error_string(disk)));
 
 		// Copy data to file
 		for (;;) {
@@ -437,18 +437,18 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 			if (r == ARCHIVE_EOF)
 				break;
 			if (r < ARCHIVE_OK)
-				throw Exception(string::f("unzipToFolder() could not read data from archive", archive_error_string(a)));
+				throw Exception(string::f("Unarchiver could not read data from archive", archive_error_string(a)));
 
 			// Write data to file
 			r = archive_write_data_block(disk, buf, size, offset);
 			if (r < ARCHIVE_OK)
-				throw Exception(string::f("unzipToFolder() could not write data to file", archive_error_string(disk)));
+				throw Exception(string::f("Unarchiver could not write data to file", archive_error_string(disk)));
 		}
 
 		// Close file
 		r = archive_write_finish_entry(disk);
 		if (r < ARCHIVE_OK)
-			throw Exception(string::f("unzipToFolder() could not close file", archive_error_string(disk)));
+			throw Exception(string::f("Unarchiver could not close file", archive_error_string(disk)));
 	}
 }
 
