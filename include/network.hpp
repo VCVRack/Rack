@@ -25,7 +25,7 @@ enum Method {
 
 void init();
 /** Requests a JSON API URL over HTTP(S), using the data as the query (GET) or the body (POST, etc)
-Caller must json_decref().
+Caller must json_decref() if return value is non-NULL.
 */
 json_t* requestJson(Method method, const std::string& url, json_t* dataJ, const CookieMap& cookies = {});
 /** Returns true if downloaded successfully */

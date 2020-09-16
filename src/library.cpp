@@ -90,9 +90,7 @@ void logIn(const std::string& email, const std::string& password) {
 		loginStatus = "No response from server";
 		return;
 	}
-	DEFER({
-		json_decref(resJ);
-	});
+	DEFER({json_decref(resJ);});
 
 	json_t* errorJ = json_object_get(resJ, "error");
 	if (errorJ) {
@@ -137,9 +135,7 @@ void queryUpdates() {
 		updateStatus = "Could not query updates";
 		return;
 	}
-	DEFER({
-		json_decref(pluginsResJ);
-	});
+	DEFER({json_decref(pluginsResJ);});
 
 	json_t* errorJ = json_object_get(pluginsResJ, "error");
 	if (errorJ) {
@@ -159,9 +155,7 @@ void queryUpdates() {
 		updateStatus = "Could not query updates";
 		return;
 	}
-	DEFER({
-		json_decref(manifestsResJ);
-	});
+	DEFER({json_decref(manifestsResJ);});
 
 	json_t* manifestsJ = json_object_get(manifestsResJ, "manifests");
 	json_t* pluginsJ = json_object_get(pluginsResJ, "plugins");
@@ -171,30 +165,37 @@ void queryUpdates() {
 	json_array_foreach(pluginsJ, pluginIndex, pluginJ) {
 		Update update;
 		// Get plugin manifest
-		update.pluginSlug = json_string_value(pluginJ);
-		json_t* manifestJ = json_object_get(manifestsJ, update.pluginSlug.c_str());
+		std::string slug = json_string_value(pluginJ);
+		json_t* manifestJ = json_object_get(manifestsJ, slug.c_str());
 		if (!manifestJ) {
-			WARN("VCV account has plugin %s but no manifest was found", update.pluginSlug.c_str());
+			WARN("VCV account has plugin %s but no manifest was found", slug.c_str());
 			continue;
 		}
 
 		// Get plugin name
 		json_t* nameJ = json_object_get(manifestJ, "name");
 		if (nameJ)
-			update.pluginName = json_string_value(nameJ);
+			update.name = json_string_value(nameJ);
 
 		// Get version
 		json_t* versionJ = json_object_get(manifestJ, "version");
 		if (!versionJ) {
-			WARN("Plugin %s has no version in manifest", update.pluginSlug.c_str());
+			WARN("Plugin %s has no version in manifest", slug.c_str());
 			continue;
 		}
 		update.version = json_string_value(versionJ);
 
 		// Check if update is needed
-		plugin::Plugin* p = plugin::getPlugin(update.pluginSlug);
+		plugin::Plugin* p = plugin::getPlugin(slug);
 		if (p && p->version == update.version)
 			continue;
+
+		// Don't add update if it exists already
+		auto it = updates.find(slug);
+		if (it != updates.end()) {
+			if (it->second.version == update.version)
+				continue;
+		}
 
 		// Check status
 		json_t* statusJ = json_object_get(manifestJ, "status");
@@ -210,7 +211,8 @@ void queryUpdates() {
 			update.changelogUrl = json_string_value(changelogUrlJ);
 		}
 
-		updates.push_back(update);
+		// Add update to updates map
+		updates[slug] = update;
 	}
 
 
@@ -223,9 +225,7 @@ void queryUpdates() {
 			updateStatus = "Could not query updates";
 			return;
 		}
-		DEFER({
-			json_decref(whitelistResJ);
-		});
+		DEFER({json_decref(whitelistResJ);});
 
 		std::map<std::string, std::set<std::string>> moduleWhitelist;
 		json_t* pluginsJ = json_object_get(whitelistResJ, "plugins");
@@ -252,73 +252,73 @@ void queryUpdates() {
 
 
 bool hasUpdates() {
-	for (Update& update : updates) {
-		if (update.progress < 1.f)
+	for (auto& pair : updates) {
+		if (pair.second.progress < 1.f)
 			return true;
 	}
 	return false;
 }
 
 
-static bool isSyncingUpdate = false;
-static bool isSyncingUpdates = false;
+void syncUpdate(const std::string& slug) {
+	if (settings::token.empty())
+		return;
 
+	auto it = updates.find(slug);
+	if (it == updates.end())
+		return;
+	Update& update = it->second;
 
-void syncUpdate(Update* update) {
-	isSyncingUpdate = true;
-	DEFER({
-		isSyncingUpdate = false;
-	});
+	updatingSlug = slug;
+	DEFER({updatingSlug = "";});
 
 	std::string downloadUrl = API_URL + "/download";
-	downloadUrl += "?slug=" + network::encodeUrl(update->pluginSlug);
-	downloadUrl += "&version=" + network::encodeUrl(update->version);
+	downloadUrl += "?slug=" + network::encodeUrl(slug);
+	downloadUrl += "&version=" + network::encodeUrl(update.version);
 	downloadUrl += "&arch=" + network::encodeUrl(APP_ARCH);
 
 	network::CookieMap cookies;
 	cookies["token"] = settings::token;
 
-	INFO("Downloading plugin %s %s %s", update->pluginSlug.c_str(), update->version.c_str(), APP_ARCH.c_str());
+	INFO("Downloading plugin %s v%s for %s", slug.c_str(), update.version.c_str(), APP_ARCH.c_str());
 
 	// Download zip
-	std::string pluginDest = system::join(asset::pluginsPath, update->pluginSlug + ".zip");
-	if (!network::requestDownload(downloadUrl, pluginDest, &update->progress, cookies)) {
-		WARN("Plugin %s download was unsuccessful", update->pluginSlug.c_str());
+	std::string pluginDest = system::join(asset::pluginsPath, slug + ".zip");
+	if (!network::requestDownload(downloadUrl, pluginDest, &update.progress, cookies)) {
+		WARN("Plugin %s download was unsuccessful", slug.c_str());
 		return;
 	}
 }
 
 
 void syncUpdates() {
-	isSyncingUpdates = true;
-	DEFER({
-		isSyncingUpdates = false;
-	});
-
 	if (settings::token.empty())
 		return;
 
-	for (Update& update : updates) {
-		if (update.progress < 1.f)
-			syncUpdate(&update);
+	// Iterate by value because the map might change
+	for (auto pair : updates) {
+		syncUpdate(pair.first);
 	}
 	restartRequested = true;
 }
 
 
 bool isSyncing() {
-	return isSyncingUpdate || isSyncingUpdates;
+	return updatingPlugins || (updatingSlug != "");
 }
 
-
-std::string loginStatus;
-std::vector<Update> updates;
-std::string updateStatus;
-bool restartRequested = false;
 
 std::string appVersion;
 std::string appDownloadUrl;
 std::string appChangelogUrl;
+
+std::string loginStatus;
+std::map<std::string, Update> updates;
+std::string updateStatus;
+std::string updatingSlug;
+bool updatingPlugins = false;
+bool restartRequested = false;
+
 
 
 } // namespace library

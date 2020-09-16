@@ -251,7 +251,7 @@ struct RtMidiDriver : midi::Driver {
 	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < (int) rtMidiIn->getPortCount()))
 			return NULL;
-		RtMidiInputDevice* device = getWithDefault(inputDevices, deviceId, NULL);
+		RtMidiInputDevice* device = get(inputDevices, deviceId, NULL);
 		if (!device) {
 			try {
 				inputDevices[deviceId] = device = new RtMidiInputDevice(driverId, deviceId);
@@ -314,7 +314,7 @@ struct RtMidiDriver : midi::Driver {
 	midi::OutputDevice* subscribeOutput(int deviceId, midi::Output* output) override {
 		if (!(0 <= deviceId && deviceId < (int) rtMidiOut->getPortCount()))
 			return NULL;
-		RtMidiOutputDevice* device = getWithDefault(outputDevices, deviceId, NULL);
+		RtMidiOutputDevice* device = get(outputDevices, deviceId, NULL);
 		if (!device) {
 			try {
 				outputDevices[deviceId] = device = new RtMidiOutputDevice(driverId, deviceId);

@@ -65,7 +65,7 @@ json_t* requestJson(Method method, const std::string& url, json_t* dataJ, const 
 	// Process data
 	if (dataJ) {
 		if (method == METHOD_GET) {
-			// Append ?key=value&... to url
+			// Append ?key1=value1&key2=value2&... to url
 			urlS += "?";
 			bool isFirst = true;
 			const char* key;
@@ -131,17 +131,17 @@ json_t* requestJson(Method method, const std::string& url, json_t* dataJ, const 
 
 	// Cleanup
 	if (reqStr)
-		free(reqStr);
+		std::free(reqStr);
 	curl_easy_cleanup(curl);
 	curl_slist_free_all(headers);
 
-	if (res == CURLE_OK) {
-		// Parse JSON response
-		json_error_t error;
-		json_t* rootJ = json_loads(resText.c_str(), 0, &error);
-		return rootJ;
-	}
-	return NULL;
+	if (res != CURLE_OK)
+		return NULL;
+
+	// Parse JSON response
+	json_error_t error;
+	json_t* rootJ = json_loads(resText.c_str(), 0, &error);
+	return rootJ;
 }
 
 
@@ -155,6 +155,7 @@ static int xferInfoCallback(void* clientp, curl_off_t dltotal, curl_off_t dlnow,
 	}
 	return 0;
 }
+
 
 bool requestDownload(const std::string& url, const std::string& filename, float* progress, const CookieMap& cookies) {
 	CURL* curl = createCurl();
@@ -189,21 +190,20 @@ bool requestDownload(const std::string& url, const std::string& filename, float*
 	return res == CURLE_OK;
 }
 
+
 std::string encodeUrl(const std::string& s) {
 	CURL* curl = curl_easy_init();
+	DEFER({curl_easy_cleanup(curl);});
 	assert(curl);
 	char* escaped = curl_easy_escape(curl, s.c_str(), s.size());
-	std::string ret = escaped;
-	curl_free(escaped);
-	curl_easy_cleanup(curl);
-	return ret;
+	DEFER({curl_free(escaped);});
+	return std::string(escaped);
 }
+
 
 std::string urlPath(const std::string& url) {
 	CURLU* curl = curl_url();
-	DEFER({
-		curl_url_cleanup(curl);
-	});
+	DEFER({curl_url_cleanup(curl);});
 	if (curl_url_set(curl, CURLUPART_URL, url.c_str(), 0))
 		return "";
 	char* buf;

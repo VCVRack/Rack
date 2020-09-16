@@ -1,7 +1,7 @@
 #pragma once
 #include <common.hpp>
 
-#include <vector>
+#include <map>
 
 
 namespace rack {
@@ -13,8 +13,7 @@ namespace library {
 
 
 struct Update {
-	std::string pluginSlug;
-	std::string pluginName;
+	std::string name;
 	std::string version;
 	std::string changelogUrl;
 	float progress = 0.f;
@@ -31,7 +30,7 @@ void logIn(const std::string& email, const std::string& password);
 void logOut();
 void queryUpdates();
 bool hasUpdates();
-void syncUpdate(Update* update);
+void syncUpdate(const std::string& slug);
 void syncUpdates();
 bool isSyncing();
 
@@ -41,8 +40,11 @@ extern std::string appDownloadUrl;
 extern std::string appChangelogUrl;
 
 extern std::string loginStatus;
-extern std::vector<Update> updates;
+// plugin slug -> Update
+extern std::map<std::string, Update> updates;
 extern std::string updateStatus;
+extern std::string updatingSlug;
+extern bool updatingPlugins;
 extern bool restartRequested;
 
 

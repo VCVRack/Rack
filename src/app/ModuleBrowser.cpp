@@ -512,7 +512,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			// // Sort by score
 			// modelContainer->children.sort([&](Widget *w1, Widget *w2) {
 			// 	// If score was not computed, scores[w] returns 0, but this doesn't matter because those widgets aren't visible.
-			// 	return getWithDefault(scores, w1, 0.f) > getWithDefault(scores, w2, 0.f);
+			// 	return get(scores, w1, 0.f) > get(scores, w2, 0.f);
 			// });
 		}
 

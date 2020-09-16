@@ -169,15 +169,15 @@ Does *not* add the default value to the map.
 Posted to https://stackoverflow.com/a/63683271/272642.
 Example:
 
-	std::map<std::string, int*> m;
-	int v = getWithDefault(m, "a", 3);
+	std::map<std::string, int> m;
+	int v = get(m, "a", 3);
 	// v is 3 because the key "a" does not exist
 
-	int w = getWithDefault(m, "a");
+	int w = get(m, "a");
 	// w is 0 because no default value is given, so it assumes the default int.
 */
 template <typename C>
-typename C::mapped_type getWithDefault(const C& m, const typename C::key_type& key, const typename C::mapped_type& def = typename C::mapped_type()) {
+typename C::mapped_type get(const C& m, const typename C::key_type& key, const typename C::mapped_type& def = typename C::mapped_type()) {
 	typename C::const_iterator it = m.find(key);
 	if (it == m.end())
 		return def;

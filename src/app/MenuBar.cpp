@@ -575,6 +575,7 @@ static bool isLoggingIn = false;
 
 struct AccountEmailField : ui::TextField {
 	ui::TextField* passwordField;
+
 	void onSelectKey(const event::SelectKey& e) override {
 		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
 			APP->event->setSelected(passwordField);
@@ -603,6 +604,7 @@ struct AccountPasswordField : ui::PasswordField {
 struct LogInItem : ui::MenuItem {
 	ui::TextField* emailField;
 	ui::TextField* passwordField;
+
 	void onAction(const event::Action& e) override {
 		isLoggingIn = true;
 		std::string email = emailField->text;
@@ -612,7 +614,7 @@ struct LogInItem : ui::MenuItem {
 			isLoggingIn = false;
 		});
 		t.detach();
-		e.consume(NULL);
+		e.unconsume();
 	}
 
 	void step() override {
@@ -623,13 +625,13 @@ struct LogInItem : ui::MenuItem {
 	}
 };
 
-struct SyncItem : ui::MenuItem {
+struct SyncUpdatesItem : ui::MenuItem {
 	void step() override {
 		disabled = true;
 		if (library::updateStatus != "") {
 			text = library::updateStatus;
 		}
-		else if (library::isSyncing()) {
+		else if (library::updatingPlugins || library::updatingSlug != "") {
 			text = "Updating...";
 		}
 		else if (!library::hasUpdates()) {
@@ -643,59 +645,72 @@ struct SyncItem : ui::MenuItem {
 	}
 
 	void onAction(const event::Action& e) override {
-		std::thread t([ = ] {
+		std::thread t([=] {
 			library::syncUpdates();
 		});
 		t.detach();
-		e.consume(NULL);
+		e.unconsume();
 	}
 };
 
-struct PluginSyncItem : ui::MenuItem {
-	library::Update* update;
+struct SyncUpdateItem : ui::MenuItem {
+	std::string slug;
 
-	void setUpdate(library::Update* update) {
-		this->update = update;
-		text = update->pluginName;
-		plugin::Plugin* p = plugin::getPlugin(update->pluginSlug);
+	void setUpdate(const std::string& slug) {
+		this->slug = slug;
+		auto it = library::updates.find(slug);
+		if (it == library::updates.end())
+			return;
+
+		text = it->second.name;
+		plugin::Plugin* p = plugin::getPlugin(slug);
 		if (p) {
 			rightText += "v" + p->version + " → ";
 		}
-		rightText += "v" + update->version;
+		rightText += "v" + it->second.version;
 	}
 
 	ui::Menu* createChildMenu() override {
-		if (update->changelogUrl != "") {
-			ui::Menu* menu = new ui::Menu;
+		auto it = library::updates.find(slug);
+		if (it == library::updates.end())
+			return NULL;
 
-			UrlItem* changelogUrl = new UrlItem;
-			changelogUrl->text = "Changelog";
-			changelogUrl->url = update->changelogUrl;
-			menu->addChild(changelogUrl);
+		if (it->second.changelogUrl == "")
+			return NULL;
 
-			return menu;
-		}
-		return NULL;
+		ui::Menu* menu = new ui::Menu;
+
+		UrlItem* changelogUrl = new UrlItem;
+		changelogUrl->text = "Changelog";
+		changelogUrl->url = it->second.changelogUrl;
+		menu->addChild(changelogUrl);
+
+		return menu;
 	}
 
 	void step() override {
 		disabled = library::isSyncing();
-		if (update->progress >= 1) {
-			rightText = CHECKMARK_STRING;
-			disabled = true;
+
+		auto it = library::updates.find(slug);
+		if (it != library::updates.end()) {
+			if (it->second.progress >= 1) {
+				rightText = CHECKMARK_STRING;
+				disabled = true;
+			}
+			else if (it->second.progress > 0) {
+				rightText = string::f("%.0f%%", it->second.progress * 100.f);
+			}
 		}
-		else if (update->progress > 0) {
-			rightText = string::f("%.0f%%", update->progress * 100.f);
-		}
+
 		MenuItem::step();
 	}
 
 	void onAction(const event::Action& e) override {
-		std::thread t([ = ] {
-			library::syncUpdate(update);
+		std::thread t([=] {
+			library::syncUpdate(slug);
 		});
 		t.detach();
-		e.consume(NULL);
+		e.unconsume();
 	}
 };
 
@@ -761,20 +776,20 @@ struct LibraryMenu : ui::Menu {
 			logOutItem->text = "Log out";
 			addChild(logOutItem);
 
-			SyncItem* syncItem = new SyncItem;
+			SyncUpdatesItem* syncItem = new SyncUpdatesItem;
 			syncItem->text = "Update all";
 			addChild(syncItem);
 
-			if (library::hasUpdates()) {
+			if (!library::updates.empty()) {
 				addChild(new ui::MenuSeparator);
 
 				ui::MenuLabel* updatesLabel = new ui::MenuLabel;
 				updatesLabel->text = "Updates";
 				addChild(updatesLabel);
 
-				for (library::Update& update : library::updates) {
-					PluginSyncItem* updateItem = new PluginSyncItem;
-					updateItem->setUpdate(&update);
+				for (auto& pair : library::updates) {
+					SyncUpdateItem* updateItem = new SyncUpdateItem;
+					updateItem->setUpdate(pair.first);
 					addChild(updateItem);
 				}
 			}
@@ -832,7 +847,6 @@ struct AppUpdateItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
 		system::openBrowser(library::appDownloadUrl);
 		APP->window->close();
-		e.consume(NULL);
 	}
 };
 
