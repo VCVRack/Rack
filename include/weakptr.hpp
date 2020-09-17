@@ -1,6 +1,5 @@
 #pragma once
 #include <common.hpp>
-#include <atomic>
 
 
 namespace rack {
@@ -8,7 +7,7 @@ namespace rack {
 
 struct WeakHandle {
 	void* ptr;
-	std::atomic<size_t> count{0};
+	size_t count = 0;
 	WeakHandle(void* ptr) : ptr(ptr) {}
 };
 
@@ -89,10 +88,13 @@ struct WeakPtr {
 			return nullptr;
 		return reinterpret_cast<T*>(weakHandle->ptr);
 	}
+	T* operator->() const {
+		return get();
+	}
 	T& operator*() const {
 		return *get();
 	}
-	T* operator->() const {
+	operator T*() const {
 		return get();
 	}
 	explicit operator bool() const {
