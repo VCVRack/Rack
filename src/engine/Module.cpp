@@ -152,13 +152,10 @@ void Module::fromJson(json_t* rootJ) {
 		}
 	}
 
-	// Only set ID if unset
-	if (id < 0) {
-		// id
-		json_t* idJ = json_object_get(rootJ, "id");
-		if (idJ)
-			id = json_integer_value(idJ);
-	}
+	// id
+	json_t* idJ = json_object_get(rootJ, "id");
+	if (idJ)
+		id = json_integer_value(idJ);
 
 	// params
 	json_t* paramsJ = json_object_get(rootJ, "params");
@@ -176,16 +173,15 @@ void Module::fromJson(json_t* rootJ) {
 	if (bypassedJ)
 		internal->bypassed = json_boolean_value(bypassedJ);
 
-	// These do not need to be deserialized, since the module positions will set them correctly when added to the rack.
-	// // leftModuleId
-	// json_t *leftModuleIdJ = json_object_get(rootJ, "leftModuleId");
-	// if (leftModuleIdJ)
-	// 	leftExpander.moduleId = json_integer_value(leftModuleIdJ);
+	// leftModuleId
+	json_t *leftModuleIdJ = json_object_get(rootJ, "leftModuleId");
+	if (leftModuleIdJ)
+		leftExpander.moduleId = json_integer_value(leftModuleIdJ);
 
-	// // rightModuleId
-	// json_t *rightModuleIdJ = json_object_get(rootJ, "rightModuleId");
-	// if (rightModuleIdJ)
-	// 	rightExpander.moduleId = json_integer_value(rightModuleIdJ);
+	// rightModuleId
+	json_t *rightModuleIdJ = json_object_get(rootJ, "rightModuleId");
+	if (rightModuleIdJ)
+		rightExpander.moduleId = json_integer_value(rightModuleIdJ);
 
 	// data
 	json_t* dataJ = json_object_get(rootJ, "data");

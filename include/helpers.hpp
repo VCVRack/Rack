@@ -26,7 +26,7 @@ plugin::Model* createModel(const std::string& slug) {
 			return m;
 		}
 		app::ModuleWidget* createModuleWidget(engine::Module* m) override {
-			TModule *tm = NULL;
+			TModule* tm = NULL;
 			if (m) {
 				assert(m->model == this);
 				tm = dynamic_cast<TModule*>(m);

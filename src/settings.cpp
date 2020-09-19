@@ -260,9 +260,7 @@ void save(const std::string& path) {
 	FILE* file = std::fopen(path.c_str(), "w");
 	if (!file)
 		return;
-	DEFER({
-		std::fclose(file);
-	});
+	DEFER({std::fclose(file);});
 
 	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 	json_decref(rootJ);
@@ -273,9 +271,7 @@ void load(const std::string& path) {
 	FILE* file = std::fopen(path.c_str(), "r");
 	if (!file)
 		return;
-	DEFER({
-		std::fclose(file);
-	});
+	DEFER({std::fclose(file);});
 
 	json_error_t error;
 	json_t* rootJ = json_loadf(file, 0, &error);

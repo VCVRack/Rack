@@ -101,9 +101,7 @@ bool isTruncated() {
 	FILE* file = std::fopen(asset::logPath.c_str(), "r");
 	if (!file)
 		return false;
-	DEFER({
-		std::fclose(file);
-	});
+	DEFER({std::fclose(file);});
 
 	if (fileEndsWith(file, "END"))
 		return false;

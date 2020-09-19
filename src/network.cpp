@@ -4,6 +4,7 @@
 #include <curl/curl.h>
 
 #include <network.hpp>
+#include <system.hpp>
 #include <asset.hpp>
 
 
@@ -160,7 +161,7 @@ static int xferInfoCallback(void* clientp, curl_off_t dltotal, curl_off_t dlnow,
 bool requestDownload(const std::string& url, const std::string& filename, float* progress, const CookieMap& cookies) {
 	CURL* curl = createCurl();
 
-	FILE* file = fopen(filename.c_str(), "wb");
+	FILE* file = std::fopen(filename.c_str(), "wb");
 	if (!file)
 		return false;
 
@@ -182,10 +183,10 @@ bool requestDownload(const std::string& url, const std::string& filename, float*
 	CURLcode res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 
-	fclose(file);
+	std::fclose(file);
 
 	if (res != CURLE_OK)
-		remove(filename.c_str());
+		system::remove(filename);
 
 	return res == CURLE_OK;
 }

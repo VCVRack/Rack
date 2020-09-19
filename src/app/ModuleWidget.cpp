@@ -611,8 +611,6 @@ PortWidget* ModuleWidget::getOutput(int portId) {
 
 json_t* ModuleWidget::toJson() {
 	json_t* moduleJ = APP->engine->moduleToJson(module);
-	// When serializing ModuleWidget, don't include the ID. This ID is only meaningful when serializing the entire rack.
-	json_object_del(moduleJ, "id");
 	return moduleJ;
 }
 
@@ -622,13 +620,9 @@ void ModuleWidget::fromJson(json_t* rootJ) {
 
 void ModuleWidget::copyClipboard() {
 	json_t* moduleJ = toJson();
-	DEFER({
-		json_decref(moduleJ);
-	});
+	DEFER({json_decref(moduleJ);});
 	char* moduleJson = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-	DEFER({
-		free(moduleJson);
-	});
+	DEFER({std::free(moduleJson);});
 	glfwSetClipboardString(APP->window->win, moduleJson);
 }
 
@@ -645,9 +639,12 @@ void ModuleWidget::pasteClipboardAction() {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		return;
 	}
-	DEFER({
-		json_decref(moduleJ);
-	});
+	DEFER({json_decref(moduleJ);});
+
+	// Don't use IDs from JSON
+	json_object_del(moduleJ, "id");
+	json_object_del(moduleJ, "leftModuleId");
+	json_object_del(moduleJ, "rightModuleId");
 
 	// history::ModuleChange
 	history::ModuleChange* h = new history::ModuleChange;
@@ -665,9 +662,7 @@ void ModuleWidget::load(std::string filename) {
 	FILE* file = std::fopen(filename.c_str(), "r");
 	if (!file)
 		throw Exception(string::f("Could not load patch file %s", filename.c_str()));
-	DEFER({
-		std::fclose(file);
-	});
+	DEFER({std::fclose(file);});
 
 	INFO("Loading preset %s", filename.c_str());
 
@@ -675,9 +670,12 @@ void ModuleWidget::load(std::string filename) {
 	json_t* moduleJ = json_loadf(file, 0, &error);
 	if (!moduleJ)
 		throw Exception(string::f("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text));
-	DEFER({
-		json_decref(moduleJ);
-	});
+	DEFER({json_decref(moduleJ);});
+
+	// Don't use IDs from JSON
+	json_object_del(moduleJ, "id");
+	json_object_del(moduleJ, "leftModuleId");
+	json_object_del(moduleJ, "rightModuleId");
 
 	fromJson(moduleJ);
 }
@@ -729,7 +727,7 @@ void ModuleWidget::loadDialog() {
 		// No path selected
 		return;
 	}
-	DEFER({free(pathC);});
+	DEFER({std::free(pathC);});
 
 	try {
 		loadAction(pathC);
@@ -744,17 +742,13 @@ void ModuleWidget::save(std::string filename) {
 
 	json_t* moduleJ = toJson();
 	assert(moduleJ);
-	DEFER({
-		json_decref(moduleJ);
-	});
+	DEFER({json_decref(moduleJ);});
 
-	FILE* file = fopen(filename.c_str(), "w");
+	FILE* file = std::fopen(filename.c_str(), "w");
 	if (!file) {
 		WARN("Could not write to patch file %s", filename.c_str());
 	}
-	DEFER({
-		fclose(file);
-	});
+	DEFER({std::fclose(file);});
 
 	json_dumpf(moduleJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 }
@@ -786,7 +780,7 @@ void ModuleWidget::saveDialog() {
 		// No path selected
 		return;
 	}
-	DEFER({free(pathC);});
+	DEFER({std::free(pathC);});
 
 	std::string path = pathC;
 	if (system::getExtension(path) == "")
@@ -872,15 +866,18 @@ void ModuleWidget::cloneAction() {
 	// history::ComplexAction
 	history::ComplexAction* h = new history::ComplexAction;
 
-	// Clone Module
-	engine::Module* clonedModule = model->createModule();
 	// JSON serialization is the obvious way to do this
 	json_t* moduleJ = toJson();
+	// Don't use IDs from JSON
+	json_object_del(moduleJ, "id");
+	json_object_del(moduleJ, "leftModuleId");
+	json_object_del(moduleJ, "rightModuleId");
+
+	// Clone Module
+	engine::Module* clonedModule = model->createModule();
 	// This doesn't need a lock (via Engine::moduleFromJson()) because the Module is not added to the Engine yet.
 	clonedModule->fromJson(moduleJ);
 	json_decref(moduleJ);
-	// Reset ID so the Engine automatically assigns a new one
-	clonedModule->id = -1;
 	APP->engine->addModule(clonedModule);
 
 	// Clone ModuleWidget

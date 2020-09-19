@@ -22,8 +22,9 @@ namespace app {
 
 
 /** Creates a new Module and ModuleWidget */
-ModuleWidget* moduleWidgetFromJson(json_t* moduleJ) {
+static ModuleWidget* moduleWidgetFromJson(json_t* moduleJ) {
 	plugin::Model* model = plugin::modelFromJson(moduleJ);
+	assert(model);
 	engine::Module* module = model->createModule();
 	assert(module);
 	module->fromJson(moduleJ);
@@ -287,10 +288,12 @@ void RackWidget::fromJson(json_t* rootJ) {
 		}
 
 		CableWidget* cw = new CableWidget;
-		// Legacy: Before v1, cable colors were not serialized. So we need to initialize the color here.
-		cw->setNextCableColor();
 		cw->setCable(cable);
 		cw->fromJson(cableJ);
+		// In <=v1, cable colors were not serialized, so choose one from the available colors.
+		if (cw->color.a == 0.f) {
+			cw->setNextCableColor();
+		}
 		addCable(cw);
 	}
 }
@@ -308,20 +311,19 @@ void RackWidget::pastePresetClipboardAction() {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		return;
 	}
-	DEFER({
-		json_decref(moduleJ);
-	});
+	DEFER({json_decref(moduleJ);});
+
+	// Because we are creating a new module, we don't want to use the IDs from the JSON.
+	json_object_del(moduleJ, "id");
+	json_object_del(moduleJ, "leftModuleId");
+	json_object_del(moduleJ, "rightModuleId");
 
 	try {
-		plugin::Model* model = plugin::modelFromJson(moduleJ);
-		engine::Module* module = model->createModule();
-		assert(module);
-		module->fromJson(moduleJ);
-		// Reset ID so the Engine automatically assigns a new one
-		module->id = -1;
-		APP->engine->addModule(module);
+		ModuleWidget* mw = moduleWidgetFromJson(moduleJ);
+		assert(mw);
+		assert(mw->module);
 
-		ModuleWidget* mw = module->model->createModuleWidget(module);
+		APP->engine->addModule(mw->module);
 		addModuleAtMouse(mw);
 
 		// history::ModuleAdd

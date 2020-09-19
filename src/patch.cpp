@@ -273,9 +273,7 @@ void PatchManager::loadAutosave() {
 		// TODO Load template without causing infinite recursion
 		return;
 	}
-	DEFER({
-		std::fclose(file);
-	});
+	DEFER({std::fclose(file);});
 
 	json_error_t error;
 	json_t* rootJ = json_loadf(file, 0, &error);
