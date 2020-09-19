@@ -226,16 +226,26 @@ struct Engine::Internal {
 };
 
 
-static void Engine_updateExpander(Engine* that, Module::Expander* expander) {
-	if (expander->moduleId >= 0) {
-		if (!expander->module || expander->module->id != expander->moduleId) {
-			expander->module = that->getModule(expander->moduleId);
+static void Engine_updateExpander(Engine* that, Module* module, bool side) {
+	Module::Expander& expander = side ? module->rightExpander : module->leftExpander;
+	Module* oldExpanderModule = expander.module;
+
+	if (expander.moduleId >= 0) {
+		if (!expander.module || expander.module->id != expander.moduleId) {
+			expander.module = that->getModule(expander.moduleId);
 		}
 	}
 	else {
-		if (expander->module) {
-			expander->module = NULL;
+		if (expander.module) {
+			expander.module = NULL;
 		}
+	}
+
+	if (expander.module != oldExpanderModule) {
+		// Trigger ExpanderChangeEvent event
+		Module::ExpanderChangeEvent e;
+		e.side = side;
+		module->onExpanderChange(e);
 	}
 }
 
@@ -571,8 +581,8 @@ void Engine::step(int frames) {
 
 	// Update expander pointers
 	for (Module* module : internal->modules) {
-		Engine_updateExpander(this, &module->leftExpander);
-		Engine_updateExpander(this, &module->rightExpander);
+		Engine_updateExpander(this, module, false);
+		Engine_updateExpander(this, module, true);
 	}
 
 	// Launch workers

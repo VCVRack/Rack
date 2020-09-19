@@ -335,7 +335,7 @@ void RackWidget::pastePresetClipboardAction() {
 	}
 }
 
-static void RackWidget_updateAdjacent(RackWidget* that) {
+static void RackWidget_updateExpanders(RackWidget* that) {
 	for (widget::Widget* w : that->moduleContainer->children) {
 		math::Vec pLeft = w->box.pos.div(RACK_GRID_SIZE).round();
 		math::Vec pRight = w->box.getTopRight().div(RACK_GRID_SIZE).round();
@@ -375,7 +375,7 @@ void RackWidget::addModule(ModuleWidget* m) {
 	assert(m->box.size.y == RACK_GRID_HEIGHT);
 	moduleContainer->addChild(m);
 
-	RackWidget_updateAdjacent(this);
+	RackWidget_updateExpanders(this);
 }
 
 void RackWidget::addModuleAtMouse(ModuleWidget* mw) {
@@ -418,7 +418,7 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 
 	// Accept requested position
 	mw->setPosition(mwBox.pos);
-	RackWidget_updateAdjacent(this);
+	RackWidget_updateExpanders(this);
 	return true;
 }
 
@@ -520,7 +520,7 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 		xLimit = newPos.x + w->box.size.x;
 	}
 
-	RackWidget_updateAdjacent(this);
+	RackWidget_updateExpanders(this);
 }
 
 ModuleWidget* RackWidget::getModule(int64_t moduleId) {

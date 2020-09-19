@@ -286,8 +286,11 @@ struct Module {
 		onSampleRateChange();
 	}
 
-	struct ExpanderChangeEvent {};
-	/** Called after the Engine sample rate changes.
+	struct ExpanderChangeEvent {
+		/** False for left, true for right. */
+		bool side;
+	};
+	/** Called after an expander is added, removed, or changed on either the left or right side of the Module.
 	*/
 	virtual void onExpanderChange(const ExpanderChangeEvent& e) {}
 

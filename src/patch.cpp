@@ -153,7 +153,8 @@ void PatchManager::saveTemplateDialog() {
 
 
 void PatchManager::saveAutosave() {
-	INFO("Saving autosave");
+	std::string patchPath = system::join(asset::autosavePath, "patch.json");
+	INFO("Saving autosave %s", patchPath.c_str());
 	json_t* rootJ = toJson();
 	if (!rootJ)
 		return;
@@ -161,7 +162,6 @@ void PatchManager::saveAutosave() {
 
 	// Write to temporary path and then rename it to the correct path
 	system::createDirectories(asset::autosavePath);
-	std::string patchPath = system::join(asset::autosavePath, "patch.json");
 	std::string tmpPath = patchPath + ".tmp";
 	FILE* file = std::fopen(tmpPath.c_str(), "w");
 	if (!file) {
@@ -265,8 +265,8 @@ void PatchManager::loadTemplateDialog() {
 
 
 void PatchManager::loadAutosave() {
-	INFO("Loading autosave");
 	std::string patchPath = system::join(asset::autosavePath, "patch.json");
+	INFO("Loading autosave %s", patchPath.c_str());
 	FILE* file = std::fopen(patchPath.c_str(), "r");
 	if (!file) {
 		// Exit silently
