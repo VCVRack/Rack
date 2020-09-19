@@ -344,7 +344,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 		}
 
 		// Step module
-		if (!module->bypassed())
+		if (!module->bypass())
 			module->process(processArgs);
 		else
 			module->processBypass(processArgs);
@@ -786,21 +786,21 @@ void Engine::randomizeModule(Module* module) {
 }
 
 
-void Engine::bypassModule(Module* module, bool bypassed) {
+void Engine::bypassModule(Module* module, bool bypass) {
 	ExclusiveSharedLock lock(internal->mutex);
 	assert(module);
 
-	if (module->bypassed() == bypassed)
+	if (module->bypass() == bypass)
 		return;
 	// Clear outputs and set to 1 channel
 	for (Output& output : module->outputs) {
 		// This zeros all voltages, but the channel is set to 1 if connected
 		output.setChannels(0);
 	}
-	// Set bypassed
-	module->bypassed() = bypassed;
+	// Set bypass state
+	module->bypass() = bypass;
 	// Trigger event
-	if (bypassed) {
+	if (bypass) {
 		Module::BypassEvent eBypass;
 		module->onBypass(eBypass);
 	}

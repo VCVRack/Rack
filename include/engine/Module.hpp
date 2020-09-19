@@ -320,7 +320,7 @@ struct Module {
 	/** private */
 	float& cpuTime();
 	/** private */
-	bool& bypassed();
+	bool& bypass();
 };
 
 

@@ -83,7 +83,7 @@ struct Engine {
 	Module* getModule(int64_t moduleId);
 	void resetModule(Module* module);
 	void randomizeModule(Module* module);
-	void bypassModule(Module* module, bool bypassed);
+	void bypassModule(Module* module, bool bypass);
 	/** Serializes/deserializes with locking, ensuring that Module::process() is not called during toJson()/fromJson().
 	*/
 	json_t* moduleToJson(Module* module);

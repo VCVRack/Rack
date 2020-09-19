@@ -91,14 +91,14 @@ void ModuleBypass::undo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
 	if (!module)
 		return;
-	APP->engine->bypassModule(module, !bypassed);
+	APP->engine->bypassModule(module, !bypass);
 }
 
 void ModuleBypass::redo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
 	if (!module)
 		return;
-	APP->engine->bypassModule(module, bypassed);
+	APP->engine->bypassModule(module, bypass);
 }
 
 

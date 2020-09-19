@@ -12,7 +12,7 @@ struct Module::Internal {
 	Only written when CPU timing is enabled, since time measurement is expensive.
 	*/
 	float cpuTime = 0.f;
-	bool bypassed = false;
+	bool bypass = false;
 };
 
 
@@ -97,9 +97,9 @@ json_t* Module::toJson() {
 	if (paramsJ)
 		json_object_set_new(rootJ, "params", paramsJ);
 
-	// bypassed
-	if (internal->bypassed)
-		json_object_set_new(rootJ, "bypassed", json_boolean(true));
+	// bypass
+	if (internal->bypass)
+		json_object_set_new(rootJ, "bypass", json_boolean(true));
 
 	// leftModuleId
 	if (leftExpander.moduleId >= 0)
@@ -162,16 +162,13 @@ void Module::fromJson(json_t* rootJ) {
 	if (paramsJ)
 		paramsFromJson(paramsJ);
 
-	// bypassed
-	json_t* bypassedJ = json_object_get(rootJ, "bypassed");
-	// legacy "bypass" in v0.6 or early v1 (don't remember)
-	if (!bypassedJ)
-		bypassedJ = json_object_get(rootJ, "bypass");
+	// bypass
+	json_t* bypassJ = json_object_get(rootJ, "bypass");
 	// legacy "disabled" in v1
-	if (!bypassedJ)
-		bypassedJ = json_object_get(rootJ, "disabled");
-	if (bypassedJ)
-		internal->bypassed = json_boolean_value(bypassedJ);
+	if (!bypassJ)
+		bypassJ = json_object_get(rootJ, "disabled");
+	if (bypassJ)
+		internal->bypass = json_boolean_value(bypassJ);
 
 	// leftModuleId
 	json_t *leftModuleIdJ = json_object_get(rootJ, "leftModuleId");
@@ -271,8 +268,8 @@ float& Module::cpuTime() {
 }
 
 
-bool& Module::bypassed() {
-	return internal->bypassed;
+bool& Module::bypass() {
+	return internal->bypass;
 }
 
 

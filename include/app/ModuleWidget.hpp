@@ -59,7 +59,6 @@ struct ModuleWidget : widget::OpaqueWidget {
 	PortWidget* getInput(int portId);
 	PortWidget* getOutput(int portId);
 
-	/** Serializes/unserializes the module state */
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
 	void copyClipboard();
