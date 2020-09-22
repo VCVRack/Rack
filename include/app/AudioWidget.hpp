@@ -2,6 +2,7 @@
 #include <app/common.hpp>
 #include <app/LedDisplay.hpp>
 #include <ui/Menu.hpp>
+#include <app/SvgButton.hpp>
 #include <audio.hpp>
 
 
@@ -26,6 +27,14 @@ struct AudioWidget : LedDisplay {
 struct AudioDeviceWidget : LedDisplay {
 	LedDisplayChoice* deviceChoice;
 	void setAudioPort(audio::Port* port);
+};
+
+
+/** A virtual audio port graphic that displays an audio menu when clicked. */
+struct AudioButton : SvgButton {
+	audio::Port* port;
+	void setAudioPort(audio::Port* port);
+	void onAction(const event::Action& e) override;
 };
 
 

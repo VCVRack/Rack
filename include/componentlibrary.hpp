@@ -5,6 +5,8 @@
 #include <app/ModuleLightWidget.hpp>
 #include <app/SvgSwitch.hpp>
 #include <app/SvgScrew.hpp>
+#include <app/AudioWidget.hpp>
+#include <app/MidiWidget.hpp>
 #include <asset.hpp>
 
 
@@ -800,6 +802,30 @@ struct SegmentDisplay : widget::Widget {
 			firstLightId += light->baseColors.size();
 			addChild(light);
 		}
+	}
+};
+
+
+struct AudioButton_ADAT : app::AudioButton {
+	AudioButton_ADAT() {
+		addFrame(APP->window->loadSvg(asset::system("res/ComponentLibrary/ADAT.svg")));
+		shadow->opacity = 0.0;
+	}
+};
+
+
+struct AudioButton_USB_B : app::AudioButton {
+	AudioButton_USB_B() {
+		addFrame(APP->window->loadSvg(asset::system("res/ComponentLibrary/USB-B.svg")));
+		shadow->opacity = 0.0;
+	}
+};
+
+
+struct MidiButton_MIDI_DIN : app::MidiButton {
+	MidiButton_MIDI_DIN() {
+		addFrame(APP->window->loadSvg(asset::system("res/ComponentLibrary/MIDI_DIN.svg")));
+		shadow->opacity = 0.0;
 	}
 };
 

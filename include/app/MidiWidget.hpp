@@ -2,6 +2,7 @@
 #include <app/common.hpp>
 #include <app/LedDisplay.hpp>
 #include <ui/Menu.hpp>
+#include <app/SvgButton.hpp>
 #include <midi.hpp>
 
 
@@ -16,6 +17,14 @@ struct MidiWidget : LedDisplay {
 	LedDisplaySeparator* deviceSeparator;
 	LedDisplayChoice* channelChoice;
 	void setMidiPort(midi::Port* port);
+};
+
+
+/** A virtual MIDI port graphic that displays an MIDI menu when clicked. */
+struct MidiButton : SvgButton {
+	midi::Port* port;
+	void setMidiPort(midi::Port* port);
+	void onAction(const event::Action& e) override;
 };
 
 

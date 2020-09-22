@@ -317,9 +317,9 @@ struct Module {
 	/** DEPRECATED. Override `onSampleRateChange(e)` instead. */
 	virtual void onSampleRateChange() {}
 
-	/** private */
+	/** Unstable API, do not use in plugins. */
 	float& cpuTime();
-	/** private */
+	/** Unstable API, do not use in plugins. */
 	bool& bypass();
 };
 

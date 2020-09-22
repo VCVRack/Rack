@@ -197,6 +197,17 @@ void MidiWidget::setMidiPort(midi::Port* port) {
 }
 
 
+void MidiButton::setMidiPort(midi::Port* port) {
+	this->port = port;
+}
+
+
+void MidiButton::onAction(const event::Action& e) {
+	ui::Menu* menu = createMenu();
+	appendMidiMenu(menu, port);
+}
+
+
 void appendMidiMenu(ui::Menu* menu, midi::Port* port) {
 	menu->addChild(createMenuLabel("MIDI driver"));
 	appendMidiDriverMenu(menu, port);

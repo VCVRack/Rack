@@ -506,6 +506,11 @@ struct MIDI_CVWidget : ModuleWidget {
 		midiWidget->box.size = mm2px(Vec(33.840, 28));
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		addChild(midiWidget);
+
+
+		MidiButton* m = createWidget<MidiButton_MIDI_DIN>(Vec());
+		m->setMidiPort(module ? &module->midiInput : NULL);
+		addChild(m);
 	}
 
 	void appendContextMenu(Menu* menu) override {

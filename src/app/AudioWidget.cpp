@@ -337,6 +337,17 @@ void AudioDeviceWidget::setAudioPort(audio::Port* port) {
 }
 
 
+void AudioButton::setAudioPort(audio::Port* port) {
+	this->port = port;
+}
+
+
+void AudioButton::onAction(const event::Action& e) {
+	ui::Menu* menu = createMenu();
+	appendAudioMenu(menu, port);
+}
+
+
 void appendAudioMenu(ui::Menu* menu, audio::Port* port) {
 	menu->addChild(createMenuLabel("Audio driver"));
 	appendAudioDriverMenu(menu, port);
