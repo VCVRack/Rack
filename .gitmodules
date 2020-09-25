@@ -22,3 +22,6 @@
 	path = dep/glfw
 	url = https://github.com/AndrewBelt/glfw.git
 	ignore = untracked
+[submodule "dep/fuzzysearchdatabase"]
+	path = dep/fuzzysearchdatabase
+	url = https://bitbucket.org/j_norberg/fuzzysearchdatabase.git

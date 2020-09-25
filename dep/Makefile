@@ -53,6 +53,7 @@ nanosvg = include/nanosvg.h
 oui-blendish = include/blendish.h
 osdialog = include/osdialog.h
 pffft = include/pffft.h
+fuzzysearchdatabase = include/FuzzySearchDatabase.hpp
 
 DEPS += $(glew)
 DEPS += $(glfw)
@@ -68,6 +69,7 @@ DEPS += $(nanosvg)
 DEPS += $(oui-blendish)
 DEPS += $(osdialog)
 DEPS += $(pffft)
+DEPS += $(fuzzysearchdatabase)
 
 
 DEP_LOCAL := .
@@ -243,6 +245,9 @@ pffft:
 $(pffft): | pffft
 	mkdir -p include
 	cp pffft/*.h include/
+
+$(fuzzysearchdatabase):
+	cp fuzzysearchdatabase/src/FuzzySearchDatabase.hpp include/
 
 # Helpers
 
