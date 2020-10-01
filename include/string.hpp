@@ -45,6 +45,7 @@ Throws std::runtime_error if string is invalid.
 std::vector<uint8_t> fromBase64(const std::string& str);
 
 struct CaseInsensitiveCompare {
+	/** Returns whether `a < b` using case-insensitive lexical comparison. */
 	bool operator()(const std::string& a, const std::string& b) const;
 };
 

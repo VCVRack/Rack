@@ -184,12 +184,16 @@ std::vector<uint8_t> fromBase64(const std::string& str) {
 
 
 bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string& b) const {
-	if (a.size() != b.size())
-		return false;
-	auto f = [](unsigned char a, unsigned char b) {
-		return std::tolower(a) == std::tolower(b);
-	};
-	return std::equal(a.begin(), a.end(), b.begin(), f);
+	for (size_t i = 0;; i++) {
+		char ai = std::tolower(a[i]);
+		char bi = std::tolower(b[i]);
+		if (ai < bi)
+			return true;
+		if (ai > bi)
+			return false;
+		if (!ai || !bi)
+			return false;
+	}
 }
 
 
