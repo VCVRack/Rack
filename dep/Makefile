@@ -246,8 +246,9 @@ $(pffft): | pffft
 	mkdir -p include
 	cp pffft/*.h include/
 
-$(fuzzysearchdatabase):
-	cp fuzzysearchdatabase/src/FuzzySearchDatabase.hpp include/
+$(fuzzysearchdatabase): fuzzysearchdatabase/src/FuzzySearchDatabase.hpp
+	mkdir -p include
+	cp $^ include/
 
 # Helpers
 

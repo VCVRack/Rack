@@ -27,60 +27,51 @@
 #include <history.hpp>
 #include <settings.hpp>
 #include <tag.hpp>
+#include <FuzzySearchDatabase.hpp>
 
 
 namespace rack {
 namespace app {
 
 
-// Static functions
+static FuzzySearchDatabase<plugin::Model*> modelDb;
+static bool modelDbInitialized = false;
 
 
-static float modelScore(plugin::Model* model, const std::string& search) {
-	if (search.empty())
-		return 1.f;
-	std::string s;
-	s += model->plugin->brand;
-	s += " ";
-	s += model->plugin->name;
-	s += " ";
-	s += model->name;
-	s += " ";
-	s += model->slug;
-	for (int tagId : model->tags) {
-		// Add all aliases of a tag
-		for (const std::string& alias : tag::tagAliases[tagId]) {
-			s += " ";
-			s += alias;
+static void modelDbInit() {
+	if (modelDbInitialized)
+		return;
+	modelDb.setWeights({1.f, 1.f, 0.25f, 1.f, 0.5f, 0.5f});
+	modelDb.setThreshold(0.5f);
+
+	// Iterate plugins
+	for (plugin::Plugin* plugin : plugin::plugins) {
+		// Iterate model in plugin
+		for (plugin::Model* model : plugin->models) {
+			// Get search fields for model
+			std::string tagStr;
+			for (int tagId : model->tags) {
+				// Add all aliases of a tag
+				for (const std::string& tagAlias : tag::tagAliases[tagId]) {
+					tagStr += tagAlias;
+					tagStr += ", ";
+				}
+			}
+			std::vector<std::string> fields {
+				model->plugin->brand,
+				model->plugin->name,
+				model->plugin->description,
+				model->name,
+				model->description,
+				tagStr,
+			};
+			modelDb.addEntry(model, fields);
 		}
 	}
-	float score = string::fuzzyScore(string::lowercase(s), string::lowercase(search));
-	return score;
+
+	modelDbInitialized = true;
 }
 
-static bool isModelVisible(plugin::Model* model, const std::string& search, const std::string& brand, int tagId) {
-	// Filter search query
-	if (search != "") {
-		float score = modelScore(model, search);
-		if (score <= 0.f)
-			return false;
-	}
-
-	// Filter brand
-	if (brand != "") {
-		if (model->plugin->brand != brand)
-			return false;
-	}
-
-	// Filter tag
-	if (tagId >= 0) {
-		auto it = std::find(model->tags.begin(), model->tags.end(), tagId);
-		if (it == model->tags.end())
-			return false;
-	}
-
-	return true;
-}
 
 static ModuleWidget* chooseModel(plugin::Model* model) {
 	// Create Module and ModuleWidget
@@ -428,12 +419,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelContainer->spacing = math::Vec(10, 10);
 		modelMargin->addChild(modelContainer);
 
-		resetModelContainer();
-
+		resetModelBoxes();
 		clear();
 	}
 
-	void resetModelContainer() {
+	void resetModelBoxes() {
 		modelContainer->clearChildren();
 		// Iterate plugins
 		for (plugin::Plugin* plugin : plugin::plugins) {
@@ -447,6 +437,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 					if (moduleIt == pluginIt->second.end())
 						continue;
 				}
+
 				// Create ModelBox
 				ModelBox* modelBox = new ModelBox;
 				modelBox->setModel(model);
@@ -479,57 +470,82 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
 
-		// Filter ModelBoxes
+		auto isModelVisible = [&](plugin::Model* model, const std::string& brand, int tagId) -> bool {
+			// Filter brand
+			if (brand != "") {
+				if (model->plugin->brand != brand)
+					return false;
+			}
+
+			// Filter tag
+			if (tagId >= 0) {
+				auto it = std::find(model->tags.begin(), model->tags.end(), tagId);
+				if (it == model->tags.end())
+					return false;
+			}
+
+			return true;
+		};
+
+		// Filter ModelBoxes by brand and tag
 		for (Widget* w : modelContainer->children) {
 			ModelBox* m = dynamic_cast<ModelBox*>(w);
 			assert(m);
-			m->visible = isModelVisible(m->model, search, brand, tagId);
+			m->visible = isModelVisible(m->model, brand, tagId);
 		}
 
-		// Sort ModelBoxes
-		modelContainer->children.sort([&](Widget * w1, Widget * w2) {
-			ModelBox* m1 = dynamic_cast<ModelBox*>(w1);
-			ModelBox* m2 = dynamic_cast<ModelBox*>(w2);
-			// Sort by (modifiedTimestamp descending, plugin brand)
-			auto t1 = std::make_tuple(-m1->model->plugin->modifiedTimestamp, m1->model->plugin->brand);
-			auto t2 = std::make_tuple(-m2->model->plugin->modifiedTimestamp, m2->model->plugin->brand);
-			return t1 < t2;
-		});
+		std::map<plugin::Model*, float> prefilteredModelScores;
 
+		// Filter and sort by search results
 		if (search.empty()) {
-			// We've already sorted above
-		}
-		else {
-			std::map<Widget*, float> scores;
-			// Compute scores
+			// Add all models to prefilteredModelScores with scores of 1
 			for (Widget* w : modelContainer->children) {
 				ModelBox* m = dynamic_cast<ModelBox*>(w);
 				assert(m);
-				if (!m->visible)
-					continue;
-				scores[m] = modelScore(m->model, search);
+				prefilteredModelScores[m->model] = 1.f;
 			}
-			// // Sort by score
-			// modelContainer->children.sort([&](Widget *w1, Widget *w2) {
-			// 	// If score was not computed, scores[w] returns 0, but this doesn't matter because those widgets aren't visible.
-			// 	return get(scores, w1, 0.f) > get(scores, w2, 0.f);
-			// });
+
+			// Sort ModelBoxes
+			modelContainer->children.sort([&](Widget * w1, Widget * w2) {
+				ModelBox* m1 = dynamic_cast<ModelBox*>(w1);
+				ModelBox* m2 = dynamic_cast<ModelBox*>(w2);
+				// Sort by (modifiedTimestamp descending, plugin brand)
+				auto t1 = std::make_tuple(-m1->model->plugin->modifiedTimestamp, m1->model->plugin->brand);
+				auto t2 = std::make_tuple(-m2->model->plugin->modifiedTimestamp, m2->model->plugin->brand);
+				return t1 < t2;
+			});
+		}
+		else {
+			// Lazily initialize search database
+			modelDbInit();
+			// Score results against search query
+			auto results = modelDb.search(search);
+			for (auto& result : results) {
+				prefilteredModelScores[result._key] = result._score;
+			}
+			// Sort by score
+			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
+				ModelBox* m1 = dynamic_cast<ModelBox*>(w1);
+				ModelBox* m2 = dynamic_cast<ModelBox*>(w2);
+				// If score was not computed, the ModelBox will not visible so the order doesn't matter.
+				return get(prefilteredModelScores, m1->model, 0.f) > get(prefilteredModelScores, m2->model, 0.f);
+			});
+			// Filter by whether the score is above the threshold
+			for (Widget* w : modelContainer->children) {
+				ModelBox* m = dynamic_cast<ModelBox*>(w);
+				assert(m);
+				if (m->visible) {
+					if (prefilteredModelScores.find(m->model) == prefilteredModelScores.end())
+						m->visible = false;
+				}
+			}
 		}
 
-		// Filter the brand and tag lists
-
-		// Get modules that would be filtered by just the search query
-		std::vector<plugin::Model*> filteredModels;
-		for (Widget* w : modelContainer->children) {
-			ModelBox* m = dynamic_cast<ModelBox*>(w);
-			assert(m);
-			if (isModelVisible(m->model, search, "", -1))
-				filteredModels.push_back(m->model);
-		}
-
-		auto hasModel = [&](const std::string & brand, int tagId) -> bool {
-			for (plugin::Model* model : filteredModels) {
-				if (isModelVisible(model, "", brand, tagId))
+		// Determines if there is at least 1 visible Model with a given brand and tag
+		auto hasVisibleModel = [&](const std::string& brand, int tagId) -> bool {
+			for (auto& pair : prefilteredModelScores) {
+				plugin::Model* model = pair.first;
+				if (isModelVisible(model, brand, tagId))
 					return true;
 			}
 			return false;
@@ -540,7 +556,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget* w : sidebar->brandList->children) {
 			BrandItem* item = dynamic_cast<BrandItem*>(w);
 			assert(item);
-			item->disabled = !hasModel(item->text, tagId);
+			item->disabled = !hasVisibleModel(item->text, tagId);
 			if (!item->disabled)
 				brandsLen++;
 		}
@@ -550,7 +566,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget* w : sidebar->tagList->children) {
 			TagItem* item = dynamic_cast<TagItem*>(w);
 			assert(item);
-			item->disabled = !hasModel(brand, item->tagId);
+			item->disabled = !hasVisibleModel(brand, item->tagId);
 			if (!item->disabled)
 				tagsLen++;
 		}
