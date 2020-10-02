@@ -714,11 +714,23 @@ struct SyncUpdateItem : ui::MenuItem {
 	}
 };
 
+
+struct CheckUpdatesItem : ui::MenuItem {
+	void onAction(const event::Action& e) override {
+		std::thread t([&] {
+			library::checkUpdates();
+		});
+		t.detach();
+	}
+};
+
+
 struct LogOutItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
 		library::logOut();
 	}
 };
+
 
 struct LibraryMenu : ui::Menu {
 	bool loggedIn = false;
@@ -793,6 +805,11 @@ struct LibraryMenu : ui::Menu {
 					addChild(updateItem);
 				}
 			}
+			else if (!settings::autoCheckUpdates) {
+				CheckUpdatesItem* checkUpdatesItem = new CheckUpdatesItem;
+				checkUpdatesItem->text = "Check for updates";
+				addChild(checkUpdatesItem);
+			}
 		}
 	}
 };
@@ -851,6 +868,16 @@ struct AppUpdateItem : ui::MenuItem {
 };
 
 
+struct CheckAppUpdateItem : ui::MenuItem {
+	void onAction(const event::Action& e) override {
+		std::thread t([&]() {
+			library::checkAppUpdate();
+		});
+		t.detach();
+	}
+};
+
+
 struct HelpButton : MenuButton {
 	NotificationIcon* notification;
 
@@ -869,6 +896,11 @@ struct HelpButton : MenuButton {
 			appUpdateItem->text = "Update " + APP_NAME;
 			appUpdateItem->rightText = APP_VERSION + " → " + library::appVersion;
 			menu->addChild(appUpdateItem);
+		}
+		else if (!settings::autoCheckUpdates && !settings::devMode) {
+			CheckAppUpdateItem* checkAppUpdateItem = new CheckAppUpdateItem;
+			checkAppUpdateItem->text = "Check for " + APP_NAME + " update";
+			menu->addChild(checkAppUpdateItem);
 		}
 
 		UrlItem* manualItem = new UrlItem;

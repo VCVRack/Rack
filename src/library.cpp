@@ -16,24 +16,18 @@ namespace rack {
 namespace library {
 
 
-static void queryAppUpdate();
-
-
 void init() {
-	if (settings::devMode)
-		return;
-
-	if (settings::checkAppUpdates) {
+	if (settings::autoCheckUpdates && !settings::devMode) {
 		std::thread t([&]() {
-			queryAppUpdate();
+			checkAppUpdate();
 		});
 		t.detach();
-	}
 
-	std::thread t2([&] {
-		queryUpdates();
-	});
-	t2.detach();
+		std::thread t2([&] {
+			checkUpdates();
+		});
+		t2.detach();
+	}
 }
 
 
@@ -41,7 +35,7 @@ void destroy() {
 }
 
 
-static void queryAppUpdate() {
+void checkAppUpdate() {
 	std::string versionUrl = API_URL + "/version";
 	json_t* resJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
 	if (!resJ) {
@@ -108,7 +102,7 @@ void logIn(const std::string& email, const std::string& password) {
 	const char* tokenStr = json_string_value(tokenJ);
 	settings::token = tokenStr;
 	loginStatus = "";
-	queryUpdates();
+	checkUpdates();
 }
 
 
@@ -118,7 +112,7 @@ void logOut() {
 }
 
 
-void queryUpdates() {
+void checkUpdates() {
 	if (settings::token.empty())
 		return;
 

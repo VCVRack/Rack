@@ -53,7 +53,7 @@ extern std::list<std::string> recentPatchPaths;
 extern std::vector<NVGcolor> cableColors;
 // pluginSlug -> moduleSlugs
 extern std::map<std::string, std::set<std::string>> moduleWhitelist;
-extern bool checkAppUpdates;
+extern bool autoCheckUpdates;
 
 json_t* toJson();
 void fromJson(json_t* rootJ);

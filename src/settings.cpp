@@ -50,7 +50,7 @@ std::vector<NVGcolor> cableColors = {
 	color::fromHexString("#8c1889ff"), // purple
 };
 std::map<std::string, std::set<std::string>> moduleWhitelist = {};
-bool checkAppUpdates = true;
+bool autoCheckUpdates = true;
 
 
 json_t* toJson() {
@@ -120,7 +120,7 @@ json_t* toJson() {
 	}
 	json_object_set_new(rootJ, "moduleWhitelist", moduleWhitelistJ);
 
-	json_object_set_new(rootJ, "checkAppUpdates", json_boolean(checkAppUpdates));
+	json_object_set_new(rootJ, "autoCheckUpdates", json_boolean(autoCheckUpdates));
 
 	return rootJ;
 }
@@ -246,9 +246,9 @@ void fromJson(json_t* rootJ) {
 		}
 	}
 
-	json_t* checkAppUpdatesJ = json_object_get(rootJ, "checkAppUpdates");
-	if (checkAppUpdatesJ)
-		checkAppUpdates = json_boolean_value(checkAppUpdatesJ);
+	json_t* autoCheckUpdatesJ = json_object_get(rootJ, "autoCheckUpdates");
+	if (autoCheckUpdatesJ)
+		autoCheckUpdates = json_boolean_value(autoCheckUpdatesJ);
 }
 
 void save(const std::string& path) {

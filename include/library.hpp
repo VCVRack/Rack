@@ -23,12 +23,13 @@ struct Update {
 void init();
 void destroy();
 
+void checkAppUpdate();
 bool isAppUpdateAvailable();
 
 bool isLoggedIn();
 void logIn(const std::string& email, const std::string& password);
 void logOut();
-void queryUpdates();
+void checkUpdates();
 bool hasUpdates();
 void syncUpdate(const std::string& slug);
 void syncUpdates();
