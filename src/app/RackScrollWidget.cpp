@@ -71,26 +71,15 @@ void RackScrollWidget::step() {
 			offset.y += speed;
 	}
 
+	// Hide scrollbars if fullscreen
+	hideScrollbars = APP->window->isFullScreen();
+
 	ScrollWidget::step();
 	oldOffset = offset;
 }
 
 void RackScrollWidget::draw(const DrawArgs& args) {
-	// Hide scrollbars if full screen
-	bool fullscreen = APP->window->isFullScreen();
-	bool horizontalVisible;
-	bool verticalVisible;
-	if (fullscreen) {
-		horizontalVisible = horizontalScrollbar->visible;
-		verticalVisible = verticalScrollbar->visible;
-		horizontalScrollbar->visible = false;
-		verticalScrollbar->visible = false;
-	}
 	ScrollWidget::draw(args);
-	if (fullscreen) {
-		horizontalScrollbar->visible = horizontalVisible;
-		verticalScrollbar->visible = verticalVisible;
-	}
 }
 
 void RackScrollWidget::onHoverKey(const event::HoverKey& e) {

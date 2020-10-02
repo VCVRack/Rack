@@ -70,8 +70,14 @@ void ScrollWidget::step() {
 	container->box.pos = offset.neg().round();
 
 	// Make scrollbars visible only if there is a positive range to scroll.
-	horizontalScrollbar->setVisible(offsetBounds.size.x > 0.f);
-	verticalScrollbar->setVisible(offsetBounds.size.y > 0.f);
+	if (hideScrollbars) {
+		horizontalScrollbar->setVisible(false);
+		verticalScrollbar->setVisible(false);
+	}
+	else {
+		horizontalScrollbar->setVisible(offsetBounds.size.x > 0.f);
+		verticalScrollbar->setVisible(offsetBounds.size.y > 0.f);
+	}
 
 	// Reposition and resize scroll bars
 	math::Vec inner = box.size.minus(math::Vec(verticalScrollbar->box.size.x, horizontalScrollbar->box.size.y));
@@ -85,10 +91,6 @@ void ScrollWidget::step() {
 void ScrollWidget::onButton(const event::Button& e) {
 	OpaqueWidget::onButton(e);
 	if (e.isConsumed())
-		return;
-
-	// Consume right button only if the scrollbars are visible
-	if (!(horizontalScrollbar->isVisible() || verticalScrollbar->isVisible()))
 		return;
 
 	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
@@ -105,22 +107,16 @@ void ScrollWidget::onDragStart(const event::DragStart& e) {
 
 
 void ScrollWidget::onDragMove(const event::DragMove& e) {
-	// Scroll only if the scrollbars are visible
-	if (!(horizontalScrollbar->isVisible() || verticalScrollbar->isVisible()))
-		return;
-
-	math::Vec offsetDelta = e.mouseDelta.div(getAbsoluteZoom());
-	offset = offset.minus(offsetDelta);
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
+		math::Vec offsetDelta = e.mouseDelta.div(getAbsoluteZoom());
+		offset = offset.minus(offsetDelta);
+	}
 }
 
 
 void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	OpaqueWidget::onHoverScroll(e);
 	if (e.isConsumed())
-		return;
-
-	// Scroll only if the scrollbars are visible
-	if (!(horizontalScrollbar->isVisible() || verticalScrollbar->isVisible()))
 		return;
 
 	math::Vec scrollDelta = e.scrollDelta;
