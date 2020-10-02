@@ -13,15 +13,15 @@ ScrollWidget::ScrollWidget() {
 	container = new widget::Widget;
 	addChild(container);
 
-	horizontalScrollBar = new ScrollBar;
-	horizontalScrollBar->vertical = false;
-	horizontalScrollBar->hide();
-	addChild(horizontalScrollBar);
+	horizontalScrollbar = new Scrollbar;
+	horizontalScrollbar->vertical = false;
+	horizontalScrollbar->hide();
+	addChild(horizontalScrollbar);
 
-	verticalScrollBar = new ScrollBar;
-	verticalScrollBar->vertical = true;
-	verticalScrollBar->hide();
-	addChild(verticalScrollBar);
+	verticalScrollbar = new Scrollbar;
+	verticalScrollbar->vertical = true;
+	verticalScrollbar->hide();
+	addChild(verticalScrollbar);
 }
 
 
@@ -70,15 +70,15 @@ void ScrollWidget::step() {
 	container->box.pos = offset.neg().round();
 
 	// Make scrollbars visible only if there is a positive range to scroll.
-	horizontalScrollBar->setVisible(offsetBounds.size.x > 0.f);
-	verticalScrollBar->setVisible(offsetBounds.size.y > 0.f);
+	horizontalScrollbar->setVisible(offsetBounds.size.x > 0.f);
+	verticalScrollbar->setVisible(offsetBounds.size.y > 0.f);
 
 	// Reposition and resize scroll bars
-	math::Vec inner = box.size.minus(math::Vec(verticalScrollBar->box.size.x, horizontalScrollBar->box.size.y));
-	horizontalScrollBar->box.pos.y = inner.y;
-	verticalScrollBar->box.pos.x = inner.x;
-	horizontalScrollBar->box.size.x = verticalScrollBar->isVisible() ? inner.x : box.size.x;
-	verticalScrollBar->box.size.y = horizontalScrollBar->isVisible() ? inner.y : box.size.y;
+	math::Vec inner = box.size.minus(math::Vec(verticalScrollbar->box.size.x, horizontalScrollbar->box.size.y));
+	horizontalScrollbar->box.pos.y = inner.y;
+	verticalScrollbar->box.pos.x = inner.x;
+	horizontalScrollbar->box.size.x = verticalScrollbar->isVisible() ? inner.x : box.size.x;
+	verticalScrollbar->box.size.y = horizontalScrollbar->isVisible() ? inner.y : box.size.y;
 }
 
 
@@ -88,7 +88,7 @@ void ScrollWidget::onButton(const event::Button& e) {
 		return;
 
 	// Consume right button only if the scrollbars are visible
-	if (!(horizontalScrollBar->isVisible() || verticalScrollBar->isVisible()))
+	if (!(horizontalScrollbar->isVisible() || verticalScrollbar->isVisible()))
 		return;
 
 	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
@@ -106,7 +106,7 @@ void ScrollWidget::onDragStart(const event::DragStart& e) {
 
 void ScrollWidget::onDragMove(const event::DragMove& e) {
 	// Scroll only if the scrollbars are visible
-	if (!(horizontalScrollBar->isVisible() || verticalScrollBar->isVisible()))
+	if (!(horizontalScrollbar->isVisible() || verticalScrollbar->isVisible()))
 		return;
 
 	math::Vec offsetDelta = e.mouseDelta.div(getAbsoluteZoom());
@@ -120,7 +120,7 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 		return;
 
 	// Scroll only if the scrollbars are visible
-	if (!(horizontalScrollBar->isVisible() || verticalScrollBar->isVisible()))
+	if (!(horizontalScrollbar->isVisible() || verticalScrollbar->isVisible()))
 		return;
 
 	math::Vec scrollDelta = e.scrollDelta;

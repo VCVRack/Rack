@@ -1,4 +1,4 @@
-#include <ui/ScrollBar.hpp>
+#include <ui/Scrollbar.hpp>
 #include <ui/ScrollWidget.hpp>
 #include <context.hpp>
 #include <window.hpp>
@@ -11,16 +11,16 @@ namespace ui {
 // Internal not currently used
 
 
-ScrollBar::ScrollBar() {
+Scrollbar::Scrollbar() {
 	box.size = math::Vec(BND_SCROLLBAR_WIDTH, BND_SCROLLBAR_HEIGHT);
 }
 
 
-ScrollBar::~ScrollBar() {
+Scrollbar::~Scrollbar() {
 }
 
 
-void ScrollBar::draw(const DrawArgs& args) {
+void Scrollbar::draw(const DrawArgs& args) {
 	ScrollWidget* sw = dynamic_cast<ScrollWidget*>(parent);
 	assert(sw);
 
@@ -36,7 +36,7 @@ void ScrollBar::draw(const DrawArgs& args) {
 }
 
 
-void ScrollBar::onButton(const event::Button& e) {
+void Scrollbar::onButton(const event::Button& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
 		ScrollWidget* sw = dynamic_cast<ScrollWidget*>(parent);
 		assert(sw);
@@ -58,15 +58,15 @@ void ScrollBar::onButton(const event::Button& e) {
 }
 
 
-void ScrollBar::onDragStart(const event::DragStart& e) {
+void Scrollbar::onDragStart(const event::DragStart& e) {
 }
 
 
-void ScrollBar::onDragEnd(const event::DragEnd& e) {
+void Scrollbar::onDragEnd(const event::DragEnd& e) {
 }
 
 
-void ScrollBar::onDragMove(const event::DragMove& e) {
+void Scrollbar::onDragMove(const event::DragMove& e) {
 	ScrollWidget* sw = dynamic_cast<ScrollWidget*>(parent);
 	assert(sw);
 

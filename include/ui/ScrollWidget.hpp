@@ -1,24 +1,25 @@
 #pragma once
 #include <ui/common.hpp>
 #include <widget/OpaqueWidget.hpp>
-#include <ui/ScrollBar.hpp>
+#include <ui/Scrollbar.hpp>
 
 
 namespace rack {
 namespace ui {
 
 
-/** Handles a container with ScrollBar */
+/** Handles a container with Scrollbar */
 struct ScrollWidget : widget::OpaqueWidget {
 	struct Internal;
 	Internal* internal;
 
 	widget::Widget* container;
-	ScrollBar* horizontalScrollBar;
-	ScrollBar* verticalScrollBar;
+	Scrollbar* horizontalScrollbar;
+	Scrollbar* verticalScrollbar;
 
 	math::Vec offset;
 	math::Rect containerBox;
+	bool hideScrollbars = false;
 
 	ScrollWidget();
 	void scrollTo(math::Rect r);

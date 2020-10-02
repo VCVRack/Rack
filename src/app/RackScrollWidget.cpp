@@ -81,15 +81,15 @@ void RackScrollWidget::draw(const DrawArgs& args) {
 	bool horizontalVisible;
 	bool verticalVisible;
 	if (fullscreen) {
-		horizontalVisible = horizontalScrollBar->visible;
-		verticalVisible = verticalScrollBar->visible;
-		horizontalScrollBar->visible = false;
-		verticalScrollBar->visible = false;
+		horizontalVisible = horizontalScrollbar->visible;
+		verticalVisible = verticalScrollbar->visible;
+		horizontalScrollbar->visible = false;
+		verticalScrollbar->visible = false;
 	}
 	ScrollWidget::draw(args);
 	if (fullscreen) {
-		horizontalScrollBar->visible = horizontalVisible;
-		verticalScrollBar->visible = verticalVisible;
+		horizontalScrollbar->visible = horizontalVisible;
+		verticalScrollbar->visible = verticalVisible;
 	}
 }
 
