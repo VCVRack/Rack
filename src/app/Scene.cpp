@@ -4,6 +4,7 @@
 
 #include <app/Scene.hpp>
 #include <app/ModuleBrowser.hpp>
+#include <app/MenuBar.hpp>
 #include <context.hpp>
 #include <system.hpp>
 #include <network.hpp>

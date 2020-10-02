@@ -4,6 +4,7 @@
 #include <osdialog.h>
 
 #include <app/MenuBar.hpp>
+#include <widget/OpaqueWidget.hpp>
 #include <window.hpp>
 #include <engine/Engine.hpp>
 #include <asset.hpp>
@@ -931,15 +932,18 @@ struct HelpButton : MenuButton {
 // MenuBar
 ////////////////////
 
-void MenuBar::draw(const DrawArgs& args) {
-	bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
-	bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 
-	Widget::draw(args);
-}
+struct MenuBar : widget::OpaqueWidget {
+	void draw(const DrawArgs& args) override {
+		bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
+		bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
+
+		Widget::draw(args);
+	}
+};
 
 
-MenuBar* createMenuBar() {
+widget::Widget* createMenuBar() {
 	MenuBar* menuBar = new MenuBar;
 
 	const float margin = 5;
