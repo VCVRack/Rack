@@ -1,6 +1,4 @@
 #pragma once
-#include <jansson.h>
-
 #include <common.hpp>
 #include <math.hpp>
 
@@ -20,9 +18,6 @@ struct Param {
 	void setValue(float value) {
 		this->value = value;
 	}
-
-	json_t* toJson();
-	void fromJson(json_t* rootJ);
 };
 
 

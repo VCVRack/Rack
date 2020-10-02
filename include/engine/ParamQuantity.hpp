@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 
+#include <jansson.h>
+
 #include <Quantity.hpp>
 #include <engine/Param.hpp>
 
@@ -80,6 +82,9 @@ struct ParamQuantity : Quantity {
 	void randomize() override;
 
 	virtual std::string getDescription();
+
+	virtual json_t* toJson();
+	virtual void fromJson(json_t* rootJ);
 };
 
 

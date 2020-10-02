@@ -147,6 +147,20 @@ std::string ParamQuantity::getDescription() {
 }
 
 
+json_t* ParamQuantity::toJson() {
+	json_t* rootJ = json_object();
+	json_object_set_new(rootJ, "value", json_real(getValue()));
+	return rootJ;
+}
+
+
+void ParamQuantity::fromJson(json_t* rootJ) {
+	json_t* valueJ = json_object_get(rootJ, "value");
+	if (valueJ)
+		setValue(json_number_value(valueJ));
+}
+
+
 std::string SwitchQuantity::getDisplayValueString() {
 	int index = (int) std::floor(getValue());
 	if (!(0 <= index && index < (int) labels.size()))

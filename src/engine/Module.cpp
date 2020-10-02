@@ -189,12 +189,12 @@ void Module::fromJson(json_t* rootJ) {
 
 json_t* Module::paramsToJson() {
 	json_t* rootJ = json_array();
-	for (size_t paramId = 0; paramId < params.size(); paramId++) {
+	for (size_t paramId = 0; paramId < paramQuantities.size(); paramId++) {
 		// Don't serialize unbounded Params
 		if (!paramQuantities[paramId]->isBounded())
 			continue;
 
-		json_t* paramJ = params[paramId].toJson();
+		json_t* paramJ = paramQuantities[paramId]->toJson();
 
 		json_object_set_new(paramJ, "id", json_integer(paramId));
 
@@ -221,7 +221,7 @@ void Module::paramsFromJson(json_t* rootJ) {
 			paramId = i;
 
 		// Check ID bounds
-		if (paramId >= params.size())
+		if (paramId >= paramQuantities.size())
 			continue;
 
 		// Check that the Param is bounded
@@ -230,7 +230,7 @@ void Module::paramsFromJson(json_t* rootJ) {
 
 		json_t* valueJ = json_object_get(paramJ, "value");
 		if (valueJ)
-			params[paramId].setValue(json_number_value(valueJ));
+			paramQuantities[paramId]->setValue(json_number_value(valueJ));
 	}
 }
 
