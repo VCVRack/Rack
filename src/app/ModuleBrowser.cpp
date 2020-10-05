@@ -34,7 +34,7 @@ namespace rack {
 namespace app {
 
 
-static FuzzySearchDatabase<plugin::Model*> modelDb;
+static fuzzysearch::Database<plugin::Model*> modelDb;
 static bool modelDbInitialized = false;
 
 
@@ -520,8 +520,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			modelDbInit();
 			// Score results against search query
 			auto results = modelDb.search(search);
+			// DEBUG("=============");
 			for (auto& result : results) {
-				prefilteredModelScores[result._key] = result._score;
+				prefilteredModelScores[result.key] = result.score;
+				// DEBUG("%s %s\t\t%f", result._key->plugin->slug.c_str(), result._key->slug.c_str(), result._score);
 			}
 			// Sort by score
 			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
