@@ -25,3 +25,6 @@
 [submodule "dep/fuzzysearchdatabase"]
 	path = dep/fuzzysearchdatabase
 	url = https://bitbucket.org/j_norberg/fuzzysearchdatabase.git
+[submodule "dep/filesystem"]
+	path = dep/filesystem
+	url = https://github.com/gulrak/filesystem.git

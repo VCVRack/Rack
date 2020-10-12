@@ -54,6 +54,7 @@ oui-blendish = include/blendish.h
 osdialog = include/osdialog.h
 pffft = include/pffft.h
 fuzzysearchdatabase = include/FuzzySearchDatabase.hpp
+ghcfilesystem = include/ghc/filesystem.hpp
 
 DEPS += $(glew)
 DEPS += $(glfw)
@@ -70,6 +71,7 @@ DEPS += $(oui-blendish)
 DEPS += $(osdialog)
 DEPS += $(pffft)
 DEPS += $(fuzzysearchdatabase)
+DEPS += $(ghcfilesystem)
 
 
 DEP_LOCAL := .
@@ -249,6 +251,10 @@ $(pffft): | pffft
 $(fuzzysearchdatabase): fuzzysearchdatabase/src/FuzzySearchDatabase.hpp
 	mkdir -p include
 	cp $^ include/
+
+$(ghcfilesystem): filesystem/include/ghc
+	mkdir -p include
+	cp -r $^ include/
 
 # Helpers
 

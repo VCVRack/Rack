@@ -1,7 +1,7 @@
 #include <thread>
 #include <regex>
 #include <chrono>
-#include <experimental/filesystem>
+#include <ghc/filesystem.hpp>
 
 #include <dirent.h>
 #include <sys/stat.h>
@@ -43,7 +43,7 @@ Important: When using `fs::path`, always convert strings to UTF-8 using
 In fact, it's best to work only with strings to avoid forgetting to decode a string as UTF-8.
 The need to do this is a fatal flaw of `fs::path`, but at least `std::filesystem` has some helpful operations.
 */
-namespace fs = std::experimental::filesystem;
+namespace fs = ghc::filesystem;
 
 
 namespace rack {
@@ -415,7 +415,7 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 		std::string entryPath = archive_entry_pathname(entry);
 		if (!fs::u8path(entryPath).is_relative())
 			throw Exception(string::f("Unarchiver does not support absolute tar paths: %s", entryPath.c_str()));
-		entryPath = fs::absolute(fs::u8path(entryPath), fs::u8path(folderPath)).generic_u8string();
+		entryPath = fs::relative(fs::u8path(entryPath), fs::u8path(folderPath)).generic_u8string();
 #if defined ARCH_WIN
 		archive_entry_copy_pathname_w(entry, string::U8toU16(entryPath).c_str());
 #else
