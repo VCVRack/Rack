@@ -700,7 +700,7 @@ void Engine::addModule(Module* module) {
 	// Set ID if unset or collides with an existing ID
 	while (module->id < 0 || internal->modulesCache.find(module->id) != internal->modulesCache.end()) {
 		// Randomly generate ID
-		module->id = random::u64() % (1ul << 53);
+		module->id = random::u64() % (1ull << 53);
 	}
 	// Add module
 	internal->modules.push_back(module);
@@ -872,7 +872,7 @@ void Engine::addCable(Cable* cable) {
 	// Set ID if unset or collides with an existing ID
 	while (cable->id < 0 || internal->cablesCache.find(cable->id) != internal->cablesCache.end()) {
 		// Randomly generate ID
-		cable->id = random::u64() % (1ul << 53);
+		cable->id = random::u64() % (1ull << 53);
 	}
 	// Add the cable
 	internal->cables.push_back(cable);
