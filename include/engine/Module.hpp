@@ -11,6 +11,7 @@
 #include <engine/Light.hpp>
 #include <engine/ParamQuantity.hpp>
 #include <engine/PortInfo.hpp>
+#include <engine/LightInfo.hpp>
 
 
 namespace rack {
@@ -43,9 +44,15 @@ struct Module {
 	std::vector<Input> inputs;
 	std::vector<Output> outputs;
 	std::vector<Light> lights;
+
+	/** Arrays of components.
+	Initialized with configParam(), configInput(), configOutput(), and configLight().
+	LightInfos are initialized to null unless configLight() is called.
+	*/
 	std::vector<ParamQuantity*> paramQuantities;
 	std::vector<PortInfo*> inputInfos;
 	std::vector<PortInfo*> outputInfos;
+	std::vector<LightInfo*> lightInfos;
 
 	/** Represents a message-passing channel for an adjacent module. */
 	struct Expander {
@@ -150,13 +157,13 @@ struct Module {
 		if (inputInfos[portId])
 			delete inputInfos[portId];
 
-		TPortInfo* p = new TPortInfo;
-		p->module = this;
-		p->type = Port::INPUT;
-		p->portId = portId;
-		p->name = name;
-		inputInfos[portId] = p;
-		return p;
+		TPortInfo* info = new TPortInfo;
+		info->module = this;
+		info->type = Port::INPUT;
+		info->portId = portId;
+		info->name = name;
+		inputInfos[portId] = info;
+		return info;
 	}
 
 	/** Helper for creating a PortInfo for an output port and setting its properties.
@@ -168,13 +175,31 @@ struct Module {
 		if (outputInfos[portId])
 			delete outputInfos[portId];
 
-		TPortInfo* p = new TPortInfo;
-		p->module = this;
-		p->type = Port::OUTPUT;
-		p->portId = portId;
-		p->name = name;
-		outputInfos[portId] = p;
-		return p;
+		TPortInfo* info = new TPortInfo;
+		info->module = this;
+		info->type = Port::OUTPUT;
+		info->portId = portId;
+		info->name = name;
+		outputInfos[portId] = info;
+		return info;
+	}
+
+	/** Helper for creating a LightInfo and setting its properties.
+	For multi-colored lights, use the first lightId.
+	See LightInfo for documentation of arguments.
+	*/
+	template <class TLightInfo = LightInfo>
+	TLightInfo* configLight(int lightId, std::string name = "") {
+		assert(lightId < (int) lights.size() && lightId < (int) lightInfos.size());
+		if (lightInfos[lightId])
+			delete lightInfos[lightId];
+
+		TLightInfo* info = new TLightInfo;
+		info->module = this;
+		info->lightId = lightId;
+		info->name = name;
+		lightInfos[lightId] = info;
+		return info;
 	}
 
 	/** Adds a direct route from an input to an output when the module is bypassed.

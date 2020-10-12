@@ -107,20 +107,24 @@ engine::PortInfo* PortWidget::getPortInfo() {
 }
 
 void PortWidget::createTooltip() {
-	if (settings::paramTooltip && !this->tooltip && module) {
-		PortTooltip* tooltip = new PortTooltip;
-		tooltip->portWidget = this;
-		APP->scene->addChild(tooltip);
-		this->tooltip = tooltip;
-	}
+	if (!settings::tooltips)
+		return;
+	if (this->tooltip)
+		return;
+	if (!module)
+		return;
+	PortTooltip* tooltip = new PortTooltip;
+	tooltip->portWidget = this;
+	APP->scene->addChild(tooltip);
+	this->tooltip = tooltip;
 }
 
 void PortWidget::destroyTooltip() {
-	if (tooltip) {
-		APP->scene->removeChild(tooltip);
-		delete tooltip;
-		tooltip = NULL;
-	}
+	if (!tooltip)
+		return;
+	APP->scene->removeChild(tooltip);
+	delete tooltip;
+	tooltip = NULL;
 }
 
 void PortWidget::step() {
@@ -169,12 +173,10 @@ void PortWidget::onButton(const event::Button& e) {
 }
 
 void PortWidget::onEnter(const event::Enter& e) {
-	hovered = true;
 	createTooltip();
 }
 
 void PortWidget::onLeave(const event::Leave& e) {
-	hovered = false;
 	destroyTooltip();
 }
 

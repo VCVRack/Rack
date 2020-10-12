@@ -28,7 +28,7 @@ KnobMode knobMode = KNOB_MODE_LINEAR;
 float knobLinearSensitivity = 0.001f;
 float sampleRate = 44100.0;
 int threadCount = 1;
-bool paramTooltip = true;
+bool tooltips = true;
 bool cpuMeter = false;
 bool lockModules = false;
 #if defined ARCH_MAC
@@ -82,7 +82,7 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "threadCount", json_integer(threadCount));
 
-	json_object_set_new(rootJ, "paramTooltip", json_boolean(paramTooltip));
+	json_object_set_new(rootJ, "tooltips", json_boolean(tooltips));
 
 	json_object_set_new(rootJ, "cpuMeter", json_boolean(cpuMeter));
 
@@ -180,9 +180,9 @@ void fromJson(json_t* rootJ) {
 	if (threadCountJ)
 		threadCount = json_integer_value(threadCountJ);
 
-	json_t* paramTooltipJ = json_object_get(rootJ, "paramTooltip");
-	if (paramTooltipJ)
-		paramTooltip = json_boolean_value(paramTooltipJ);
+	json_t* tooltipsJ = json_object_get(rootJ, "tooltips");
+	if (tooltipsJ)
+		tooltips = json_boolean_value(tooltipsJ);
 
 	json_t* cpuMeterJ = json_object_get(rootJ, "cpuMeter");
 	if (cpuMeterJ)

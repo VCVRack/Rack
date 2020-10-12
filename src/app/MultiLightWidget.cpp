@@ -6,6 +6,11 @@ namespace rack {
 namespace app {
 
 
+int MultiLightWidget::getNumColors() {
+	return baseColors.size();
+}
+
+
 void MultiLightWidget::addBaseColor(NVGcolor baseColor) {
 	baseColors.push_back(baseColor);
 }

@@ -34,6 +34,10 @@ Module::~Module() {
 		if (outputInfo)
 			delete outputInfo;
 	}
+	for (LightInfo* lightInfo : lightInfos) {
+		if (lightInfo)
+			delete lightInfo;
+	}
 	delete internal;
 }
 
@@ -59,6 +63,8 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 	for (int i = 0; i < numOutputs; i++) {
 		configOutput(i);
 	}
+	// Initialize LightInfos with null
+	lightInfos.resize(numLights);
 }
 
 

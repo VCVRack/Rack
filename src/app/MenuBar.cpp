@@ -341,9 +341,9 @@ struct CableTensionSlider : ui::Slider {
 	}
 };
 
-struct ParamTooltipItem : ui::MenuItem {
+struct TooltipsItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
-		settings::paramTooltip ^= true;
+		settings::tooltips ^= true;
 	}
 };
 
@@ -423,10 +423,10 @@ struct ViewButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		ParamTooltipItem* paramTooltipItem = new ParamTooltipItem;
-		paramTooltipItem->text = "Show tooltips";
-		paramTooltipItem->rightText = CHECKMARK(settings::paramTooltip);
-		menu->addChild(paramTooltipItem);
+		TooltipsItem* tooltipsItem = new TooltipsItem;
+		tooltipsItem->text = "Show tooltips";
+		tooltipsItem->rightText = CHECKMARK(settings::tooltips);
+		menu->addChild(tooltipsItem);
 
 		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
 		allowCursorLockItem->text = "Lock cursor when dragging parameters";

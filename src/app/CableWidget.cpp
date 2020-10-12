@@ -5,6 +5,7 @@
 #include <context.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
+#include <event.hpp>
 #include <engine/Engine.hpp>
 #include <engine/Port.hpp>
 
@@ -189,17 +190,18 @@ void CableWidget::draw(const DrawArgs& args) {
 
 	if (isComplete()) {
 		engine::Output* output = &cable->outputModule->outputs[cable->outputId];
-		// Draw opaque if mouse is hovering over a connected port
+		// Increase thickness if output port is polyphonic
 		if (output->channels > 1) {
-			// Increase thickness if output port is polyphonic
 			thickness = 9;
 		}
 
-		if (outputPort->hovered || inputPort->hovered) {
+		// Draw opaque if mouse is hovering over a connected port
+		Widget* hoveredWidget = APP->event->hoveredWidget;
+		if (outputPort == hoveredWidget || inputPort == hoveredWidget) {
 			opacity = 1.0;
 		}
+		// Draw translucent cable if not active (i.e. 0 channels)
 		else if (output->channels == 0) {
-			// Draw translucent cable if not active (i.e. 0 channels)
 			opacity *= 0.5;
 		}
 	}

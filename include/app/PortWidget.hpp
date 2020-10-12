@@ -18,7 +18,6 @@ struct PortWidget : widget::OpaqueWidget {
 	int portId;
 
 	ui::Tooltip* tooltip = NULL;
-	bool hovered = false;
 
 	MultiLightWidget* plugLight;
 

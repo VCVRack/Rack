@@ -152,20 +152,24 @@ engine::ParamQuantity* ParamWidget::getParamQuantity() {
 }
 
 void ParamWidget::createTooltip() {
-	if (settings::paramTooltip && !this->tooltip && module) {
-		ParamTooltip* tooltip = new ParamTooltip;
-		tooltip->paramWidget = this;
-		APP->scene->addChild(tooltip);
-		this->tooltip = tooltip;
-	}
+	if (!settings::tooltips)
+		return;
+	if (this->tooltip)
+		return;
+	if (!module)
+		return;
+	ParamTooltip* tooltip = new ParamTooltip;
+	tooltip->paramWidget = this;
+	APP->scene->addChild(tooltip);
+	this->tooltip = tooltip;
 }
 
 void ParamWidget::destroyTooltip() {
-	if (tooltip) {
-		APP->scene->removeChild(tooltip);
-		delete tooltip;
-		tooltip = NULL;
-	}
+	if (!tooltip)
+		return;
+	APP->scene->removeChild(tooltip);
+	delete tooltip;
+	tooltip = NULL;
 }
 
 void ParamWidget::step() {

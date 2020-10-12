@@ -42,7 +42,7 @@ extern KnobMode knobMode;
 extern float knobLinearSensitivity;
 extern float sampleRate;
 extern int threadCount;
-extern bool paramTooltip;
+extern bool tooltips;
 extern bool cpuMeter;
 extern bool lockModules;
 extern int frameSwapInterval;
