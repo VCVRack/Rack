@@ -415,7 +415,7 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 		std::string entryPath = archive_entry_pathname(entry);
 		if (!fs::u8path(entryPath).is_relative())
 			throw Exception(string::f("Unarchiver does not support absolute tar paths: %s", entryPath.c_str()));
-		entryPath = fs::relative(fs::u8path(entryPath), fs::u8path(folderPath)).generic_u8string();
+		entryPath = (fs::u8path(folderPath) / fs::u8path(entryPath)).generic_u8string();
 #if defined ARCH_WIN
 		archive_entry_copy_pathname_w(entry, string::U8toU16(entryPath).c_str());
 #else

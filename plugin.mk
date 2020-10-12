@@ -20,6 +20,9 @@ FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
 LDFLAGS += -shared
 LDFLAGS += -L$(RACK_DIR) -lRack
 
+# Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
+LDFLAGS += -static-libstdc++
+
 include $(RACK_DIR)/arch.mk
 
 ifdef ARCH_LIN
@@ -71,10 +74,10 @@ else
 	cp -r --parents $(DISTRIBUTABLES) dist/"$(SLUG)"/
 endif
 	@# Create ZIP package
-	cd dist && zip -q -9 -r "$(SLUG)"-"$(VERSION)"-$(ARCH).zip "$(SLUG)"
+	cd dist && ZSTD_CLEVEL=19 tar -cf "$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin --zstd "$(SLUG)"
 
 install: dist
-	cp dist/"$(SLUG)"-"$(VERSION)"-$(ARCH).zip $(RACK_USER_DIR)/plugins-v2/
+	cp dist/"$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin $(RACK_USER_DIR)/plugins-v2/
 
 .PHONY: clean dist
 .DEFAULT_GOAL := all
