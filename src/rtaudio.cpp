@@ -5,7 +5,7 @@
 #ifndef __clang__
 	#pragma GCC diagnostic ignored "-Wsuggest-override"
 #endif
-#include <rtaudio/RtAudio.h>
+#include <RtAudio.h>
 #pragma GCC diagnostic pop
 
 #include <rtaudio.hpp>
