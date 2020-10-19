@@ -55,6 +55,7 @@ struct Widget : WeakBase {
 	Returns `Rect(Vec(inf, inf), Vec(-inf, -inf))` if there are no children.
 	*/
 	virtual math::Rect getChildrenBoundingBox();
+	virtual math::Rect getVisibleChildrenBoundingBox();
 	/**  Returns `v` (given in local coordinates) transformed into the coordinate system of `relative`.
 	*/
 	virtual math::Vec getRelativeOffset(math::Vec v, Widget* relative);

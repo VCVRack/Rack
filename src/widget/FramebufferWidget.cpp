@@ -77,7 +77,7 @@ void FramebufferWidget::step() {
 		localBox = box.zeroPos();
 	}
 	else {
-		localBox = getChildrenBoundingBox();
+		localBox = getVisibleChildrenBoundingBox();
 	}
 
 	// DEBUG("rendering FramebufferWidget localBox (%g %g %g %g) fbOffset (%g %g) fbScale (%g %g)", RECT_ARGS(localBox), VEC_ARGS(internal->fbOffsetF), VEC_ARGS(internal->fbScale));

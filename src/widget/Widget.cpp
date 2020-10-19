@@ -94,6 +94,19 @@ math::Rect Widget::getChildrenBoundingBox() {
 }
 
 
+math::Rect Widget::getVisibleChildrenBoundingBox() {
+	math::Vec min = math::Vec(INFINITY, INFINITY);
+	math::Vec max = math::Vec(-INFINITY, -INFINITY);
+	for (Widget* child : children) {
+		if (!child->isVisible())
+			continue;
+		min = min.min(child->box.getTopLeft());
+		max = max.max(child->box.getBottomRight());
+	}
+	return math::Rect::fromMinMax(min, max);
+}
+
+
 math::Vec Widget::getRelativeOffset(math::Vec v, Widget* relative) {
 	if (this == relative)
 		return v;

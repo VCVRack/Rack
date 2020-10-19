@@ -60,7 +60,7 @@ void ScrollWidget::step() {
 	Widget::step();
 
 	// Set containerBox cache
-	containerBox = container->getChildrenBoundingBox();
+	containerBox = container->getVisibleChildrenBoundingBox();
 
 	// Clamp scroll offset
 	math::Rect offsetBounds = getContainerOffsetBound();
@@ -93,6 +93,11 @@ void ScrollWidget::onButton(const event::Button& e) {
 	if (e.isConsumed())
 		return;
 
+	// Check if scrollable
+	math::Rect offsetBound = getContainerOffsetBound();
+	if (offsetBound.size.x <= 0.f && offsetBound.size.y <= 0.f)
+		return;
+
 	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
 		e.consume(this);
 	}
@@ -100,6 +105,11 @@ void ScrollWidget::onButton(const event::Button& e) {
 
 
 void ScrollWidget::onDragStart(const event::DragStart& e) {
+	// Check if scrollable
+	math::Rect offsetBound = getContainerOffsetBound();
+	if (offsetBound.size.x <= 0.f && offsetBound.size.y <= 0.f)
+		return;
+
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
 		e.consume(this);
 	}
@@ -117,6 +127,11 @@ void ScrollWidget::onDragMove(const event::DragMove& e) {
 void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	OpaqueWidget::onHoverScroll(e);
 	if (e.isConsumed())
+		return;
+
+	// Check if scrollable
+	math::Rect offsetBound = getContainerOffsetBound();
+	if (offsetBound.size.x <= 0.f && offsetBound.size.y <= 0.f)
 		return;
 
 	math::Vec scrollDelta = e.scrollDelta;
@@ -137,6 +152,11 @@ void ScrollWidget::onHoverKey(const event::HoverKey& e) {
 	if (e.isConsumed())
 		return;
 
+	// Check if scrollable
+	math::Rect offsetBound = getContainerOffsetBound();
+	if (offsetBound.size.x <= 0.f && offsetBound.size.y <= 0.f)
+		return;
+
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		if (e.key == GLFW_KEY_PAGE_UP && (e.mods & RACK_MOD_MASK) == 0) {
 			offset.y -= box.size.y * 0.5;
@@ -155,22 +175,22 @@ void ScrollWidget::onHoverKey(const event::HoverKey& e) {
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == 0) {
-			math::Rect containerBox = container->getChildrenBoundingBox();
+			math::Rect containerBox = container->getVisibleChildrenBoundingBox();
 			offset.y = containerBox.getTop();
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-			math::Rect containerBox = container->getChildrenBoundingBox();
+			math::Rect containerBox = container->getVisibleChildrenBoundingBox();
 			offset.x = containerBox.getLeft();
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_END && (e.mods & RACK_MOD_MASK) == 0) {
-			math::Rect containerBox = container->getChildrenBoundingBox();
+			math::Rect containerBox = container->getVisibleChildrenBoundingBox();
 			offset.y = containerBox.getBottom();
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_END && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-			math::Rect containerBox = container->getChildrenBoundingBox();
+			math::Rect containerBox = container->getVisibleChildrenBoundingBox();
 			offset.x = containerBox.getRight();
 			e.consume(this);
 		}
