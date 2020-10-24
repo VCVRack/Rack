@@ -628,11 +628,10 @@ struct LogInItem : ui::MenuItem {
 
 struct SyncUpdatesItem : ui::MenuItem {
 	void step() override {
-		disabled = true;
 		if (library::updateStatus != "") {
 			text = library::updateStatus;
 		}
-		else if (library::updatingPlugins || library::updatingSlug != "") {
+		else if (library::isSyncing) {
 			text = "Updating...";
 		}
 		else if (!library::hasUpdates()) {
@@ -640,8 +639,9 @@ struct SyncUpdatesItem : ui::MenuItem {
 		}
 		else {
 			text = "Update all";
-			disabled = false;
 		}
+
+		disabled = library::isSyncing || !library::hasUpdates();
 		MenuItem::step();
 	}
 
@@ -659,47 +659,55 @@ struct SyncUpdateItem : ui::MenuItem {
 
 	void setUpdate(const std::string& slug) {
 		this->slug = slug;
-		auto it = library::updates.find(slug);
-		if (it == library::updates.end())
-			return;
 
-		text = it->second.name;
-		plugin::Plugin* p = plugin::getPlugin(slug);
-		if (p) {
-			rightText += "v" + p->version + " → ";
-		}
-		rightText += "v" + it->second.version;
+		auto it = library::updateInfos.find(slug);
+		if (it == library::updateInfos.end())
+			return;
+		library::UpdateInfo update = it->second;
+
+		text = update.name;
 	}
 
 	ui::Menu* createChildMenu() override {
-		auto it = library::updates.find(slug);
-		if (it == library::updates.end())
+		auto it = library::updateInfos.find(slug);
+		if (it == library::updateInfos.end())
 			return NULL;
+		library::UpdateInfo update = it->second;
 
-		if (it->second.changelogUrl == "")
+		if (update.changelogUrl == "")
 			return NULL;
 
 		ui::Menu* menu = new ui::Menu;
 
 		UrlItem* changelogUrl = new UrlItem;
 		changelogUrl->text = "Changelog";
-		changelogUrl->url = it->second.changelogUrl;
+		changelogUrl->url = update.changelogUrl;
 		menu->addChild(changelogUrl);
 
 		return menu;
 	}
 
 	void step() override {
-		disabled = library::isSyncing();
+		disabled = library::isSyncing;
 
-		auto it = library::updates.find(slug);
-		if (it != library::updates.end()) {
-			if (it->second.progress >= 1) {
+		auto it = library::updateInfos.find(slug);
+		if (it != library::updateInfos.end()) {
+			library::UpdateInfo update = it->second;
+
+			if (update.downloaded) {
 				rightText = CHECKMARK_STRING;
 				disabled = true;
 			}
-			else if (it->second.progress > 0) {
-				rightText = string::f("%.0f%%", it->second.progress * 100.f);
+			else if (slug == library::updateSlug) {
+				rightText = string::f("%.0f%%", library::updateProgress * 100.f);
+			}
+			else {
+				rightText = "";
+				plugin::Plugin* p = plugin::getPlugin(slug);
+				if (p) {
+					rightText += "v" + p->version + " → ";
+				}
+				rightText += "v" + update.version;
 			}
 		}
 
@@ -793,14 +801,14 @@ struct LibraryMenu : ui::Menu {
 			syncItem->text = "Update all";
 			addChild(syncItem);
 
-			if (!library::updates.empty()) {
+			if (!library::updateInfos.empty()) {
 				addChild(new ui::MenuSeparator);
 
 				ui::MenuLabel* updatesLabel = new ui::MenuLabel;
 				updatesLabel->text = "Updates";
 				addChild(updatesLabel);
 
-				for (auto& pair : library::updates) {
+				for (auto& pair : library::updateInfos) {
 					SyncUpdateItem* updateItem = new SyncUpdateItem;
 					updateItem->setUpdate(pair.first);
 					addChild(updateItem);

@@ -12,11 +12,11 @@ namespace rack {
 namespace library {
 
 
-struct Update {
+struct UpdateInfo {
 	std::string name;
 	std::string version;
 	std::string changelogUrl;
-	float progress = 0.f;
+	bool downloaded = false;
 };
 
 
@@ -33,7 +33,6 @@ void checkUpdates();
 bool hasUpdates();
 void syncUpdate(const std::string& slug);
 void syncUpdates();
-bool isSyncing();
 
 
 extern std::string appVersion;
@@ -41,11 +40,14 @@ extern std::string appDownloadUrl;
 extern std::string appChangelogUrl;
 
 extern std::string loginStatus;
-// plugin slug -> Update
-extern std::map<std::string, Update> updates;
+// plugin slug -> UpdateInfo
+extern std::map<std::string, UpdateInfo> updateInfos;
 extern std::string updateStatus;
-extern std::string updatingSlug;
-extern bool updatingPlugins;
+extern std::string updateSlug;
+extern float updateProgress;
+/** Whether plugins are currently downloading. */
+extern bool isSyncing;
+/** Whether the UI should ask the user to restart after updating plugins. */
 extern bool restartRequested;
 
 

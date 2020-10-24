@@ -1,4 +1,6 @@
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #include <library.hpp>
 #include <settings.hpp>
@@ -16,6 +18,26 @@ namespace rack {
 namespace library {
 
 
+static std::mutex updatesLoopMutex;
+static std::condition_variable updatesLoopCv;
+static bool updatesLoopRunning = false;
+
+
+static void checkUpdatesLoop() {
+	updatesLoopRunning = true;
+	while (updatesLoopRunning) {
+		checkUpdates();
+
+		// Sleep a few seconds, or wake up when destroy() is called
+		std::unique_lock<std::mutex> lock(updatesLoopMutex);
+		auto duration = std::chrono::seconds(60);
+		if (!updatesLoopRunning)
+			break;
+		updatesLoopCv.wait_for(lock, duration, []() {return !updatesLoopRunning;});
+	}
+}
+
+
 void init() {
 	if (settings::autoCheckUpdates && !settings::devMode) {
 		std::thread t([&]() {
@@ -24,7 +46,7 @@ void init() {
 		t.detach();
 
 		std::thread t2([&] {
-			checkUpdates();
+			checkUpdatesLoop();
 		});
 		t2.detach();
 	}
@@ -32,6 +54,12 @@ void init() {
 
 
 void destroy() {
+	// Stop checkUpdatesLoop thread if it's running
+	{
+		std::lock_guard<std::mutex> lock(updatesLoopMutex);
+		updatesLoopRunning = false;
+		updatesLoopCv.notify_all();
+	}
 }
 
 
@@ -108,25 +136,32 @@ void logIn(const std::string& email, const std::string& password) {
 
 void logOut() {
 	settings::token = "";
-	updates.clear();
+	updateInfos.clear();
 }
 
+
+static network::CookieMap getTokenCookies() {
+	network::CookieMap cookies;
+	cookies["token"] = settings::token;
+	return cookies;
+}
 
 void checkUpdates() {
 	if (settings::token.empty())
 		return;
 
-	updates.clear();
+	// Refuse to check for updates while updating plugins
+	if (isSyncing)
+		return;
+
 	updateStatus = "Querying for updates...";
 
 	// Get user's plugins list
 	std::string pluginsUrl = API_URL + "/plugins";
-	network::CookieMap cookies;
-	cookies["token"] = settings::token;
-	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, NULL, cookies);
+	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, NULL, getTokenCookies());
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
-		updateStatus = "Could not query updates";
+		updateStatus = "Could not query plugins";
 		return;
 	}
 	DEFER({json_decref(pluginsResJ);});
@@ -134,7 +169,7 @@ void checkUpdates() {
 	json_t* errorJ = json_object_get(pluginsResJ, "error");
 	if (errorJ) {
 		WARN("Request for user's plugins returned an error: %s", json_string_value(errorJ));
-		updateStatus = "Could not query updates";
+		updateStatus = "Could not query plugins";
 		return;
 	}
 
@@ -157,7 +192,6 @@ void checkUpdates() {
 	size_t pluginIndex;
 	json_t* pluginJ;
 	json_array_foreach(pluginsJ, pluginIndex, pluginJ) {
-		Update update;
 		// Get plugin manifest
 		std::string slug = json_string_value(pluginJ);
 		json_t* manifestJ = json_object_get(manifestsJ, slug.c_str());
@@ -165,6 +199,14 @@ void checkUpdates() {
 			WARN("VCV account has plugin %s but no manifest was found", slug.c_str());
 			continue;
 		}
+
+		// Don't replace existing UpdateInfo, even if version is newer.
+		// This keeps things sane and ensures that only one version of each plugin is downloaded to `plugins/` at a time.
+		auto it = updateInfos.find(slug);
+		if (it != updateInfos.end()) {
+			continue;
+		}
+		UpdateInfo update;
 
 		// Get plugin name
 		json_t* nameJ = json_object_get(manifestJ, "name");
@@ -184,14 +226,7 @@ void checkUpdates() {
 		if (p && p->version == update.version)
 			continue;
 
-		// Don't add update if it exists already
-		auto it = updates.find(slug);
-		if (it != updates.end()) {
-			if (it->second.version == update.version)
-				continue;
-		}
-
-		// Check status
+		// Require that "status" is "available"
 		json_t* statusJ = json_object_get(manifestJ, "status");
 		if (!statusJ)
 			continue;
@@ -201,19 +236,17 @@ void checkUpdates() {
 
 		// Get changelog URL
 		json_t* changelogUrlJ = json_object_get(manifestJ, "changelogUrl");
-		if (changelogUrlJ) {
+		if (changelogUrlJ)
 			update.changelogUrl = json_string_value(changelogUrlJ);
-		}
 
 		// Add update to updates map
-		updates[slug] = update;
+		updateInfos[slug] = update;
 	}
-
 
 	// Get module whitelist
 	{
-		std::string whitelistUrl = API_URL + "/moduleWhitelist";
-		json_t* whitelistResJ = network::requestJson(network::METHOD_GET, whitelistUrl, NULL, cookies);
+		std::string whitelistUrl = API_URL + "/modules";
+		json_t* whitelistResJ = network::requestJson(network::METHOD_GET, whitelistUrl, NULL, getTokenCookies());
 		if (!whitelistResJ) {
 			WARN("Request for module whitelist failed");
 			updateStatus = "Could not query updates";
@@ -246,8 +279,8 @@ void checkUpdates() {
 
 
 bool hasUpdates() {
-	for (auto& pair : updates) {
-		if (pair.second.progress < 1.f)
+	for (auto& pair : updateInfos) {
+		if (!pair.second.downloaded)
 			return true;
 	}
 	return false;
@@ -258,31 +291,45 @@ void syncUpdate(const std::string& slug) {
 	if (settings::token.empty())
 		return;
 
-	auto it = updates.find(slug);
-	if (it == updates.end())
+	isSyncing = true;
+	DEFER({isSyncing = false;});
+
+	// Get the UpdateInfo object
+	auto it = updateInfos.find(slug);
+	if (it == updateInfos.end())
 		return;
-	Update& update = it->second;
+	UpdateInfo update = it->second;
 
-	updatingSlug = slug;
-	DEFER({updatingSlug = "";});
+	updateSlug = slug;
+	DEFER({updateSlug = "";});
 
+	// Set progress to 0%
+	updateProgress = 0.f;
+	DEFER({updateProgress = 0.f;});
+
+	INFO("Downloading plugin %s v%s for %s", slug.c_str(), update.version.c_str(), APP_ARCH.c_str());
+
+	// Get download URL
 	std::string downloadUrl = API_URL + "/download";
 	downloadUrl += "?slug=" + network::encodeUrl(slug);
 	downloadUrl += "&version=" + network::encodeUrl(update.version);
 	downloadUrl += "&arch=" + network::encodeUrl(APP_ARCH);
 
-	network::CookieMap cookies;
-	cookies["token"] = settings::token;
-
-	INFO("Downloading plugin %s v%s for %s", slug.c_str(), update.version.c_str(), APP_ARCH.c_str());
-
-	// Download plugin package
+	// Get file path
 	std::string packageFilename = slug + "-" + update.version + "-" + APP_ARCH + ".vcvplugin";
 	std::string packagePath = system::join(asset::pluginsPath, packageFilename);
-	if (!network::requestDownload(downloadUrl, packagePath, &update.progress, cookies)) {
+
+	// Download plugin package
+	if (!network::requestDownload(downloadUrl, packagePath, &updateProgress, getTokenCookies())) {
 		WARN("Plugin %s download was unsuccessful", slug.c_str());
 		return;
 	}
+
+	// updateInfos could possibly change in the checkUpdates() thread, so re-get the UpdateInfo to modify it.
+	it = updateInfos.find(slug);
+	if (it == updateInfos.end())
+		return;
+	it->second.downloaded = true;
 }
 
 
@@ -290,16 +337,12 @@ void syncUpdates() {
 	if (settings::token.empty())
 		return;
 
-	// Iterate by value because the map might change
-	for (auto pair : updates) {
+	// updateInfos could possibly change in the checkUpdates() thread, but checkUpdates() will not execute if syncUpdate() is running, so the chance of the updateInfos map being modified while iterating is rare.
+	auto updateInfosClone = updateInfos;
+	for (auto& pair : updateInfosClone) {
 		syncUpdate(pair.first);
 	}
 	restartRequested = true;
-}
-
-
-bool isSyncing() {
-	return updatingPlugins || (updatingSlug != "");
 }
 
 
@@ -308,12 +351,12 @@ std::string appDownloadUrl;
 std::string appChangelogUrl;
 
 std::string loginStatus;
-std::map<std::string, Update> updates;
+std::map<std::string, UpdateInfo> updateInfos;
 std::string updateStatus;
-std::string updatingSlug;
-bool updatingPlugins = false;
+std::string updateSlug;
+float updateProgress = 0.f;
+bool isSyncing = false;
 bool restartRequested = false;
-
 
 
 } // namespace library
