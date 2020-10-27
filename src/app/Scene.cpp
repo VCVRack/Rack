@@ -56,9 +56,16 @@ Scene::~Scene() {
 }
 
 void Scene::step() {
-	bool fullscreen = APP->window->isFullScreen();
-	menuBar->visible = !fullscreen;
-	rackScroll->box.pos.y = menuBar->visible ? menuBar->box.size.y : 0;
+	if (APP->window->isFullScreen()) {
+		// Expand RackScrollWidget to cover entire screen if fullscreen
+		rackScroll->box.pos.y = 0;
+	}
+	else {
+		// Always show MenuBar if not fullscreen
+		menuBar->show();
+		rackScroll->box.pos.y = menuBar->box.size.y;
+	}
+
 	frameRateWidget->box.pos.x = box.size.x - frameRateWidget->box.size.x;
 
 	// Resize owned descendants
@@ -66,9 +73,9 @@ void Scene::step() {
 	rackScroll->box.size = box.size.minus(rackScroll->box.pos);
 
 	// Autosave periodically
-	if (settings::autosavePeriod > 0.0) {
+	if (settings::autosaveInterval > 0.0) {
 		double time = glfwGetTime();
-		if (time - lastAutosaveTime >= settings::autosavePeriod) {
+		if (time - lastAutosaveTime >= settings::autosaveInterval) {
 			lastAutosaveTime = time;
 			APP->patch->saveAutosave();
 			settings::save(asset::settingsPath);
@@ -84,6 +91,9 @@ void Scene::draw(const DrawArgs& args) {
 
 void Scene::onHover(const event::Hover& e) {
 	mousePos = e.pos;
+	if (mousePos.y < menuBar->box.size.y) {
+		menuBar->show();
+	}
 	OpaqueWidget::onHover(e);
 }
 
@@ -169,6 +179,8 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 		}
 		if (e.key == GLFW_KEY_F11 && (e.mods & RACK_MOD_MASK) == 0) {
 			APP->window->setFullScreen(!APP->window->isFullScreen());
+			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
+			// menuBar->hide();
 			e.consume(this);
 		}
 		// Alternate key command for exiting fullscreen, since F11 doesn't work reliably on Mac due to "Show desktop" OS binding.

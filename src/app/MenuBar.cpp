@@ -5,9 +5,6 @@
 
 #include <app/MenuBar.hpp>
 #include <widget/OpaqueWidget.hpp>
-#include <window.hpp>
-#include <engine/Engine.hpp>
-#include <asset.hpp>
 #include <ui/Button.hpp>
 #include <ui/MenuItem.hpp>
 #include <ui/MenuSeparator.hpp>
@@ -16,6 +13,9 @@
 #include <ui/TextField.hpp>
 #include <ui/PasswordField.hpp>
 #include <ui/ProgressBar.hpp>
+#include <engine/Engine.hpp>
+#include <window.hpp>
+#include <asset.hpp>
 #include <context.hpp>
 #include <settings.hpp>
 #include <helpers.hpp>

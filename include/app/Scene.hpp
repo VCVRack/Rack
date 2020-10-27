@@ -32,8 +32,6 @@ struct Scene : widget::OpaqueWidget {
 	void onDragHover(const event::DragHover& e) override;
 	void onHoverKey(const event::HoverKey& e) override;
 	void onPathDrop(const event::PathDrop& e) override;
-
-	void runCheckVersion();
 };
 
 

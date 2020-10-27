@@ -17,11 +17,12 @@ struct RackScrollWidget : ui::ScrollWidget {
 	math::Vec oldOffset;
 
 	RackScrollWidget();
+	void reset();
 	void step() override;
 	void draw(const DrawArgs& args) override;
 	void onHoverKey(const event::HoverKey& e) override;
 	void onHoverScroll(const event::HoverScroll& e) override;
-	void reset();
+	void onHover(const event::Hover& e) override;
 };
 
 

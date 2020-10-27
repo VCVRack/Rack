@@ -46,7 +46,7 @@ extern bool tooltips;
 extern bool cpuMeter;
 extern bool lockModules;
 extern int frameSwapInterval;
-extern float autosavePeriod;
+extern float autosaveInterval;
 extern bool skipLoadOnLaunch;
 extern std::string patchPath;
 extern std::list<std::string> recentPatchPaths;

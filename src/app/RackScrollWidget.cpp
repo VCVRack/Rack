@@ -20,6 +20,13 @@ RackScrollWidget::RackScrollWidget() {
 	reset();
 }
 
+
+void RackScrollWidget::reset() {
+	offset = RACK_OFFSET.mult(zoomWidget->zoom);
+	offset = offset.minus(math::Vec(30, 30));
+}
+
+
 void RackScrollWidget::step() {
 	// Clamp zoom
 	settings::zoom = math::clamp(settings::zoom, -2.f, 2.f);
@@ -78,9 +85,11 @@ void RackScrollWidget::step() {
 	oldOffset = offset;
 }
 
+
 void RackScrollWidget::draw(const DrawArgs& args) {
 	ScrollWidget::draw(args);
 }
+
 
 void RackScrollWidget::onHoverKey(const event::HoverKey& e) {
 	ScrollWidget::onHoverKey(e);
@@ -116,6 +125,7 @@ void RackScrollWidget::onHoverKey(const event::HoverKey& e) {
 	}
 }
 
+
 void RackScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		// Increase zoom
@@ -131,9 +141,14 @@ void RackScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	ScrollWidget::onHoverScroll(e);
 }
 
-void RackScrollWidget::reset() {
-	offset = RACK_OFFSET.mult(zoomWidget->zoom);
-	offset = offset.minus(math::Vec(30, 30));
+
+void RackScrollWidget::onHover(const event::Hover& e) {
+	ScrollWidget::onHover(e);
+
+	// Hide menu bar if fullscreen and moving mouse over the RackScrollWidget
+	if (APP->window->isFullScreen()) {
+		APP->scene->menuBar->hide();
+	}
 }
 
 

@@ -37,7 +37,7 @@ bool lockModules = false;
 #else
 	int frameSwapInterval = 1;
 #endif
-float autosavePeriod = 15.0;
+float autosaveInterval = 15.0;
 bool skipLoadOnLaunch = false;
 std::string patchPath;
 std::list<std::string> recentPatchPaths;
@@ -90,7 +90,7 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "frameSwapInterval", json_integer(frameSwapInterval));
 
-	json_object_set_new(rootJ, "autosavePeriod", json_real(autosavePeriod));
+	json_object_set_new(rootJ, "autosaveInterval", json_real(autosaveInterval));
 
 	if (skipLoadOnLaunch)
 		json_object_set_new(rootJ, "skipLoadOnLaunch", json_boolean(true));
@@ -196,9 +196,9 @@ void fromJson(json_t* rootJ) {
 	if (frameSwapIntervalJ)
 		frameSwapInterval = json_integer_value(frameSwapIntervalJ);
 
-	json_t* autosavePeriodJ = json_object_get(rootJ, "autosavePeriod");
-	if (autosavePeriodJ)
-		autosavePeriod = json_number_value(autosavePeriodJ);
+	json_t* autosaveIntervalJ = json_object_get(rootJ, "autosaveInterval");
+	if (autosaveIntervalJ)
+		autosaveInterval = json_number_value(autosaveIntervalJ);
 
 	json_t* skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
 	if (skipLoadOnLaunchJ)
