@@ -21,7 +21,9 @@ struct SequentialLayout : widget::Widget {
 
 	Orientation orientation = HORIZONTAL_ORIENTATION;
 	Alignment alignment = LEFT_ALIGNMENT;
-	/** Space between adjacent elements */
+	/** Space between box bounds. */
+	math::Vec margin;
+	/** Space between adjacent elements. */
 	math::Vec spacing;
 
 	void step() override;

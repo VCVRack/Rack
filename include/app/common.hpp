@@ -3,6 +3,7 @@
 
 #include <common.hpp>
 #include <math.hpp>
+#include <ui/common.hpp>
 
 
 namespace rack {

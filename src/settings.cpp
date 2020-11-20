@@ -51,6 +51,8 @@ std::vector<NVGcolor> cableColors = {
 };
 std::map<std::string, std::set<std::string>> moduleWhitelist = {};
 bool autoCheckUpdates = true;
+bool showTipsOnLaunch = true;
+int tipIndex = -1;
 
 
 json_t* toJson() {
@@ -121,6 +123,10 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "moduleWhitelist", moduleWhitelistJ);
 
 	json_object_set_new(rootJ, "autoCheckUpdates", json_boolean(autoCheckUpdates));
+
+	json_object_set_new(rootJ, "showTipsOnLaunch", json_boolean(showTipsOnLaunch));
+
+	json_object_set_new(rootJ, "tipIndex", json_integer(tipIndex));
 
 	return rootJ;
 }
@@ -249,6 +255,14 @@ void fromJson(json_t* rootJ) {
 	json_t* autoCheckUpdatesJ = json_object_get(rootJ, "autoCheckUpdates");
 	if (autoCheckUpdatesJ)
 		autoCheckUpdates = json_boolean_value(autoCheckUpdatesJ);
+
+	json_t* showTipsOnLaunchJ = json_object_get(rootJ, "showTipsOnLaunch");
+	if (showTipsOnLaunchJ)
+		showTipsOnLaunch = json_boolean_value(showTipsOnLaunchJ);
+
+	json_t* tipIndexJ = json_object_get(rootJ, "tipIndex");
+	if (tipIndexJ)
+		tipIndex = json_integer_value(tipIndexJ);
 }
 
 void save(const std::string& path) {

@@ -56,6 +56,11 @@ void Widget::setSize(math::Vec size) {
 }
 
 
+widget::Widget *Widget::getParent() {
+	return parent;
+}
+
+
 bool Widget::isVisible() {
 	return visible;
 }

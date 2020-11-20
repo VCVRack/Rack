@@ -40,6 +40,7 @@ struct Widget : WeakBase {
 	void setPosition(math::Vec pos);
 	math::Vec getSize();
 	void setSize(math::Vec size);
+	widget::Widget* getParent();
 	bool isVisible();
 	void setVisible(bool visible);
 	void show() {

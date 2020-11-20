@@ -54,6 +54,8 @@ extern std::vector<NVGcolor> cableColors;
 // pluginSlug -> moduleSlugs
 extern std::map<std::string, std::set<std::string>> moduleWhitelist;
 extern bool autoCheckUpdates;
+extern bool showTipsOnLaunch;
+extern int tipIndex;
 
 json_t* toJson();
 void fromJson(json_t* rootJ);

@@ -887,6 +887,13 @@ struct CheckAppUpdateItem : ui::MenuItem {
 };
 
 
+struct TipItem : ui::MenuItem {
+	void onAction(const event::Action& e) override {
+		APP->scene->tipWindow->show();
+	}
+};
+
+
 struct HelpButton : MenuButton {
 	NotificationIcon* notification;
 
@@ -911,6 +918,10 @@ struct HelpButton : MenuButton {
 			checkAppUpdateItem->text = "Check for " + APP_NAME + " update";
 			menu->addChild(checkAppUpdateItem);
 		}
+
+		TipItem* tipItem = new TipItem;
+		tipItem->text = "Tips";
+		menu->addChild(tipItem);
 
 		UrlItem* manualItem = new UrlItem;
 		manualItem->text = "Manual";

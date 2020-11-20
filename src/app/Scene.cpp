@@ -4,6 +4,7 @@
 
 #include <app/Scene.hpp>
 #include <app/ModuleBrowser.hpp>
+#include <app/TipWindow.hpp>
 #include <app/MenuBar.hpp>
 #include <context.hpp>
 #include <system.hpp>
@@ -44,6 +45,10 @@ Scene::Scene() {
 	moduleBrowser = moduleBrowserCreate();
 	moduleBrowser->hide();
 	addChild(moduleBrowser);
+
+	tipWindow = tipWindowCreate();
+	tipWindow->setVisible(settings::showTipsOnLaunch);
+	addChild(tipWindow);
 
 	frameRateWidget = new FrameRateWidget;
 	frameRateWidget->box.size = math::Vec(80.0, 30.0);
