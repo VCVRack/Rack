@@ -98,11 +98,19 @@ struct ModuleInfoItem : ui::MenuItem {
 
 		menu->addChild(new ui::MenuSeparator);
 
-		// library
+		// VCV Library page
 		ModuleUrlItem* libraryItem = new ModuleUrlItem;
-		libraryItem->text = "VCV Library entry";
+		libraryItem->text = "VCV Library page";
 		libraryItem->url = "https://library.vcvrack.com/" + model->plugin->slug + "/" + model->slug;
 		menu->addChild(libraryItem);
+
+		// modularGridUrl
+		if (model->modularGridUrl != "") {
+			ModuleUrlItem* modularGridItem = new ModuleUrlItem;
+			modularGridItem->text = "ModularGrid page";
+			modularGridItem->url = model->modularGridUrl;
+			menu->addChild(modularGridItem);
+		}
 
 		// manual
 		std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;

@@ -49,6 +49,11 @@ void Model::fromJson(json_t* rootJ) {
 	json_t* manualUrlJ = json_object_get(rootJ, "manualUrl");
 	if (manualUrlJ)
 		manualUrl = json_string_value(manualUrlJ);
+
+	// modularGridUrl
+	json_t* modularGridUrlJ = json_object_get(rootJ, "modularGridUrl");
+	if (modularGridUrlJ)
+		modularGridUrl = json_string_value(modularGridUrlJ);
 }
 
 

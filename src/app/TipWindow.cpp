@@ -60,6 +60,10 @@ static std::vector<TipInfo> tipInfos = {
 	{"Some plugin developers accept donations for their work. Right-click a module panel and select Info > Donate.\n\nYou can support VCV Rack by purchasing VCV plugins.", "VCV Library", "https://library.vcvrack.com/"}, // reviewed
 	{"You can learn more about VCV Rack by browsing the official Rack manual.", "VCV Rack manual", "https://vcvrack.com/manual/"},
 	{"Follow VCV Rack on Twitter for new modules, product announcements, and development news.", "Twitter @vcvrack", "https://twitter.com/vcvrack"}, // reviewed
+	{"Did you know that patch cables in Rack can carry up to 16 signals? You can use this to easily build polyphonic patches with modules with the \"Polyphonic\" tag. Cables carrying more than 1 signal appear thicker than normal cables. To try out polyphony, add the VCV MIDI-CV module to your patch, right-click its panel, and select your desired number of polyphonic channels.", "Learn more about polyphony in VCV Rack", "https://vcvrack.com/manual/Polyphony"}, // reviewed
+	{"Know C++ programming and want to create your own modules for Rack? Developing Rack modules is a great way to learn digital signal processing and quickly test your ideas with an easy-to-learn platform.\n\nDownload the Rack SDK and follow the official tutorial to get started.", "Plugin Development Tutorial", "https://vcvrack.com/manual/PluginDevelopmentTutorial"}, // reviewed
+	{"Confused about how to use a particular module? Right-click its panel and choose Info > User manual.\n\nYou can also open the module's Info menu to view the module's tags, website, VCV Library entry, and changelog.", "", ""}, // reviewed
+	{"Did you know that ModularGrid is interconnected with the VCV Library? If a Eurorack version of a Rack module is available, right-click its panel and choose Info > ModularGrid, or click the \"ModularGrid\" link on its VCV Library page.\nOn ModularGrid.net, you can click the \"Available for VCV Rack\" link if a hardware module has a virtual Rack version.", "Example: Grayscale Permutation on ModularGrid", "https://www.modulargrid.net/e/grayscale-permutation-18hp"}, // reviewed
 	// {"", "", ""},
 };
 

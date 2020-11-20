@@ -40,6 +40,7 @@ struct Model {
 	/** The manual of the module. HTML, PDF, or GitHub readme/wiki are fine.
 	*/
 	std::string manualUrl;
+	std::string modularGridUrl;
 
 	virtual ~Model() {}
 	/** Creates a Module. */
