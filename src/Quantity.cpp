@@ -73,6 +73,10 @@ void Quantity::setMax() {
 	setValue(getMaxValue());
 }
 
+void Quantity::toggle() {
+	setValue(isMin() ? getMaxValue() : getMinValue());
+}
+
 void Quantity::setScaledValue(float scaledValue) {
 	if (!isBounded())
 		setValue(scaledValue);

@@ -88,6 +88,8 @@ struct Quantity {
 	void setMin();
 	/** Sets the value to the max value. */
 	void setMax();
+	/** Sets the value to max if the current value is min, otherwise sets the value to min. */
+	void toggle();
 	/** Sets value from the range 0 to 1. */
 	void setScaledValue(float scaledValue);
 	/** Returns the value rescaled to the range 0 to 1. */

@@ -4,6 +4,7 @@
 #include <widget/OpaqueWidget.hpp>
 #include <ui/Label.hpp>
 #include <ui/Button.hpp>
+#include <ui/OptionButton.hpp>
 #include <ui/MenuItem.hpp>
 #include <ui/SequentialLayout.hpp>
 #include <settings.hpp>
@@ -51,19 +52,20 @@ struct TipInfo {
 };
 
 
+// Remember to use “smart quotes.”
 static std::vector<TipInfo> tipInfos = {
 	{"To add a module to the rack, right-click an empty rack space or press Enter. Click and drag a module from the Module Browser into the desired rack space.\n\nYou can force-move modules by holding " RACK_MOD_CTRL_NAME " while dragging it.", "", ""}, // reviewed
 	{"Pan around the rack by using the scroll bars, dragging while holding the middle mouse button, or pressing the arrow keys. Arrow key panning speed can be modified by holding " RACK_MOD_CTRL_NAME ", " RACK_MOD_SHIFT_NAME ", or " RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME ".\n\nZoom in and out using the View menu, " RACK_MOD_CTRL_NAME "+scroll, or " RACK_MOD_CTRL_NAME "+= / " RACK_MOD_CTRL_NAME "+-.", "", ""}, // reviewed
 	// {"Want to use VCV Rack as a plugin in your DAW? VCV Rack for DAWs is available now as a 64-bit VST 2 plugin for Ableton Live, Cubase, FL Studio, Reason, Studio One, REAPER, Bitwig, and more. Other plugin formats coming soon.", "Learn more", "https://vcvrack.com/RackForDAWs"}, // reviewed
-	{"You can use Rack fullscreen by selecting View > Fullscreen or pressing F11.\n\nIn fullscreen mode, the menu bar and scroll bars are hidden. This is ideal for screen recording with VCV Recorder.", "Get VCV Recorder", "https://vcvrack.com/Recorder"}, // reviewed
-	{"You can browse over 2400 modules on the VCV Library.", "VCV Library", "https://library.vcvrack.com/"},
-	{"Some plugin developers accept donations for their work. Right-click a module panel and select Info > Donate.\n\nYou can support VCV Rack by purchasing VCV plugins.", "VCV Library", "https://library.vcvrack.com/"}, // reviewed
+	{"You can use Rack in fullscreen mode by selecting “View > Fullscreen“ or pressing F11.\n\nIn fullscreen mode, the menu bar and scroll bars are hidden. This is ideal for screen recording with VCV Recorder.", "Get VCV Recorder", "https://vcvrack.com/Recorder"}, // reviewed
+	{"You can search over 2400 modules on the VCV Library website.\n\nRegister for a VCV account, log into Rack using the Library menu, and browse the VCV Library to add or purchase modules. Keep all plugins up to date by clicking “Library > Update all”.", "VCV Library", "https://library.vcvrack.com/"}, // reviewed
+	{"Some developers of free plugins accept donations for their work. Right-click a module panel and select “Info > Donate”.\n\nYou can support VCV Rack by purchasing VCV plugins.", "VCV Library", "https://library.vcvrack.com/"}, // reviewed
 	{"You can learn more about VCV Rack by browsing the official Rack manual.", "VCV Rack manual", "https://vcvrack.com/manual/"},
 	{"Follow VCV Rack on Twitter for new modules, product announcements, and development news.", "Twitter @vcvrack", "https://twitter.com/vcvrack"}, // reviewed
-	{"Did you know that patch cables in Rack can carry up to 16 signals? You can use this to easily build polyphonic patches with modules with the \"Polyphonic\" tag. Cables carrying more than 1 signal appear thicker than normal cables. To try out polyphony, add the VCV MIDI-CV module to your patch, right-click its panel, and select your desired number of polyphonic channels.", "Learn more about polyphony in VCV Rack", "https://vcvrack.com/manual/Polyphony"}, // reviewed
+	{"Did you know that patch cables in Rack can carry up to 16 signals? You can use this to easily build polyphonic patches with modules with the “Polyphonic” tag. Cables carrying more than 1 signal appear thicker than normal cables. To try out polyphony, add the VCV MIDI-CV module to your patch, right-click its panel, and select your desired number of polyphonic channels.", "Learn more about polyphony in VCV Rack", "https://vcvrack.com/manual/Polyphony"}, // reviewed
 	{"Know C++ programming and want to create your own modules for Rack? Developing Rack modules is a great way to learn digital signal processing and quickly test your ideas with an easy-to-learn platform.\n\nDownload the Rack SDK and follow the official tutorial to get started.", "Plugin Development Tutorial", "https://vcvrack.com/manual/PluginDevelopmentTutorial"}, // reviewed
-	{"Confused about how to use a particular module? Right-click its panel and choose Info > User manual.\n\nYou can also open the module's Info menu to view the module's tags, website, VCV Library entry, and changelog.", "", ""}, // reviewed
-	{"Did you know that ModularGrid is interconnected with the VCV Library? If a Eurorack version of a Rack module is available, right-click its panel and choose Info > ModularGrid, or click the \"ModularGrid\" link on its VCV Library page.\nOn ModularGrid.net, you can click the \"Available for VCV Rack\" link if a hardware module has a virtual Rack version.", "Example: Grayscale Permutation on ModularGrid", "https://www.modulargrid.net/e/grayscale-permutation-18hp"}, // reviewed
+	{"Confused about how to use a particular module? Right-click its panel and choose “Info > User manual”.\n\nYou can also open the module's Info menu to view the module's tags, website, VCV Library entry, and changelog.", "", ""}, // reviewed
+	{"Did you know that ModularGrid is interconnected with the VCV Library? If a Eurorack version of a Rack module is available, right-click its panel and choose “Info > ModularGrid”, or click the “ModularGrid” link on its VCV Library page.\nOn ModularGrid.net, search for the “Available for VCV Rack” link if a hardware module has a virtual Rack version.", "Example: Grayscale Permutation on ModularGrid", "https://www.modulargrid.net/e/grayscale-permutation-18hp"}, // reviewed
 	// {"", "", ""},
 };
 
@@ -106,15 +108,19 @@ struct TipWindow : widget::OpaqueWidget {
 		buttonLayout->spacing = math::Vec(margin, margin);
 		addChild(buttonLayout);
 
-		struct ShowButton : ui::Button {
-			void step() override {
-				text = settings::showTipsOnLaunch ? "Don't show at startup" : "Show tips at startup";
+		struct ShowQuantity : Quantity {
+			void setValue(float value) override {
+				settings::showTipsOnLaunch = (value > 0.f);
 			}
-			void onAction(const event::Action& e) override {
-				settings::showTipsOnLaunch ^= true;
+			float getValue() override {
+				return settings::showTipsOnLaunch ? 1.f : 0.f;
 			}
 		};
-		ShowButton* showButton = new ShowButton;
+		static ShowQuantity showQuantity;
+
+		ui::OptionButton* showButton = new ui::OptionButton;
+		showButton->text = "Show tips at startup";
+		showButton->quantity = &showQuantity;
 		showButton->box.size.x = buttonWidth * 2 + margin;
 		buttonLayout->addChild(showButton);
 
