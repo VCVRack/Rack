@@ -4,6 +4,7 @@
 #include <osdialog.h>
 
 #include <app/MenuBar.hpp>
+#include <app/TipWindow.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <ui/Button.hpp>
 #include <ui/MenuItem.hpp>
@@ -889,7 +890,7 @@ struct CheckAppUpdateItem : ui::MenuItem {
 
 struct TipItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
-		APP->scene->tipWindow->show();
+		APP->scene->addChild(tipWindowCreate());
 	}
 };
 

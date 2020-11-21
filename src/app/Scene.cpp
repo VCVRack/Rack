@@ -46,14 +46,14 @@ Scene::Scene() {
 	moduleBrowser->hide();
 	addChild(moduleBrowser);
 
-	tipWindow = tipWindowCreate();
-	tipWindow->setVisible(settings::showTipsOnLaunch);
-	addChild(tipWindow);
+	if (settings::showTipsOnLaunch) {
+		addChild(tipWindowCreate());
+	}
 
-	frameRateWidget = new FrameRateWidget;
-	frameRateWidget->box.size = math::Vec(80.0, 30.0);
-	frameRateWidget->hide();
-	addChild(frameRateWidget);
+	// frameRateWidget = new FrameRateWidget;
+	// frameRateWidget->box.size = math::Vec(80.0, 30.0);
+	// frameRateWidget->hide();
+	// addChild(frameRateWidget);
 }
 
 Scene::~Scene() {
@@ -71,7 +71,7 @@ void Scene::step() {
 		rackScroll->box.pos.y = menuBar->box.size.y;
 	}
 
-	frameRateWidget->box.pos.x = box.size.x - frameRateWidget->box.size.x;
+	// frameRateWidget->box.pos.x = box.size.x - frameRateWidget->box.size.x;
 
 	// Resize owned descendants
 	menuBar->box.size.x = box.size.x;

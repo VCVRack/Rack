@@ -2,6 +2,7 @@
 
 #include <app/TipWindow.hpp>
 #include <widget/OpaqueWidget.hpp>
+#include <ui/MenuOverlay.hpp>
 #include <ui/Label.hpp>
 #include <ui/Button.hpp>
 #include <ui/OptionButton.hpp>
@@ -13,36 +14,6 @@
 
 namespace rack {
 namespace app {
-
-
-struct TipOverlay : widget::OpaqueWidget {
-	void step() override {
-		box = parent->box.zeroPos();
-		OpaqueWidget::step();
-	}
-
-	void onButton(const event::Button& e) override {
-		OpaqueWidget::onButton(e);
-		if (e.getTarget() != this)
-			return;
-
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-			hide();
-			e.consume(this);
-		}
-	}
-
-	void onHoverKey(const event::HoverKey& e) override {
-		OpaqueWidget::onHoverKey(e);
-		if (e.isConsumed())
-			return;
-
-		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
-			hide();
-			e.consume(this);
-		}
-	}
-};
 
 
 struct UrlButton : ui::Button {
@@ -162,7 +133,7 @@ struct TipWindow : widget::OpaqueWidget {
 		struct CloseButton : ui::Button {
 			TipWindow* tipWindow;
 			void onAction(const event::Action& e) override {
-				tipWindow->getParent()->hide();
+				tipWindow->getParent()->requestDelete();
 			}
 		};
 		CloseButton* closeButton = new CloseButton;
@@ -198,16 +169,11 @@ struct TipWindow : widget::OpaqueWidget {
 		bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, 0);
 		Widget::draw(args);
 	}
-
-	void onShow(const event::Show& e) override {
-		advanceTip();
-		OpaqueWidget::onShow(e);
-	}
 };
 
 
 widget::Widget* tipWindowCreate() {
-	TipOverlay* overlay = new TipOverlay;
+	ui::MenuOverlay* overlay = new ui::MenuOverlay;
 
 	TipWindow* tipWindow = new TipWindow;
 	overlay->addChild(tipWindow);
