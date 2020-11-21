@@ -37,6 +37,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Re-render framebuffers when subpixel offset changes, fixing bug that makes ports and knobs appear slightly offset at certain zoom levels.
 - Use new `.vcv` patch format, an archive (POSIX tar compressed with Zstandard) of a `patch.json` file, module patch assets, and potentially other future files.
 - Use randomly-generated 53-bit IDs to identify modules and cables in the patch.
+- Use a fuzzy search algorithm for searching modules in the Module Browser.
+- Add tips window which appears when Rack launches or when choosing "Help > Tips".
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
