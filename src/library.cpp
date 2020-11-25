@@ -30,7 +30,7 @@ static void checkUpdatesLoop() {
 
 		// Sleep a few seconds, or wake up when destroy() is called
 		std::unique_lock<std::mutex> lock(updatesLoopMutex);
-		auto duration = std::chrono::seconds(60);
+		auto duration = std::chrono::seconds(15);
 		if (!updatesLoopRunning)
 			break;
 		updatesLoopCv.wait_for(lock, duration, []() {return !updatesLoopRunning;});

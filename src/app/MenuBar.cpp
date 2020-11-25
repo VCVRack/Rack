@@ -766,7 +766,7 @@ struct LibraryMenu : ui::Menu {
 		else if (!library::isLoggedIn()) {
 			UrlItem* registerItem = new UrlItem;
 			registerItem->text = "Register VCV account";
-			registerItem->url = "https://vcvrack.com/";
+			registerItem->url = "https://vcvrack.com/login";
 			addChild(registerItem);
 
 			AccountEmailField* emailField = new AccountEmailField;
@@ -789,14 +789,14 @@ struct LibraryMenu : ui::Menu {
 		else {
 			loggedIn = true;
 
-			UrlItem* manageItem = new UrlItem;
-			manageItem->text = "Manage plugins";
-			manageItem->url = "https://vcvrack.com/plugins.html";
-			addChild(manageItem);
-
 			LogOutItem* logOutItem = new LogOutItem;
 			logOutItem->text = "Log out";
 			addChild(logOutItem);
+
+			UrlItem* manageItem = new UrlItem;
+			manageItem->text = "Browse VCV Library";
+			manageItem->url = "https://library.vcvrack.com/";
+			addChild(manageItem);
 
 			SyncUpdatesItem* syncItem = new SyncUpdatesItem;
 			syncItem->text = "Update all";

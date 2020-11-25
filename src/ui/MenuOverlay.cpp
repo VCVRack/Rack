@@ -5,6 +5,15 @@ namespace rack {
 namespace ui {
 
 
+void MenuOverlay::draw(const DrawArgs& args) {
+	// Possible translucent background
+	// nvgRect(args.vg, 0, 0, VEC_ARGS(box.size));
+	// nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.25));
+	// nvgFill(args.vg);
+
+	OpaqueWidget::draw(args);
+}
+
 void MenuOverlay::step() {
 	// Adopt parent's size
 	box.size = parent->box.size;
