@@ -113,10 +113,6 @@ int main(int argc, char* argv[]) {
 	bool loggerWasTruncated = logger::isTruncated();
 	logger::init();
 
-	for (int i = 0; i < 100; i++)
-		DEBUG("%lf", system::getTime() * 1e9);
-	exit(0);
-
 	// We can now install a signal handler and log the output
 	if (!settings::devMode) {
 		signal(SIGABRT, fatalSignalHandler);
