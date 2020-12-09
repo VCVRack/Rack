@@ -20,8 +20,8 @@ namespace midi {
 struct Message {
 	/** Initialized to 3 empty bytes. */
 	std::vector<uint8_t> bytes;
-	/** Timestamp of MIDI message in nanoseconds. Negative if not set. */
-	int64_t timestamp = -1;
+	/** Timestamp of MIDI message in nanoseconds. NAN if not set. */
+	double timestamp = NAN;
 
 	Message() : bytes(3) {}
 

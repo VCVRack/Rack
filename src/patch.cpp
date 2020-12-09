@@ -69,11 +69,11 @@ void PatchManager::save(std::string path) {
 	// Take screenshot (disabled because there is currently no way to quickly view them on any OS or website.)
 	// APP->window->screenshot(system::join(asset::autosavePath, "screenshot.png"));
 
-	uint64_t startTime = system::getNanoseconds();
+	double startTime = system::getTime();
 	// Set compression level to 1 so that a 500MB/s SSD is almost bottlenecked
 	system::archiveFolder(path, asset::autosavePath, 1);
-	uint64_t endTime = system::getNanoseconds();
-	INFO("Archived patch in %lf seconds", (endTime - startTime) / 1e9);
+	double endTime = system::getTime();
+	INFO("Archived patch in %lf seconds", (endTime - startTime));
 }
 
 
@@ -222,10 +222,10 @@ void PatchManager::load(std::string path) {
 	}
 	else {
 		// Extract the .vcv file as a .tar.zst archive.
-		uint64_t startTime = system::getNanoseconds();
+		double startTime = system::getTime();
 		system::unarchiveToFolder(path, asset::autosavePath);
-		uint64_t endTime = system::getNanoseconds();
-		INFO("Unarchived patch in %lf seconds", (endTime - startTime) / 1e9);
+		double endTime = system::getTime();
+		INFO("Unarchived patch in %lf seconds", (endTime - startTime));
 	}
 
 	loadAutosave();

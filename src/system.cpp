@@ -18,6 +18,8 @@
 #if defined ARCH_MAC
 	#include <mach/mach_init.h>
 	#include <mach/thread_act.h>
+	#include <mach/clock.h>
+	#include <mach/mach.h>
 #endif
 
 #if defined ARCH_WIN
@@ -526,30 +528,62 @@ std::string getStackTrace() {
 }
 
 
-int64_t getNanoseconds() {
+#if defined ARCH_WIN
+	static int64_t startCounter = 0;
+	static double counterTime = 0.0;
+#endif
+#if defined ARCH_LIN || defined ARCH_MAC
+	static int64_t startTime = 0;
+#endif
+
+static void initTime() {
+#if defined ARCH_WIN
+	assert(startCounter == 0);
+	LARGE_INTEGER counter;
+	QueryPerformanceCounter(&counter);
+	startCounter = counter.QuadPart;
+
+	LARGE_INTEGER frequency;
+	QueryPerformanceFrequency(&frequency);
+	counterTime = 1.0 / frequency.QuadPart;
+#endif
+#if defined ARCH_LIN
+	assert(startTime == 0);
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
+	startTime = int64_t(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
+#endif
+#if defined ARCH_MAC
+	assert(startTime == 0);
+	clock_serv_t cclock;
+	mach_timespec_t mts;
+	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
+	clock_get_time(cclock, &mts);
+	mach_port_deallocate(mach_task_self(), cclock);
+	startTime = int64_t(mts.tv_sec) * 1000000000LL + mts.tv_nsec;
+#endif
+}
+
+double getTime() {
 #if defined ARCH_WIN
 	LARGE_INTEGER counter;
 	QueryPerformanceCounter(&counter);
-	LARGE_INTEGER frequency;
-	QueryPerformanceFrequency(&frequency);
-	// TODO Check if this is always an integer factor on all CPUs
-	int64_t nsPerTick = 1000000000LL / frequency.QuadPart;
-	int64_t time = counter.QuadPart * nsPerTick;
-	return time;
+	return (counter.QuadPart - startCounter) * counterTime;
 #endif
 #if defined ARCH_LIN
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
 	int64_t time = int64_t(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
-	return time;
+	return (time - startTime) / 1e9;
 #endif
 #if defined ARCH_MAC
-	using clock = std::chrono::high_resolution_clock;
-	using time_point = std::chrono::time_point<clock>;
-	time_point now = clock::now();
-	using duration = std::chrono::duration<int64_t, std::nano>;
-	duration d = now.time_since_epoch();
-	return d.count();
+	clock_serv_t cclock;
+	mach_timespec_t mts;
+	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
+	clock_get_time(cclock, &mts);
+	mach_port_deallocate(mach_task_self(), cclock);
+	int64_t time = int64_t(mts.tv_sec) * 1000000000LL + mts.tv_nsec;
+	return (time - startTime) / 1e9;
 #endif
 }
 
@@ -618,6 +652,11 @@ void runProcessDetached(const std::string& path) {
 	// Not implemented on Linux or Mac
 	assert(0);
 #endif
+}
+
+
+void init() {
+	initTime();
 }
 
 

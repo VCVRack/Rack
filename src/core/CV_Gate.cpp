@@ -8,7 +8,7 @@ namespace core {
 struct GateMidiOutput : midi::Output {
 	int vels[128];
 	bool lastGates[128];
-	int64_t timestamp = -1;
+	double timestamp = 0.0;
 
 	GateMidiOutput() {
 		reset();
@@ -62,7 +62,7 @@ struct GateMidiOutput : midi::Output {
 		lastGates[note] = gate;
 	}
 
-	void setTimestamp(int64_t timestamp) {
+	void setTimestamp(double timestamp) {
 		this->timestamp = timestamp;
 	}
 };

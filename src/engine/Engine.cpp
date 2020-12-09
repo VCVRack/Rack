@@ -198,7 +198,7 @@ struct Engine::Internal {
 	float sampleTime = 0.f;
 	int64_t frame = 0;
 	int64_t stepFrame = 0;
-	int64_t stepTime = 0;
+	double stepTime = 0.0;
 	int stepFrames = 0;
 	Module* primaryModule = NULL;
 
@@ -338,9 +338,9 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 		Module* module = internal->modules[i];
 
 		// Start CPU timer
-		int64_t startTime;
+		double startTime;
 		if (cpuMeter) {
-			startTime = system::getNanoseconds();
+			startTime = system::getTime();
 		}
 
 		// Step module
@@ -351,8 +351,8 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 
 		// Stop CPU timer
 		if (cpuMeter) {
-			int64_t endTime = system::getNanoseconds();
-			float duration = (endTime - startTime) * 1e-9f;
+			double endTime = system::getTime();
+			float duration = (endTime - startTime) / 1e9;
 
 			// Smooth CPU time
 			const float cpuTau = 2.f /* seconds */;
@@ -564,7 +564,7 @@ void Engine::step(int frames) {
 	random::init();
 
 	internal->stepFrame = internal->frame;
-	internal->stepTime = system::getNanoseconds();
+	internal->stepTime = system::getTime();
 	internal->stepFrames = frames;
 
 	// Set sample rate
@@ -635,9 +635,9 @@ int64_t Engine::getFrame() {
 }
 
 
-int64_t Engine::getFrameTime() {
+double Engine::getFrameTime() {
 	double timeSinceStep = (internal->frame - internal->stepFrame) * internal->sampleTime;
-	return internal->stepTime + int64_t(timeSinceStep * 1e9);
+	return internal->stepTime + timeSinceStep;
 }
 
 
@@ -646,7 +646,7 @@ int64_t Engine::getStepFrame() {
 }
 
 
-int64_t Engine::getStepTime() {
+double Engine::getStepTime() {
 	return internal->stepTime;
 }
 
@@ -656,9 +656,8 @@ int Engine::getStepFrames() {
 }
 
 
-int64_t Engine::getStepDuration() {
-	double duration = internal->stepFrames * internal->sampleTime;
-	return int64_t(duration * 1e9);
+double Engine::getStepDuration() {
+	return internal->stepFrames * internal->sampleTime;
 }
 
 

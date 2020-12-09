@@ -131,11 +131,10 @@ void setThreadName(const std::string& name);
 
 /** Returns the caller's human-readable stack trace with "\n"-separated lines. */
 std::string getStackTrace();
-/** Returns the current number of nanoseconds since the epoch.
-The goal of this function is to give the most precise (fine-grained) time available on the OS for benchmarking purposes, while being fast to compute.
-The epoch is undefined. Do not use this function to get absolute time, as it is different on each OS.
+/** Returns the number of seconds since application launch.
+The goal of this function is to give the most precise (fine-grained) time differences available on the OS for benchmarking purposes, while being fast to compute.
 */
-int64_t getNanoseconds();
+double getTime();
 std::string getOperatingSystemInfo();
 
 // Applications
@@ -151,6 +150,8 @@ void openFolder(const std::string& path);
 The launched process will continue running if the current process is closed.
 */
 void runProcessDetached(const std::string& path);
+
+void init();
 
 
 } // namespace system

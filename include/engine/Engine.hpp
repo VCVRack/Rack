@@ -50,20 +50,20 @@ struct Engine {
 	/** Returns the estimated timestamp corresponding to the current frame, based on the timestamp of when step() was last called.
 	Calculated by `stepTime + framesSinceStep / sampleRate`.
 	*/
-	int64_t getFrameTime();
+	double getFrameTime();
 	/** Returns the frame when step() was last called.
 	*/
 	int64_t getStepFrame();
-	/** Returns the timestamp in nanoseconds when step() was last called.
+	/** Returns the timestamp in seconds when step() was last called.
 	*/
-	int64_t getStepTime();
+	double getStepTime();
 	/** Returns the total number of frames in the current step() call.
 	*/
 	int getStepFrames();
-	/** Returns the total time that step() is advancing, in nanoseconds.
+	/** Returns the total time that step() is advancing, in seconds.
 	Calculated by `stepFrames / sampleRate`.
 	*/
-	int64_t getStepDuration();
+	double getStepDuration();
 
 	// Modules
 	size_t getNumModules();

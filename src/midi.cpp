@@ -30,8 +30,8 @@ void InputDevice::unsubscribe(Input* input) {
 void InputDevice::onMessage(const Message &message) {
 	// Set timestamp to now if unset
 	Message msg = message;
-	if (msg.timestamp < 0)
-		msg.timestamp = system::getNanoseconds();
+	if (msg.timestamp == 0.0)
+		msg.timestamp = system::getTime();
 
 	for (Input* input : subscribed) {
 		// We're probably in the MIDI driver's thread, so set the Rack context.

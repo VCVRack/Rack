@@ -7,7 +7,7 @@ namespace core {
 
 struct CCMidiOutput : midi::Output {
 	int lastValues[128];
-	int64_t timestamp = -1;
+	double timestamp = 0.0;
 
 	CCMidiOutput() {
 		reset();
@@ -33,7 +33,7 @@ struct CCMidiOutput : midi::Output {
 		sendMessage(m);
 	}
 
-	void setTimestamp(int64_t timestamp) {
+	void setTimestamp(double timestamp) {
 		this->timestamp = timestamp;
 	}
 };
