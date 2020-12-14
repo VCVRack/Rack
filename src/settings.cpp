@@ -19,7 +19,7 @@ bool headless = false;
 std::string token;
 math::Vec windowSize;
 math::Vec windowPos;
-float zoom = 0.0;
+float zoom = 0.25;
 bool invertZoom = false;
 float cableOpacity = 0.5;
 float cableTension = 0.5;

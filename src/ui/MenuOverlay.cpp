@@ -6,9 +6,10 @@ namespace ui {
 
 
 void MenuOverlay::draw(const DrawArgs& args) {
-	// Possible translucent background
+	// Translucent background
+	nvgBeginPath(args.vg);
 	nvgRect(args.vg, 0, 0, VEC_ARGS(box.size));
-	nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.333));
+	nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.33));
 	nvgFill(args.vg);
 
 	OpaqueWidget::draw(args);
