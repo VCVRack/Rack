@@ -161,7 +161,7 @@ struct TipWindow : widget::OpaqueWidget {
 	}
 
 	void step() override {
-		box.pos = parent->box.size.minus(box.size).div(2);
+		box.pos = parent->box.size.minus(box.size).div(2).round();
 		OpaqueWidget::step();
 	}
 

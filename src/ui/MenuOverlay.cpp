@@ -39,10 +39,8 @@ void MenuOverlay::onHoverKey(const event::HoverKey& e) {
 
 	if (e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
 		requestDelete();
+		e.consume(this);
 	}
-
-	// Consume all key presses
-	e.consume(this);
 }
 
 
