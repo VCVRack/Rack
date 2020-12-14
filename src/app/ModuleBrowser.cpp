@@ -5,6 +5,7 @@
 #include <widget/OpaqueWidget.hpp>
 #include <widget/TransparentWidget.hpp>
 #include <widget/ZoomWidget.hpp>
+#include <ui/MenuOverlay.hpp>
 #include <ui/ScrollWidget.hpp>
 #include <ui/SequentialLayout.hpp>
 #include <ui/MarginLayout.hpp>
@@ -101,23 +102,15 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 // Widgets
 
 
-struct BrowserOverlay : widget::OpaqueWidget {
+struct BrowserOverlay : ui::MenuOverlay {
 	void step() override {
-		box = parent->box.zeroPos();
 		// Only step if visible, since there are potentially thousands of descendants that don't need to be stepped.
-		if (visible)
-			OpaqueWidget::step();
+		if (isVisible())
+			MenuOverlay::step();
 	}
 
-	void onButton(const event::Button& e) override {
-		OpaqueWidget::onButton(e);
-		if (e.getTarget() != this)
-			return;
-
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-			hide();
-			e.consume(this);
-		}
+	void onAction(const event::Action& e) override {
+		hide();
 	}
 };
 
@@ -447,7 +440,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	}
 
 	void step() override {
-		box = parent->box.zeroPos().grow(math::Vec(-70, -70));
+		box = parent->box.zeroPos().grow(math::Vec(-40, -40));
 
 		sidebar->box.size.y = box.size.y;
 

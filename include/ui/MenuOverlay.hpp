@@ -13,6 +13,7 @@ struct MenuOverlay : widget::OpaqueWidget {
 	void step() override;
 	void onButton(const event::Button& e) override;
 	void onHoverKey(const event::HoverKey& e) override;
+	void onAction(const event::Action& e) override;
 };
 
 
