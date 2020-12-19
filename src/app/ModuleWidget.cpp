@@ -505,6 +505,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 void ModuleWidget::onDragStart(const event::DragStart& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		internal->dragPos = APP->scene->rack->mousePos.minus(box.pos);
+		DEBUG("drag (%f, %f)", VEC_ARGS(internal->dragPos));
 		APP->scene->rack->updateModuleOldPositions();
 	}
 }

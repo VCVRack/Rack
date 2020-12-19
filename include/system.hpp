@@ -106,10 +106,10 @@ Examples:
 std::string getExtension(const std::string& path);
 
 /** Compresses the contents of a folder (recursively) to an archive.
-Currently supports the "ustar zstd" format (.tar.zst)
+Uses the Unix Standard TAR + Zstandard format (.tar.zst).
 An equivalent shell command is
 
-	tar -cf archivePath --zstd -C folderPath .
+	ZSTD_CLEVEL=1 tar -cf archivePath --zstd -C folderPath .
 */
 void archiveFolder(const std::string& archivePath, const std::string& folderPath, int compressionLevel = 1);
 /** Extracts an archive into a folder.

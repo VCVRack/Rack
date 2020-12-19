@@ -352,7 +352,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 		// Stop CPU timer
 		if (cpuMeter) {
 			double endTime = system::getTime();
-			float duration = (endTime - startTime) / 1e9;
+			float duration = endTime - startTime;
 
 			// Smooth CPU time
 			const float cpuTau = 2.f /* seconds */;
@@ -571,6 +571,7 @@ void Engine::step(int frames) {
 	if (internal->sampleRate != settings::sampleRate) {
 		internal->sampleRate = settings::sampleRate;
 		internal->sampleTime = 1.f / internal->sampleRate;
+		// Trigger SampleRateChangeEvent
 		Module::SampleRateChangeEvent e;
 		e.sampleRate = internal->sampleRate;
 		e.sampleTime = internal->sampleTime;
@@ -594,6 +595,11 @@ void Engine::step(int frames) {
 	}
 
 	yieldWorkers();
+
+	double endTime = system::getTime();
+	float duration = endTime - internal->stepTime;
+	float stepDuration = internal->stepFrames * internal->sampleTime;
+	DEBUG("%d %f / %f = %f%%", internal->stepFrames, duration, stepDuration, duration / stepDuration * 100.f);
 }
 
 
