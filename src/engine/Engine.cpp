@@ -599,7 +599,7 @@ void Engine::step(int frames) {
 	double endTime = system::getTime();
 	float duration = endTime - internal->stepTime;
 	float stepDuration = internal->stepFrames * internal->sampleTime;
-	DEBUG("%d %f / %f = %f%%", internal->stepFrames, duration, stepDuration, duration / stepDuration * 100.f);
+	// DEBUG("%d %f / %f = %f%%", internal->stepFrames, duration, stepDuration, duration / stepDuration * 100.f);
 }
 
 

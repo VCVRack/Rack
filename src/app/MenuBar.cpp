@@ -28,6 +28,7 @@
 
 namespace rack {
 namespace app {
+namespace menuBar {
 
 
 struct MenuButton : ui::Button {
@@ -61,7 +62,7 @@ struct NotificationIcon : widget::Widget {
 struct UrlItem : ui::MenuItem {
 	std::string url;
 	void onAction(const event::Action& e) override {
-		std::thread t([ = ] {
+		std::thread t([=] {
 			system::openBrowser(url);
 		});
 		t.detach();
@@ -71,7 +72,7 @@ struct UrlItem : ui::MenuItem {
 struct FolderItem : ui::MenuItem {
 	std::string path;
 	void onAction(const event::Action& e) override {
-		std::thread t([ = ] {
+		std::thread t([=] {
 			system::openFolder(path);
 		});
 		t.detach();
@@ -611,7 +612,7 @@ struct LogInItem : ui::MenuItem {
 		isLoggingIn = true;
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
-		std::thread t([ = ] {
+		std::thread t([=] {
 			library::logIn(email, password);
 			isLoggingIn = false;
 		});
@@ -954,6 +955,40 @@ struct HelpButton : MenuButton {
 
 
 struct MenuBar : widget::OpaqueWidget {
+	MenuBar() {
+		const float margin = 5;
+		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
+
+		ui::SequentialLayout* layout = new ui::SequentialLayout;
+		layout->box.pos = math::Vec(margin, margin);
+		layout->spacing = math::Vec(0, 0);
+		addChild(layout);
+
+		FileButton* fileButton = new FileButton;
+		fileButton->text = "File";
+		layout->addChild(fileButton);
+
+		EditButton* editButton = new EditButton;
+		editButton->text = "Edit";
+		layout->addChild(editButton);
+
+		ViewButton* viewButton = new ViewButton;
+		viewButton->text = "View";
+		layout->addChild(viewButton);
+
+		EngineButton* engineButton = new EngineButton;
+		engineButton->text = "Engine";
+		layout->addChild(engineButton);
+
+		LibraryButton* libraryButton = new LibraryButton;
+		libraryButton->text = "Library";
+		layout->addChild(libraryButton);
+
+		HelpButton* helpButton = new HelpButton;
+		helpButton->text = "Help";
+		layout->addChild(helpButton);
+	}
+
 	void draw(const DrawArgs& args) override {
 		bndMenuBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_ALL);
 		bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
@@ -963,41 +998,11 @@ struct MenuBar : widget::OpaqueWidget {
 };
 
 
+} // namespace menuBar
+
+
 widget::Widget* createMenuBar() {
-	MenuBar* menuBar = new MenuBar;
-
-	const float margin = 5;
-	menuBar->box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
-
-	ui::SequentialLayout* layout = new ui::SequentialLayout;
-	layout->box.pos = math::Vec(margin, margin);
-	layout->spacing = math::Vec(0, 0);
-	menuBar->addChild(layout);
-
-	FileButton* fileButton = new FileButton;
-	fileButton->text = "File";
-	layout->addChild(fileButton);
-
-	EditButton* editButton = new EditButton;
-	editButton->text = "Edit";
-	layout->addChild(editButton);
-
-	ViewButton* viewButton = new ViewButton;
-	viewButton->text = "View";
-	layout->addChild(viewButton);
-
-	EngineButton* engineButton = new EngineButton;
-	engineButton->text = "Engine";
-	layout->addChild(engineButton);
-
-	LibraryButton* libraryButton = new LibraryButton;
-	libraryButton->text = "Library";
-	layout->addChild(libraryButton);
-
-	HelpButton* helpButton = new HelpButton;
-	helpButton->text = "Help";
-	layout->addChild(helpButton);
-
+	menuBar::MenuBar* menuBar = new menuBar::MenuBar;
 	return menuBar;
 }
 

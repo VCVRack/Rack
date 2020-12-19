@@ -1,5 +1,6 @@
 #include <set>
 #include <algorithm>
+#include <thread>
 
 #include <app/ModuleBrowser.hpp>
 #include <widget/OpaqueWidget.hpp>
@@ -10,13 +11,12 @@
 #include <ui/SequentialLayout.hpp>
 #include <ui/MarginLayout.hpp>
 #include <ui/Label.hpp>
+#include <ui/Slider.hpp>
 #include <ui/TextField.hpp>
-#include <ui/MenuOverlay.hpp>
-#include <ui/List.hpp>
 #include <ui/MenuItem.hpp>
 #include <ui/Button.hpp>
-#include <ui/RadioButton.hpp>
 #include <ui/ChoiceButton.hpp>
+#include <ui/RadioButton.hpp>
 #include <ui/Tooltip.hpp>
 #include <app/ModuleWidget.hpp>
 #include <app/Scene.hpp>
@@ -27,12 +27,14 @@
 #include <string.hpp>
 #include <history.hpp>
 #include <settings.hpp>
+#include <system.hpp>
 #include <tag.hpp>
 #include <FuzzySearchDatabase.hpp>
 
 
 namespace rack {
 namespace app {
+namespace moduleBrowser {
 
 
 static fuzzysearch::Database<plugin::Model*> modelDb;
@@ -244,19 +246,6 @@ struct ModelBox : widget::OpaqueWidget {
 };
 
 
-struct BrandItem : ui::MenuItem {
-	void onAction(const event::Action& e) override;
-	void step() override;
-};
-
-
-struct TagItem : ui::MenuItem {
-	int tagId;
-	void onAction(const event::Action& e) override;
-	void step() override;
-};
-
-
 struct BrowserSearchField : ui::TextField {
 	void step() override {
 		// Steal focus when step is called
@@ -285,131 +274,185 @@ struct ClearButton : ui::Button {
 };
 
 
-struct BrowserSidebar : widget::Widget {
-	BrowserSearchField* searchField;
-	ClearButton* clearButton;
-	ui::Label* tagLabel;
-	ui::List* tagList;
-	ui::ScrollWidget* tagScroll;
-	ui::Label* brandLabel;
-	ui::List* brandList;
-	ui::ScrollWidget* brandScroll;
+struct BrandItem : ui::MenuItem {
+	std::string brand;
+	void onAction(const event::Action& e) override;
+	void step() override;
+};
 
-	BrowserSidebar() {
-		// Search
-		searchField = new BrowserSearchField;
-		addChild(searchField);
 
-		// Clear filters
-		clearButton = new ClearButton;
-		clearButton->text = "Reset filters";
-		addChild(clearButton);
+struct BrandButton : ui::ChoiceButton {
+	void onAction(const event::Action& e) override {
+		// // Collect brands from all plugins
+		// std::set<std::string, string::CaseInsensitiveCompare> brands;
+		// for (plugin::Plugin* plugin : plugin::plugins) {
+		// 	brands.insert(plugin->brand);
+		// }
 
-		// Tag label
-		tagLabel = new ui::Label;
-		// tagLabel->fontSize = 16;
-		tagLabel->color = nvgRGB(0x80, 0x80, 0x80);
-		tagLabel->text = "Tags";
-		addChild(tagLabel);
-
-		// Tag list
-		tagScroll = new ui::ScrollWidget;
-		addChild(tagScroll);
-
-		tagList = new ui::List;
-		tagScroll->container->addChild(tagList);
-
-		for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
-			TagItem* item = new TagItem;
-			item->text = tag::tagAliases[tagId][0];
-			item->tagId = tagId;
-			tagList->addChild(item);
-		}
-
-		// Brand label
-		brandLabel = new ui::Label;
-		// brandLabel->fontSize = 16;
-		brandLabel->color = nvgRGB(0x80, 0x80, 0x80);
-		brandLabel->text = "Brands";
-		addChild(brandLabel);
-
-		// Brand list
-		brandScroll = new ui::ScrollWidget;
-		addChild(brandScroll);
-
-		brandList = new ui::List;
-		brandScroll->container->addChild(brandList);
-
-		// Collect brands from all plugins
-		std::set<std::string, string::CaseInsensitiveCompare> brands;
-		for (plugin::Plugin* plugin : plugin::plugins) {
-			brands.insert(plugin->brand);
-		}
-
-		for (const std::string& brand : brands) {
-			BrandItem* item = new BrandItem;
-			item->text = brand;
-			brandList->addChild(item);
-		}
+		// for (const std::string& brand : brands) {
+		// 	BrandItem* item = new BrandItem;
+		// 	item->text = brand;
+		// 	brandList->addChild(item);
+		// }
 	}
 
-	void step() override {
-		searchField->box.size.x = box.size.x;
-		clearButton->box.pos = searchField->box.getBottomLeft();
-		clearButton->box.size.x = box.size.x;
+	void step() override;
+};
 
-		float listHeight = (box.size.y - clearButton->box.getBottom()) / 2;
-		listHeight = std::floor(listHeight);
 
-		tagLabel->box.pos = clearButton->box.getBottomLeft();
-		tagLabel->box.size.x = box.size.x;
-		tagScroll->box.pos = tagLabel->box.getBottomLeft();
-		tagScroll->box.size.y = listHeight - tagLabel->box.size.y;
-		tagScroll->box.size.x = box.size.x;
-		tagList->box.size.x = tagScroll->box.size.x;
+struct TagItem : ui::MenuItem {
+	int tagId;
+	void onAction(const event::Action& e) override;
+	void step() override;
+};
 
-		brandLabel->box.pos = tagScroll->box.getBottomLeft();
-		brandLabel->box.size.x = box.size.x;
-		brandScroll->box.pos = brandLabel->box.getBottomLeft();
-		brandScroll->box.size.y = listHeight - brandLabel->box.size.y;
-		brandScroll->box.size.x = box.size.x;
-		brandList->box.size.x = brandScroll->box.size.x;
 
-		Widget::step();
+struct TagButton : ui::ChoiceButton {
+	void onAction(const event::Action& e) override {
+		// for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
+		// 	TagItem* item = new TagItem;
+		// 	item->text = tag::tagAliases[tagId][0];
+		// 	item->tagId = tagId;
+		// 	tagList->addChild(item);
+		// }
+	}
+
+	void step() override;
+};
+
+
+struct ZoomQuantity : Quantity {
+	void setValue(float value) override {
+		settings::zoom = value;
+	}
+	float getValue() override {
+		return settings::zoom;
+	}
+	float getMinValue() override {
+		return -2.0;
+	}
+	float getMaxValue() override {
+		return 2.0;
+	}
+	float getDefaultValue() override {
+		return 0.0;
+	}
+	float getDisplayValue() override {
+		return std::round(std::pow(2.f, getValue()) * 100);
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(std::log2(displayValue / 100));
+	}
+	std::string getLabel() override {
+		return "Zoom";
+	}
+	std::string getUnit() override {
+		return "%";
+	}
+};
+
+
+struct ZoomSlider : ui::Slider {
+	ZoomSlider() {
+		quantity = new ZoomQuantity;
+	}
+	~ZoomSlider() {
+		delete quantity;
+	}
+};
+
+
+struct SortButton : ui::ChoiceButton {
+	void onAction(const event::Action& e) override {}
+	void step() override {}
+};
+
+
+struct UrlButton : ui::Button {
+	std::string url;
+	void onAction(const event::Action& e) override {
+		std::thread t([=] {
+			system::openBrowser(url);
+		});
+		t.detach();
 	}
 };
 
 
 struct ModuleBrowser : widget::OpaqueWidget {
-	BrowserSidebar* sidebar;
+	ui::SequentialLayout* headerLayout;
+	BrowserSearchField* searchField;
+	BrandButton* brandButton;
+	TagButton* tagButton;
+	ClearButton* clearButton;
+
 	ui::ScrollWidget* modelScroll;
-	ui::Label* modelLabel;
 	ui::MarginLayout* modelMargin;
 	ui::SequentialLayout* modelContainer;
 
 	std::string search;
 	std::string brand;
-	int tagId = -1;
+	std::vector<int> tagIds = {};
 
 	ModuleBrowser() {
-		sidebar = new BrowserSidebar;
-		sidebar->box.size.x = 200;
-		addChild(sidebar);
+		float margin = 10;
 
-		modelLabel = new ui::Label;
-		// modelLabel->fontSize = 16;
-		// modelLabel->box.size.x = 400;
-		addChild(modelLabel);
+		// Header
+		headerLayout = new ui::SequentialLayout;
+		headerLayout->box.pos = math::Vec(0, 0);
+		headerLayout->box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
+		headerLayout->margin = math::Vec(margin, margin);
+		headerLayout->spacing = math::Vec(margin, margin);
+		addChild(headerLayout);
 
+		searchField = new BrowserSearchField;
+		searchField->box.size.x = 150;
+		searchField->placeholder = "Search modules";
+		headerLayout->addChild(searchField);
+
+		brandButton = new BrandButton;
+		brandButton->box.size.x = 150;
+		headerLayout->addChild(brandButton);
+
+		tagButton = new TagButton;
+		tagButton->box.size.x = 150;
+		headerLayout->addChild(tagButton);
+
+		clearButton = new ClearButton;
+		clearButton->box.size.x = 100;
+		clearButton->text = "Reset filters";
+		headerLayout->addChild(clearButton);
+
+		widget::Widget* spacer1 = new widget::Widget;
+		spacer1->box.size.x = 20;
+		headerLayout->addChild(spacer1);
+
+		ZoomSlider* zoomSlider = new ZoomSlider;
+		zoomSlider->box.size.x = 150;
+		headerLayout->addChild(zoomSlider);
+
+		SortButton* sortButton = new SortButton;
+		sortButton->box.size.x = 150;
+		sortButton->text = "Sort: Most used";
+		headerLayout->addChild(sortButton);
+
+		UrlButton* libraryButton = new UrlButton;
+		libraryButton->box.size.x = 150;
+		libraryButton->text = "Browse VCV Library";
+		libraryButton->url = "https://library.vcvrack.com/";
+		headerLayout->addChild(libraryButton);
+
+		// Model container
 		modelScroll = new ui::ScrollWidget;
+		modelScroll->box.pos.y = BND_WIDGET_HEIGHT;
 		addChild(modelScroll);
 
 		modelMargin = new ui::MarginLayout;
-		modelMargin->margin = math::Vec(10, 10);
+		modelMargin->margin = math::Vec(margin, 0);
 		modelScroll->container->addChild(modelMargin);
 
 		modelContainer = new ui::SequentialLayout;
-		modelContainer->spacing = math::Vec(10, 10);
+		modelContainer->spacing = math::Vec(margin, margin);
 		modelMargin->addChild(modelContainer);
 
 		resetModelBoxes();
@@ -442,11 +485,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	void step() override {
 		box = parent->box.zeroPos().grow(math::Vec(-40, -40));
 
-		sidebar->box.size.y = box.size.y;
+		headerLayout->box.size.x = box.size.x;
 
-		modelLabel->box.pos = sidebar->box.getTopRight().plus(math::Vec(5, 5));
-
-		modelScroll->box.pos = sidebar->box.getTopRight().plus(math::Vec(0, 30));
+		modelScroll->box.pos = headerLayout->box.getBottomLeft();
 		modelScroll->box.size = box.size.minus(modelScroll->box.pos);
 		modelMargin->box.size.x = modelScroll->box.size.x;
 		modelMargin->box.size.y = modelContainer->getChildrenBoundingBox().size.y + 2 * modelMargin->margin.y;
@@ -463,7 +504,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
 
-		auto isModelVisible = [&](plugin::Model* model, const std::string& brand, int tagId) -> bool {
+		auto isModelVisible = [&](plugin::Model* model, const std::string& brand, std::vector<int> tagIds) -> bool {
 			// Filter brand
 			if (brand != "") {
 				if (model->plugin->brand != brand)
@@ -471,7 +512,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 
 			// Filter tag
-			if (tagId >= 0) {
+			for (int tagId : tagIds) {
 				auto it = std::find(model->tags.begin(), model->tags.end(), tagId);
 				if (it == model->tags.end())
 					return false;
@@ -484,7 +525,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		for (Widget* w : modelContainer->children) {
 			ModelBox* m = dynamic_cast<ModelBox*>(w);
 			assert(m);
-			m->visible = isModelVisible(m->model, brand, tagId);
+			m->visible = isModelVisible(m->model, brand, tagIds);
 		}
 
 		std::map<plugin::Model*, float> prefilteredModelScores;
@@ -537,56 +578,50 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 
 		// Determines if there is at least 1 visible Model with a given brand and tag
-		auto hasVisibleModel = [&](const std::string& brand, int tagId) -> bool {
+		auto hasVisibleModel = [&](const std::string& brand, std::vector<int> tagIds) -> bool {
 			for (auto& pair : prefilteredModelScores) {
 				plugin::Model* model = pair.first;
-				if (isModelVisible(model, brand, tagId))
+				if (isModelVisible(model, brand, tagIds))
 					return true;
 			}
 			return false;
 		};
 
-		// Enable brand and tag items that are available in visible ModelBoxes
-		int brandsLen = 0;
-		for (Widget* w : sidebar->brandList->children) {
-			BrandItem* item = dynamic_cast<BrandItem*>(w);
-			assert(item);
-			item->disabled = !hasVisibleModel(item->text, tagId);
-			if (!item->disabled)
-				brandsLen++;
-		}
-		sidebar->brandLabel->text = string::f("Brands (%d)", brandsLen);
+		// // Enable brand and tag items that are available in visible ModelBoxes
+		// int brandsLen = 0;
+		// for (Widget* w : sidebar->brandList->children) {
+		// 	BrandItem* item = dynamic_cast<BrandItem*>(w);
+		// 	assert(item);
+		// 	item->disabled = !hasVisibleModel(item->text, tagIds);
+		// 	if (!item->disabled)
+		// 		brandsLen++;
+		// }
+		// sidebar->brandLabel->text = string::f("Brands (%d)", brandsLen);
 
-		int tagsLen = 0;
-		for (Widget* w : sidebar->tagList->children) {
-			TagItem* item = dynamic_cast<TagItem*>(w);
-			assert(item);
-			item->disabled = !hasVisibleModel(brand, item->tagId);
-			if (!item->disabled)
-				tagsLen++;
-		}
-		sidebar->tagLabel->text = string::f("Tags (%d)", tagsLen);
+		// int tagsLen = 0;
+		// for (Widget* w : sidebar->tagList->children) {
+		// 	TagItem* item = dynamic_cast<TagItem*>(w);
+		// 	assert(item);
+		// 	item->disabled = !hasVisibleModel(brand, {item->tagId});
+		// 	if (!item->disabled)
+		// 		tagsLen++;
+		// }
+		// sidebar->tagLabel->text = string::f("Tags (%d)", tagsLen);
 
-		// Count models
-		int modelsLen = 0;
-		for (Widget* w : modelContainer->children) {
-			if (w->visible)
-				modelsLen++;
-		}
-		modelLabel->text = string::f("Modules (%d) Click and drag a module to place it in the rack.", modelsLen);
+		// // Count models
+		// int modelsLen = 0;
+		// for (Widget* w : modelContainer->children) {
+		// 	if (w->visible)
+		// 		modelsLen++;
+		// }
 	}
 
 	void clear() {
 		search = "";
-		sidebar->searchField->setText("");
-		brand = "";
-		tagId = -1;
+		searchField->setText("");
+		brand = "VCV";
+		tagIds = {};
 		refresh();
-	}
-
-	void onShow(const event::Show& e) override {
-		refresh();
-		OpaqueWidget::onShow(e);
 	}
 };
 
@@ -594,34 +629,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 // Implementations to resolve dependencies
 
 
-inline void BrandItem::onAction(const event::Action& e) {
+inline void ClearButton::onAction(const event::Action& e) {
 	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	if (browser->brand == text)
-		browser->brand = "";
-	else
-		browser->brand = text;
-	browser->refresh();
-}
-
-inline void BrandItem::step() {
-	MenuItem::step();
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	active = (browser->brand == text);
-}
-
-inline void TagItem::onAction(const event::Action& e) {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	if (browser->tagId == tagId)
-		browser->tagId = -1;
-	else
-		browser->tagId = tagId;
-	browser->refresh();
-}
-
-inline void TagItem::step() {
-	MenuItem::step();
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	active = (browser->tagId == tagId);
+	browser->clear();
 }
 
 inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
@@ -631,6 +641,7 @@ inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
 			overlay->hide();
 			e.consume(this);
 		}
+		// Backspace when the field is empty to clear filters.
 		if (e.key == GLFW_KEY_BACKSPACE) {
 			if (text == "") {
 				ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
@@ -655,7 +666,7 @@ inline void BrowserSearchField::onAction(const event::Action& e) {
 	ModelBox* mb = NULL;
 	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 	for (Widget* w : browser->modelContainer->children) {
-		if (w->visible) {
+		if (w->isVisible()) {
 			mb = dynamic_cast<ModelBox*>(w);
 			break;
 		}
@@ -666,19 +677,74 @@ inline void BrowserSearchField::onAction(const event::Action& e) {
 	}
 }
 
-inline void ClearButton::onAction(const event::Action& e) {
+inline void BrandItem::onAction(const event::Action& e) {
 	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	browser->clear();
+	if (browser->brand == brand)
+		browser->brand = "";
+	else
+		browser->brand = brand;
+	browser->refresh();
+}
+
+inline void BrandItem::step() {
+	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
+	rightText = CHECKMARK(browser->brand == brand);
+	MenuItem::step();
+}
+
+inline void BrandButton::step() {
+	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
+	text = "Brand";
+	if (!browser->brand.empty()) {
+		text += ": ";
+		text += browser->brand;
+	}
+	ChoiceButton::step();
+}
+
+inline void TagItem::onAction(const event::Action& e) {
+	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
+	auto it = std::find(browser->tagIds.begin(), browser->tagIds.end(), tagId);
+	bool isSelected = (it != browser->tagIds.end());
+	if (isSelected)
+		browser->tagIds = {};
+	else
+		browser->tagIds = {tagId};
+	browser->refresh();
+}
+
+inline void TagItem::step() {
+	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
+	auto it = std::find(browser->tagIds.begin(), browser->tagIds.end(), tagId);
+	bool isSelected = (it != browser->tagIds.end());
+	rightText = CHECKMARK(isSelected);
+	MenuItem::step();
+}
+
+inline void TagButton::step() {
+	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
+	text = "Tags";
+	if (!browser->tagIds.empty()) {
+		text += ": ";
+		bool firstTag = true;
+		for (int tagId : browser->tagIds) {
+			if (!firstTag)
+				text += ", ";
+			text += tag::getTag(tagId);
+			firstTag = false;
+		}
+	}
+	ChoiceButton::step();
 }
 
 
-// Global functions
+} // namespace moduleBrowser
 
 
 widget::Widget* moduleBrowserCreate() {
-	BrowserOverlay* overlay = new BrowserOverlay;
+	moduleBrowser::BrowserOverlay* overlay = new moduleBrowser::BrowserOverlay;
 
-	ModuleBrowser* browser = new ModuleBrowser;
+	moduleBrowser::ModuleBrowser* browser = new moduleBrowser::ModuleBrowser;
 	overlay->addChild(browser);
 
 	return overlay;
