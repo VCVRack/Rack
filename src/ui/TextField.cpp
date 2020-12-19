@@ -61,7 +61,7 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 		if (pos == std::string::npos)
 			cursor = 0;
 		else
-			cursor = pos;
+			cursor = std::min((int) pos + 1, (int) text.size());
 	};
 	auto cursorToNextWord = [&]() {
 		size_t pos = text.find(' ', std::min(cursor + 1, (int) text.size()));
