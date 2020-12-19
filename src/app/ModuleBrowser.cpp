@@ -321,48 +321,13 @@ struct TagButton : ui::ChoiceButton {
 };
 
 
-struct ZoomQuantity : Quantity {
-	void setValue(float value) override {
-		settings::zoom = value;
-	}
-	float getValue() override {
-		return settings::zoom;
-	}
-	float getMinValue() override {
-		return -2.0;
-	}
-	float getMaxValue() override {
-		return 2.0;
-	}
-	float getDefaultValue() override {
-		return 0.0;
-	}
-	float getDisplayValue() override {
-		return std::round(std::pow(2.f, getValue()) * 100);
-	}
-	void setDisplayValue(float displayValue) override {
-		setValue(std::log2(displayValue / 100));
-	}
-	std::string getLabel() override {
-		return "Zoom";
-	}
-	std::string getUnit() override {
-		return "%";
-	}
-};
-
-
-struct ZoomSlider : ui::Slider {
-	ZoomSlider() {
-		quantity = new ZoomQuantity;
-	}
-	~ZoomSlider() {
-		delete quantity;
-	}
-};
-
-
 struct SortButton : ui::ChoiceButton {
+	void onAction(const event::Action& e) override {}
+	void step() override {}
+};
+
+
+struct ZoomButton : ui::ChoiceButton {
 	void onAction(const event::Action& e) override {}
 	void step() override {}
 };
@@ -427,14 +392,15 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		spacer1->box.size.x = 20;
 		headerLayout->addChild(spacer1);
 
-		ZoomSlider* zoomSlider = new ZoomSlider;
-		zoomSlider->box.size.x = 150;
-		headerLayout->addChild(zoomSlider);
-
 		SortButton* sortButton = new SortButton;
 		sortButton->box.size.x = 150;
 		sortButton->text = "Sort: Most used";
 		headerLayout->addChild(sortButton);
+
+		ZoomButton* zoomButton = new ZoomButton;
+		zoomButton->box.size.x = 100;
+		zoomButton->text = "Zoom: 25%";
+		headerLayout->addChild(zoomButton);
 
 		UrlButton* libraryButton = new UrlButton;
 		libraryButton->box.size.x = 150;
