@@ -114,7 +114,7 @@ struct TipWindow : widget::OpaqueWidget {
 		};
 		PreviousButton* prevButton = new PreviousButton;
 		prevButton->box.size.x = buttonWidth;
-		prevButton->text = "Previous";
+		prevButton->text = "◀ Previous";
 		prevButton->tipWindow = this;
 		buttonLayout->addChild(prevButton);
 
@@ -126,7 +126,7 @@ struct TipWindow : widget::OpaqueWidget {
 		};
 		NextButton* nextButton = new NextButton;
 		nextButton->box.size.x = buttonWidth;
-		nextButton->text = "Next";
+		nextButton->text = "▶ Next";
 		nextButton->tipWindow = this;
 		buttonLayout->addChild(nextButton);
 
@@ -138,7 +138,7 @@ struct TipWindow : widget::OpaqueWidget {
 		};
 		CloseButton* closeButton = new CloseButton;
 		closeButton->box.size.x = buttonWidth;
-		closeButton->text = "Close";
+		closeButton->text = "✖ Close";
 		closeButton->tipWindow = this;
 		buttonLayout->addChild(closeButton);
 

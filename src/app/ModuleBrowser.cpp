@@ -14,6 +14,7 @@
 #include <ui/Slider.hpp>
 #include <ui/TextField.hpp>
 #include <ui/MenuItem.hpp>
+#include <ui/MenuSeparator.hpp>
 #include <ui/Button.hpp>
 #include <ui/ChoiceButton.hpp>
 #include <ui/RadioButton.hpp>
@@ -29,6 +30,7 @@
 #include <settings.hpp>
 #include <system.hpp>
 #include <tag.hpp>
+#include <helpers.hpp>
 #include <FuzzySearchDatabase.hpp>
 
 
@@ -102,6 +104,9 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 
 
 // Widgets
+
+
+struct ModuleBrowser;
 
 
 struct BrowserOverlay : ui::MenuOverlay {
@@ -247,6 +252,8 @@ struct ModelBox : widget::OpaqueWidget {
 
 
 struct BrowserSearchField : ui::TextField {
+	ModuleBrowser* browser;
+
 	void step() override {
 		// Steal focus when step is called
 		APP->event->setSelected(this);
@@ -270,11 +277,13 @@ struct BrowserSearchField : ui::TextField {
 
 
 struct ClearButton : ui::Button {
+	ModuleBrowser* browser;
 	void onAction(const event::Action& e) override;
 };
 
 
 struct BrandItem : ui::MenuItem {
+	ModuleBrowser* browser;
 	std::string brand;
 	void onAction(const event::Action& e) override;
 	void step() override;
@@ -282,18 +291,34 @@ struct BrandItem : ui::MenuItem {
 
 
 struct BrandButton : ui::ChoiceButton {
-	void onAction(const event::Action& e) override {
-		// // Collect brands from all plugins
-		// std::set<std::string, string::CaseInsensitiveCompare> brands;
-		// for (plugin::Plugin* plugin : plugin::plugins) {
-		// 	brands.insert(plugin->brand);
-		// }
+	ModuleBrowser* browser;
 
-		// for (const std::string& brand : brands) {
-		// 	BrandItem* item = new BrandItem;
-		// 	item->text = brand;
-		// 	brandList->addChild(item);
-		// }
+	void onAction(const event::Action& e) override {
+		ui::Menu* menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		BrandItem* noneItem = new BrandItem;
+		noneItem->text = "All brands";
+		noneItem->brand = "";
+		noneItem->browser = browser;
+		menu->addChild(noneItem);
+
+		menu->addChild(new ui::MenuSeparator);
+
+		// Collect brands from all plugins
+		std::set<std::string, string::CaseInsensitiveCompare> brands;
+		for (plugin::Plugin* plugin : plugin::plugins) {
+			brands.insert(plugin->brand);
+		}
+
+		for (const std::string& brand : brands) {
+			BrandItem* brandItem = new BrandItem;
+			brandItem->text = brand;
+			brandItem->brand = brand;
+			brandItem->browser = browser;
+			menu->addChild(brandItem);
+		}
 	}
 
 	void step() override;
@@ -301,6 +326,7 @@ struct BrandButton : ui::ChoiceButton {
 
 
 struct TagItem : ui::MenuItem {
+	ModuleBrowser* browser;
 	int tagId;
 	void onAction(const event::Action& e) override;
 	void step() override;
@@ -308,13 +334,29 @@ struct TagItem : ui::MenuItem {
 
 
 struct TagButton : ui::ChoiceButton {
+	ModuleBrowser* browser;
+
 	void onAction(const event::Action& e) override {
-		// for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
-		// 	TagItem* item = new TagItem;
-		// 	item->text = tag::tagAliases[tagId][0];
-		// 	item->tagId = tagId;
-		// 	tagList->addChild(item);
-		// }
+		ui::Menu* menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		TagItem* noneItem = new TagItem;
+		noneItem->text = "All tags";
+		noneItem->tagId = -1;
+		noneItem->browser = browser;
+		menu->addChild(noneItem);
+
+		menu->addChild(createMenuLabel(RACK_MOD_CTRL_NAME "+click to select multiple"));
+		menu->addChild(new ui::MenuSeparator);
+
+		for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
+			TagItem* tagItem = new TagItem;
+			tagItem->text = tag::getTag(tagId);
+			tagItem->tagId = tagId;
+			tagItem->browser = browser;
+			menu->addChild(tagItem);
+		}
 	}
 
 	void step() override;
@@ -357,7 +399,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 	std::string search;
 	std::string brand;
-	std::vector<int> tagIds = {};
+	std::set<int> tagIds = {};
 
 	ModuleBrowser() {
 		float margin = 10;
@@ -373,19 +415,23 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		searchField = new BrowserSearchField;
 		searchField->box.size.x = 150;
 		searchField->placeholder = "Search modules";
+		searchField->browser = this;
 		headerLayout->addChild(searchField);
 
 		brandButton = new BrandButton;
 		brandButton->box.size.x = 150;
+		brandButton->browser = this;
 		headerLayout->addChild(brandButton);
 
 		tagButton = new TagButton;
 		tagButton->box.size.x = 150;
+		tagButton->browser = this;
 		headerLayout->addChild(tagButton);
 
 		clearButton = new ClearButton;
 		clearButton->box.size.x = 100;
 		clearButton->text = "Reset filters";
+		clearButton->browser = this;
 		headerLayout->addChild(clearButton);
 
 		widget::Widget* spacer1 = new widget::Widget;
@@ -470,7 +516,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
 
-		auto isModelVisible = [&](plugin::Model* model, const std::string& brand, std::vector<int> tagIds) -> bool {
+		auto isModelVisible = [&](plugin::Model* model, const std::string& brand, std::set<int> tagIds) -> bool {
 			// Filter brand
 			if (brand != "") {
 				if (model->plugin->brand != brand)
@@ -544,7 +590,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 
 		// Determines if there is at least 1 visible Model with a given brand and tag
-		auto hasVisibleModel = [&](const std::string& brand, std::vector<int> tagIds) -> bool {
+		auto hasVisibleModel = [&](const std::string& brand, std::set<int> tagIds) -> bool {
 			for (auto& pair : prefilteredModelScores) {
 				plugin::Model* model = pair.first;
 				if (isModelVisible(model, brand, tagIds))
@@ -585,7 +631,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	void clear() {
 		search = "";
 		searchField->setText("");
-		brand = "VCV";
+		brand = "";
 		tagIds = {};
 		refresh();
 	}
@@ -596,21 +642,19 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 
 inline void ClearButton::onAction(const event::Action& e) {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 	browser->clear();
 }
 
 inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		if (e.key == GLFW_KEY_ESCAPE) {
-			BrowserOverlay* overlay = getAncestorOfType<BrowserOverlay>();
+			BrowserOverlay* overlay = browser->getAncestorOfType<BrowserOverlay>();
 			overlay->hide();
 			e.consume(this);
 		}
 		// Backspace when the field is empty to clear filters.
 		if (e.key == GLFW_KEY_BACKSPACE) {
 			if (text == "") {
-				ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 				browser->clear();
 				e.consume(this);
 			}
@@ -622,7 +666,6 @@ inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
 }
 
 inline void BrowserSearchField::onChange(const event::Change& e) {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 	browser->search = string::trim(text);
 	browser->refresh();
 }
@@ -630,7 +673,6 @@ inline void BrowserSearchField::onChange(const event::Change& e) {
 inline void BrowserSearchField::onAction(const event::Action& e) {
 	// Get first ModelBox
 	ModelBox* mb = NULL;
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 	for (Widget* w : browser->modelContainer->children) {
 		if (w->isVisible()) {
 			mb = dynamic_cast<ModelBox*>(w);
@@ -644,7 +686,6 @@ inline void BrowserSearchField::onAction(const event::Action& e) {
 }
 
 inline void BrandItem::onAction(const event::Action& e) {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 	if (browser->brand == brand)
 		browser->brand = "";
 	else
@@ -653,42 +694,66 @@ inline void BrandItem::onAction(const event::Action& e) {
 }
 
 inline void BrandItem::step() {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 	rightText = CHECKMARK(browser->brand == brand);
 	MenuItem::step();
 }
 
 inline void BrandButton::step() {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 	text = "Brand";
 	if (!browser->brand.empty()) {
 		text += ": ";
 		text += browser->brand;
 	}
+	text = string::ellipsize(text, 21);
 	ChoiceButton::step();
 }
 
 inline void TagItem::onAction(const event::Action& e) {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	auto it = std::find(browser->tagIds.begin(), browser->tagIds.end(), tagId);
+	auto it = browser->tagIds.find(tagId);
 	bool isSelected = (it != browser->tagIds.end());
-	if (isSelected)
+
+	if (tagId >= 0) {
+		// Actual tag
+		int mods = APP->window->getMods();
+		if ((mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			// Multi select
+			if (isSelected)
+				browser->tagIds.erase(tagId);
+			else
+				browser->tagIds.insert(tagId);
+			e.unconsume();
+		}
+		else {
+			// Single select
+			if (isSelected)
+				browser->tagIds = {};
+			else {
+				browser->tagIds = {tagId};
+			}
+		}
+	}
+	else {
+		// All tags
 		browser->tagIds = {};
-	else
-		browser->tagIds = {tagId};
+	}
+
 	browser->refresh();
 }
 
 inline void TagItem::step() {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
-	auto it = std::find(browser->tagIds.begin(), browser->tagIds.end(), tagId);
-	bool isSelected = (it != browser->tagIds.end());
-	rightText = CHECKMARK(isSelected);
+	// TODO Disable tags with no modules
+	if (tagId >= 0) {
+		auto it = browser->tagIds.find(tagId);
+		bool isSelected = (it != browser->tagIds.end());
+		rightText = CHECKMARK(isSelected);
+	}
+	else {
+		rightText = CHECKMARK(browser->tagIds.empty());
+	}
 	MenuItem::step();
 }
 
 inline void TagButton::step() {
-	ModuleBrowser* browser = getAncestorOfType<ModuleBrowser>();
 	text = "Tags";
 	if (!browser->tagIds.empty()) {
 		text += ": ";
@@ -700,6 +765,7 @@ inline void TagButton::step() {
 			firstTag = false;
 		}
 	}
+	text = string::ellipsize(text, 21);
 	ChoiceButton::step();
 }
 
