@@ -31,7 +31,7 @@ void InputDevice::onMessage(const Message &message) {
 	// Set timestamp to now if unset
 	Message msg = message;
 	if (msg.timestamp == 0.0)
-		msg.timestamp = system::getTime();
+		msg.timestamp = system::getRuntime();
 
 	for (Input* input : subscribed) {
 		// We're probably in the MIDI driver's thread, so set the Rack context.

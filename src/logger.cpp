@@ -17,7 +17,7 @@ static std::mutex logMutex;
 
 
 void init() {
-	startTime = system::getTime();
+	startTime = system::getRuntime();
 	// Don't open a file in development mode.
 	if (settings::devMode) {
 		outputFile = stderr;
@@ -64,7 +64,7 @@ static void logVa(Level level, const char* filename, int line, const char* func,
 	if (!outputFile)
 		return;
 
-	double nowTime = system::getTime();
+	double nowTime = system::getRuntime();
 	double duration = nowTime - startTime;
 	if (outputFile == stderr)
 		std::fprintf(outputFile, "\x1B[%dm", levelColors[level]);

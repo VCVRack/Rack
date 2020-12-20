@@ -148,7 +148,7 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 			else {
 				// Get earliest message
 				const midi::Message& message = messageQueue.top();
-				double duration = message.timestamp - system::getTime();
+				double duration = message.timestamp - system::getRuntime();
 
 				// If we need to wait, release the lock and wait for the timeout, or if the CV is notified.
 				// This correctly handles MIDI messages with no timestamp, because duration will be NAN.

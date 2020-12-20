@@ -536,7 +536,7 @@ std::string getStackTrace() {
 	static int64_t startTime = 0;
 #endif
 
-static void initTime() {
+static void initRuntime() {
 #if defined ARCH_WIN
 	assert(startCounter == 0);
 	LARGE_INTEGER counter;
@@ -564,7 +564,7 @@ static void initTime() {
 #endif
 }
 
-double getTime() {
+double getRuntime() {
 #if defined ARCH_WIN
 	LARGE_INTEGER counter;
 	QueryPerformanceCounter(&counter);
@@ -585,6 +585,12 @@ double getTime() {
 	int64_t time = int64_t(mts.tv_sec) * 1000000000LL + mts.tv_nsec;
 	return (time - startTime) / 1e9;
 #endif
+}
+
+
+double getUnixTime() {
+	auto duration = std::chrono::system_clock::now().time_since_epoch();
+	return std::chrono::duration<double>(duration).count();
 }
 
 
@@ -656,7 +662,7 @@ void runProcessDetached(const std::string& path) {
 
 
 void init() {
-	initTime();
+	initRuntime();
 }
 
 

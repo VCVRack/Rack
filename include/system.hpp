@@ -134,7 +134,10 @@ std::string getStackTrace();
 /** Returns the number of seconds since application launch.
 The goal of this function is to give the most precise (fine-grained) time differences available on the OS for benchmarking purposes, while being fast to compute.
 */
-double getTime();
+double getRuntime();
+/** Returns time since 1970-01-01 00:00:00 UTC in seconds.
+*/
+double getUnixTime();
 std::string getOperatingSystemInfo();
 
 // Applications

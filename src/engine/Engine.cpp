@@ -340,7 +340,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 		// Start CPU timer
 		double startTime;
 		if (cpuMeter) {
-			startTime = system::getTime();
+			startTime = system::getRuntime();
 		}
 
 		// Step module
@@ -351,7 +351,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 
 		// Stop CPU timer
 		if (cpuMeter) {
-			double endTime = system::getTime();
+			double endTime = system::getRuntime();
 			float duration = endTime - startTime;
 
 			// Smooth CPU time
@@ -564,7 +564,7 @@ void Engine::step(int frames) {
 	random::init();
 
 	internal->stepFrame = internal->frame;
-	internal->stepTime = system::getTime();
+	internal->stepTime = system::getRuntime();
 	internal->stepFrames = frames;
 
 	// Set sample rate
@@ -596,7 +596,7 @@ void Engine::step(int frames) {
 
 	yieldWorkers();
 
-	double endTime = system::getTime();
+	double endTime = system::getRuntime();
 	float duration = endTime - internal->stepTime;
 	float stepDuration = internal->stepFrames * internal->sampleTime;
 	// DEBUG("%d %f / %f = %f%%", internal->stepFrames, duration, stepDuration, duration / stepDuration * 100.f);
