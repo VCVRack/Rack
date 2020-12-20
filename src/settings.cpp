@@ -49,10 +49,13 @@ std::vector<NVGcolor> cableColors = {
 	color::fromHexString("#0f8df4ff"), // blue
 	color::fromHexString("#8c1889ff"), // purple
 };
-std::map<std::string, std::set<std::string>> moduleWhitelist = {};
 bool autoCheckUpdates = true;
 bool showTipsOnLaunch = true;
 int tipIndex = -1;
+ModuleBrowserSort moduleBrowserSort = MODULE_BROWSER_SORT_UPDATED;
+float moduleBrowserZoom = -2.f;
+std::map<std::string, std::set<std::string>> moduleWhitelist = {};
+std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages = {};
 
 
 json_t* toJson() {
@@ -112,6 +115,16 @@ json_t* toJson() {
 	}
 	json_object_set_new(rootJ, "cableColors", cableColorsJ);
 
+	json_object_set_new(rootJ, "autoCheckUpdates", json_boolean(autoCheckUpdates));
+
+	json_object_set_new(rootJ, "showTipsOnLaunch", json_boolean(showTipsOnLaunch));
+
+	json_object_set_new(rootJ, "tipIndex", json_integer(tipIndex));
+
+	json_object_set_new(rootJ, "moduleBrowserSort", json_integer((int) moduleBrowserSort));
+
+	json_object_set_new(rootJ, "moduleBrowserZoom", json_real(moduleBrowserZoom));
+
 	json_t* moduleWhitelistJ = json_object();
 	for (const auto& pair : moduleWhitelist) {
 		json_t* moduleSlugsJ = json_array();
@@ -122,11 +135,23 @@ json_t* toJson() {
 	}
 	json_object_set_new(rootJ, "moduleWhitelist", moduleWhitelistJ);
 
-	json_object_set_new(rootJ, "autoCheckUpdates", json_boolean(autoCheckUpdates));
-
-	json_object_set_new(rootJ, "showTipsOnLaunch", json_boolean(showTipsOnLaunch));
-
-	json_object_set_new(rootJ, "tipIndex", json_integer(tipIndex));
+	json_t* moduleUsagesJ = json_object();
+	for (const auto& pair : moduleUsages) {
+		json_t* modulesJ = json_object();
+		for (const auto& modulePair : pair.second) {
+			const ModuleUsage& mu = modulePair.second;
+			if (mu.count <= 0 || !std::isfinite(mu.lastTime))
+				continue;
+			json_t* moduleUsagesJ = json_object();
+			{
+				json_object_set_new(moduleUsagesJ, "count", json_integer(mu.count));
+				json_object_set_new(moduleUsagesJ, "lastTime", json_real(mu.lastTime));
+			}
+			json_object_set_new(modulesJ, modulePair.first.c_str(), moduleUsagesJ);
+		}
+		json_object_set_new(moduleUsagesJ, pair.first.c_str(), modulesJ);
+	}
+	json_object_set_new(rootJ, "moduleUsages", moduleUsagesJ);
 
 	return rootJ;
 }
@@ -236,6 +261,26 @@ void fromJson(json_t* rootJ) {
 		}
 	}
 
+	json_t* autoCheckUpdatesJ = json_object_get(rootJ, "autoCheckUpdates");
+	if (autoCheckUpdatesJ)
+		autoCheckUpdates = json_boolean_value(autoCheckUpdatesJ);
+
+	json_t* showTipsOnLaunchJ = json_object_get(rootJ, "showTipsOnLaunch");
+	if (showTipsOnLaunchJ)
+		showTipsOnLaunch = json_boolean_value(showTipsOnLaunchJ);
+
+	json_t* tipIndexJ = json_object_get(rootJ, "tipIndex");
+	if (tipIndexJ)
+		tipIndex = json_integer_value(tipIndexJ);
+
+	json_t* moduleBrowserSortJ = json_object_get(rootJ, "moduleBrowserSort");
+	if (moduleBrowserSortJ)
+		moduleBrowserSort = (ModuleBrowserSort) json_integer_value(moduleBrowserSortJ);
+
+	json_t* moduleBrowserZoomJ = json_object_get(rootJ, "moduleBrowserZoom");
+	if (moduleBrowserZoomJ)
+		moduleBrowserZoom = json_number_value(moduleBrowserZoomJ);
+
 	moduleWhitelist.clear();
 	json_t* moduleWhitelistJ = json_object_get(rootJ, "moduleWhitelist");
 	if (moduleWhitelistJ) {
@@ -252,17 +297,26 @@ void fromJson(json_t* rootJ) {
 		}
 	}
 
-	json_t* autoCheckUpdatesJ = json_object_get(rootJ, "autoCheckUpdates");
-	if (autoCheckUpdatesJ)
-		autoCheckUpdates = json_boolean_value(autoCheckUpdatesJ);
-
-	json_t* showTipsOnLaunchJ = json_object_get(rootJ, "showTipsOnLaunch");
-	if (showTipsOnLaunchJ)
-		showTipsOnLaunch = json_boolean_value(showTipsOnLaunchJ);
-
-	json_t* tipIndexJ = json_object_get(rootJ, "tipIndex");
-	if (tipIndexJ)
-		tipIndex = json_integer_value(tipIndexJ);
+	moduleUsages.clear();
+	json_t* moduleUsagesJ = json_object_get(rootJ, "moduleUsages");
+	if (moduleUsagesJ) {
+		const char* pluginSlug;
+		json_t* modulesJ;
+		json_object_foreach(moduleUsagesJ, pluginSlug, modulesJ) {
+			const char* moduleSlug;
+			json_t* moduleJ;
+			json_object_foreach(modulesJ, moduleSlug, moduleJ) {
+				ModuleUsage mu;
+				json_t* countJ = json_object_get(moduleJ, "count");
+				if (countJ)
+					mu.count = json_integer_value(countJ);
+				json_t* lastTimeJ = json_object_get(moduleJ, "lastTime");
+				if (lastTimeJ)
+					mu.lastTime = json_number_value(lastTimeJ);
+				moduleUsages[pluginSlug][moduleSlug] = mu;
+			}
+		}
+	}
 }
 
 void save(const std::string& path) {
@@ -276,7 +330,8 @@ void save(const std::string& path) {
 		return;
 	DEFER({std::fclose(file);});
 
-	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	// Because settings include doubles, it should use 17 decimal digits of precision instead of just 9 for float32.
+	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(17));
 	json_decref(rootJ);
 }
 

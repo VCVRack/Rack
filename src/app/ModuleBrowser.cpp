@@ -79,6 +79,11 @@ static void modelDbInit() {
 
 
 static ModuleWidget* chooseModel(plugin::Model* model) {
+	// Record usage
+	settings::ModuleUsage& mu = settings::moduleUsages[model->plugin->slug][model->slug];
+	mu.count++;
+	mu.lastTime = system::getUnixTime();
+
 	// Create Module and ModuleWidget
 	engine::Module* module = model->createModule();
 	APP->engine->addModule(module);
@@ -363,15 +368,85 @@ struct TagButton : ui::ChoiceButton {
 };
 
 
+static const std::string sortNames[] = {
+	"Last updated",
+	"Most used",
+	"Last used",
+	"Brand",
+	"Module name",
+	"Random",
+};
+
+
+struct SortItem : ui::MenuItem {
+	ModuleBrowser* browser;
+	settings::ModuleBrowserSort sort;
+	void onAction(const event::Action& e) override;
+	void step() override {
+		rightText = CHECKMARK(settings::moduleBrowserSort == sort);
+		MenuItem::step();
+	}
+};
+
+
 struct SortButton : ui::ChoiceButton {
-	void onAction(const event::Action& e) override {}
-	void step() override {}
+	ModuleBrowser* browser;
+
+	void onAction(const event::Action& e) override {
+		ui::Menu* menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		for (int sortId = 0; sortId <= settings::MODULE_BROWSER_SORT_RANDOM; sortId++) {
+			SortItem* sortItem = new SortItem;
+			sortItem->text = sortNames[sortId];
+			sortItem->sort = (settings::ModuleBrowserSort) sortId;
+			sortItem->browser = browser;
+			menu->addChild(sortItem);
+		}
+	}
+
+	void step() override {
+		text = "Sort: ";
+		text += sortNames[settings::moduleBrowserSort];
+		ChoiceButton::step();
+	}
+};
+
+
+struct ZoomItem : ui::MenuItem {
+	ModuleBrowser* browser;
+	float zoom;
+	void onAction(const event::Action& e) override;
+	void step() override {
+		rightText = CHECKMARK(settings::moduleBrowserZoom == zoom);
+		MenuItem::step();
+	}
 };
 
 
 struct ZoomButton : ui::ChoiceButton {
-	void onAction(const event::Action& e) override {}
-	void step() override {}
+	ModuleBrowser* browser;
+
+	void onAction(const event::Action& e) override {
+		ui::Menu* menu = createMenu();
+		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		menu->box.size.x = box.size.x;
+
+		for (int zoom = 0; zoom >= -3; zoom--) {
+			ZoomItem* sortItem = new ZoomItem;
+			sortItem->text = string::f("%g%%", std::pow(2.f, zoom) * 100.f);
+			sortItem->zoom = zoom;
+			sortItem->browser = browser;
+			menu->addChild(sortItem);
+		}
+	}
+
+	void step() override {
+		text = "Zoom: ";
+		text += string::f("%g%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
+		ChoiceButton::step();
+	}
 };
 
 
@@ -440,12 +515,12 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 		SortButton* sortButton = new SortButton;
 		sortButton->box.size.x = 150;
-		sortButton->text = "Sort: Most used";
+		sortButton->browser = this;
 		headerLayout->addChild(sortButton);
 
 		ZoomButton* zoomButton = new ZoomButton;
 		zoomButton->box.size.x = 100;
-		zoomButton->text = "Zoom: 25%";
+		zoomButton->browser = this;
 		headerLayout->addChild(zoomButton);
 
 		UrlButton* libraryButton = new UrlButton;
@@ -767,6 +842,15 @@ inline void TagButton::step() {
 	}
 	text = string::ellipsize(text, 21);
 	ChoiceButton::step();
+}
+
+inline void SortItem::onAction(const event::Action& e) {
+	settings::moduleBrowserSort = sort;
+	browser->refresh();
+}
+
+inline void ZoomItem::onAction(const event::Action& e) {
+	settings::moduleBrowserZoom = zoom;
 }
 
 

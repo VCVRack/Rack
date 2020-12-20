@@ -51,11 +51,27 @@ extern bool skipLoadOnLaunch;
 extern std::string patchPath;
 extern std::list<std::string> recentPatchPaths;
 extern std::vector<NVGcolor> cableColors;
-// pluginSlug -> moduleSlugs
-extern std::map<std::string, std::set<std::string>> moduleWhitelist;
 extern bool autoCheckUpdates;
 extern bool showTipsOnLaunch;
 extern int tipIndex;
+enum ModuleBrowserSort {
+	MODULE_BROWSER_SORT_UPDATED,
+	MODULE_BROWSER_SORT_MOST_USED,
+	MODULE_BROWSER_SORT_LAST_USED,
+	MODULE_BROWSER_SORT_BRAND,
+	MODULE_BROWSER_SORT_NAME,
+	MODULE_BROWSER_SORT_RANDOM,
+};
+extern ModuleBrowserSort moduleBrowserSort;
+extern float moduleBrowserZoom;
+// pluginSlug -> moduleSlugs
+extern std::map<std::string, std::set<std::string>> moduleWhitelist;
+
+struct ModuleUsage {
+	int count = 0;
+	double lastTime = NAN;
+};
+extern std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages;
 
 json_t* toJson();
 void fromJson(json_t* rootJ);
