@@ -309,34 +309,7 @@ struct BrandItem : ui::MenuItem {
 struct BrandButton : ui::ChoiceButton {
 	ModuleBrowser* browser;
 
-	void onAction(const event::Action& e) override {
-		ui::Menu* menu = createMenu();
-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-		BrandItem* noneItem = new BrandItem;
-		noneItem->text = "All brands";
-		noneItem->brand = "";
-		noneItem->browser = browser;
-		menu->addChild(noneItem);
-
-		menu->addChild(new ui::MenuSeparator);
-
-		// Collect brands from all plugins
-		std::set<std::string, string::CaseInsensitiveCompare> brands;
-		for (plugin::Plugin* plugin : plugin::plugins) {
-			brands.insert(plugin->brand);
-		}
-
-		for (const std::string& brand : brands) {
-			BrandItem* brandItem = new BrandItem;
-			brandItem->text = brand;
-			brandItem->brand = brand;
-			brandItem->browser = browser;
-			menu->addChild(brandItem);
-		}
-	}
-
+	void onAction(const event::Action& e) override;
 	void step() override;
 };
 
@@ -352,29 +325,7 @@ struct TagItem : ui::MenuItem {
 struct TagButton : ui::ChoiceButton {
 	ModuleBrowser* browser;
 
-	void onAction(const event::Action& e) override {
-		ui::Menu* menu = createMenu();
-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-		TagItem* noneItem = new TagItem;
-		noneItem->text = "All tags";
-		noneItem->tagId = -1;
-		noneItem->browser = browser;
-		menu->addChild(noneItem);
-
-		menu->addChild(createMenuLabel(RACK_MOD_CTRL_NAME "+click to select multiple"));
-		menu->addChild(new ui::MenuSeparator);
-
-		for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
-			TagItem* tagItem = new TagItem;
-			tagItem->text = tag::getTag(tagId);
-			tagItem->tagId = tagId;
-			tagItem->browser = browser;
-			menu->addChild(tagItem);
-		}
-	}
-
+	void onAction(const event::Action& e) override;
 	void step() override;
 };
 
@@ -446,7 +397,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 		for (float zoom = 0.f; zoom >= -2.f; zoom -= 0.5f) {
 			ZoomItem* sortItem = new ZoomItem;
-			sortItem->text = string::f("%.2g%%", std::pow(2.f, zoom) * 100.f);
+			sortItem->text = string::f("%.3g%%", std::pow(2.f, zoom) * 100.f);
 			sortItem->zoom = zoom;
 			sortItem->browser = browser;
 			menu->addChild(sortItem);
@@ -455,7 +406,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 	void step() override {
 		text = "Zoom: ";
-		text += string::f("%.2g%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
+		text += string::f("%.3g%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
 		ChoiceButton::step();
 	}
 };
@@ -813,6 +764,35 @@ inline void BrandItem::step() {
 	MenuItem::step();
 }
 
+inline void BrandButton::onAction(const event::Action& e) {
+	ui::Menu* menu = createMenu();
+	menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+	menu->box.size.x = box.size.x;
+
+	BrandItem* noneItem = new BrandItem;
+	noneItem->text = "All brands";
+	noneItem->brand = "";
+	noneItem->browser = browser;
+	menu->addChild(noneItem);
+
+	menu->addChild(new ui::MenuSeparator);
+
+	// Collect brands from all plugins
+	std::set<std::string, string::CaseInsensitiveCompare> brands;
+	for (plugin::Plugin* plugin : plugin::plugins) {
+		brands.insert(plugin->brand);
+	}
+
+	for (const std::string& brand : brands) {
+		BrandItem* brandItem = new BrandItem;
+		brandItem->text = brand;
+		brandItem->brand = brand;
+		brandItem->browser = browser;
+		brandItem->disabled = !browser->hasVisibleModel(brand, browser->tagIds);
+		menu->addChild(brandItem);
+	}
+}
+
 inline void BrandButton::step() {
 	text = "Brand";
 	if (!browser->brand.empty()) {
@@ -866,6 +846,30 @@ inline void TagItem::step() {
 		rightText = CHECKMARK(browser->tagIds.empty());
 	}
 	MenuItem::step();
+}
+
+inline void TagButton::onAction(const event::Action& e) {
+	ui::Menu* menu = createMenu();
+	menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+	menu->box.size.x = box.size.x;
+
+	TagItem* noneItem = new TagItem;
+	noneItem->text = "All tags";
+	noneItem->tagId = -1;
+	noneItem->browser = browser;
+	menu->addChild(noneItem);
+
+	menu->addChild(createMenuLabel(RACK_MOD_CTRL_NAME "+click to select multiple"));
+	menu->addChild(new ui::MenuSeparator);
+
+	for (int tagId = 0; tagId < (int) tag::tagAliases.size(); tagId++) {
+		TagItem* tagItem = new TagItem;
+		tagItem->text = tag::getTag(tagId);
+		tagItem->tagId = tagId;
+		tagItem->browser = browser;
+		tagItem->disabled = !browser->hasVisibleModel(browser->brand, {tagId});
+		menu->addChild(tagItem);
+	}
 }
 
 inline void TagButton::step() {
