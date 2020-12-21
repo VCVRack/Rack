@@ -19,18 +19,28 @@ namespace rack {
 namespace settings {
 
 
-/** Runtime state, not serialized. */
+// Runtime state, not serialized.
+
 extern bool devMode;
 extern bool headless;
 
-/** Persistent state, serialized to settings.json. */
+// Persistent state, serialized to settings.json.
+
+/** vcvrack.com user token */
 extern std::string token;
+/** Size of window in pixels */
 extern math::Vec windowSize;
+/** Position in window in pixels */
 extern math::Vec windowPos;
+/** Rack zoom level, log2. E.g. 100% = 0, 200% = 1, 50% = -1. */
 extern float zoom;
+/** Reverse the zoom scroll direction */
 extern bool invertZoom;
+/** Opacity of cables in the range [0, 1] */
 extern float cableOpacity;
+/** Straightness of cables in the range [0, 1]. Unitless and arbitrary. */
 extern float cableTension;
+/** Allows rack to hide and lock the cursor position when dragging knobs etc. */
 extern bool allowCursorLock;
 enum KnobMode {
 	KNOB_MODE_LINEAR,

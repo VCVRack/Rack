@@ -53,7 +53,7 @@ bool autoCheckUpdates = true;
 bool showTipsOnLaunch = true;
 int tipIndex = -1;
 ModuleBrowserSort moduleBrowserSort = MODULE_BROWSER_SORT_UPDATED;
-float moduleBrowserZoom = -2.f;
+float moduleBrowserZoom = -1.f;
 std::map<std::string, std::set<std::string>> moduleWhitelist = {};
 std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages = {};
 

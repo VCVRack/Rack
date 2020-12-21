@@ -127,59 +127,66 @@ struct BrowserOverlay : ui::MenuOverlay {
 };
 
 
-static const float MODEL_BOX_ZOOM = 0.5f;
-
-
 struct ModelBox : widget::OpaqueWidget {
 	plugin::Model* model;
-	widget::Widget* previewWidget;
 	ui::Tooltip* tooltip = NULL;
-	/** Lazily created */
-	widget::FramebufferWidget* previewFb = NULL;
+	// Lazily created widgets
+	widget::Widget* previewWidget = NULL;
+	widget::ZoomWidget* zoomWidget = NULL;
+	widget::FramebufferWidget* fb = NULL;
+	ModuleWidget* moduleWidget = NULL;
 
 	ModelBox() {
-		// Approximate size as 10HP before we know the actual size.
-		// We need a nonzero size, otherwise the parent widget will consider it not in the draw bounds, so its preview will not be lazily created.
-		box.size.x = 10 * RACK_GRID_WIDTH * MODEL_BOX_ZOOM;
-		box.size.y = RACK_GRID_HEIGHT * MODEL_BOX_ZOOM;
-		box.size = box.size.ceil();
+		updateZoom();
 	}
 
 	void setModel(plugin::Model* model) {
 		this->model = model;
+	}
 
-		previewWidget = new widget::TransparentWidget;
-		previewWidget->box.size.y = std::ceil(RACK_GRID_HEIGHT * MODEL_BOX_ZOOM);
-		addChild(previewWidget);
+	void updateZoom() {
+		float zoom = std::pow(2.f, settings::moduleBrowserZoom);
+
+		if (previewWidget) {
+			fb->setDirty();
+			zoomWidget->setZoom(zoom);
+			box.size.x = moduleWidget->box.size.x * zoom;
+		}
+		else {
+			// Approximate size as 12HP before we know the actual size.
+			// We need a nonzero size, otherwise too many ModelBoxes will lazily render in the same frame.
+			box.size.x = 12 * RACK_GRID_WIDTH * zoom;
+		}
+		box.size.y = RACK_GRID_HEIGHT * zoom;
+		box.size = box.size.ceil();
 	}
 
 	void createPreview() {
-		previewFb = new widget::FramebufferWidget;
+		if (previewWidget)
+			return;
+
+		previewWidget = new widget::TransparentWidget;
+		addChild(previewWidget);
+
+		zoomWidget = new widget::ZoomWidget;
+		previewWidget->addChild(zoomWidget);
+
+		fb = new widget::FramebufferWidget;
 		if (math::isNear(APP->window->pixelRatio, 1.0)) {
 			// Small details draw poorly at low DPI, so oversample when drawing to the framebuffer
-			previewFb->oversample = 2.0;
+			fb->oversample = 2.0;
 		}
-		previewWidget->addChild(previewFb);
+		zoomWidget->addChild(fb);
 
-		widget::ZoomWidget* zoomWidget = new widget::ZoomWidget;
-		zoomWidget->setZoom(MODEL_BOX_ZOOM);
-		previewFb->addChild(zoomWidget);
+		moduleWidget = model->createModuleWidget(NULL);
+		fb->addChild(moduleWidget);
 
-		ModuleWidget* moduleWidget = model->createModuleWidget(NULL);
-		zoomWidget->addChild(moduleWidget);
-
-		zoomWidget->box.size.x = moduleWidget->box.size.x * MODEL_BOX_ZOOM;
-		zoomWidget->box.size.y = RACK_GRID_HEIGHT * MODEL_BOX_ZOOM;
-		previewWidget->box.size.x = std::ceil(zoomWidget->box.size.x);
-
-		box.size.x = previewWidget->box.size.x;
+		updateZoom();
 	}
 
 	void draw(const DrawArgs& args) override {
 		// Lazily create preview when drawn
-		if (!previewFb) {
-			createPreview();
-		}
+		createPreview();
 
 		// Draw shadow
 		nvgBeginPath(args.vg);
@@ -192,6 +199,10 @@ struct ModelBox : widget::OpaqueWidget {
 		nvgFill(args.vg);
 
 		OpaqueWidget::draw(args);
+	}
+
+	void step() override {
+		OpaqueWidget::step();
 	}
 
 	void setTooltip(ui::Tooltip* tooltip) {
@@ -433,9 +444,9 @@ struct ZoomButton : ui::ChoiceButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		for (int zoom = 0; zoom >= -3; zoom--) {
+		for (float zoom = 0.f; zoom >= -2.f; zoom -= 0.5f) {
 			ZoomItem* sortItem = new ZoomItem;
-			sortItem->text = string::f("%g%%", std::pow(2.f, zoom) * 100.f);
+			sortItem->text = string::f("%.3g%%", std::pow(2.f, zoom) * 100.f);
 			sortItem->zoom = zoom;
 			sortItem->browser = browser;
 			menu->addChild(sortItem);
@@ -444,7 +455,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 	void step() override {
 		text = "Zoom: ";
-		text += string::f("%g%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
+		text += string::f("%.3g%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
 		ChoiceButton::step();
 	}
 };
@@ -549,6 +560,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	void resetModelBoxes() {
 		modelContainer->clearChildren();
 		// Iterate plugins
+		for (int i = 0; i < 100; i++)
 		for (plugin::Plugin* plugin : plugin::plugins) {
 			// Get module slugs from module whitelist
 			const auto& pluginIt = settings::moduleWhitelist.find(plugin->slug);
@@ -566,6 +578,14 @@ struct ModuleBrowser : widget::OpaqueWidget {
 				modelBox->setModel(model);
 				modelContainer->addChild(modelBox);
 			}
+		}
+	}
+
+	void updateZoom() {
+		for (Widget* w : modelContainer->children) {
+			ModelBox* mb = reinterpret_cast<ModelBox*>(w);
+			assert(mb);
+			mb->updateZoom();
 		}
 	}
 
@@ -850,7 +870,10 @@ inline void SortItem::onAction(const event::Action& e) {
 }
 
 inline void ZoomItem::onAction(const event::Action& e) {
-	settings::moduleBrowserZoom = zoom;
+	if (zoom != settings::moduleBrowserZoom) {
+		settings::moduleBrowserZoom = zoom;
+		browser->updateZoom();
+	}
 }
 
 

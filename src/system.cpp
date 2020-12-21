@@ -589,6 +589,8 @@ double getRuntime() {
 
 
 double getUnixTime() {
+	// This is not guaranteed to return the time since 1970 in C++11. (It only does in C++20).
+	// However, it does on all platforms I care about.
 	auto duration = std::chrono::system_clock::now().time_since_epoch();
 	return std::chrono::duration<double>(duration).count();
 }

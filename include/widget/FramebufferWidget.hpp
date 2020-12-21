@@ -23,6 +23,7 @@ struct FramebufferWidget : Widget {
 
 	FramebufferWidget();
 	~FramebufferWidget();
+	void setDirty(bool dirty = true);
 	void onDirty(const event::Dirty& e) override;
 	void step() override;
 	void draw(const DrawArgs& args) override;

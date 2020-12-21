@@ -44,6 +44,11 @@ FramebufferWidget::~FramebufferWidget() {
 }
 
 
+void FramebufferWidget::setDirty(bool dirty) {
+	this->dirty = dirty;
+}
+
+
 void FramebufferWidget::onDirty(const event::Dirty& e) {
 	dirty = true;
 	Widget::onDirty(e);
