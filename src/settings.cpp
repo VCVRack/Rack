@@ -58,6 +58,17 @@ std::map<std::string, std::set<std::string>> moduleWhitelist = {};
 std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages = {};
 
 
+ModuleUsage* getModuleUsage(const std::string& pluginSlug, const std::string& moduleSlug) {
+	auto it1 = moduleUsages.find(pluginSlug);
+	if (it1 == moduleUsages.end())
+		return NULL;
+	auto it2 = it1->second.find(moduleSlug);
+	if (it2 == it1->second.end())
+		return NULL;
+	return &it2->second;
+}
+
+
 json_t* toJson() {
 	json_t* rootJ = json_object();
 

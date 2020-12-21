@@ -381,8 +381,8 @@ struct TagButton : ui::ChoiceButton {
 
 static const std::string sortNames[] = {
 	"Last updated",
-	"Most used",
 	"Last used",
+	"Most used",
 	"Brand",
 	"Module name",
 	"Random",
@@ -446,7 +446,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 		for (float zoom = 0.f; zoom >= -2.f; zoom -= 0.5f) {
 			ZoomItem* sortItem = new ZoomItem;
-			sortItem->text = string::f("%.3g%%", std::pow(2.f, zoom) * 100.f);
+			sortItem->text = string::f("%.2g%%", std::pow(2.f, zoom) * 100.f);
 			sortItem->zoom = zoom;
 			sortItem->browser = browser;
 			menu->addChild(sortItem);
@@ -455,7 +455,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 	void step() override {
 		text = "Zoom: ";
-		text += string::f("%.3g%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
+		text += string::f("%.2g%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
 		ChoiceButton::step();
 	}
 };
@@ -486,6 +486,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	std::string search;
 	std::string brand;
 	std::set<int> tagIds = {};
+
+	std::map<plugin::Model*, float> prefilteredModelScores;
 
 	ModuleBrowser() {
 		float margin = 10;
@@ -560,7 +562,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	void resetModelBoxes() {
 		modelContainer->clearChildren();
 		// Iterate plugins
-		for (int i = 0; i < 100; i++)
+		// for (int i = 0; i < 100; i++)
 		for (plugin::Plugin* plugin : plugin::plugins) {
 			// Get module slugs from module whitelist
 			const auto& pluginIt = settings::moduleWhitelist.find(plugin->slug);
@@ -582,6 +584,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	}
 
 	void updateZoom() {
+		modelScroll->offset = math::Vec();
+
 		for (Widget* w : modelContainer->children) {
 			ModelBox* mb = reinterpret_cast<ModelBox*>(w);
 			assert(mb);
@@ -607,54 +611,106 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		Widget::draw(args);
 	}
 
+	bool isModelVisible(plugin::Model* model, const std::string& brand, std::set<int> tagIds) {
+		// Filter brand
+		if (!brand.empty()) {
+			if (model->plugin->brand != brand)
+				return false;
+		}
+
+		// Filter tag
+		for (int tagId : tagIds) {
+			auto it = std::find(model->tags.begin(), model->tags.end(), tagId);
+			if (it == model->tags.end())
+				return false;
+		}
+
+		return true;
+	};
+
+	// Determines if there is at least 1 visible Model with a given brand and tag
+	bool hasVisibleModel(const std::string& brand, std::set<int> tagIds) {
+		for (const auto& pair : prefilteredModelScores) {
+			plugin::Model* model = pair.first;
+			if (isModelVisible(model, brand, tagIds))
+				return true;
+		}
+		return false;
+	};
+
+	template <typename F>
+	void sortModels(F f) {
+		modelContainer->children.sort([&](Widget* w1, Widget* w2) {
+			ModelBox* m1 = reinterpret_cast<ModelBox*>(w1);
+			ModelBox* m2 = reinterpret_cast<ModelBox*>(w2);
+			return f(m1) < f(m2);
+		});
+	}
+
 	void refresh() {
 		// Reset scroll position
 		modelScroll->offset = math::Vec();
 
-		auto isModelVisible = [&](plugin::Model* model, const std::string& brand, std::set<int> tagIds) -> bool {
-			// Filter brand
-			if (brand != "") {
-				if (model->plugin->brand != brand)
-					return false;
-			}
-
-			// Filter tag
-			for (int tagId : tagIds) {
-				auto it = std::find(model->tags.begin(), model->tags.end(), tagId);
-				if (it == model->tags.end())
-					return false;
-			}
-
-			return true;
-		};
+		prefilteredModelScores.clear();
 
 		// Filter ModelBoxes by brand and tag
 		for (Widget* w : modelContainer->children) {
-			ModelBox* m = dynamic_cast<ModelBox*>(w);
-			assert(m);
-			m->visible = isModelVisible(m->model, brand, tagIds);
+			ModelBox* m = reinterpret_cast<ModelBox*>(w);
+			m->setVisible(isModelVisible(m->model, brand, tagIds));
 		}
-
-		std::map<plugin::Model*, float> prefilteredModelScores;
 
 		// Filter and sort by search results
 		if (search.empty()) {
 			// Add all models to prefilteredModelScores with scores of 1
 			for (Widget* w : modelContainer->children) {
-				ModelBox* m = dynamic_cast<ModelBox*>(w);
-				assert(m);
+				ModelBox* m = reinterpret_cast<ModelBox*>(w);
 				prefilteredModelScores[m->model] = 1.f;
 			}
 
 			// Sort ModelBoxes
-			modelContainer->children.sort([&](Widget * w1, Widget * w2) {
-				ModelBox* m1 = dynamic_cast<ModelBox*>(w1);
-				ModelBox* m2 = dynamic_cast<ModelBox*>(w2);
-				// Sort by (modifiedTimestamp descending, plugin brand)
-				auto t1 = std::make_tuple(-m1->model->plugin->modifiedTimestamp, m1->model->plugin->brand);
-				auto t2 = std::make_tuple(-m2->model->plugin->modifiedTimestamp, m2->model->plugin->brand);
-				return t1 < t2;
-			});
+			if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_UPDATED) {
+				sortModels([](ModelBox* m) {
+					plugin::Plugin* p = m->model->plugin;
+					return std::make_tuple(-p->modifiedTimestamp, p->brand, m->model->name);
+				});
+			}
+			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_LAST_USED) {
+				sortModels([](ModelBox* m) {
+					plugin::Plugin* p = m->model->plugin;
+					const settings::ModuleUsage* mu = settings::getModuleUsage(p->slug, m->model->slug);
+					double lastTime = mu ? mu->lastTime : -INFINITY;
+					return std::make_tuple(-lastTime, -p->modifiedTimestamp, p->brand);
+				});
+			}
+			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_MOST_USED) {
+				sortModels([](ModelBox* m) {
+					plugin::Plugin* p = m->model->plugin;
+					const settings::ModuleUsage* mu = settings::getModuleUsage(p->slug, m->model->slug);
+					int count = mu ? mu->count : 0;
+					double lastTime = mu ? mu->lastTime : -INFINITY;
+					return std::make_tuple(-count, -lastTime, -p->modifiedTimestamp, p->brand);
+				});
+			}
+			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_BRAND) {
+				sortModels([](ModelBox* m) {
+					return std::make_tuple(m->model->plugin->brand, m->model->name);
+				});
+			}
+			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_NAME) {
+				sortModels([](ModelBox* m) {
+					return std::make_tuple(m->model->name, m->model->plugin->brand);
+				});
+			}
+			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_RANDOM) {
+				std::map<ModelBox*, uint64_t> randomOrder;
+				for (Widget* w : modelContainer->children) {
+					ModelBox* m = reinterpret_cast<ModelBox*>(w);
+					randomOrder[m] = random::u64();
+				}
+				sortModels([&](ModelBox* m) {
+					return get(randomOrder, m, 0);
+				});
+			}
 		}
 		else {
 			// Lazily initialize search database
@@ -667,15 +723,12 @@ struct ModuleBrowser : widget::OpaqueWidget {
 				// DEBUG("%s %s\t\t%f", result._key->plugin->slug.c_str(), result._key->slug.c_str(), result._score);
 			}
 			// Sort by score
-			modelContainer->children.sort([&](Widget *w1, Widget *w2) {
-				ModelBox* m1 = dynamic_cast<ModelBox*>(w1);
-				ModelBox* m2 = dynamic_cast<ModelBox*>(w2);
-				// If score was not computed, the ModelBox will not visible so the order doesn't matter.
-				return get(prefilteredModelScores, m1->model, 0.f) > get(prefilteredModelScores, m2->model, 0.f);
+			sortModels([&](ModelBox* m) {
+				return get(prefilteredModelScores, m->model, 0.f);
 			});
 			// Filter by whether the score is above the threshold
 			for (Widget* w : modelContainer->children) {
-				ModelBox* m = dynamic_cast<ModelBox*>(w);
+				ModelBox* m = reinterpret_cast<ModelBox*>(w);
 				assert(m);
 				if (m->visible) {
 					if (prefilteredModelScores.find(m->model) == prefilteredModelScores.end())
@@ -683,44 +736,6 @@ struct ModuleBrowser : widget::OpaqueWidget {
 				}
 			}
 		}
-
-		// Determines if there is at least 1 visible Model with a given brand and tag
-		auto hasVisibleModel = [&](const std::string& brand, std::set<int> tagIds) -> bool {
-			for (auto& pair : prefilteredModelScores) {
-				plugin::Model* model = pair.first;
-				if (isModelVisible(model, brand, tagIds))
-					return true;
-			}
-			return false;
-		};
-
-		// // Enable brand and tag items that are available in visible ModelBoxes
-		// int brandsLen = 0;
-		// for (Widget* w : sidebar->brandList->children) {
-		// 	BrandItem* item = dynamic_cast<BrandItem*>(w);
-		// 	assert(item);
-		// 	item->disabled = !hasVisibleModel(item->text, tagIds);
-		// 	if (!item->disabled)
-		// 		brandsLen++;
-		// }
-		// sidebar->brandLabel->text = string::f("Brands (%d)", brandsLen);
-
-		// int tagsLen = 0;
-		// for (Widget* w : sidebar->tagList->children) {
-		// 	TagItem* item = dynamic_cast<TagItem*>(w);
-		// 	assert(item);
-		// 	item->disabled = !hasVisibleModel(brand, {item->tagId});
-		// 	if (!item->disabled)
-		// 		tagsLen++;
-		// }
-		// sidebar->tagLabel->text = string::f("Tags (%d)", tagsLen);
-
-		// // Count models
-		// int modelsLen = 0;
-		// for (Widget* w : modelContainer->children) {
-		// 	if (w->visible)
-		// 		modelsLen++;
-		// }
 	}
 
 	void clear() {
@@ -729,6 +744,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		brand = "";
 		tagIds = {};
 		refresh();
+	}
+
+	void onShow(const event::Show& e) override {
+		refresh();
+		OpaqueWidget::onShow(e);
 	}
 };
 
@@ -770,7 +790,7 @@ inline void BrowserSearchField::onAction(const event::Action& e) {
 	ModelBox* mb = NULL;
 	for (Widget* w : browser->modelContainer->children) {
 		if (w->isVisible()) {
-			mb = dynamic_cast<ModelBox*>(w);
+			mb = reinterpret_cast<ModelBox*>(w);
 			break;
 		}
 	}

@@ -66,8 +66,8 @@ extern bool showTipsOnLaunch;
 extern int tipIndex;
 enum ModuleBrowserSort {
 	MODULE_BROWSER_SORT_UPDATED,
-	MODULE_BROWSER_SORT_MOST_USED,
 	MODULE_BROWSER_SORT_LAST_USED,
+	MODULE_BROWSER_SORT_MOST_USED,
 	MODULE_BROWSER_SORT_BRAND,
 	MODULE_BROWSER_SORT_NAME,
 	MODULE_BROWSER_SORT_RANDOM,
@@ -81,7 +81,9 @@ struct ModuleUsage {
 	int count = 0;
 	double lastTime = NAN;
 };
+// pluginSlug, moduleSlug -> ModuleUsage
 extern std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages;
+ModuleUsage* getModuleUsage(const std::string& pluginSlug, const std::string& moduleSlug);
 
 json_t* toJson();
 void fromJson(json_t* rootJ);
