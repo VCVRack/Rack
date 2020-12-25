@@ -564,7 +564,7 @@ static void initRuntime() {
 #endif
 }
 
-double getRuntime() {
+double getTime() {
 #if defined ARCH_WIN
 	LARGE_INTEGER counter;
 	QueryPerformanceCounter(&counter);

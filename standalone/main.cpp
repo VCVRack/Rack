@@ -112,6 +112,7 @@ int main(int argc, char* argv[]) {
 	asset::init();
 	bool loggerWasTruncated = logger::isTruncated();
 	logger::init();
+	random::init();
 
 	// We can now install a signal handler and log the output
 	if (!settings::devMode) {
@@ -160,7 +161,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	INFO("Initializing environment");
-	random::init();
 	network::init();
 	audio::init();
 	rtaudioInit();

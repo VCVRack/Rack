@@ -564,7 +564,7 @@ void Engine::step(int frames) {
 	random::init();
 
 	internal->stepFrame = internal->frame;
-	internal->stepTime = system::getRuntime();
+	internal->stepTime = system::getTime();
 	internal->stepFrames = frames;
 
 	// Set sample rate
@@ -596,7 +596,7 @@ void Engine::step(int frames) {
 
 	yieldWorkers();
 
-	double endTime = system::getRuntime();
+	double endTime = system::getTime();
 	float duration = endTime - internal->stepTime;
 	float stepDuration = internal->stepFrames * internal->sampleTime;
 	// DEBUG("%d %f / %f = %f%%", internal->stepFrames, duration, stepDuration, duration / stepDuration * 100.f);
