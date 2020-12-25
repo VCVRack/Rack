@@ -553,7 +553,7 @@ struct EngineButton : MenuButton {
 		menu->box.size.x = box.size.x;
 
 		CpuMeterItem* cpuMeterItem = new CpuMeterItem;
-		cpuMeterItem->text = "CPU meter";
+		cpuMeterItem->text = "Performance meters";
 		cpuMeterItem->rightText = "F3 ";
 		cpuMeterItem->rightText += CHECKMARK(settings::cpuMeter);
 		menu->addChild(cpuMeterItem);

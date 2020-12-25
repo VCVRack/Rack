@@ -1,5 +1,7 @@
 #include <engine/Module.hpp>
 #include <plugin.hpp>
+#include <system.hpp>
+#include <settings.hpp>
 #include <asset.hpp>
 
 
@@ -7,12 +9,21 @@ namespace rack {
 namespace engine {
 
 
+
+// Arbitrary prime number so it doesn't over- or under-estimate time of buffered processors.
+static const int meterDivider = 23;
+static const int samplesCount = 64;
+static const int meterBufferLength = 128;
+
+
+
 struct Module::Internal {
-	/** Seconds spent in the process() method, with exponential smoothing.
-	Only written when CPU timing is enabled, since time measurement is expensive.
-	*/
-	float cpuTime = 0.f;
 	bool bypass = false;
+
+	float meterTimeTotal = 0.f;
+	int meterSamples = 0;
+	int meterIndex = 0;
+	float meterBuffer[meterBufferLength] = {};
 };
 
 
@@ -269,13 +280,95 @@ void Module::onRandomize(const RandomizeEvent& e) {
 }
 
 
-float& Module::cpuTime() {
-	return internal->cpuTime;
+bool& Module::bypass() {
+	return internal->bypass;
 }
 
 
-bool& Module::bypass() {
-	return internal->bypass;
+const float* Module::meterBuffer() {
+	return internal->meterBuffer;
+}
+
+
+int Module::meterLength() {
+	return meterBufferLength;
+}
+
+
+int Module::meterIndex() {
+	return internal->meterIndex;
+}
+
+
+static void Port_step(Port* that, float deltaTime) {
+	// Set plug lights
+	if (that->channels == 0) {
+		that->plugLights[0].setBrightness(0.f);
+		that->plugLights[1].setBrightness(0.f);
+		that->plugLights[2].setBrightness(0.f);
+	}
+	else if (that->channels == 1) {
+		float v = that->getVoltage() / 10.f;
+		that->plugLights[0].setSmoothBrightness(v, deltaTime);
+		that->plugLights[1].setSmoothBrightness(-v, deltaTime);
+		that->plugLights[2].setBrightness(0.f);
+	}
+	else {
+		float v2 = 0.f;
+		for (int c = 0; c < that->channels; c++) {
+			v2 += std::pow(that->getVoltage(c), 2);
+		}
+		float v = std::sqrt(v2) / 10.f;
+		that->plugLights[0].setBrightness(0.f);
+		that->plugLights[1].setBrightness(0.f);
+		that->plugLights[2].setSmoothBrightness(v, deltaTime);
+	}
+}
+
+
+void Module::step(const ProcessArgs& args) {
+	// This global setting can change while the function is running, so use a local variable.
+	bool meterEnabled = settings::cpuMeter && (args.frame % meterDivider == 0);
+
+	// Start CPU timer
+	double startTime;
+	if (meterEnabled) {
+		startTime = system::getTime();
+	}
+
+	// Step module
+	if (!internal->bypass)
+		process(args);
+	else
+		processBypass(args);
+
+	// Stop CPU timer
+	if (meterEnabled) {
+		double endTime = system::getTime();
+		float duration = endTime - startTime;
+
+		internal->meterTimeTotal += duration;
+		if (++internal->meterSamples >= samplesCount) {
+			// Push time to buffer
+			internal->meterBuffer[internal->meterIndex++] = internal->meterTimeTotal / samplesCount;
+			internal->meterIndex %= meterBufferLength;
+			// Reset total
+			internal->meterSamples = 0;
+			internal->meterTimeTotal = 0.f;
+		}
+	}
+
+	// Iterate ports to step plug lights
+	const int portDivider = 8;
+	if (args.frame % portDivider == 0) {
+		float portTime = args.sampleTime * portDivider;
+		for (Input& input : inputs) {
+			Port_step(&input, portTime);
+		}
+		for (Output& output : outputs) {
+			Port_step(&output, portTime);
+		}
+	}
 }
 
 

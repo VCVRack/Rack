@@ -289,43 +289,17 @@ static void Engine_relaunchWorkers(Engine* that, int threadCount) {
 }
 
 
-static void Port_step(Port* that, float deltaTime) {
-	// Set plug lights
-	if (that->channels == 0) {
-		that->plugLights[0].setBrightness(0.f);
-		that->plugLights[1].setBrightness(0.f);
-		that->plugLights[2].setBrightness(0.f);
-	}
-	else if (that->channels == 1) {
-		float v = that->getVoltage() / 10.f;
-		that->plugLights[0].setSmoothBrightness(v, deltaTime);
-		that->plugLights[1].setSmoothBrightness(-v, deltaTime);
-		that->plugLights[2].setBrightness(0.f);
-	}
-	else {
-		float v2 = 0.f;
-		for (int c = 0; c < that->channels; c++) {
-			v2 += std::pow(that->getVoltage(c), 2);
-		}
-		float v = std::sqrt(v2) / 10.f;
-		that->plugLights[0].setBrightness(0.f);
-		that->plugLights[1].setBrightness(0.f);
-		that->plugLights[2].setSmoothBrightness(v, deltaTime);
-	}
-}
-
-
-static void Engine_stepModulesWorker(Engine* that, int threadId) {
+static void Engine_stepWorker(Engine* that, int threadId) {
 	Engine::Internal* internal = that->internal;
 
 	// int threadCount = internal->threadCount;
 	int modulesLen = internal->modules.size();
 
+	// Build ProcessArgs
 	Module::ProcessArgs processArgs;
 	processArgs.sampleRate = internal->sampleRate;
 	processArgs.sampleTime = internal->sampleTime;
-
-	bool cpuMeter = settings::cpuMeter;
+	processArgs.frame = internal->frame;
 
 	// Step each module
 	while (true) {
@@ -336,40 +310,7 @@ static void Engine_stepModulesWorker(Engine* that, int threadId) {
 			break;
 
 		Module* module = internal->modules[i];
-
-		// Start CPU timer
-		double startTime;
-		if (cpuMeter) {
-			startTime = system::getRuntime();
-		}
-
-		// Step module
-		if (!module->bypass())
-			module->process(processArgs);
-		else
-			module->processBypass(processArgs);
-
-		// Stop CPU timer
-		if (cpuMeter) {
-			double endTime = system::getRuntime();
-			float duration = endTime - startTime;
-
-			// Smooth CPU time
-			const float cpuTau = 2.f /* seconds */;
-			module->cpuTime() += (duration - module->cpuTime()) * processArgs.sampleTime / cpuTau;
-		}
-
-		// Iterate ports to step plug lights
-		const int portDivider = 8;
-		if (internal->frame % portDivider == 0) {
-			float portTime = processArgs.sampleTime * portDivider;
-			for (Input& input : module->inputs) {
-				Port_step(&input, portTime);
-			}
-			for (Output& output : module->outputs) {
-				Port_step(&output, portTime);
-			}
-		}
+		module->step(processArgs);
 	}
 }
 
@@ -441,7 +382,7 @@ static void Engine_stepFrame(Engine* that) {
 	// Step modules along with workers
 	internal->workerModuleIndex = 0;
 	internal->engineBarrier.wait();
-	Engine_stepModulesWorker(that, 0);
+	Engine_stepWorker(that, 0);
 	internal->workerBarrier.wait();
 
 	internal->frame++;
@@ -1156,7 +1097,7 @@ void EngineWorker::run() {
 		engine->internal->engineBarrier.wait();
 		if (!running)
 			return;
-		Engine_stepModulesWorker(engine, id);
+		Engine_stepWorker(engine, id);
 		engine->internal->workerBarrier.wait();
 	}
 }

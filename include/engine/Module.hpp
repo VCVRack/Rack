@@ -225,6 +225,8 @@ struct Module {
 		Defined by `1 / sampleRate`.
 		*/
 		float sampleTime;
+		/** Number of audio samples since the Engine's first sample. */
+		int64_t frame;
 	};
 	/** Advances the module by one audio sample.
 	Override this method to read Inputs and Params and to write Outputs and Lights.
@@ -342,10 +344,11 @@ struct Module {
 	/** DEPRECATED. Override `onSampleRateChange(e)` instead. */
 	virtual void onSampleRateChange() {}
 
-	/** Unstable API, do not use in plugins. */
-	float& cpuTime();
-	/** Unstable API, do not use in plugins. */
-	bool& bypass();
+	PRIVATE bool& bypass();
+	PRIVATE const float* meterBuffer();
+	PRIVATE int meterLength();
+	PRIVATE int meterIndex();
+	PRIVATE void step(const ProcessArgs& args);
 };
 
 

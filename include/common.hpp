@@ -1,5 +1,6 @@
 #pragma once
 // Include most of the C stdlib for convenience
+#include <cstddef>
 #include <cstdlib>
 #include <cstdio>
 #include <cstdint>

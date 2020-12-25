@@ -394,27 +394,53 @@ void ModuleWidget::draw(const DrawArgs& args) {
 
 	Widget::draw(args);
 
-	// Power meter
+	// Meter
 	if (module && settings::cpuMeter) {
+		float sampleRate = APP->engine->getSampleRate();
+		const float* meterBuffer = module->meterBuffer();
+		int meterLength = module->meterLength();
+		int meterIndex = module->meterIndex();
+
+		float meterAvg = 0.f;
+		for (int i = 0; i < meterLength; i++) {
+			meterAvg += meterBuffer[i];
+		}
+		meterAvg /= meterLength;
+
+		// Text background
 		nvgBeginPath(args.vg);
-		nvgRect(args.vg,
-		        0, box.size.y - 35,
-		        65, 35);
+		nvgRect(args.vg, 0, box.size.y - 20, box.size.x, 20);
 		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
 		nvgFill(args.vg);
 
-		float percent = module->cpuTime() * APP->engine->getSampleRate() * 100;
-		float microseconds = module->cpuTime() * 1e6f;
-		std::string cpuText = string::f("%.1f%%\n%.2f μs", percent, microseconds);
-		bndLabel(args.vg, 2.0, box.size.y - 34.0, INFINITY, INFINITY, -1, cpuText.c_str());
+		// Text
+		float percent = meterAvg * sampleRate * 100.f;
+		float microseconds = meterAvg * 1e6f;
+		std::string meterText = string::f("%.1f%% %.2f μs", percent, microseconds);
+		bndLabel(args.vg, 0.0, box.size.y - 20.0, INFINITY, INFINITY, -1, meterText.c_str());
 
-		float p = math::clamp(module->cpuTime() / APP->engine->getSampleTime(), 0.f, 1.f);
+		// Draw time plot
 		nvgBeginPath(args.vg);
-		nvgRect(args.vg,
-		        0, (1.f - p) * box.size.y,
-		        5, p * box.size.y);
-		nvgFillColor(args.vg, nvgRGBAf(1, 0, 0, 1.0));
+		nvgMoveTo(args.vg, box.size.x, box.size.y);
+		for (int i = 0; i < meterLength; i++) {
+			int index = (meterIndex - i + meterLength) % meterLength;
+			math::Vec p;
+			p.x = (1.f - (float) i / (meterLength - 1)) * box.size.x;
+			p.y = (1.f - meterBuffer[index] * sampleRate * 1.f) * (box.size.y - 20);
+			nvgLineTo(args.vg, p.x, p.y);
+		}
+		NVGcolor color = nvgRGBAf(0.6, 0, 0, 0.6);
+		nvgLineTo(args.vg, 0.0, box.size.y);
+		nvgClosePath(args.vg);
+		nvgFillColor(args.vg, color);
 		nvgFill(args.vg);
+
+		// Draw border
+		nvgStrokeColor(args.vg, color);
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
+		nvgStrokeWidth(args.vg, 2.0);
+		nvgStroke(args.vg);
 	}
 
 	// if (module) {
