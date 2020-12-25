@@ -19,7 +19,7 @@
 namespace rack {
 
 
-/** Deprecation notice for functions
+/** Attribute for deprecated functions and symbols.
 E.g.
 
 	DEPRECATED void foo();
@@ -30,6 +30,10 @@ E.g.
 	#define DEPRECATED __declspec(deprecated)
 #endif
 
+/** Attribute for private functions and symbols not intended to be used by plugins.
+By default this does nothing, but when #including rack.hpp, it prints a compile-time warning.
+*/
+#define PRIVATE
 
 
 /** Concatenates two literals or two macros

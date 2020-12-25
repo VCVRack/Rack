@@ -99,6 +99,10 @@
 #include <simd/functions.hpp>
 
 
+#undef PRIVATE
+#define PRIVATE __attribute__ ((warning ("Using private function or symbol")))
+
+
 namespace rack {
 
 
