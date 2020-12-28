@@ -196,10 +196,11 @@ struct Engine::Internal {
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
+	int64_t block = 0;
 	int64_t frame = 0;
-	int64_t stepFrame = 0;
-	double stepTime = 0.0;
-	int stepFrames = 0;
+	int64_t blockFrame = 0;
+	double blockTime = 0.0;
+	int blockFrames = 0;
 	Module* primaryModule = NULL;
 
 	// Parameter smoothing
@@ -207,15 +208,15 @@ struct Engine::Internal {
 	int smoothParamId = 0;
 	float smoothValue = 0.f;
 
-	/** Engine mutex
-	Writers lock when mutating the engine's Modules, Cables, etc.
-	Readers lock when using the engine's Modules, Cables, etc.
+	/** Mutex that guards the Engine state, such as settings, Modules, and Cables.
+	Writers lock when mutating the engine's state.
+	Readers lock when using the engine's state.
 	*/
 	SharedMutex mutex;
-	/** Step mutex
-	step() locks to guarantee its exclusivity.
+	/** Mutex that guards the block.
+	stepBlock() locks to guarantee its exclusivity.
 	*/
-	std::mutex stepMutex;
+	std::mutex blockMutex;
 
 	int threadCount = 0;
 	std::vector<EngineWorker> workers;
@@ -310,7 +311,7 @@ static void Engine_stepWorker(Engine* that, int threadId) {
 			break;
 
 		Module* module = internal->modules[i];
-		module->step(processArgs);
+		module->doProcess(processArgs);
 	}
 }
 
@@ -497,16 +498,16 @@ void Engine::clear() {
 }
 
 
-void Engine::step(int frames) {
-	std::lock_guard<std::mutex> stepLock(internal->stepMutex);
+void Engine::stepBlock(int frames) {
+	std::lock_guard<std::mutex> stepLock(internal->blockMutex);
 	SharedLock lock(internal->mutex);
 	// Configure thread
 	initMXCSR();
 	random::init();
 
-	internal->stepFrame = internal->frame;
-	internal->stepTime = system::getTime();
-	internal->stepFrames = frames;
+	internal->blockFrame = internal->frame;
+	internal->blockTime = system::getTime();
+	internal->blockFrames = frames;
 
 	// Set sample rate
 	if (internal->sampleRate != settings::sampleRate) {
@@ -538,9 +539,11 @@ void Engine::step(int frames) {
 	yieldWorkers();
 
 	double endTime = system::getTime();
-	float duration = endTime - internal->stepTime;
-	float stepDuration = internal->stepFrames * internal->sampleTime;
-	// DEBUG("%d %f / %f = %f%%", internal->stepFrames, duration, stepDuration, duration / stepDuration * 100.f);
+	float duration = endTime - internal->blockTime;
+	float blockDuration = internal->blockFrames * internal->sampleTime;
+	// DEBUG("%d %f / %f = %f%%", internal->blockFrames, duration, blockDuration, duration / blockDuration * 100.f);
+
+	internal->block++;
 }
 
 
@@ -577,34 +580,39 @@ void Engine::yieldWorkers() {
 }
 
 
+int64_t Engine::getBlock() {
+	return internal->block;
+}
+
+
 int64_t Engine::getFrame() {
 	return internal->frame;
 }
 
 
 double Engine::getFrameTime() {
-	double timeSinceStep = (internal->frame - internal->stepFrame) * internal->sampleTime;
-	return internal->stepTime + timeSinceStep;
+	double timeSinceBlock = (internal->frame - internal->blockFrame) * internal->sampleTime;
+	return internal->blockTime + timeSinceBlock;
 }
 
 
-int64_t Engine::getStepFrame() {
-	return internal->stepFrame;
+int64_t Engine::getBlockFrame() {
+	return internal->blockFrame;
 }
 
 
-double Engine::getStepTime() {
-	return internal->stepTime;
+double Engine::getBlockTime() {
+	return internal->blockTime;
 }
 
 
-int Engine::getStepFrames() {
-	return internal->stepFrames;
+int Engine::getBlockFrames() {
+	return internal->blockFrames;
 }
 
 
-double Engine::getStepDuration() {
-	return internal->stepFrames * internal->sampleTime;
+double Engine::getBlockDuration() {
+	return internal->blockFrames * internal->sampleTime;
 }
 
 
@@ -1031,7 +1039,7 @@ json_t* Engine::toJson() {
 
 void Engine::fromJson(json_t* rootJ) {
 	// We can't lock here because addModule() and addCable() are called inside.
-	// Also, AudioInterface::fromJson() can open the audio device, which can call Engine::step() before this method exits.
+	// Also, AudioInterface::fromJson() can open the audio device, which can call Engine::stepBlock() before this method exits.
 	// ExclusiveSharedLock lock(internal->mutex);
 	clear();
 	// modules

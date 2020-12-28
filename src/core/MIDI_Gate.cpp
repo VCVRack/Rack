@@ -67,7 +67,7 @@ struct MIDI_Gate : Module {
 		while (!midiInput.queue.empty()) {
 			midi::Message& msg = midiInput.queue.front();
 			// Don't process MIDI message until its timestamp corresponds with the audio frame time when played back in the next block.
-			if (msg.timestamp + APP->engine->getStepDuration() > APP->engine->getFrameTime())
+			if (msg.timestamp + APP->engine->getBlockDuration() > APP->engine->getFrameTime())
 				break;
 			processMessage(msg);
 			midiInput.queue.pop();

@@ -30,7 +30,7 @@ struct Engine {
 	/** Advances the engine by `frames` frames.
 	Only call this method from the primary module.
 	*/
-	void step(int frames);
+	void stepBlock(int frames);
 	void setPrimaryModule(Module* module);
 	Module* getPrimaryModule();
 
@@ -41,29 +41,32 @@ struct Engine {
 	*/
 	float getSampleTime();
 	/** Causes worker threads to block on a mutex instead of spinlock.
-	Call this in your Module::step() method to hint that the operation will take more than ~0.1 ms.
+	Call this in your Module::stepBlock() method to hint that the operation will take more than ~0.1 ms.
 	*/
 	void yieldWorkers();
-	/** Returns the number of audio samples since the Engine's first sample.
+	/** Returns the number of stepBlock() calls since the Engine was created.
+	*/
+	int64_t getBlock();
+	/** Returns the number of audio samples since the Engine was created.
 	*/
 	int64_t getFrame();
-	/** Returns the estimated timestamp corresponding to the current frame, based on the timestamp of when step() was last called.
+	/** Returns the estimated time corresponding to the current frame, based on the time of when stepBlock() was last called.
 	Calculated by `stepTime + framesSinceStep / sampleRate`.
 	*/
 	double getFrameTime();
-	/** Returns the frame when step() was last called.
+	/** Returns the frame when stepBlock() was last called.
 	*/
-	int64_t getStepFrame();
-	/** Returns the timestamp in seconds when step() was last called.
+	int64_t getBlockFrame();
+	/** Returns the time in seconds when stepBlock() was last called.
 	*/
-	double getStepTime();
-	/** Returns the total number of frames in the current step() call.
+	double getBlockTime();
+	/** Returns the total number of frames in the current stepBlock() call.
 	*/
-	int getStepFrames();
-	/** Returns the total time that step() is advancing, in seconds.
+	int getBlockFrames();
+	/** Returns the total time that stepBlock() is advancing, in seconds.
 	Calculated by `stepFrames / sampleRate`.
 	*/
-	double getStepDuration();
+	double getBlockDuration();
 
 	// Modules
 	size_t getNumModules();

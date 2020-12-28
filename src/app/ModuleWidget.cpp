@@ -401,39 +401,49 @@ void ModuleWidget::draw(const DrawArgs& args) {
 		int meterLength = module->meterLength();
 		int meterIndex = module->meterIndex();
 
+		float meterMax = 0.f;
 		float meterAvg = 0.f;
 		for (int i = 0; i < meterLength; i++) {
-			meterAvg += meterBuffer[i];
+			float m = meterBuffer[i];
+			meterAvg += m;
+			meterMax = std::max(meterMax, m);
 		}
 		meterAvg /= meterLength;
+		float percentMax = meterMax * sampleRate;
+		float mult = (percentMax <= 0.1f) ? 10.f : 1.f;
 
-		// Text background
-		nvgBeginPath(args.vg);
-		nvgRect(args.vg, 0, box.size.y - 20, box.size.x, 20);
-		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
-		nvgFill(args.vg);
-
-		// Text
-		float percent = meterAvg * sampleRate * 100.f;
-		float microseconds = meterAvg * 1e6f;
-		std::string meterText = string::f("%.1f%% %.2f μs", percent, microseconds);
-		bndLabel(args.vg, 0.0, box.size.y - 20.0, INFINITY, INFINITY, -1, meterText.c_str());
+		// // Text background
+		// nvgBeginPath(args.vg);
+		// nvgRect(args.vg, 0.0, box.size.y - infoHeight, box.size.x, infoHeight);
+		// nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
+		// nvgFill(args.vg);
 
 		// Draw time plot
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, box.size.x, box.size.y);
 		for (int i = 0; i < meterLength; i++) {
 			int index = (meterIndex - i + meterLength) % meterLength;
+			float percent = math::clamp(meterBuffer[index] * mult * sampleRate, 0.f, 1.f);
 			math::Vec p;
 			p.x = (1.f - (float) i / (meterLength - 1)) * box.size.x;
-			p.y = (1.f - meterBuffer[index] * sampleRate * 1.f) * (box.size.y - 20);
+			p.y = (1.f - percent) * (box.size.y);
 			nvgLineTo(args.vg, p.x, p.y);
 		}
-		NVGcolor color = nvgRGBAf(0.6, 0, 0, 0.6);
+		NVGcolor color;
+		if (mult == 1.f)
+			color = nvgRGBAf(0.5, 0, 0, 0.85);
+		else if (mult == 10.f)
+			color = nvgRGBAf(0.85, 0, 0, 0.85);
 		nvgLineTo(args.vg, 0.0, box.size.y);
 		nvgClosePath(args.vg);
 		nvgFillColor(args.vg, color);
 		nvgFill(args.vg);
+
+		// Text
+		float percent = meterAvg * sampleRate * 100.f;
+		float microseconds = meterAvg * 1e6f;
+		std::string meterText = string::f("%.0fx\n%.2f μs\n%.1f%%", mult, microseconds, percent);
+		bndLabel(args.vg, 0.0, box.size.y - 60, INFINITY, INFINITY, -1, meterText.c_str());
 
 		// Draw border
 		nvgStrokeColor(args.vg, color);

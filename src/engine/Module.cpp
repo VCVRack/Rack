@@ -1,8 +1,10 @@
 #include <engine/Module.hpp>
+#include <engine/Engine.hpp>
 #include <plugin.hpp>
 #include <system.hpp>
 #include <settings.hpp>
 #include <asset.hpp>
+#include <context.hpp>
 
 
 namespace rack {
@@ -11,19 +13,19 @@ namespace engine {
 
 
 // Arbitrary prime number so it doesn't over- or under-estimate time of buffered processors.
-static const int meterDivider = 23;
-static const int samplesCount = 64;
+static const int meterDivider = 1;
 static const int meterBufferLength = 128;
-
 
 
 struct Module::Internal {
 	bool bypass = false;
 
-	float meterTimeTotal = 0.f;
+	int64_t meterLastBlock = 0;
 	int meterSamples = 0;
-	int meterIndex = 0;
+	float meterTimeTotal = 0.f;
+
 	float meterBuffer[meterBufferLength] = {};
+	int meterIndex = 0;
 };
 
 
@@ -326,7 +328,7 @@ static void Port_step(Port* that, float deltaTime) {
 }
 
 
-void Module::step(const ProcessArgs& args) {
+void Module::doProcess(const ProcessArgs& args) {
 	// This global setting can change while the function is running, so use a local variable.
 	bool meterEnabled = settings::cpuMeter && (args.frame % meterDivider == 0);
 
@@ -347,15 +349,21 @@ void Module::step(const ProcessArgs& args) {
 		double endTime = system::getTime();
 		float duration = endTime - startTime;
 
-		internal->meterTimeTotal += duration;
-		if (++internal->meterSamples >= samplesCount) {
+		int64_t block = APP->engine->getBlock();
+		if (block > internal->meterLastBlock) {
 			// Push time to buffer
-			internal->meterBuffer[internal->meterIndex++] = internal->meterTimeTotal / samplesCount;
-			internal->meterIndex %= meterBufferLength;
+			if (internal->meterSamples > 0) {
+				internal->meterBuffer[internal->meterIndex++] = internal->meterTimeTotal / internal->meterSamples;
+				internal->meterIndex %= meterBufferLength;
+			}
 			// Reset total
 			internal->meterSamples = 0;
 			internal->meterTimeTotal = 0.f;
 		}
+
+		internal->meterLastBlock = block;
+		internal->meterSamples++;
+		internal->meterTimeTotal += duration;
 	}
 
 	// Iterate ports to step plug lights

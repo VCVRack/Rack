@@ -348,7 +348,7 @@ struct Module {
 	PRIVATE const float* meterBuffer();
 	PRIVATE int meterLength();
 	PRIVATE int meterIndex();
-	PRIVATE void step(const ProcessArgs& args);
+	PRIVATE void doProcess(const ProcessArgs& args);
 };
 
 
