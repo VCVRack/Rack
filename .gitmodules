@@ -28,3 +28,6 @@
 [submodule "dep/filesystem"]
 	path = dep/filesystem
 	url = https://github.com/gulrak/filesystem.git
+[submodule "dep/pffft"]
+	path = dep/pffft
+	url = https://bitbucket.org/jpommier/pffft.git
