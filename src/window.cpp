@@ -360,92 +360,97 @@ Window::~Window() {
 void Window::run() {
 	internal->frame = 0;
 	while (!glfwWindowShouldClose(win)) {
-		double frameTime = glfwGetTime();
-		internal->lastFrameDuration = frameTime - internal->lastFrameTime;
-		// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
-		internal->lastFrameTime = frameTime;
-
-		// Make event handlers and step() have a clean nanovg context
-		nvgReset(vg);
-		bndSetFont(uiFont->handle);
-
-		// Poll events
-		glfwPollEvents();
-
-		// In case glfwPollEvents() sets another OpenGL context
-		glfwMakeContextCurrent(win);
-		if (settings::frameSwapInterval != internal->frameSwapInterval) {
-			glfwSwapInterval(settings::frameSwapInterval);
-			internal->frameSwapInterval = settings::frameSwapInterval;
-		}
-
-		// Call cursorPosCallback every frame, not just when the mouse moves
-		{
-			double xpos, ypos;
-			glfwGetCursorPos(win, &xpos, &ypos);
-			cursorPosCallback(win, xpos, ypos);
-		}
-		gamepad::step();
-
-		// Set window title
-		std::string windowTitle = APP_NAME + " v" + APP_VERSION;
-		if (APP->patch->path != "") {
-			windowTitle += " - ";
-			if (!APP->history->isSaved())
-				windowTitle += "*";
-			windowTitle += system::getFilename(APP->patch->path);
-		}
-		if (windowTitle != internal->lastWindowTitle) {
-			glfwSetWindowTitle(win, windowTitle.c_str());
-			internal->lastWindowTitle = windowTitle;
-		}
-
-		// Get desired scaling
-		float newPixelRatio;
-		glfwGetWindowContentScale(win, &newPixelRatio, NULL);
-		newPixelRatio = std::floor(newPixelRatio + 0.5);
-		if (newPixelRatio != pixelRatio) {
-			APP->event->handleDirty();
-			pixelRatio = newPixelRatio;
-		}
-
-		// Get framebuffer/window ratio
-		int fbWidth, fbHeight;
-		glfwGetFramebufferSize(win, &fbWidth, &fbHeight);
-		int winWidth, winHeight;
-		glfwGetWindowSize(win, &winWidth, &winHeight);
-		windowRatio = (float)fbWidth / winWidth;
-
-		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
-		// Resize scene
-		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
-
-		// Step scene
-		APP->scene->step();
-
-		// Render scene
-		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
-		if (visible) {
-			// Update and render
-			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
-			nvgScale(vg, pixelRatio, pixelRatio);
-
-			// Draw scene
-			widget::Widget::DrawArgs args;
-			args.vg = vg;
-			args.clipBox = APP->scene->box.zeroPos();
-			APP->scene->draw(args);
-
-			glViewport(0, 0, fbWidth, fbHeight);
-			glClearColor(0.0, 0.0, 0.0, 1.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-			nvgEndFrame(vg);
-		}
-
-		glfwSwapBuffers(win);
-
-		internal->frame++;
+		step();
 	}
+}
+
+
+void Window::step() {
+	double frameTime = glfwGetTime();
+	internal->lastFrameDuration = frameTime - internal->lastFrameTime;
+	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
+	internal->lastFrameTime = frameTime;
+
+	// Make event handlers and step() have a clean nanovg context
+	nvgReset(vg);
+	bndSetFont(uiFont->handle);
+
+	// Poll events
+	glfwPollEvents();
+
+	// In case glfwPollEvents() sets another OpenGL context
+	glfwMakeContextCurrent(win);
+	if (settings::frameSwapInterval != internal->frameSwapInterval) {
+		glfwSwapInterval(settings::frameSwapInterval);
+		internal->frameSwapInterval = settings::frameSwapInterval;
+	}
+
+	// Call cursorPosCallback every frame, not just when the mouse moves
+	{
+		double xpos, ypos;
+		glfwGetCursorPos(win, &xpos, &ypos);
+		cursorPosCallback(win, xpos, ypos);
+	}
+	gamepad::step();
+
+	// Set window title
+	std::string windowTitle = APP_NAME + " v" + APP_VERSION;
+	if (APP->patch->path != "") {
+		windowTitle += " - ";
+		if (!APP->history->isSaved())
+			windowTitle += "*";
+		windowTitle += system::getFilename(APP->patch->path);
+	}
+	if (windowTitle != internal->lastWindowTitle) {
+		glfwSetWindowTitle(win, windowTitle.c_str());
+		internal->lastWindowTitle = windowTitle;
+	}
+
+	// Get desired scaling
+	float newPixelRatio;
+	glfwGetWindowContentScale(win, &newPixelRatio, NULL);
+	newPixelRatio = std::floor(newPixelRatio + 0.5);
+	if (newPixelRatio != pixelRatio) {
+		APP->event->handleDirty();
+		pixelRatio = newPixelRatio;
+	}
+
+	// Get framebuffer/window ratio
+	int fbWidth, fbHeight;
+	glfwGetFramebufferSize(win, &fbWidth, &fbHeight);
+	int winWidth, winHeight;
+	glfwGetWindowSize(win, &winWidth, &winHeight);
+	windowRatio = (float)fbWidth / winWidth;
+
+	// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
+	// Resize scene
+	APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
+
+	// Step scene
+	APP->scene->step();
+
+	// Render scene
+	bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
+	if (visible) {
+		// Update and render
+		nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
+		nvgScale(vg, pixelRatio, pixelRatio);
+
+		// Draw scene
+		widget::Widget::DrawArgs args;
+		args.vg = vg;
+		args.clipBox = APP->scene->box.zeroPos();
+		APP->scene->draw(args);
+
+		glViewport(0, 0, fbWidth, fbHeight);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		nvgEndFrame(vg);
+	}
+
+	glfwSwapBuffers(win);
+
+	internal->frame++;
 }
 
 

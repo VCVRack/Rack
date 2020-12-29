@@ -76,6 +76,7 @@ struct Window {
 	Window();
 	~Window();
 	void run();
+	void step();
 	/** Takes a screenshot of the screen and saves it to a PNG file. */
 	void screenshot(const std::string& screenshotPath);
 	/** Saves a PNG image of all modules to `screenshotsDir/<plugin slug>/<module slug>.png`.
