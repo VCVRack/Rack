@@ -95,9 +95,9 @@ struct ModuleWidget : widget::OpaqueWidget {
 	*/
 	virtual void appendContextMenu(ui::Menu* menu) {}
 
-	math::Vec& dragPos();
-	math::Vec& oldPos();
-	engine::Module* releaseModule();
+	PRIVATE math::Vec& dragPos();
+	PRIVATE math::Vec& oldPos();
+	PRIVATE engine::Module* releaseModule();
 };
 
 

@@ -485,6 +485,11 @@ void ModuleWidget::onButton(const event::Button& e) {
 	else
 		OpaqueWidget::onButton(e);
 
+	// Set starting drag position even if we don't consume it
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		internal->dragPos = e.pos;
+	}
+
 	if (e.isConsumed())
 		return;
 
@@ -540,8 +545,6 @@ void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 
 void ModuleWidget::onDragStart(const event::DragStart& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		internal->dragPos = APP->scene->rack->mousePos.minus(box.pos);
-		DEBUG("drag (%f, %f)", VEC_ARGS(internal->dragPos));
 		APP->scene->rack->updateModuleOldPositions();
 	}
 }
