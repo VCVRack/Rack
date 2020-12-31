@@ -193,12 +193,7 @@ bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	}
 
 	if (draggedWidget) {
-		// Trigger DragMove event
-		DragMove eDragMove;
-		eDragMove.button = dragButton;
-		eDragMove.mouseDelta = mouseDelta;
-		draggedWidget->onDragMove(eDragMove);
-
+		bool dragHovered = false;
 		if (!cursorLocked) {
 			// Trigger DragHover event
 			Context cDragHover;
@@ -211,9 +206,18 @@ bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 			rootWidget->onDragHover(eDragHover);
 
 			setDragHovered(cDragHover.target);
+			// If consumed, don't continue after DragMove so Hover is not triggered.
 			if (cDragHover.target)
-				return true;
+				dragHovered = true;
 		}
+
+		// Trigger DragMove event
+		DragMove eDragMove;
+		eDragMove.button = dragButton;
+		eDragMove.mouseDelta = mouseDelta;
+		draggedWidget->onDragMove(eDragMove);
+		if (dragHovered)
+			return true;
 	}
 
 	if (!cursorLocked) {
@@ -226,7 +230,8 @@ bool State::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		rootWidget->onHover(eHover);
 
 		setHovered(cHover.target);
-		return !!cHover.target;
+		if (cHover.target)
+			return true;
 	}
 	return false;
 }

@@ -361,9 +361,15 @@ struct ModuleDeleteItem : ui::MenuItem {
 
 
 struct ModuleWidget::Internal {
-	/** The position the user clicked on the module to start dragging in the RackWidget.
+	/** The module position clicked on to start dragging in the rack.
 	*/
-	math::Vec dragPos;
+	math::Vec dragOffset;
+
+	/** Global rack position the user clicked on.
+	*/
+	math::Vec dragRackPos;
+	bool dragRackEnabled;
+
 	/** The position in the RackWidget when dragging began.
 	Used for history::ModuleMove.
 	Set by RackWidget::updateModuleOldPositions() when *any* module begins dragging, since force-dragging can move other modules around.
@@ -487,7 +493,7 @@ void ModuleWidget::onButton(const event::Button& e) {
 
 	// Set starting drag position even if we don't consume it
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		internal->dragPos = e.pos;
+		internal->dragOffset = e.pos;
 	}
 
 	if (e.isConsumed())
@@ -545,6 +551,11 @@ void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 
 void ModuleWidget::onDragStart(const event::DragStart& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		// Clear dragRack so dragging in not enabled until mouse is moved a bit.
+		internal->dragRackPos = math::Vec(NAN, NAN);
+		internal->dragRackEnabled = false;
+
+		// Prepare initial position of modules for history.
 		APP->scene->rack->updateModuleOldPositions();
 	}
 }
@@ -561,11 +572,24 @@ void ModuleWidget::onDragEnd(const event::DragEnd& e) {
 void ModuleWidget::onDragMove(const event::DragMove& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (!settings::lockModules) {
-			math::Vec pos = APP->scene->rack->mousePos.minus(internal->dragPos);
-			if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
-				APP->scene->rack->setModulePosForce(this, pos);
-			else
-				APP->scene->rack->setModulePosNearest(this, pos);
+			// Set dragRackPos on the first time after dragging
+			math::Vec mousePos = APP->scene->rack->mousePos;
+			if (!internal->dragRackPos.isFinite())
+				internal->dragRackPos = mousePos;
+
+			// Check if the mouse has moved enough to start dragging the module.
+			const float dist = RACK_GRID_WIDTH;
+			if (!internal->dragRackEnabled && internal->dragRackPos.minus(mousePos).square() >= std::pow(dist, 2))
+				internal->dragRackEnabled = true;
+
+			// Move module
+			if (internal->dragRackEnabled) {
+				math::Vec pos = mousePos.minus(internal->dragOffset);
+				if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
+					APP->scene->rack->setModulePosForce(this, pos);
+				else
+					APP->scene->rack->setModulePosNearest(this, pos);
+			}
 		}
 	}
 }
@@ -1062,8 +1086,8 @@ void ModuleWidget::createContextMenu() {
 }
 
 
-math::Vec& ModuleWidget::dragPos() {
-	return internal->dragPos;
+math::Vec& ModuleWidget::dragOffset() {
+	return internal->dragOffset;
 }
 
 math::Vec& ModuleWidget::oldPos() {
