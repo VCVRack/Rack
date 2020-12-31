@@ -229,8 +229,9 @@ struct ModelBox : widget::OpaqueWidget {
 			e.consume(mw);
 
 			// Set the drag position at the center of the module
-			// TODO This doesn't work because ModuleWidget::onDragStart, which is called afterwards, overwrites this.
 			mw->dragOffset() = mw->box.size.div(2);
+			// Disable dragging temporarily until the mouse has moved a bit.
+			mw->dragEnabled() = false;
 		}
 	}
 
