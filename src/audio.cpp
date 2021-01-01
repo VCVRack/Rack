@@ -242,7 +242,7 @@ std::string Port::getDeviceDetail(int deviceId, int offset) {
 	}
 }
 
-std::set<int> Port::getSampleRates() {
+std::set<float> Port::getSampleRates() {
 	if (!device)
 		return {};
 	try {
@@ -254,7 +254,7 @@ std::set<int> Port::getSampleRates() {
 	}
 }
 
-int Port::getSampleRate() {
+float Port::getSampleRate() {
 	if (!device)
 		return 0;
 	try {
@@ -266,7 +266,7 @@ int Port::getSampleRate() {
 	}
 }
 
-void Port::setSampleRate(int sampleRate) {
+void Port::setSampleRate(float sampleRate) {
 	if (!device)
 		return;
 	try {
@@ -345,7 +345,7 @@ json_t* Port::toJson() {
 		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
 	}
 
-	json_object_set_new(rootJ, "sampleRate", json_integer(getSampleRate()));
+	json_object_set_new(rootJ, "sampleRate", json_real(getSampleRate()));
 	json_object_set_new(rootJ, "blockSize", json_integer(getBlockSize()));
 	json_object_set_new(rootJ, "offset", json_integer(offset));
 	return rootJ;
@@ -377,7 +377,7 @@ void Port::fromJson(json_t* rootJ) {
 
 	json_t* sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ)
-		setSampleRate(json_integer_value(sampleRateJ));
+		setSampleRate(json_number_value(sampleRateJ));
 
 	json_t* blockSizeJ = json_object_get(rootJ, "blockSize");
 	if (blockSizeJ)

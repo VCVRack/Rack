@@ -144,7 +144,7 @@ struct AudioDeviceItem : ui::MenuItem {
 
 struct AudioSampleRateValueItem : ui::MenuItem {
 	audio::Port* port;
-	int sampleRate;
+	float sampleRate;
 	void onAction(const event::Action& e) override {
 		port->setSampleRate(sampleRate);
 	}
@@ -154,14 +154,14 @@ static void appendAudioSampleRateMenu(ui::Menu* menu, audio::Port* port) {
 	if (!port)
 		return;
 
-	std::set<int> sampleRates = port->getSampleRates();
+	std::set<float> sampleRates = port->getSampleRates();
 	// Add current sample rate in case it's not in the list
 	sampleRates.insert(port->getSampleRate());
 
 	if (sampleRates.empty()) {
 		menu->addChild(createMenuLabel("(Locked by device)"));
 	}
-	for (int sampleRate : sampleRates) {
+	for (float sampleRate : sampleRates) {
 		if (sampleRate <= 0)
 			continue;
 		AudioSampleRateValueItem* item = new AudioSampleRateValueItem;
@@ -184,9 +184,9 @@ struct AudioSampleRateChoice : LedDisplayChoice {
 		text = "";
 		if (box.size.x >= 100.0)
 			text += "Rate: ";
-		int sampleRate = port ? port->getSampleRate() : 0;
+		float sampleRate = port ? port->getSampleRate() : 0;
 		if (sampleRate > 0) {
-			text += string::f("%g", sampleRate / 1000.0);
+			text += string::f("%g", sampleRate / 1000.f);
 			color.a = 1.0;
 		}
 		else {

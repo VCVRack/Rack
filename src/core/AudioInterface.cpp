@@ -205,7 +205,7 @@ struct AudioInterface : Module, audio::Port {
 		// Initialize sample rate converters
 		int numInputs = getNumInputs();
 		int engineSampleRate = (int) APP->engine->getSampleRate();
-		int sampleRate = getSampleRate();
+		float sampleRate = getSampleRate();
 		double sampleRateRatio = (double) engineSampleRate / sampleRate;
 		outputSrc.setRates(sampleRate, engineSampleRate);
 		outputSrc.setChannels(numInputs);
@@ -253,7 +253,7 @@ struct AudioInterface : Module, audio::Port {
 		bool isPrimary = (APP->engine->getPrimaryModule() == this);
 		int numOutputs = getNumOutputs();
 		int engineSampleRate = (int) APP->engine->getSampleRate();
-		int sampleRate = getSampleRate();
+		float sampleRate = getSampleRate();
 		inputSrc.setRates(engineSampleRate, sampleRate);
 		inputSrc.setChannels(numOutputs);
 

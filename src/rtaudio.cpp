@@ -19,14 +19,14 @@ namespace rack {
 
 
 struct RtAudioDevice : audio::Device {
-	RtAudio *rtAudio;
+	RtAudio* rtAudio;
 	int deviceId;
 	RtAudio::DeviceInfo deviceInfo;
 	RtAudio::StreamParameters inputParameters;
 	RtAudio::StreamParameters outputParameters;
 	RtAudio::StreamOptions options;
 	int blockSize = 0;
-	int sampleRate = 44100;
+	float sampleRate = 44100;
 
 	RtAudioDevice(RtAudio::Api api, int deviceId) {
 		rtAudio = new RtAudio(api);
@@ -73,11 +73,11 @@ struct RtAudioDevice : audio::Device {
 		options.numberOfBuffers = 2;
 		options.streamName = "VCV Rack";
 
-		int closestSampleRate = deviceInfo.preferredSampleRate;
+		float closestSampleRate = deviceInfo.preferredSampleRate;
 		if (sampleRate > 0) {
 			// Find the closest sample rate to the requested one.
-			for (int sr : deviceInfo.sampleRates) {
-				if (std::abs(sr - sampleRate) < std::abs(closestSampleRate - sampleRate)) {
+			for (float sr : deviceInfo.sampleRates) {
+				if (std::fabs(sr - sampleRate) < std::fabs(closestSampleRate - sampleRate)) {
 					closestSampleRate = sr;
 				}
 			}
@@ -87,7 +87,7 @@ struct RtAudioDevice : audio::Device {
 			blockSize = 256;
 		}
 
-		INFO("Opening audio RtAudio device %d with %d in %d out, %d sample rate %d block size", deviceId, inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
+		INFO("Opening audio RtAudio device %d with %d in %d out, %f sample rate %d block size", deviceId, inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
 		try {
 			rtAudio->openStream(
 			  outputParameters.nChannels > 0 ? &outputParameters : NULL,
@@ -146,14 +146,14 @@ struct RtAudioDevice : audio::Device {
 		return outputParameters.nChannels;
 	}
 
-	std::set<int> getSampleRates() override {
-		std::set<int> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
+	std::set<float> getSampleRates() override {
+		std::set<float> sampleRates(deviceInfo.sampleRates.begin(), deviceInfo.sampleRates.end());
 		return sampleRates;
 	}
-	int getSampleRate() override {
+	float getSampleRate() override {
 		return sampleRate;
 	}
-	void setSampleRate(int sampleRate) override {
+	void setSampleRate(float sampleRate) override {
 		closeStream();
 		this->sampleRate = sampleRate;
 		openStream();
@@ -190,7 +190,7 @@ struct RtAudioDevice : audio::Device {
 
 struct RtAudioDriver : audio::Driver {
 	// Just for querying device IDs names
-	RtAudio *rtAudio;
+	RtAudio* rtAudio;
 	// deviceId -> Device
 	std::map<int, RtAudioDevice*> devices;
 
