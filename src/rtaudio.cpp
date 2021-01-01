@@ -26,7 +26,7 @@ struct RtAudioDevice : audio::Device {
 	RtAudio::StreamParameters outputParameters;
 	RtAudio::StreamOptions options;
 	int blockSize = 0;
-	float sampleRate = 44100;
+	float sampleRate = 0;
 
 	RtAudioDevice(RtAudio::Api api, int deviceId) {
 		rtAudio = new RtAudio(api);
@@ -161,6 +161,8 @@ struct RtAudioDevice : audio::Device {
 		return sampleRate;
 	}
 	void setSampleRate(float sampleRate) override {
+		if (sampleRate == this->sampleRate)
+			return;
 		closeStream();
 		this->sampleRate = sampleRate;
 		openStream();
@@ -178,6 +180,8 @@ struct RtAudioDevice : audio::Device {
 		return blockSize;
 	}
 	void setBlockSize(int blockSize) override {
+		if (blockSize == this->blockSize)
+			return;
 		closeStream();
 		this->blockSize = blockSize;
 		openStream();

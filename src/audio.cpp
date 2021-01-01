@@ -167,10 +167,12 @@ int Port::getDeviceId() {
 }
 
 void Port::setDeviceId(int deviceId) {
+	if (!driver)
+		return;
 	if (deviceId == this->deviceId)
 		return;
 	// Destroy device
-	if (driver && this->deviceId >= 0) {
+	if (this->deviceId >= 0) {
 		try {
 			driver->unsubscribe(this->deviceId, this);
 		}
@@ -182,7 +184,7 @@ void Port::setDeviceId(int deviceId) {
 	this->deviceId = -1;
 
 	// Create device
-	if (driver && deviceId >= 0) {
+	if (deviceId >= 0) {
 		try {
 			device = driver->subscribe(deviceId, this);
 			this->deviceId = deviceId;
@@ -367,19 +369,17 @@ void Port::fromJson(json_t* rootJ) {
 	if (driverJ)
 		setDriverId(json_number_value(driverJ));
 
-	if (driver) {
-		json_t* deviceNameJ = json_object_get(rootJ, "deviceName");
-		if (deviceNameJ) {
-			std::string deviceName = json_string_value(deviceNameJ);
-			// Search for device ID with equal name
-			for (int deviceId : getDeviceIds()) {
-				std::string deviceNameCurr = getDeviceName(deviceId);
-				if (deviceNameCurr == "")
-					continue;
-				if (deviceNameCurr == deviceName) {
-					setDeviceId(deviceId);
-					break;
-				}
+	json_t* deviceNameJ = json_object_get(rootJ, "deviceName");
+	if (deviceNameJ) {
+		std::string deviceName = json_string_value(deviceNameJ);
+		// Search for device ID with equal name
+		for (int deviceId : getDeviceIds()) {
+			std::string deviceNameCurr = getDeviceName(deviceId);
+			if (deviceNameCurr == "")
+				continue;
+			if (deviceNameCurr == deviceName) {
+				setDeviceId(deviceId);
+				break;
 			}
 		}
 	}
