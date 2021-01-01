@@ -47,8 +47,14 @@ struct RtAudioDevice : audio::Device {
 	}
 
 	~RtAudioDevice() {
-		closeStream();
-		delete rtAudio;
+		try {
+			closeStream();
+			delete rtAudio;
+		}
+		catch (Exception& e) {
+			WARN("Failed to destroy RtAudioDevice: %s", e.what());
+			// Ignore exceptions
+		}
 	}
 
 	void openStream() {
@@ -87,7 +93,7 @@ struct RtAudioDevice : audio::Device {
 			blockSize = 256;
 		}
 
-		INFO("Opening audio RtAudio device %d with %d in %d out, %f sample rate %d block size", deviceId, inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
+		INFO("Opening audio RtAudio device %d with %d in %d out, %g sample rate %d block size", deviceId, inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
 		try {
 			rtAudio->openStream(
 			  outputParameters.nChannels > 0 ? &outputParameters : NULL,
@@ -255,14 +261,9 @@ struct RtAudioDriver : audio::Driver {
 		RtAudioDevice* device;
 		auto it = devices.find(deviceId);
 		if (it == devices.end()) {
-			try {
-				device = new RtAudioDevice(rtAudio->getCurrentApi(), deviceId);
-				devices[deviceId] = device;
-			}
-			catch (Exception& e) {
-				WARN("Could not subscribe to audio device: %s", e.what());
-				return NULL;
-			}
+			// Can throw Exception
+			device = new RtAudioDevice(rtAudio->getCurrentApi(), deviceId);
+			devices[deviceId] = device;
 		}
 		else {
 			device = it->second;
