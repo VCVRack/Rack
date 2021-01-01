@@ -177,6 +177,9 @@ struct Port {
 	int getBlockSize();
 	void setBlockSize(int blockSize);
 
+	int getOffset();
+	void setOffset(int offset);
+
 	int getNumInputs();
 	int getNumOutputs();
 

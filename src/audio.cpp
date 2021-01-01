@@ -56,15 +56,15 @@ void Device::processBuffer(const float* input, int inputStride, float* output, i
 	for (Port* port : subscribed) {
 		// Setting the thread context should probably be the responsibility of Port, but because processInput() etc are overridden, this is the only good place for it.
 		contextSet(port->context);
-		port->processInput(input + port->offset, inputStride, frames);
+		port->processInput(input + port->getOffset(), inputStride, frames);
 	}
 	for (Port* port : subscribed) {
 		contextSet(port->context);
-		port->processBuffer(input + port->offset, inputStride, output + port->offset, outputStride, frames);
+		port->processBuffer(input + port->getOffset(), inputStride, output + port->getOffset(), outputStride, frames);
 	}
 	for (Port* port : subscribed) {
 		contextSet(port->context);
-		port->processOutput(output + port->offset, outputStride, frames);
+		port->processOutput(output + port->getOffset(), outputStride, frames);
 	}
 }
 
@@ -103,7 +103,7 @@ void Port::reset() {
 		firstDriverId = driverIds[0];
 
 	setDriverId(firstDriverId);
-	offset = 0;
+	setOffset(0);
 }
 
 Driver* Port::getDriver() {
@@ -312,11 +312,20 @@ void Port::setBlockSize(int blockSize) {
 	}
 }
 
+int Port::getOffset() {
+	return offset;
+}
+
+void Port::setOffset(int offset) {
+	this->offset = offset;
+}
+
+
 int Port::getNumInputs() {
 	if (!device)
 		return 0;
 	try {
-		return std::min(device->getNumInputs() - offset, maxChannels);
+		return std::min(device->getNumInputs() - getOffset(), maxChannels);
 	}
 	catch (Exception& e) {
 		WARN("Audio port could not get device number of inputs: %s", e.what());
@@ -328,7 +337,7 @@ int Port::getNumOutputs() {
 	if (!device)
 		return 0;
 	try {
-		return std::min(device->getNumOutputs() - offset, maxChannels);
+		return std::min(device->getNumOutputs() - getOffset(), maxChannels);
 	}
 	catch (Exception& e) {
 		WARN("Audio port could not get device number of outputs: %s", e.what());
@@ -347,7 +356,7 @@ json_t* Port::toJson() {
 
 	json_object_set_new(rootJ, "sampleRate", json_real(getSampleRate()));
 	json_object_set_new(rootJ, "blockSize", json_integer(getBlockSize()));
-	json_object_set_new(rootJ, "offset", json_integer(offset));
+	json_object_set_new(rootJ, "offset", json_integer(getOffset()));
 	return rootJ;
 }
 
@@ -385,7 +394,7 @@ void Port::fromJson(json_t* rootJ) {
 
 	json_t* offsetJ = json_object_get(rootJ, "offset");
 	if (offsetJ)
-		offset = json_integer_value(offsetJ);
+		setOffset(json_integer_value(offsetJ));
 }
 
 ////////////////////

@@ -70,7 +70,7 @@ struct AudioDeviceValueItem : ui::MenuItem {
 	int offset;
 	void onAction(const event::Action& e) override {
 		port->setDeviceId(deviceId);
-		port->offset = offset;
+		port->setOffset(offset);
 	}
 };
 
@@ -99,7 +99,7 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 			item->deviceId = deviceId;
 			item->offset = offset;
 			item->text = port->getDeviceDetail(deviceId, offset);
-			item->rightText = CHECKMARK(item->deviceId == port->getDeviceId() && item->offset == port->offset);
+			item->rightText = CHECKMARK(item->deviceId == port->getDeviceId() && item->offset == port->getOffset());
 			menu->addChild(item);
 		}
 	}
@@ -117,7 +117,7 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		text = "";
 		if (box.size.x >= 200.0)
 			text += "Device: ";
-		std::string detail = (port && port->device) ? port->device->getDetail(port->offset, port->maxChannels) : "";
+		std::string detail = (port && port->device) ? port->device->getDetail(port->getOffset(), port->maxChannels) : "";
 		if (detail != "") {
 			text += detail;
 			color.a = 1.0;
