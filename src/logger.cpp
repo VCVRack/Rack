@@ -73,7 +73,9 @@ static void logVa(Level level, const char* filename, int line, const char* func,
 		std::fprintf(outputFile, "\x1B[0m");
 	std::vfprintf(outputFile, format, args);
 	std::fprintf(outputFile, "\n");
-	std::fflush(outputFile);
+	// Don't flush log file, just console output.
+	if (outputFile == stderr)
+		std::fflush(outputFile);
 }
 
 void log(Level level, const char* filename, int line, const char* func, const char* format, ...) {
