@@ -21,16 +21,23 @@
 namespace rack {
 
 
+static void rtMidiErrorCallback(RtMidiError::Type type, const std::string& errorText, void* userData) {
+	// Do nothing
+}
+
+
 struct RtMidiInputDevice : midi::InputDevice {
 	RtMidiIn* rtMidiIn;
 	std::string name;
 
 	RtMidiInputDevice(int driverId, int deviceId) {
-		rtMidiIn = new RtMidiIn((RtMidi::Api) driverId, "VCV Rack");
-		if (!rtMidiIn) {
-			throw Exception(string::f("Failed to create RtMidi input driver %d", driverId));
+		try {
+			rtMidiIn = new RtMidiIn((RtMidi::Api) driverId, "VCV Rack");
 		}
-
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to create RtMidi input driver %d: %s", driverId, e.what()));
+		}
+		rtMidiIn->setErrorCallback(rtMidiErrorCallback);
 		rtMidiIn->ignoreTypes(false, false, false);
 		rtMidiIn->setCallback(midiInputCallback, this);
 
@@ -50,6 +57,7 @@ struct RtMidiInputDevice : midi::InputDevice {
 	}
 
 	~RtMidiInputDevice() {
+		// This does not throw for any driver API
 		rtMidiIn->closePort();
 		delete rtMidiIn;
 	}
@@ -93,10 +101,13 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	bool stopped = false;
 
 	RtMidiOutputDevice(int driverId, int deviceId) : messageQueue(messageEarlier) {
-		rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
-		if (!rtMidiOut) {
-			throw Exception(string::f("Failed to create RtMidi output driver %d", driverId));
+		try {
+			rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
 		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to create RtMidi output driver %d: %s", driverId, e.what()));
+		}
+		rtMidiOut->setErrorCallback(rtMidiErrorCallback);
 
 		try {
 			name = rtMidiOut->getPortName(deviceId);
@@ -117,6 +128,7 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 
 	~RtMidiOutputDevice() {
 		stopThread();
+		// This does not throw for any driver API
 		rtMidiOut->closePort();
 		delete rtMidiOut;
 	}
@@ -194,20 +206,28 @@ struct RtMidiDriver : midi::Driver {
 
 	RtMidiDriver(int driverId) {
 		this->driverId = driverId;
-		rtMidiIn = new RtMidiIn((RtMidi::Api) driverId);
-		if (!rtMidiIn) {
-			throw Exception(string::f("Failed to create RtMidi input driver %d", driverId));
-		}
 
-		rtMidiOut = new RtMidiOut((RtMidi::Api) driverId);
-		if (!rtMidiOut) {
-			throw Exception(string::f("Failed to create RtMidi output driver %d", driverId));
+		try {
+			rtMidiIn = new RtMidiIn((RtMidi::Api) driverId);
 		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to create RtMidi input driver %d: %s", driverId, e.what()));
+		}
+		rtMidiIn->setErrorCallback(rtMidiErrorCallback);
+
+		try {
+			rtMidiOut = new RtMidiOut((RtMidi::Api) driverId);
+		}
+		catch (RtMidiError& e) {
+			throw Exception(string::f("Failed to create RtMidi output driver %d: %s", driverId, e.what()));
+		}
+		rtMidiOut->setErrorCallback(rtMidiErrorCallback);
 	}
 
 	~RtMidiDriver() {
 		assert(inputDevices.empty());
 		assert(outputDevices.empty());
+		// This does not throw for any driver API
 		delete rtMidiIn;
 		delete rtMidiOut;
 	}

@@ -30,6 +30,7 @@ struct RtAudioDevice : audio::Device {
 
 	RtAudioDevice(RtAudio::Api api, int deviceId) {
 		rtAudio = new RtAudio(api);
+		rtAudio->showWarnings(false);
 		if (!rtAudio) {
 			throw Exception(string::f("Failed to create RtAudio driver %d", api));
 		}
@@ -202,6 +203,7 @@ struct RtAudioDriver : audio::Driver {
 
 	RtAudioDriver(RtAudio::Api api) {
 		rtAudio = new RtAudio(api);
+		rtAudio->showWarnings(false);
 	}
 
 	~RtAudioDriver() {
