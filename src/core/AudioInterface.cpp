@@ -245,7 +245,7 @@ struct AudioInterface : Module, audio::Port {
 		bool isPrimary = (APP->engine->getPrimaryModule() == this);
 		// Step engine
 		if (isPrimary && requestedEngineFrames > 0) {
-			APP->engine->stepBlock(requestedEngineFrames);
+			APP->engine->stepBlock(requestedEngineFrames, getSampleRate());
 		}
 	}
 

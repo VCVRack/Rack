@@ -182,6 +182,9 @@ struct EngineWorker {
 };
 
 
+static const float FALLBACK_SAMPLE_RATE = 44100;
+
+
 struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
@@ -453,8 +456,7 @@ Engine::Engine() {
 	internal = new Internal;
 
 	internal->context = contextGet();
-	internal->sampleRate = 44100.f;
-	internal->sampleTime = 1 / internal->sampleRate;
+	setSampleRate(FALLBACK_SAMPLE_RATE);
 }
 
 
@@ -498,7 +500,7 @@ void Engine::clear() {
 }
 
 
-void Engine::stepBlock(int frames) {
+void Engine::stepBlock(int frames, float suggestedSampleRate) {
 	std::lock_guard<std::mutex> stepLock(internal->blockMutex);
 	SharedLock lock(internal->mutex);
 	// Configure thread
@@ -510,16 +512,14 @@ void Engine::stepBlock(int frames) {
 	internal->blockFrames = frames;
 
 	// Set sample rate
-	if (internal->sampleRate != settings::sampleRate) {
-		internal->sampleRate = settings::sampleRate;
-		internal->sampleTime = 1.f / internal->sampleRate;
-		// Trigger SampleRateChangeEvent
-		Module::SampleRateChangeEvent e;
-		e.sampleRate = internal->sampleRate;
-		e.sampleTime = internal->sampleTime;
-		for (Module* module : internal->modules) {
-			module->onSampleRateChange(e);
-		}
+	if (settings::sampleRate > 0) {
+		setSampleRate(settings::sampleRate);
+	}
+	else if (suggestedSampleRate > 0) {
+		setSampleRate(suggestedSampleRate);
+	}
+	else {
+		setSampleRate(FALLBACK_SAMPLE_RATE);
 	}
 
 	// Update expander pointers
@@ -567,6 +567,21 @@ Module* Engine::getPrimaryModule() {
 
 float Engine::getSampleRate() {
 	return internal->sampleRate;
+}
+
+
+void Engine::setSampleRate(float sampleRate) {
+	if (sampleRate == internal->sampleRate)
+		return;
+	internal->sampleRate = sampleRate;
+	internal->sampleTime = 1.f / sampleRate;
+	// Trigger SampleRateChangeEvent
+	Module::SampleRateChangeEvent e;
+	e.sampleRate = internal->sampleRate;
+	e.sampleTime = internal->sampleTime;
+	for (Module* module : internal->modules) {
+		module->onSampleRateChange(e);
+	}
 }
 
 

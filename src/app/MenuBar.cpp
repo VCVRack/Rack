@@ -492,6 +492,16 @@ struct SampleRateItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
 
+		SampleRateValueItem* autoItem = new SampleRateValueItem;
+		autoItem->sampleRate = 0;
+		autoItem->text = "Auto";
+		if (settings::sampleRate == 0) {
+			float sampleRate = APP->engine->getSampleRate();
+			autoItem->rightText = string::f("(%g kHz) ", sampleRate / 1000.f);
+			autoItem->rightText += CHECKMARK_STRING;
+		}
+		menu->addChild(autoItem);
+
 		for (int i = -2; i <= 4; i++) {
 			for (int j = 0; j < 2; j++) {
 				float oversample = std::pow(2.f, i);
@@ -500,7 +510,7 @@ struct SampleRateItem : ui::MenuItem {
 
 				SampleRateValueItem* item = new SampleRateValueItem;
 				item->sampleRate = sampleRate;
-				item->text = string::f("%g kHz", sampleRate / 1000.0);
+				item->text = string::f("%g kHz", sampleRate / 1000.f);
 				if (oversample > 1.f) {
 					item->rightText += string::f("(%.0fx)", oversample);
 				}
