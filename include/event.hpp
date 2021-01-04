@@ -12,7 +12,7 @@ Use this instead of GLFW_MOD_CONTROL, since Cmd should be used on Mac in place o
 */
 #if defined ARCH_MAC
 	#define RACK_MOD_CTRL GLFW_MOD_SUPER
-	#define RACK_MOD_CTRL_NAME "Cmd"
+	#define RACK_MOD_CTRL_NAME "⌘"
 #else
 	#define RACK_MOD_CTRL GLFW_MOD_CONTROL
 	#define RACK_MOD_CTRL_NAME "Ctrl"
