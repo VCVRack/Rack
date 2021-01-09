@@ -243,8 +243,7 @@ struct Engine::Internal {
 	Readers lock when using the engine's state.
 	*/
 	ReadWriteMutex mutex;
-	/** Mutex that guards the block.
-	stepBlock() locks to guarantee its exclusivity.
+	/** Mutex that guards stepBlock() so it's not called simultaneously.
 	*/
 	std::mutex blockMutex;
 
@@ -1084,7 +1083,8 @@ json_t* Engine::toJson() {
 
 
 void Engine::fromJson(json_t* rootJ) {
-	WriteLock lock(internal->mutex);
+	// Don't write-lock here because most of this function doesn't need it.
+
 	clear();
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
@@ -1105,7 +1105,7 @@ void Engine::fromJson(json_t* rootJ) {
 				module->id = moduleIndex;
 			}
 
-			// This method exclusively locks
+			// This write-locks
 			addModule(module);
 		}
 		catch (Exception& e) {
@@ -1127,7 +1127,7 @@ void Engine::fromJson(json_t* rootJ) {
 		Cable* cable = new Cable;
 		try {
 			cable->fromJson(cableJ);
-			// This method exclusively locks
+			// This write-locks
 			addCable(cable);
 		}
 		catch (Exception& e) {
