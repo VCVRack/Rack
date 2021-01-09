@@ -30,7 +30,7 @@ struct Engine {
 	/** Advances the engine by `frames` frames.
 	Only call this method from the primary module.
 	*/
-	void stepBlock(int frames, float suggestedSampleRate = 0.f);
+	void stepBlock(int frames);
 	void setPrimaryModule(Module* module);
 	Module* getPrimaryModule();
 
@@ -38,6 +38,7 @@ struct Engine {
 	*/
 	float getSampleRate();
 	PRIVATE void setSampleRate(float sampleRate);
+	void setSuggestedSampleRate(float suggestedSampleRate);
 	/** Returns the inverse of the current sample rate.
 	*/
 	float getSampleTime();

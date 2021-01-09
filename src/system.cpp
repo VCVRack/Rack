@@ -9,6 +9,7 @@
 
 #if defined ARCH_LIN || defined ARCH_MAC
 	#include <pthread.h>
+	#include <time.h> // for clock_gettime
 	#include <sched.h>
 	#include <execinfo.h> // for backtrace and backtrace_symbols
 	#include <unistd.h> // for execl

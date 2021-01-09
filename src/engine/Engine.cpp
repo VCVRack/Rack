@@ -32,39 +32,66 @@ static void initMXCSR() {
 
 
 /** Allows multiple "reader" threads to obtain a lock simultaneously, but only one "writer" thread.
+Recursive, so WriteLock can be used recursively.
 This implementation is just a wrapper for pthreads.
-This is available in C++14 as std::shared_mutex, but unfortunately we're using C++11.
+This is available in C++17 as std::shared_mutex, but unfortunately we're using C++11.
 */
-struct SharedMutex {
+struct ReadWriteMutex {
 	pthread_rwlock_t rwlock;
-	SharedMutex() {
+	std::atomic<pthread_t> writerThread{0};
+	int recursion = 0;
+
+	ReadWriteMutex() {
 		if (pthread_rwlock_init(&rwlock, NULL))
 			throw Exception("pthread_rwlock_init failed");
 	}
-	~SharedMutex() {
+	~ReadWriteMutex() {
 		pthread_rwlock_destroy(&rwlock);
 	}
-};
-
-struct SharedLock {
-	SharedMutex& m;
-	SharedLock(SharedMutex& m) : m(m) {
-		if (pthread_rwlock_rdlock(&m.rwlock))
+	void lockReader() {
+		if (pthread_rwlock_rdlock(&rwlock))
 			throw Exception("pthread_rwlock_rdlock failed");
 	}
-	~SharedLock() {
-		pthread_rwlock_unlock(&m.rwlock);
+	void unlockReader() {
+		if (pthread_rwlock_unlock(&rwlock))
+			throw Exception("pthread_rwlock_unlock failed");
+	}
+	void lockWriter() {
+		pthread_t self = pthread_self();
+		if (writerThread != self) {
+			if (pthread_rwlock_wrlock(&rwlock))
+				throw Exception("pthread_rwlock_wrlock failed");
+			writerThread = self;
+		}
+		// We're safe behind a lock so we can increment the recursion count.
+		recursion++;
+	}
+	void unlockWriter() {
+		if (--recursion == 0) {
+			writerThread = 0;
+			if (pthread_rwlock_unlock(&rwlock))
+				throw Exception("pthread_rwlock_unlock failed");
+		}
 	}
 };
 
-struct ExclusiveSharedLock {
-	SharedMutex& m;
-	ExclusiveSharedLock(SharedMutex& m) : m(m) {
-		if (pthread_rwlock_wrlock(&m.rwlock))
-			throw Exception("pthread_rwlock_wrlock failed");
+struct ReadLock {
+	ReadWriteMutex& m;
+	ReadLock(ReadWriteMutex& m) : m(m) {
+		m.lockReader();
 	}
-	~ExclusiveSharedLock() {
-		pthread_rwlock_unlock(&m.rwlock);
+	~ReadLock() {
+		m.unlockReader();
+	}
+};
+
+struct WriteLock {
+	ReadWriteMutex& m;
+	WriteLock(ReadWriteMutex& m) : m(m) {
+		m.lockWriter();
+	}
+	~WriteLock() {
+		m.unlockWriter();
 	}
 };
 
@@ -215,7 +242,7 @@ struct Engine::Internal {
 	Writers lock when mutating the engine's state.
 	Readers lock when using the engine's state.
 	*/
-	SharedMutex mutex;
+	ReadWriteMutex mutex;
 	/** Mutex that guards the block.
 	stepBlock() locks to guarantee its exclusivity.
 	*/
@@ -479,7 +506,7 @@ Engine::~Engine() {
 
 
 void Engine::clear() {
-	// TODO This needs a lock that doesn't interfere with removeParamHandle, removeCable, and removeModule.
+	WriteLock lock(internal->mutex);
 
 	// Copy lists because we'll be removing while iterating
 	std::set<ParamHandle*> paramHandles = internal->paramHandles;
@@ -500,9 +527,9 @@ void Engine::clear() {
 }
 
 
-void Engine::stepBlock(int frames, float suggestedSampleRate) {
+void Engine::stepBlock(int frames) {
 	std::lock_guard<std::mutex> stepLock(internal->blockMutex);
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	// Configure thread
 	initMXCSR();
 	random::init();
@@ -510,17 +537,6 @@ void Engine::stepBlock(int frames, float suggestedSampleRate) {
 	internal->blockFrame = internal->frame;
 	internal->blockTime = system::getTime();
 	internal->blockFrames = frames;
-
-	// Set sample rate
-	if (settings::sampleRate > 0) {
-		setSampleRate(settings::sampleRate);
-	}
-	else if (suggestedSampleRate > 0) {
-		setSampleRate(suggestedSampleRate);
-	}
-	else {
-		setSampleRate(FALLBACK_SAMPLE_RATE);
-	}
 
 	// Update expander pointers
 	for (Module* module : internal->modules) {
@@ -548,7 +564,7 @@ void Engine::stepBlock(int frames, float suggestedSampleRate) {
 
 
 void Engine::setPrimaryModule(Module* module) {
-	SharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	// Don't allow module to be set if not added to the Engine.
 	// NULL will unset the primary module.
 	if (module) {
@@ -573,6 +589,8 @@ float Engine::getSampleRate() {
 void Engine::setSampleRate(float sampleRate) {
 	if (sampleRate == internal->sampleRate)
 		return;
+	WriteLock lock(internal->mutex);
+
 	internal->sampleRate = sampleRate;
 	internal->sampleTime = 1.f / sampleRate;
 	// Trigger SampleRateChangeEvent
@@ -581,6 +599,19 @@ void Engine::setSampleRate(float sampleRate) {
 	e.sampleTime = internal->sampleTime;
 	for (Module* module : internal->modules) {
 		module->onSampleRateChange(e);
+	}
+}
+
+
+void Engine::setSuggestedSampleRate(float suggestedSampleRate) {
+	if (settings::sampleRate > 0) {
+		setSampleRate(settings::sampleRate);
+	}
+	else if (suggestedSampleRate > 0) {
+		setSampleRate(suggestedSampleRate);
+	}
+	else {
+		setSampleRate(FALLBACK_SAMPLE_RATE);
 	}
 }
 
@@ -637,7 +668,7 @@ size_t Engine::getNumModules() {
 
 
 size_t Engine::getModuleIds(int64_t* moduleIds, size_t len) {
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	size_t i = 0;
 	for (Module* m : internal->modules) {
 		if (i >= len)
@@ -650,7 +681,7 @@ size_t Engine::getModuleIds(int64_t* moduleIds, size_t len) {
 
 
 std::vector<int64_t> Engine::getModuleIds() {
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	std::vector<int64_t> moduleIds;
 	moduleIds.reserve(internal->modules.size());
 	for (Module* m : internal->modules) {
@@ -661,7 +692,7 @@ std::vector<int64_t> Engine::getModuleIds() {
 
 
 void Engine::addModule(Module* module) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	assert(module);
 	// Check that the module is not already added
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -686,7 +717,7 @@ void Engine::addModule(Module* module) {
 
 
 void Engine::removeModule(Module* module) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	assert(module);
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -729,7 +760,7 @@ void Engine::removeModule(Module* module) {
 
 
 Module* Engine::getModule(int64_t moduleId) {
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	auto it = internal->modulesCache.find(moduleId);
 	if (it == internal->modulesCache.end())
 		return NULL;
@@ -738,7 +769,7 @@ Module* Engine::getModule(int64_t moduleId) {
 
 
 void Engine::resetModule(Module* module) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	assert(module);
 
 	Module::ResetEvent eReset;
@@ -747,7 +778,7 @@ void Engine::resetModule(Module* module) {
 
 
 void Engine::randomizeModule(Module* module) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	assert(module);
 
 	Module::RandomizeEvent eRandomize;
@@ -756,7 +787,7 @@ void Engine::randomizeModule(Module* module) {
 
 
 void Engine::bypassModule(Module* module, bool bypass) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	assert(module);
 
 	if (module->bypass() == bypass)
@@ -781,13 +812,13 @@ void Engine::bypassModule(Module* module, bool bypass) {
 
 
 json_t* Engine::moduleToJson(Module* module) {
-	ExclusiveSharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	return module->toJson();
 }
 
 
 void Engine::moduleFromJson(Module* module, json_t* rootJ) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	module->fromJson(rootJ);
 }
 
@@ -798,7 +829,7 @@ size_t Engine::getNumCables() {
 
 
 size_t Engine::getCableIds(int64_t* cableIds, size_t len) {
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	size_t i = 0;
 	for (Cable* c : internal->cables) {
 		if (i >= len)
@@ -811,7 +842,7 @@ size_t Engine::getCableIds(int64_t* cableIds, size_t len) {
 
 
 std::vector<int64_t> Engine::getCableIds() {
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	std::vector<int64_t> cableIds;
 	cableIds.reserve(internal->cables.size());
 	for (Cable* c : internal->cables) {
@@ -822,7 +853,7 @@ std::vector<int64_t> Engine::getCableIds() {
 
 
 void Engine::addCable(Cable* cable) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	assert(cable);
 	// Check cable properties
 	assert(cable->inputModule);
@@ -867,7 +898,7 @@ void Engine::addCable(Cable* cable) {
 
 
 void Engine::removeCable(Cable* cable) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	assert(cable);
 	// Check that the cable is already added
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
@@ -903,7 +934,7 @@ void Engine::removeCable(Cable* cable) {
 
 
 Cable* Engine::getCable(int64_t cableId) {
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	auto it = internal->cablesCache.find(cableId);
 	if (it == internal->cablesCache.end())
 		return NULL;
@@ -946,7 +977,7 @@ float Engine::getSmoothParam(Module* module, int paramId) {
 
 
 void Engine::addParamHandle(ParamHandle* paramHandle) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	// New ParamHandles must be blank.
 	// This means we don't have to refresh the cache.
 	assert(paramHandle->moduleId < 0);
@@ -962,7 +993,7 @@ void Engine::addParamHandle(ParamHandle* paramHandle) {
 
 
 void Engine::removeParamHandle(ParamHandle* paramHandle) {
-	ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	// Check that the ParamHandle is already added
 	auto it = internal->paramHandles.find(paramHandle);
 	assert(it != internal->paramHandles.end());
@@ -975,7 +1006,7 @@ void Engine::removeParamHandle(ParamHandle* paramHandle) {
 
 
 ParamHandle* Engine::getParamHandle(int64_t moduleId, int paramId) {
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	auto it = internal->paramHandlesCache.find(std::make_tuple(moduleId, paramId));
 	if (it == internal->paramHandlesCache.end())
 		return NULL;
@@ -989,7 +1020,7 @@ ParamHandle* Engine::getParamHandle(Module* module, int paramId) {
 
 
 void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite) {
-	SharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	// Check that it exists
 	auto it = internal->paramHandles.find(paramHandle);
 	assert(it != internal->paramHandles.end());
@@ -1027,7 +1058,7 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int p
 
 
 json_t* Engine::toJson() {
-	ExclusiveSharedLock lock(internal->mutex);
+	ReadLock lock(internal->mutex);
 	json_t* rootJ = json_object();
 
 	// modules
@@ -1053,9 +1084,7 @@ json_t* Engine::toJson() {
 
 
 void Engine::fromJson(json_t* rootJ) {
-	// We can't lock here because addModule() and addCable() are called inside.
-	// Also, AudioInterface::fromJson() can open the audio device, which can call Engine::stepBlock() before this method exits.
-	// ExclusiveSharedLock lock(internal->mutex);
+	WriteLock lock(internal->mutex);
 	clear();
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
