@@ -1,4 +1,5 @@
 #pragma once
+#include <stdarg.h>
 #include <vector>
 
 #include <common.hpp>
@@ -15,7 +16,9 @@ namespace string {
 /** Converts a `printf()` format string and optional arguments into a std::string.
 Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string`s, otherwise you might get binary garbage.
 */
+__attribute__((format(printf, 1, 2)))
 std::string f(const char* format, ...);
+std::string fV(const char* format, va_list args);
 /** Replaces all characters to lowercase letters */
 std::string lowercase(const std::string& s);
 /** Replaces all characters to uppercase letters */

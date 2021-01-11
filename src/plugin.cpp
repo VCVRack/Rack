@@ -48,7 +48,7 @@ static void* loadLibrary(std::string libraryPath) {
 	SetErrorMode(0);
 	if (!handle) {
 		int error = GetLastError();
-		throw Exception(string::f("Failed to load library %s: code %d", libraryPath.c_str(), error));
+		throw Exception("Failed to load library %s: code %d", libraryPath.c_str(), error);
 	}
 #else
 	// As of Rack v2.0, plugins are linked with `-rpath=.` so change current directory so it can find libRack.
@@ -59,7 +59,7 @@ static void* loadLibrary(std::string libraryPath) {
 	// Load library with dlopen
 	void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if (!handle)
-		throw Exception(string::f("Failed to load library %s: %s", libraryPath.c_str(), dlerror()));
+		throw Exception("Failed to load library %s: %s", libraryPath.c_str(), dlerror());
 #endif
 	return handle;
 }
@@ -80,7 +80,7 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 
 	// Check file existence
 	if (!system::isFile(libraryPath))
-		throw Exception(string::f("Plugin binary not found at %s", libraryPath.c_str()));
+		throw Exception("Plugin binary not found at %s", libraryPath.c_str());
 
 	// Load dynamic/shared library
 	plugin->handle = loadLibrary(libraryPath);
@@ -93,7 +93,7 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 	initCallback = (InitCallback) dlsym(plugin->handle, "init");
 #endif
 	if (!initCallback)
-		throw Exception(string::f("Failed to read init() symbol in %s", libraryPath.c_str()));
+		throw Exception("Failed to read init() symbol in %s", libraryPath.c_str());
 
 	return initCallback;
 }
@@ -124,13 +124,13 @@ static Plugin* loadPlugin(std::string path) {
 		std::string manifestFilename = (path == "") ? asset::system("Core.json") : system::join(path, "plugin.json");
 		FILE* file = std::fopen(manifestFilename.c_str(), "r");
 		if (!file)
-			throw Exception(string::f("Manifest file %s does not exist", manifestFilename.c_str()));
+			throw Exception("Manifest file %s does not exist", manifestFilename.c_str());
 		DEFER({std::fclose(file);});
 
 		json_error_t error;
 		json_t* rootJ = json_loadf(file, 0, &error);
 		if (!rootJ)
-			throw Exception(string::f("JSON parsing error at %s %d:%d %s", manifestFilename.c_str(), error.line, error.column, error.text));
+			throw Exception("JSON parsing error at %s %d:%d %s", manifestFilename.c_str(), error.line, error.column, error.text);
 		DEFER({json_decref(rootJ);});
 
 		// Call init callback
@@ -149,7 +149,7 @@ static Plugin* loadPlugin(std::string path) {
 		// Reject plugin if slug already exists
 		Plugin* oldPlugin = getPlugin(plugin->slug);
 		if (oldPlugin)
-			throw Exception(string::f("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str()));
+			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
 
 		plugins.push_back(plugin);
 		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), plugin->path.c_str());
@@ -288,7 +288,7 @@ Model* modelFromJson(json_t* moduleJ) {
 	// Get Model
 	Model* model = getModel(pluginSlug, modelSlug);
 	if (!model)
-		throw Exception(string::f("Could not find module \"%s\" of plugin \"%s\"", modelSlug.c_str(), pluginSlug.c_str()));
+		throw Exception("Could not find module \"%s\" of plugin \"%s\"", modelSlug.c_str(), pluginSlug.c_str());
 	return model;
 }
 

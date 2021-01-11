@@ -35,7 +35,7 @@ void destroy();
 /** Do not use this function directly. Use the macros above.
 Thread-safe, meaning messages cannot overlap each other in the log.
 */
-__attribute__ ((format(printf, 5, 6)))
+__attribute__((format(printf, 5, 6)))
 void log(Level level, const char* filename, int line, const char* func, const char* format, ...);
 /** Returns whether the current log file failed to end properly, due to a possible crash.
 Must be called *before* init().

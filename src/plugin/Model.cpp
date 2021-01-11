@@ -19,7 +19,7 @@ void Model::fromJson(json_t* rootJ) {
 	if (nameJ)
 		name = json_string_value(nameJ);
 	if (name == "")
-		throw Exception(string::f("No module name for slug %s", slug.c_str()));
+		throw Exception("No module name for slug %s", slug.c_str());
 
 	json_t* descriptionJ = json_object_get(rootJ, "description");
 	if (descriptionJ)

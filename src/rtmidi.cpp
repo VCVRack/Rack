@@ -35,7 +35,7 @@ struct RtMidiInputDevice : midi::InputDevice {
 			rtMidiIn = new RtMidiIn((RtMidi::Api) driverId, "VCV Rack");
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to create RtMidi input driver %d: %s", driverId, e.what()));
+			throw Exception("Failed to create RtMidi input driver %d: %s", driverId, e.what());
 		}
 		rtMidiIn->setErrorCallback(rtMidiErrorCallback);
 		rtMidiIn->ignoreTypes(false, false, false);
@@ -45,14 +45,14 @@ struct RtMidiInputDevice : midi::InputDevice {
 			name = rtMidiIn->getPortName(deviceId);
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to get RtMidi input device name: %s", e.what()));
+			throw Exception("Failed to get RtMidi input device name: %s", e.what());
 		}
 
 		try {
 			rtMidiIn->openPort(deviceId, "VCV Rack input");
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to open RtMidi input device: %s", e.what()));
+			throw Exception("Failed to open RtMidi input device: %s", e.what());
 		}
 	}
 
@@ -105,7 +105,7 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 			rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to create RtMidi output driver %d: %s", driverId, e.what()));
+			throw Exception("Failed to create RtMidi output driver %d: %s", driverId, e.what());
 		}
 		rtMidiOut->setErrorCallback(rtMidiErrorCallback);
 
@@ -113,14 +113,14 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 			name = rtMidiOut->getPortName(deviceId);
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to get RtMidi output device name: %s", e.what()));
+			throw Exception("Failed to get RtMidi output device name: %s", e.what());
 		}
 
 		try {
 			rtMidiOut->openPort(deviceId, "VCV Rack output");
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to get RtMidi output device name: %s", e.what()));
+			throw Exception("Failed to get RtMidi output device name: %s", e.what());
 		}
 
 		startThread();
@@ -211,7 +211,7 @@ struct RtMidiDriver : midi::Driver {
 			rtMidiIn = new RtMidiIn((RtMidi::Api) driverId);
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to create RtMidi input driver %d: %s", driverId, e.what()));
+			throw Exception("Failed to create RtMidi input driver %d: %s", driverId, e.what());
 		}
 		rtMidiIn->setErrorCallback(rtMidiErrorCallback);
 
@@ -219,7 +219,7 @@ struct RtMidiDriver : midi::Driver {
 			rtMidiOut = new RtMidiOut((RtMidi::Api) driverId);
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to create RtMidi output driver %d: %s", driverId, e.what()));
+			throw Exception("Failed to create RtMidi output driver %d: %s", driverId, e.what());
 		}
 		rtMidiOut->setErrorCallback(rtMidiErrorCallback);
 	}
@@ -250,7 +250,7 @@ struct RtMidiDriver : midi::Driver {
 			count = rtMidiIn->getPortCount();
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to get RtMidi input device count: %s", e.what()));
+			throw Exception("Failed to get RtMidi input device count: %s", e.what());
 		}
 
 		std::vector<int> deviceIds;
@@ -266,7 +266,7 @@ struct RtMidiDriver : midi::Driver {
 			return rtMidiIn->getPortName(deviceId);
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to get RtMidi input device name: %s", e.what()));
+			throw Exception("Failed to get RtMidi input device name: %s", e.what());
 		}
 	}
 
@@ -279,7 +279,7 @@ struct RtMidiDriver : midi::Driver {
 				inputDevices[deviceId] = device = new RtMidiInputDevice(driverId, deviceId);
 			}
 			catch (RtMidiError& e) {
-				throw Exception(string::f("Failed to create RtMidi input device: %s", e.what()));
+				throw Exception("Failed to create RtMidi input device: %s", e.what());
 			}
 		}
 
@@ -301,7 +301,7 @@ struct RtMidiDriver : midi::Driver {
 				delete device;
 			}
 			catch (RtMidiError& e) {
-				throw Exception(string::f("Failed to delete RtMidi input device: %s", e.what()));
+				throw Exception("Failed to delete RtMidi input device: %s", e.what());
 			}
 		}
 	}
@@ -313,7 +313,7 @@ struct RtMidiDriver : midi::Driver {
 			count = rtMidiOut->getPortCount();
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to get RtMidi output device count: %s", e.what()));
+			throw Exception("Failed to get RtMidi output device count: %s", e.what());
 		}
 
 		std::vector<int> deviceIds;
@@ -329,7 +329,7 @@ struct RtMidiDriver : midi::Driver {
 			return rtMidiOut->getPortName(deviceId);
 		}
 		catch (RtMidiError& e) {
-			throw Exception(string::f("Failed to get RtMidi output device count: %s", e.what()));
+			throw Exception("Failed to get RtMidi output device count: %s", e.what());
 		}
 	}
 
@@ -342,7 +342,7 @@ struct RtMidiDriver : midi::Driver {
 				outputDevices[deviceId] = device = new RtMidiOutputDevice(driverId, deviceId);
 			}
 			catch (RtMidiError& e) {
-				throw Exception(string::f("Failed to create RtMidi output device: %s", e.what()));
+				throw Exception("Failed to create RtMidi output device: %s", e.what());
 			}
 		}
 
@@ -364,7 +364,7 @@ struct RtMidiDriver : midi::Driver {
 				delete device;
 			}
 			catch (RtMidiError& e) {
-				throw Exception(string::f("Failed to delete RtMidi output device: %s", e.what()));
+				throw Exception("Failed to delete RtMidi output device: %s", e.what());
 			}
 		}
 	}

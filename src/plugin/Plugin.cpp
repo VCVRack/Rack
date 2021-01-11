@@ -39,14 +39,14 @@ void Plugin::fromJson(json_t* rootJ) {
 	if (slug == "")
 		throw Exception("No plugin slug");
 	if (!isSlugValid(slug))
-		throw Exception(string::f("Plugin slug \"%s\" is invalid", slug.c_str()));
+		throw Exception("Plugin slug \"%s\" is invalid", slug.c_str());
 
 	// version
 	json_t* versionJ = json_object_get(rootJ, "version");
 	if (versionJ)
 		version = json_string_value(versionJ);
 	if (!string::startsWith(version, ABI_VERSION + "."))
-		throw Exception(string::f("Plugin version %s does not match Rack ABI version %s", version.c_str(), ABI_VERSION.c_str()));
+		throw Exception("Plugin version %s does not match Rack ABI version %s", version.c_str(), ABI_VERSION.c_str());
 	if (version == "")
 		throw Exception("No plugin version");
 
@@ -120,26 +120,26 @@ void Plugin::fromJson(json_t* rootJ) {
 			// Get model slug
 			json_t* modelSlugJ = json_object_get(moduleJ, "slug");
 			if (!modelSlugJ) {
-				throw Exception(string::f("No slug found for module entry %d", moduleId));
+				throw Exception("No slug found for module entry %" PRId64, moduleId);
 			}
 			std::string modelSlug = json_string_value(modelSlugJ);
 
 			// Check model slug
 			if (!isSlugValid(modelSlug)) {
-				throw Exception(string::f("Module slug \"%s\" is invalid", modelSlug.c_str()));
+				throw Exception("Module slug \"%s\" is invalid", modelSlug.c_str());
 			}
 
 			// Get model
 			Model* model = getModel(modelSlug);
 			if (!model) {
-				throw Exception(string::f("Manifest contains module %s but it is not defined in the plugin", modelSlug.c_str()));
+				throw Exception("Manifest contains module %s but it is not defined in the plugin", modelSlug.c_str());
 			}
 
 			model->fromJson(moduleJ);
 		}
 	}
 	else {
-		WARN("No modules in plugin %s", slug.c_str());
+		WARN("No modules in plugin manifest %s", slug.c_str());
 	}
 
 	// Remove models without names

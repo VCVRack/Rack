@@ -737,7 +737,7 @@ void ModuleWidget::pasteClipboardAction() {
 void ModuleWidget::load(std::string filename) {
 	FILE* file = std::fopen(filename.c_str(), "r");
 	if (!file)
-		throw Exception(string::f("Could not load patch file %s", filename.c_str()));
+		throw Exception("Could not load patch file %s", filename.c_str());
 	DEFER({std::fclose(file);});
 
 	INFO("Loading preset %s", filename.c_str());
@@ -745,7 +745,7 @@ void ModuleWidget::load(std::string filename) {
 	json_error_t error;
 	json_t* moduleJ = json_loadf(file, 0, &error);
 	if (!moduleJ)
-		throw Exception(string::f("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text));
+		throw Exception("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	DEFER({json_decref(moduleJ);});
 
 	// Don't use IDs from JSON

@@ -21,6 +21,14 @@ const std::string API_URL = "https://api.vcvrack.com";
 const std::string API_VERSION = "2";
 
 
+Exception::Exception(const char* format, ...) {
+	va_list args;
+	va_start(args, format);
+	msg = string::fV(format, args);
+	va_end(args);
+}
+
+
 } // namespace rack
 
 

@@ -27,7 +27,7 @@ E.g.
 	DEPRECATED void foo();
 */
 #if defined(__GNUC__) || defined(__clang__)
-	#define DEPRECATED __attribute__ ((deprecated))
+	#define DEPRECATED __attribute__((deprecated))
 #elif defined(_MSC_VER)
 	#define DEPRECATED __declspec(deprecated)
 #endif
@@ -168,6 +168,10 @@ Can be subclassed to throw/catch specific custom exceptions.
 */
 struct Exception : std::exception {
 	std::string msg;
+
+	// Attribute index 1 refers to `Exception*` argument so use 2.
+	__attribute__((format(printf, 2, 3)))
+	Exception(const char* format, ...);
 	Exception(const std::string& msg) : msg(msg) {}
 	const char* what() const noexcept override {
 		return msg.c_str();

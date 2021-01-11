@@ -1,6 +1,7 @@
 #include <cctype> // for tolower and toupper
 #include <algorithm> // for transform and equal
 #include <libgen.h> // for dirname and basename
+#include <stdarg.h>
 
 #if defined ARCH_WIN
 	#include <windows.h> // for MultiByteToWideChar
@@ -16,17 +17,24 @@ namespace string {
 std::string f(const char* format, ...) {
 	va_list args;
 	va_start(args, format);
+	std::string s = fV(format, args);
+	va_end(args);
+	return s;
+}
+
+
+std::string fV(const char* format, va_list args) {
+	// va_lists cannot be reused but we need it twice, so clone args.
+	va_list args2;
+	va_copy(args2, args);
 	// Compute size of required buffer
 	int size = vsnprintf(NULL, 0, format, args);
-	va_end(args);
 	if (size < 0)
 		return "";
 	// Create buffer
 	std::string s;
 	s.resize(size);
-	va_start(args, format);
-	vsnprintf(&s[0], size + 1, format, args);
-	va_end(args);
+	vsnprintf(&s[0], size + 1, format, args2);
 	return s;
 }
 
