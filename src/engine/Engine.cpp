@@ -7,6 +7,7 @@
 #include <tuple>
 #include <pmmintrin.h>
 #include <pthread.h>
+#include <unistd.h>
 
 #include <engine/Engine.hpp>
 #include <settings.hpp>
@@ -32,7 +33,8 @@ static void initMXCSR() {
 
 
 /** Allows multiple "reader" threads to obtain a lock simultaneously, but only one "writer" thread.
-Recursive, so WriteLock can be used recursively.
+WriteLock can be used recursively.
+Uses reader priority, which implies that ReadLock can also be used recursively.
 This implementation is just a wrapper for pthreads.
 This is available in C++17 as std::shared_mutex, but unfortunately we're using C++11.
 */
@@ -569,7 +571,7 @@ void Engine::setPrimaryModule(Module* module) {
 	if (module) {
 		auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 		if (it == internal->modules.end())
-			return;
+			throw Exception("Module being set as primary does not belong to Engine");
 	}
 	internal->primaryModule = module;
 }
@@ -755,6 +757,14 @@ void Engine::removeModule(Module* module) {
 	// Remove module
 	internal->modulesCache.erase(module->id);
 	internal->modules.erase(it);
+}
+
+
+bool Engine::hasModule(Module* module) {
+	ReadLock lock(internal->mutex);
+	// TODO Performance could be improved by searching modulesCache, but more testing would be needed to make sure it's always valid.
+	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
+	return it != internal->modules.end();
 }
 
 
@@ -1105,10 +1115,13 @@ void Engine::fromJson(json_t* rootJ) {
 				module->id = moduleIndex;
 			}
 
+			sleep(1);
+
 			// This write-locks
 			addModule(module);
 		}
 		catch (Exception& e) {
+			WARN("Cannot deserialize module: %s", e.what());
 			APP->patch->log(e.what());
 		}
 	}
@@ -1131,6 +1144,7 @@ void Engine::fromJson(json_t* rootJ) {
 			addCable(cable);
 		}
 		catch (Exception& e) {
+			WARN("Cannot deserialize cable: %s", e.what());
 			delete cable;
 			// Don't log exceptions because missing modules create unnecessary complaining when cables try to connect to them.
 		}

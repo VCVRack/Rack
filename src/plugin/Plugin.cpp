@@ -32,7 +32,7 @@ Model* Plugin::getModel(const std::string& slug) {
 }
 
 void Plugin::fromJson(json_t* rootJ) {
-	// Slug
+	// slug
 	json_t* slugJ = json_object_get(rootJ, "slug");
 	if (slugJ)
 		slug = json_string_value(slugJ);
@@ -41,7 +41,7 @@ void Plugin::fromJson(json_t* rootJ) {
 	if (!isSlugValid(slug))
 		throw Exception(string::f("Plugin slug \"%s\" is invalid", slug.c_str()));
 
-	// Version
+	// version
 	json_t* versionJ = json_object_get(rootJ, "version");
 	if (versionJ)
 		version = json_string_value(versionJ);
@@ -50,14 +50,14 @@ void Plugin::fromJson(json_t* rootJ) {
 	if (version == "")
 		throw Exception("No plugin version");
 
-	// Name
+	// name
 	json_t* nameJ = json_object_get(rootJ, "name");
 	if (nameJ)
 		name = json_string_value(nameJ);
 	if (name == "")
 		throw Exception("No plugin name");
 
-	// Brand
+	// brand
 	json_t* brandJ = json_object_get(rootJ, "brand");
 	if (brandJ)
 		brand = json_string_value(brandJ);
@@ -106,7 +106,7 @@ void Plugin::fromJson(json_t* rootJ) {
 		changelogUrl = json_string_value(changelogUrlJ);
 
 	json_t* modulesJ = json_object_get(rootJ, "modules");
-	if (modulesJ) {
+	if (modulesJ && json_array_size(modulesJ) > 0) {
 		size_t moduleId;
 		json_t* moduleJ;
 		json_array_foreach(modulesJ, moduleId, moduleJ) {
@@ -137,6 +137,9 @@ void Plugin::fromJson(json_t* rootJ) {
 
 			model->fromJson(moduleJ);
 		}
+	}
+	else {
+		WARN("No modules in plugin %s", slug.c_str());
 	}
 
 	// Remove models without names

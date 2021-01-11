@@ -184,6 +184,10 @@ struct AudioInterface : Module, audio::Port {
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "audio", audio::Port::toJson());
+
+		if (isPrimary())
+			json_object_set_new(rootJ, "primary", json_boolean(true));
+
 		return rootJ;
 	}
 
@@ -191,20 +195,38 @@ struct AudioInterface : Module, audio::Port {
 		json_t* audioJ = json_object_get(rootJ, "audio");
 		if (audioJ)
 			audio::Port::fromJson(audioJ);
+
+		// TODO
+		// json_t* primaryJ = json_object_get(rootJ, "primary");
+		// if (primaryJ)
+		// 	setPrimary();
+	}
+
+	/** Must be called when the Engine mutex is unlocked.
+	*/
+	void setPrimary() {
+		APP->engine->setPrimaryModule(this);
+	}
+
+	bool isPrimary() {
+		return APP->engine->getPrimaryModule() == this;
 	}
 
 	// audio::Port
 
 	void processInput(const float* input, int inputStride, int frames) override {
+		if (!APP->engine->hasModule(this))
+			return;
+
 		// Claim primary module if there is none
 		if (!APP->engine->getPrimaryModule()) {
-			APP->engine->setPrimaryModule(this);
+			setPrimary();
 		}
-		bool isPrimary = (APP->engine->getPrimaryModule() == this);
+		bool isPrimaryCached = isPrimary();
 
 		// Set sample rate of engine if engine sample rate is "auto".
 		float sampleRate = getSampleRate();
-		if (isPrimary) {
+		if (isPrimaryCached) {
 			APP->engine->setSuggestedSampleRate(sampleRate);
 		}
 
@@ -218,7 +240,7 @@ struct AudioInterface : Module, audio::Port {
 		// Consider engine buffers "too full" if they contain a bit more than the audio device's number of frames, converted to engine sample rate.
 		maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 1.5);
 		// If this is a secondary audio module and the engine output buffer is too full, flush it.
-		if (!isPrimary && (int) outputBuffer.size() > maxEngineFrames) {
+		if (!isPrimaryCached && (int) outputBuffer.size() > maxEngineFrames) {
 			outputBuffer.clear();
 			// DEBUG("%p: flushing engine output", this);
 		}
@@ -247,15 +269,14 @@ struct AudioInterface : Module, audio::Port {
 	}
 
 	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) override {
-		bool isPrimary = (APP->engine->getPrimaryModule() == this);
 		// Step engine
-		if (isPrimary && requestedEngineFrames > 0) {
+		if (isPrimary() && requestedEngineFrames > 0) {
 			APP->engine->stepBlock(requestedEngineFrames);
 		}
 	}
 
 	void processOutput(float* output, int outputStride, int frames) override {
-		bool isPrimary = (APP->engine->getPrimaryModule() == this);
+		bool isPrimaryCached = isPrimary();
 		int numOutputs = getNumOutputs();
 		int engineSampleRate = (int) APP->engine->getSampleRate();
 		float sampleRate = getSampleRate();
@@ -279,12 +300,12 @@ struct AudioInterface : Module, audio::Port {
 		}
 
 		// If this is a secondary audio module and the engine input buffer is too full, flush it.
-		if (!isPrimary && (int) inputBuffer.size() > maxEngineFrames) {
+		if (!isPrimaryCached && (int) inputBuffer.size() > maxEngineFrames) {
 			inputBuffer.clear();
 			// DEBUG("%p: flushing engine input", this);
 		}
 
-		// DEBUG("%p %s:\tframes %d requestedEngineFrames %d\toutputBuffer %d inputBuffer %d\t", this, isPrimary ? "primary" : "secondary", frames, requestedEngineFrames, outputBuffer.size(), inputBuffer.size());
+		// DEBUG("%p %s:\tframes %d requestedEngineFrames %d\toutputBuffer %d inputBuffer %d\t", this, isPrimaryCached ? "primary" : "secondary", frames, requestedEngineFrames, outputBuffer.size(), inputBuffer.size());
 	}
 
 	void onOpenStream() override {
@@ -295,16 +316,6 @@ struct AudioInterface : Module, audio::Port {
 	void onCloseStream() override {
 		inputBuffer.clear();
 		outputBuffer.clear();
-	}
-};
-
-
-template <typename TAudioInterface>
-struct PrimaryModuleItem : MenuItem {
-	TAudioInterface* module;
-
-	void onAction(const event::Action& e) override {
-		APP->engine->setPrimaryModule(module);
 	}
 };
 
@@ -463,9 +474,16 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		PrimaryModuleItem<TAudioInterface>* primaryModuleItem = new PrimaryModuleItem<TAudioInterface>;
+		struct PrimaryModuleItem : MenuItem {
+			TAudioInterface* module;
+			void onAction(const event::Action& e) override {
+				module->setPrimary();
+			}
+		};
+
+		PrimaryModuleItem* primaryModuleItem = new PrimaryModuleItem;
 		primaryModuleItem->text = "Primary audio module";
-		primaryModuleItem->rightText = CHECKMARK(APP->engine->getPrimaryModule() == module);
+		primaryModuleItem->rightText = CHECKMARK(module->isPrimary());
 		primaryModuleItem->module = module;
 		menu->addChild(primaryModuleItem);
 	}

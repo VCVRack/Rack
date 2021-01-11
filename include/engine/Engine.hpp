@@ -31,6 +31,7 @@ struct Engine {
 	Only call this method from the primary module.
 	*/
 	void stepBlock(int frames);
+	/**  */
 	void setPrimaryModule(Module* module);
 	Module* getPrimaryModule();
 
@@ -85,6 +86,7 @@ struct Engine {
 	*/
 	void addModule(Module* module);
 	void removeModule(Module* module);
+	bool hasModule(Module* module);
 	Module* getModule(int64_t moduleId);
 	void resetModule(Module* module);
 	void randomizeModule(Module* module);
