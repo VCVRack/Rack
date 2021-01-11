@@ -14,7 +14,7 @@ Additional tasks for fully supporting a feature include
 In the past, free code contributions have cost far more time to review, iterate, fix, and test than writing the implementation from scratch.
 There have been exceptions to this, but they are rare.
 - **Legal.**
-A proprietary fork of VCV Rack is planned (see [*Rack for DAWs*](https://vcvrack.com/manual/FAQ.html#is-vcv-rack-available-as-a-vst-au-aax-plugin-for-daws)), so VCV must own all GPLv3 code.
+A proprietary fork of VCV Rack is planned (see [*Rack for DAWs*](https://vcvrack.com/manual/FAQ.html#is-vcv-rack-available-as-a-vst-au-aax-plugin-for-daws)), so VCV must own all GPL-licensed code that is included in Rack.
 To accept a contribution, all authors of the contribution need to either
 	- declare the patch under the [CC0](https://creativecommons.org/publicdomain/zero/1.0/) license.
 	- complete a copyright reassignment form.
