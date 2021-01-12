@@ -282,8 +282,13 @@ void Module::onRandomize(const RandomizeEvent& e) {
 }
 
 
-bool& Module::bypass() {
+bool Module::isBypass() {
 	return internal->bypass;
+}
+
+
+void Module::setBypass(bool bypass) {
+	internal->bypass = bypass;
 }
 
 

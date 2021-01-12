@@ -344,7 +344,8 @@ struct Module {
 	/** DEPRECATED. Override `onSampleRateChange(e)` instead. */
 	virtual void onSampleRateChange() {}
 
-	PRIVATE bool& bypass();
+	bool isBypass();
+	PRIVATE void setBypass(bool bypass);
 	PRIVATE const float* meterBuffer();
 	PRIVATE int meterLength();
 	PRIVATE int meterIndex();

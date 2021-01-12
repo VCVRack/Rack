@@ -32,15 +32,11 @@ static void initMXCSR() {
 
 
 /** Allows multiple "reader" threads to obtain a lock simultaneously, but only one "writer" thread.
-WriteLock can be used recursively.
-Uses reader priority, which implies that ReadLock can also be used recursively.
-This implementation is just a wrapper for pthreads.
+This implementation is currently just a wrapper for pthreads, which works on Linux/Mac/.
 This is available in C++17 as std::shared_mutex, but unfortunately we're using C++11.
 */
 struct ReadWriteMutex {
 	pthread_rwlock_t rwlock;
-	std::atomic<pthread_t> writerThread{0};
-	int recursion = 0;
 
 	ReadWriteMutex() {
 		if (pthread_rwlock_init(&rwlock, NULL))
@@ -58,21 +54,12 @@ struct ReadWriteMutex {
 			throw Exception("pthread_rwlock_unlock failed");
 	}
 	void lockWriter() {
-		pthread_t self = pthread_self();
-		if (writerThread != self) {
-			if (pthread_rwlock_wrlock(&rwlock))
-				throw Exception("pthread_rwlock_wrlock failed");
-			writerThread = self;
-		}
-		// We're safe behind a lock so we can increment the recursion count.
-		recursion++;
+		if (pthread_rwlock_wrlock(&rwlock))
+			throw Exception("pthread_rwlock_wrlock failed");
 	}
 	void unlockWriter() {
-		if (--recursion == 0) {
-			writerThread = 0;
-			if (pthread_rwlock_unlock(&rwlock))
-				throw Exception("pthread_rwlock_unlock failed");
-		}
+		if (pthread_rwlock_unlock(&rwlock))
+			throw Exception("pthread_rwlock_unlock failed");
 	}
 };
 
@@ -210,9 +197,6 @@ struct EngineWorker {
 };
 
 
-static const float FALLBACK_SAMPLE_RATE = 44100;
-
-
 struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
@@ -240,7 +224,7 @@ struct Engine::Internal {
 	float smoothValue = 0.f;
 
 	/** Mutex that guards the Engine state, such as settings, Modules, and Cables.
-	Writers lock when mutating the engine's state.
+	Writers lock when mutating the engine's state or stepping the block.
 	Readers lock when using the engine's state.
 	*/
 	ReadWriteMutex mutex;
@@ -483,7 +467,7 @@ Engine::Engine() {
 	internal = new Internal;
 
 	internal->context = contextGet();
-	setSampleRate(FALLBACK_SAMPLE_RATE);
+	setSuggestedSampleRate(0.f);
 }
 
 
@@ -507,21 +491,25 @@ Engine::~Engine() {
 
 void Engine::clear() {
 	WriteLock lock(internal->mutex);
+	clear_NoLock();
+}
 
+
+void Engine::clear_NoLock() {
 	// Copy lists because we'll be removing while iterating
 	std::set<ParamHandle*> paramHandles = internal->paramHandles;
 	for (ParamHandle* paramHandle : paramHandles) {
-		removeParamHandle(paramHandle);
-		// Don't delete paramHandle because they're owned by other things (e.g. Modules)
+		removeParamHandle_NoLock(paramHandle);
+		// Don't delete paramHandle because they're normally owned by Module subclasses
 	}
 	std::vector<Cable*> cables = internal->cables;
 	for (Cable* cable : cables) {
-		removeCable(cable);
+		removeCable_NoLock(cable);
 		delete cable;
 	}
 	std::vector<Module*> modules = internal->modules;
 	for (Module* module : modules) {
-		removeModule(module);
+		removeModule_NoLock(module);
 		delete module;
 	}
 }
@@ -604,7 +592,8 @@ void Engine::setSuggestedSampleRate(float suggestedSampleRate) {
 		setSampleRate(suggestedSampleRate);
 	}
 	else {
-		setSampleRate(FALLBACK_SAMPLE_RATE);
+		// Fallback sample rate
+		setSampleRate(44100.f);
 	}
 }
 
@@ -711,6 +700,11 @@ void Engine::addModule(Module* module) {
 
 void Engine::removeModule(Module* module) {
 	WriteLock lock(internal->mutex);
+	removeModule_NoLock(module);
+}
+
+
+void Engine::removeModule_NoLock(Module* module) {
 	assert(module);
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
@@ -792,7 +786,7 @@ void Engine::bypassModule(Module* module, bool bypass) {
 	WriteLock lock(internal->mutex);
 	assert(module);
 
-	if (module->bypass() == bypass)
+	if (module->isBypass() == bypass)
 		return;
 	// Clear outputs and set to 1 channel
 	for (Output& output : module->outputs) {
@@ -800,7 +794,7 @@ void Engine::bypassModule(Module* module, bool bypass) {
 		output.setChannels(0);
 	}
 	// Set bypass state
-	module->bypass() = bypass;
+	module->setBypass(bypass);
 	// Trigger event
 	if (bypass) {
 		Module::BypassEvent eBypass;
@@ -901,6 +895,11 @@ void Engine::addCable(Cable* cable) {
 
 void Engine::removeCable(Cable* cable) {
 	WriteLock lock(internal->mutex);
+	removeCable_NoLock(cable);
+}
+
+
+void Engine::removeCable_NoLock(Cable* cable) {
 	assert(cable);
 	// Check that the cable is already added
 	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
@@ -932,6 +931,14 @@ void Engine::removeCable(Cable* cable) {
 		e.portId = cable->outputId;
 		cable->outputModule->onPortChange(e);
 	}
+}
+
+
+bool Engine::hasCable(Cable* cable) {
+	ReadLock lock(internal->mutex);
+	// TODO Performance could be improved by searching cablesCache, but more testing would be needed to make sure it's always valid.
+	auto it = std::find(internal->cables.begin(), internal->cables.end(), cable);
+	return it != internal->cables.end();
 }
 
 
@@ -996,6 +1003,11 @@ void Engine::addParamHandle(ParamHandle* paramHandle) {
 
 void Engine::removeParamHandle(ParamHandle* paramHandle) {
 	WriteLock lock(internal->mutex);
+	removeParamHandle_NoLock(paramHandle);
+}
+
+
+void Engine::removeParamHandle_NoLock(ParamHandle* paramHandle) {
 	// Check that the ParamHandle is already added
 	auto it = internal->paramHandles.find(paramHandle);
 	assert(it != internal->paramHandles.end());
@@ -1035,6 +1047,7 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int p
 
 	if (paramHandle->moduleId >= 0) {
 		// Replace old ParamHandle, or reset the current ParamHandle
+		// TODO Maybe call getParamHandle_NoLock()?
 		ParamHandle* oldParamHandle = getParamHandle(moduleId, paramId);
 		if (oldParamHandle) {
 			if (overwrite) {
@@ -1052,6 +1065,7 @@ void Engine::updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int p
 
 	// Set module pointer if the above block didn't reset it
 	if (paramHandle->moduleId >= 0) {
+		// TODO Maybe call getModule_NoLock()?
 		paramHandle->module = getModule(paramHandle->moduleId);
 	}
 
@@ -1086,8 +1100,9 @@ json_t* Engine::toJson() {
 
 
 void Engine::fromJson(json_t* rootJ) {
-	// Don't write-lock here because most of this function doesn't need it.
+	// Don't write-lock the entire method because most of it doesn't need it.
 
+	// Write-locks
 	clear();
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
@@ -1108,7 +1123,7 @@ void Engine::fromJson(json_t* rootJ) {
 				module->id = moduleIndex;
 			}
 
-			// This write-locks
+			// Write-locks
 			addModule(module);
 		}
 		catch (Exception& e) {
@@ -1131,7 +1146,7 @@ void Engine::fromJson(json_t* rootJ) {
 		Cable* cable = new Cable;
 		try {
 			cable->fromJson(cableJ);
-			// This write-locks
+			// Write-locks
 			addCable(cable);
 		}
 		catch (Exception& e) {
