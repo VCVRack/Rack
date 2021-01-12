@@ -18,7 +18,7 @@ static const int meterBufferLength = 128;
 
 
 struct Module::Internal {
-	bool bypass = false;
+	bool bypassed = false;
 
 	int64_t meterLastBlock = 0;
 	int meterSamples = 0;
@@ -117,7 +117,7 @@ json_t* Module::toJson() {
 		json_object_set_new(rootJ, "params", paramsJ);
 
 	// bypass
-	if (internal->bypass)
+	if (internal->bypassed)
 		json_object_set_new(rootJ, "bypass", json_boolean(true));
 
 	// leftModuleId
@@ -187,7 +187,7 @@ void Module::fromJson(json_t* rootJ) {
 	if (!bypassJ)
 		bypassJ = json_object_get(rootJ, "disabled");
 	if (bypassJ)
-		internal->bypass = json_boolean_value(bypassJ);
+		internal->bypassed = json_boolean_value(bypassJ);
 
 	// leftModuleId
 	json_t *leftModuleIdJ = json_object_get(rootJ, "leftModuleId");
@@ -282,13 +282,13 @@ void Module::onRandomize(const RandomizeEvent& e) {
 }
 
 
-bool Module::isBypass() {
-	return internal->bypass;
+bool Module::isBypassed() {
+	return internal->bypassed;
 }
 
 
-void Module::setBypass(bool bypass) {
-	internal->bypass = bypass;
+void Module::setBypassed(bool bypassed) {
+	internal->bypassed = bypassed;
 }
 
 
@@ -344,7 +344,7 @@ void Module::doProcess(const ProcessArgs& args) {
 	}
 
 	// Step module
-	if (!internal->bypass)
+	if (!internal->bypassed)
 		process(args);
 	else
 		processBypass(args);

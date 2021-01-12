@@ -16,7 +16,7 @@ struct FramebufferWidget : Widget {
 
 	/** Set this to true to re-render the children to the framebuffer the next time it is drawn */
 	bool dirty = true;
-	bool bypass = false;
+	bool bypassed = false;
 	float oversample = 1.0;
 	/** Redraw when the world offset of the FramebufferWidget changes its fractional value. */
 	bool dirtyOnSubpixelChange = true;

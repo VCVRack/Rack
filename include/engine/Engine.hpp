@@ -124,10 +124,10 @@ struct Engine {
 	Write-locks.
 	*/
 	void randomizeModule(Module* module);
-	/** Sets the bypass state and triggers a BypassEvent or UnBypassEvent of the given Module.
+	/** Sets the bypassed state and triggers a BypassEvent or UnBypassEvent of the given Module.
 	Write-locks.
 	*/
-	void bypassModule(Module* module, bool bypass);
+	void bypassModule(Module* module, bool bypassed);
 	/** Serializes the given Module with locking, ensuring that Module::process() is not called simultaneously.
 	Read-locks.
 	*/

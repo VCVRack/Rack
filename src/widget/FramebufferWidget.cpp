@@ -163,7 +163,7 @@ void FramebufferWidget::step() {
 
 void FramebufferWidget::draw(const DrawArgs& args) {
 	// Draw directly if already drawing in a framebuffer
-	if (bypass || args.fb) {
+	if (bypassed || args.fb) {
 		Widget::draw(args);
 		return;
 	}

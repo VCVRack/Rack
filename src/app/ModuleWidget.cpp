@@ -394,7 +394,7 @@ ModuleWidget::~ModuleWidget() {
 void ModuleWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
-	if (module && module->isBypass()) {
+	if (module && module->isBypassed()) {
 		nvgGlobalAlpha(args.vg, 0.33);
 	}
 
@@ -1002,12 +1002,12 @@ void ModuleWidget::cloneAction() {
 
 void ModuleWidget::bypassAction() {
 	assert(module);
-	APP->engine->bypassModule(module, !module->isBypass());
+	APP->engine->bypassModule(module, !module->isBypassed());
 
 	// history::ModuleBypass
 	history::ModuleBypass* h = new history::ModuleBypass;
 	h->moduleId = module->id;
-	h->bypass = module->isBypass();
+	h->bypassed = module->isBypassed();
 	APP->history->push(h);
 }
 
@@ -1075,7 +1075,7 @@ void ModuleWidget::createContextMenu() {
 	ModuleBypassItem* bypassItem = new ModuleBypassItem;
 	bypassItem->text = "Bypass";
 	bypassItem->rightText = RACK_MOD_CTRL_NAME "+E";
-	if (module && module->isBypass())
+	if (module && module->isBypassed())
 		bypassItem->rightText = CHECKMARK_STRING " " + bypassItem->rightText;
 	bypassItem->moduleWidget = this;
 	menu->addChild(bypassItem);

@@ -782,21 +782,21 @@ void Engine::randomizeModule(Module* module) {
 }
 
 
-void Engine::bypassModule(Module* module, bool bypass) {
+void Engine::bypassModule(Module* module, bool bypassed) {
 	WriteLock lock(internal->mutex);
 	assert(module);
 
-	if (module->isBypass() == bypass)
+	if (module->isBypassed() == bypassed)
 		return;
 	// Clear outputs and set to 1 channel
 	for (Output& output : module->outputs) {
 		// This zeros all voltages, but the channel is set to 1 if connected
 		output.setChannels(0);
 	}
-	// Set bypass state
-	module->setBypass(bypass);
+	// Set bypassed state
+	module->setBypassed(bypassed);
 	// Trigger event
-	if (bypass) {
+	if (bypassed) {
 		Module::BypassEvent eBypass;
 		module->onBypass(eBypass);
 	}

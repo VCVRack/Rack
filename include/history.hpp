@@ -101,7 +101,7 @@ struct ModuleMove : ModuleAction {
 
 
 struct ModuleBypass : ModuleAction {
-	bool bypass;
+	bool bypassed;
 	void undo() override;
 	void redo() override;
 	ModuleBypass() {
