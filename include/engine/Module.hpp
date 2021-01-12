@@ -345,11 +345,11 @@ struct Module {
 	virtual void onSampleRateChange() {}
 
 	bool isBypassed();
-	PRIVATE void setBypassed(bool bypassed);
-	PRIVATE const float* meterBuffer();
-	PRIVATE int meterLength();
-	PRIVATE int meterIndex();
-	PRIVATE void doProcess(const ProcessArgs& args);
+	INTERNAL void setBypassed(bool bypassed);
+	INTERNAL const float* meterBuffer();
+	INTERNAL int meterLength();
+	INTERNAL int meterIndex();
+	INTERNAL void doProcess(const ProcessArgs& args);
 };
 
 

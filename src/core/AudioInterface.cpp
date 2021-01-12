@@ -283,6 +283,7 @@ struct AudioInterface : Module, audio::Port {
 			// engine input -> audio output
 			dsp::Frame<NUM_AUDIO_OUTPUTS> outputAudioBuffer[frames];
 			int inputFrames = inputBuffer.size();
+			DEBUG("frames %d, inputFrames %d", frames, inputFrames);
 			int outputAudioFrames = frames;
 			inputSrc.process(inputBuffer.startData(), &inputFrames, outputAudioBuffer, &outputAudioFrames);
 			inputBuffer.startIncr(inputFrames);

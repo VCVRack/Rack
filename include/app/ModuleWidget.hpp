@@ -95,10 +95,10 @@ struct ModuleWidget : widget::OpaqueWidget {
 	*/
 	virtual void appendContextMenu(ui::Menu* menu) {}
 
-	PRIVATE math::Vec& dragOffset();
-	PRIVATE bool& dragEnabled();
-	PRIVATE math::Vec& oldPos();
-	PRIVATE engine::Module* releaseModule();
+	INTERNAL math::Vec& dragOffset();
+	INTERNAL bool& dragEnabled();
+	INTERNAL math::Vec& oldPos();
+	INTERNAL engine::Module* releaseModule();
 };
 
 

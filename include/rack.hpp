@@ -99,8 +99,8 @@
 #include <simd/functions.hpp>
 
 
-#undef PRIVATE
-#define PRIVATE __attribute__((error ("Using private function or symbol")))
+#undef INTERNAL
+#define INTERNAL __attribute__((visibility("internal"))) __attribute__((error ("Using function or symbol internal to Rack")))
 
 
 namespace rack {

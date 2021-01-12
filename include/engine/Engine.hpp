@@ -28,7 +28,7 @@ struct Engine {
 	Write-locks.
 	*/
 	void clear();
-	PRIVATE void clear_NoLock();
+	INTERNAL void clear_NoLock();
 	/** Advances the engine by `frames` frames.
 	Only call this method from the primary module.
 	Read-locks. Also locks so only one stepBlock() can be called simultaneously or recursively.
@@ -48,7 +48,7 @@ struct Engine {
 	/** Sets the sample rate to step the modules.
 	Write-locks.
 	*/
-	PRIVATE void setSampleRate(float sampleRate);
+	INTERNAL void setSampleRate(float sampleRate);
 	/** Sets the sample rate if the sample rate in the settings is "Auto".
 	Write-locks.
 	*/
@@ -107,7 +107,7 @@ struct Engine {
 	Write-locks.
 	*/
 	void removeModule(Module* module);
-	PRIVATE void removeModule_NoLock(Module* module);
+	INTERNAL void removeModule_NoLock(Module* module);
 	/** Checks whether a Module is in the rack.
 	Read-locks.
 	*/
@@ -160,7 +160,7 @@ struct Engine {
 	Write-locks.
 	*/
 	void removeCable(Cable* cable);
-	PRIVATE void removeCable_NoLock(Cable* cable);
+	INTERNAL void removeCable_NoLock(Cable* cable);
 	/** Checks whether a Cable is in the rack.
 	Read-locks.
 	*/
@@ -190,7 +190,7 @@ struct Engine {
 	Write-locks.
 	*/
 	void removeParamHandle(ParamHandle* paramHandle);
-	PRIVATE void removeParamHandle_NoLock(ParamHandle* paramHandle);
+	INTERNAL void removeParamHandle_NoLock(ParamHandle* paramHandle);
 	/** Returns the unique ParamHandle for the given paramId
 	Read-locks.
 	*/
