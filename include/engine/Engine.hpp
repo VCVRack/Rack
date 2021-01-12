@@ -14,9 +14,8 @@ namespace engine {
 /** Manages Modules and Cables and steps them in time.
 
 All methods are thread-safe and can safely be called from anywhere.
-
-The methods clear, addModule, removeModule, moduleToJson, moduleFromJson, addCable, removeCable, addParamHandle, removeParamHandle, toJson, and fromJson cannot be run simultaneously with any other Engine method.
-Calling these methods inside any Engine method will result in a deadlock.
+However, the following methods obtain a write-lock, so they cannot be called with the engine thread (e.g. inside Module::process()):
+clear, stepBlock, setPrimaryModule, setSampleRate, addModule, removeModule, resetModule, randomizeModule, bypassModule, moduleFromJson, addCable, removeCable, addParamHandle, removeParamHandle, and fromJson
 */
 struct Engine {
 	struct Internal;
@@ -31,7 +30,10 @@ struct Engine {
 	Only call this method from the primary module.
 	*/
 	void stepBlock(int frames);
-	/**  */
+	/** Module does not need to belong to the Engine.
+	However, Engine will unset the primary module when it is removed from the Engine.
+	NULL will unset the primary module.
+	*/
 	void setPrimaryModule(Module* module);
 	Module* getPrimaryModule();
 

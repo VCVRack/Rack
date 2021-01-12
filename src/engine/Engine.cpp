@@ -7,7 +7,6 @@
 #include <tuple>
 #include <pmmintrin.h>
 #include <pthread.h>
-#include <unistd.h>
 
 #include <engine/Engine.hpp>
 #include <settings.hpp>
@@ -566,13 +565,6 @@ void Engine::stepBlock(int frames) {
 
 void Engine::setPrimaryModule(Module* module) {
 	WriteLock lock(internal->mutex);
-	// Don't allow module to be set if not added to the Engine.
-	// NULL will unset the primary module.
-	if (module) {
-		auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
-		if (it == internal->modules.end())
-			throw Exception("Module being set as primary does not belong to Engine");
-	}
 	internal->primaryModule = module;
 }
 
@@ -752,8 +744,9 @@ void Engine::removeModule(Module* module) {
 	Module::RemoveEvent eRemove;
 	module->onRemove(eRemove);
 	// Unset primary module
-	if (internal->primaryModule == module)
+	if (internal->primaryModule == module) {
 		internal->primaryModule = NULL;
+	}
 	// Remove module
 	internal->modulesCache.erase(module->id);
 	internal->modules.erase(it);
@@ -1114,8 +1107,6 @@ void Engine::fromJson(json_t* rootJ) {
 			if (APP->patch->isLegacy(2)) {
 				module->id = moduleIndex;
 			}
-
-			sleep(1);
 
 			// This write-locks
 			addModule(module);

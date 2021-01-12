@@ -196,10 +196,9 @@ struct AudioInterface : Module, audio::Port {
 		if (audioJ)
 			audio::Port::fromJson(audioJ);
 
-		// TODO
-		// json_t* primaryJ = json_object_get(rootJ, "primary");
-		// if (primaryJ)
-		// 	setPrimary();
+		json_t* primaryJ = json_object_get(rootJ, "primary");
+		if (primaryJ)
+			setPrimary();
 	}
 
 	/** Must be called when the Engine mutex is unlocked.
@@ -215,9 +214,6 @@ struct AudioInterface : Module, audio::Port {
 	// audio::Port
 
 	void processInput(const float* input, int inputStride, int frames) override {
-		if (!APP->engine->hasModule(this))
-			return;
-
 		// Claim primary module if there is none
 		if (!APP->engine->getPrimaryModule()) {
 			setPrimary();
