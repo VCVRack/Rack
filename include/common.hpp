@@ -35,7 +35,7 @@ E.g.
 /** Attribute for private functions and symbols not intended to be used by plugins.
 By default this does nothing, but when #including rack.hpp, it prints a compile-time warning.
 */
-#define INTERNAL __attribute__((visibility("internal")))
+#define INTERNAL __attribute__((visibility("hidden")))
 
 
 /** Concatenates two literals or two macros
