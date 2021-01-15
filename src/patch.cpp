@@ -103,7 +103,6 @@ void PatchManager::saveDialog() {
 
 	// Note: If save() fails below, this should probably be reset. But we need it so toJson() doesn't set the "unsaved" property.
 	APP->history->setSaved();
-	this->path = path;
 
 	try {
 		save(path);
