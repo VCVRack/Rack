@@ -402,8 +402,10 @@ json_t* PatchManager::toJson() {
 	json_object_set_new(rootJ, "version", versionJ);
 
 	// path
-	json_t* pathJ = json_string(path.c_str());
-	json_object_set_new(rootJ, "path", pathJ);
+	if (path != "") {
+		json_t* pathJ = json_string(path.c_str());
+		json_object_set_new(rootJ, "path", pathJ);
+	}
 
 	// unsaved
 	if (!APP->history->isSaved())
@@ -451,6 +453,8 @@ void PatchManager::fromJson(json_t* rootJ) {
 	json_t* pathJ = json_object_get(rootJ, "path");
 	if (pathJ)
 		path = json_string_value(pathJ);
+	else
+		path = "";
 
 	// unsaved
 	json_t* unsavedJ = json_object_get(rootJ, "unsaved");
