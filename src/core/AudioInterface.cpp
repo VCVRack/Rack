@@ -36,6 +36,9 @@ struct AudioInterface : Module, audio::Port {
 		NUM_LIGHTS
 	};
 
+	dsp::RCFilter dcFilters[NUM_AUDIO_INPUTS];
+	bool dcFilterEnabled = false;
+
 	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_INPUTS>, 32768> engineInputBuffer;
 	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_OUTPUTS>, 32768> engineOutputBuffer;
 
@@ -71,6 +74,13 @@ struct AudioInterface : Module, audio::Port {
 		maxChannels = std::max(NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS);
 		inputSrc.setQuality(6);
 		outputSrc.setQuality(6);
+
+		float sampleTime = APP->engine->getSampleTime();
+		for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+			dcFilters[i].setCutoffFreq(10.f * sampleTime);
+		}
+
+		reset();
 	}
 
 	~AudioInterface() {
@@ -80,11 +90,20 @@ struct AudioInterface : Module, audio::Port {
 
 	void onReset() override {
 		setDriverId(-1);
+
+		if (NUM_AUDIO_INPUTS == 2)
+			dcFilterEnabled = true;
+		else
+			dcFilterEnabled = false;
 	}
 
 	void onSampleRateChange(const SampleRateChangeEvent& e) override {
 		engineInputBuffer.clear();
 		engineOutputBuffer.clear();
+
+		for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+			dcFilters[i].setCutoffFreq(10.f * e.sampleTime);
+		}
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -101,6 +120,12 @@ struct AudioInterface : Module, audio::Port {
 				// Normalize right input to left on Audio-2
 				else if (i == 1 && NUM_AUDIO_INPUTS == 2)
 					v = inputFrame.samples[0];
+
+				// Apply DC filter
+				if (dcFilterEnabled) {
+					dcFilters[i].process(v);
+					v = dcFilters[i].highpass();
+				}
 
 				// Detect clipping
 				if (NUM_AUDIO_INPUTS > 2) {
@@ -195,6 +220,8 @@ struct AudioInterface : Module, audio::Port {
 		if (isPrimary())
 			json_object_set_new(rootJ, "primary", json_boolean(true));
 
+		json_object_set_new(rootJ, "dcFilter", json_boolean(dcFilterEnabled));
+
 		return rootJ;
 	}
 
@@ -206,6 +233,10 @@ struct AudioInterface : Module, audio::Port {
 		json_t* primaryJ = json_object_get(rootJ, "primary");
 		if (primaryJ)
 			setPrimary();
+
+		json_t* dcFilterJ = json_object_get(rootJ, "dcFilter");
+		if (dcFilterJ)
+			dcFilterEnabled = json_boolean_value(dcFilterJ);
 	}
 
 	/** Must be called when the Engine mutex is unlocked.
@@ -513,6 +544,19 @@ struct AudioInterfaceWidget : ModuleWidget {
 		primaryModuleItem->rightText = CHECKMARK(module->isPrimary());
 		primaryModuleItem->module = module;
 		menu->addChild(primaryModuleItem);
+
+		struct DCFilterItem : MenuItem {
+			TAudioInterface* module;
+			void onAction(const event::Action& e) override {
+				module->dcFilterEnabled ^= true;
+			}
+		};
+
+		DCFilterItem* dcFilterItem = new DCFilterItem;
+		dcFilterItem->text = "DC blocker";
+		dcFilterItem->rightText = CHECKMARK(module->dcFilterEnabled);
+		dcFilterItem->module = module;
+		menu->addChild(dcFilterItem);
 	}
 };
 
