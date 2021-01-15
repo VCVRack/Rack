@@ -124,8 +124,8 @@ struct Device {
 
 	// Called by this Device class, forwards to subscribed Ports.
 	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames);
-	void onOpenStream();
-	void onCloseStream();
+	void onStartStream();
+	void onStopStream();
 };
 
 ////////////////////
@@ -198,8 +198,8 @@ struct Port {
 	/** Called after processBuffer() is called for all Ports of the same device.
 	*/
 	virtual void processOutput(float* output, int outputStride, int frames) {}
-	virtual void onOpenStream() {}
-	virtual void onCloseStream() {}
+	virtual void onStartStream() {}
+	virtual void onStopStream() {}
 };
 
 

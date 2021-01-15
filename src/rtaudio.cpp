@@ -117,7 +117,7 @@ struct RtAudioDevice : audio::Device {
 		// Update sample rate to actual value
 		sampleRate = rtAudio->getStreamSampleRate();
 		INFO("Opened RtAudio stream");
-		onOpenStream();
+		onStartStream();
 	}
 
 	void closeStream() {
@@ -140,7 +140,7 @@ struct RtAudioDevice : audio::Device {
 			}
 		}
 		INFO("Closed RtAudio stream");
-		onCloseStream();
+		onStopStream();
 	}
 
 	std::string getName() override {

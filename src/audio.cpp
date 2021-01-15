@@ -53,6 +53,9 @@ std::string Device::getDetail(int offset, int maxChannels) {
 }
 
 void Device::processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) {
+	// Zero output in case no Port writes values to it.
+	std::memset(output, 0, frames * outputStride * sizeof(float));
+
 	for (Port* port : subscribed) {
 		// Setting the thread context should probably be the responsibility of Port, but because processInput() etc are overridden, this is the only good place for it.
 		contextSet(port->context);
@@ -68,17 +71,17 @@ void Device::processBuffer(const float* input, int inputStride, float* output, i
 	}
 }
 
-void Device::onOpenStream() {
+void Device::onStartStream() {
 	for (Port* port : subscribed) {
 		contextSet(port->context);
-		port->onOpenStream();
+		port->onStartStream();
 	}
 }
 
-void Device::onCloseStream() {
+void Device::onStopStream() {
 	for (Port* port : subscribed) {
 		contextSet(port->context);
-		port->onCloseStream();
+		port->onStopStream();
 	}
 }
 
@@ -175,6 +178,7 @@ void Port::setDeviceId(int deviceId) {
 	if (this->deviceId >= 0) {
 		try {
 			driver->unsubscribe(this->deviceId, this);
+			onStopStream();
 		}
 		catch (Exception& e) {
 			WARN("Audio port could not unsubscribe from device: %s", e.what());
@@ -188,6 +192,7 @@ void Port::setDeviceId(int deviceId) {
 		try {
 			device = driver->subscribe(deviceId, this);
 			this->deviceId = deviceId;
+			onStartStream();
 		}
 		catch (Exception& e) {
 			WARN("Audio port could not subscribe to device: %s", e.what());

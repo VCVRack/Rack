@@ -36,8 +36,8 @@ struct AudioInterface : Module, audio::Port {
 		NUM_LIGHTS
 	};
 
-	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_INPUTS>, 32768> inputBuffer;
-	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_OUTPUTS>, 32768> outputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_INPUTS>, 32768> engineInputBuffer;
+	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_OUTPUTS>, 32768> engineOutputBuffer;
 
 	dsp::SampleRateConverter<NUM_AUDIO_INPUTS> inputSrc;
 	dsp::SampleRateConverter<NUM_AUDIO_OUTPUTS> outputSrc;
@@ -48,9 +48,11 @@ struct AudioInterface : Module, audio::Port {
 	float outputClipTimers[(NUM_AUDIO_INPUTS > 0) ? NUM_OUTPUT_LIGHTS : 0] = {};
 	dsp::VuMeter2 vuMeter[(NUM_AUDIO_INPUTS == 2) ? 2 : 0];
 
-	// Port variables
+	// Port variable caches
+	int deviceNumInputs = 0;
+	int deviceNumOutputs = 0;
+	float deviceSampleRate = 0.f;
 	int requestedEngineFrames = 0;
-	int maxEngineFrames = 0;
 
 	AudioInterface() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -81,47 +83,56 @@ struct AudioInterface : Module, audio::Port {
 	}
 
 	void onSampleRateChange(const SampleRateChangeEvent& e) override {
-		inputBuffer.clear();
-		outputBuffer.clear();
+		engineInputBuffer.clear();
+		engineOutputBuffer.clear();
 	}
 
 	void process(const ProcessArgs& args) override {
 		const float clipTime = 0.25f;
 
 		// Push inputs to buffer
-		dsp::Frame<NUM_AUDIO_INPUTS> inputFrame;
-		for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-			// Get input
-			float v = 0.f;
-			if (inputs[AUDIO_INPUTS + i].isConnected())
-				v = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
-			// Normalize right input to left on Audio-2
-			else if (i > 0 && NUM_AUDIO_INPUTS == 2)
-				v = inputFrame.samples[i - 1];
+		if (deviceNumOutputs > 0) {
+			dsp::Frame<NUM_AUDIO_INPUTS> inputFrame = {};
+			for (int i = 0; i < deviceNumOutputs; i++) {
+				// Get input
+				float v = 0.f;
+				if (inputs[AUDIO_INPUTS + i].isConnected())
+					v = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
+				// Normalize right input to left on Audio-2
+				else if (i == 1 && NUM_AUDIO_INPUTS == 2)
+					v = inputFrame.samples[0];
 
-			// Detect clipping
-			if (NUM_AUDIO_INPUTS > 2) {
-				if (std::fabs(v) >= 1.f)
-					inputClipTimers[i / 2] = clipTime;
+				// Detect clipping
+				if (NUM_AUDIO_INPUTS > 2) {
+					if (std::fabs(v) >= 1.f)
+						inputClipTimers[i / 2] = clipTime;
+				}
+				inputFrame.samples[i] = v;
 			}
-			inputFrame.samples[i] = v;
-		}
 
-		// Apply gain from knob
-		if (NUM_AUDIO_INPUTS == 2) {
-			float gain = std::pow(params[GAIN_PARAM].getValue(), 2.f);
-			for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-				inputFrame.samples[i] *= gain;
+			// Audio-2: Apply gain from knob
+			if (NUM_AUDIO_INPUTS == 2) {
+				float gain = std::pow(params[GAIN_PARAM].getValue(), 2.f);
+				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+					inputFrame.samples[i] *= gain;
+				}
 			}
-		}
 
-		if (!inputBuffer.full()) {
-			inputBuffer.push(inputFrame);
+			if (!engineInputBuffer.full()) {
+				engineInputBuffer.push(inputFrame);
+			}
+
+			// Audio-2: VU meter process
+			if (NUM_AUDIO_INPUTS == 2) {
+				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+					vuMeter[i].process(args.sampleTime, inputFrame.samples[i]);
+				}
+			}
 		}
 
 		// Pull outputs from buffer
-		if (!outputBuffer.empty()) {
-			dsp::Frame<NUM_AUDIO_OUTPUTS> outputFrame = outputBuffer.shift();
+		if (!engineOutputBuffer.empty()) {
+			dsp::Frame<NUM_AUDIO_OUTPUTS> outputFrame = engineOutputBuffer.shift();
 			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
 				float v = outputFrame.samples[i];
 				outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * v);
@@ -134,19 +145,16 @@ struct AudioInterface : Module, audio::Port {
 			}
 		}
 		else {
+			// Zero outputs
 			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
 				outputs[AUDIO_OUTPUTS + i].setVoltage(0.f);
 			}
 		}
 
 		// Lights
-		if (NUM_AUDIO_INPUTS == 2) {
-			for (int i = 0; i < 2; i++) {
-				vuMeter[i].process(args.sampleTime, inputFrame.samples[i]);
-			}
-		}
 		if (lightDivider.process()) {
 			float lightTime = args.sampleTime * lightDivider.getDivision();
+			// Audio-2: VU meter
 			if (NUM_AUDIO_INPUTS == 2) {
 				for (int i = 0; i < 2; i++) {
 					lights[VU_LIGHTS + i * 6 + 0].setBrightness(vuMeter[i].getBrightness(0, 0));
@@ -157,12 +165,11 @@ struct AudioInterface : Module, audio::Port {
 					lights[VU_LIGHTS + i * 6 + 5].setBrightness(vuMeter[i].getBrightness(-36, -24));
 				}
 			}
+			// Audio-8 and Audio-16: pair state lights
 			else {
-				int numDeviceInputs = getNumInputs();
-				int numDeviceOutputs = getNumOutputs();
 				// Turn on light if at least one port is enabled in the nearby pair.
 				for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
-					bool active = numDeviceOutputs >= 2 * i + 1;
+					bool active = deviceNumOutputs >= 2 * i + 1;
 					bool clip = inputClipTimers[i] > 0.f;
 					if (clip)
 						inputClipTimers[i] -= lightTime;
@@ -170,7 +177,7 @@ struct AudioInterface : Module, audio::Port {
 					lights[INPUT_LIGHTS + i * 2 + 1].setBrightness(active && clip);
 				}
 				for (int i = 0; i < NUM_AUDIO_OUTPUTS / 2; i++) {
-					bool active = numDeviceInputs >= 2 * i + 1;
+					bool active = deviceNumInputs >= 2 * i + 1;
 					bool clip = outputClipTimers[i] > 0.f;
 					if (clip)
 						outputClipTimers[i] -= lightTime;
@@ -221,98 +228,120 @@ struct AudioInterface : Module, audio::Port {
 		bool isPrimaryCached = isPrimary();
 
 		// Set sample rate of engine if engine sample rate is "auto".
-		float sampleRate = getSampleRate();
 		if (isPrimaryCached) {
-			APP->engine->setSuggestedSampleRate(sampleRate);
+			APP->engine->setSuggestedSampleRate(deviceSampleRate);
 		}
 
-		// Initialize sample rate converters
-		int numInputs = getNumInputs();
-		int engineSampleRate = (int) APP->engine->getSampleRate();
-		double sampleRateRatio = (double) engineSampleRate / sampleRate;
-		outputSrc.setRates(sampleRate, engineSampleRate);
-		outputSrc.setChannels(numInputs);
+		float engineSampleRate = APP->engine->getSampleRate();
+		float sampleRateRatio = engineSampleRate / deviceSampleRate;
+
+		DEBUG("%p: %d block, engineOutputBuffer %d", this, frames, (int) engineOutputBuffer.size());
 
 		// Consider engine buffers "too full" if they contain a bit more than the audio device's number of frames, converted to engine sample rate.
-		maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 1.5);
-		// If this is a secondary audio module and the engine output buffer is too full, flush it.
-		if (!isPrimaryCached && (int) outputBuffer.size() > maxEngineFrames) {
-			outputBuffer.clear();
-			// DEBUG("%p: flushing engine output", this);
+		int maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 2.0) - 1;
+		// If the engine output buffer is too full, flush it to keep latency low. No need to flush if primary because it's always flushed below.
+		if (!isPrimaryCached && (int) engineOutputBuffer.size() > maxEngineFrames) {
+			engineOutputBuffer.clear();
+			DEBUG("%p: flushing engine output", this);
 		}
 
-		if (numInputs > 0) {
-			// audio input -> engine output
-			dsp::Frame<NUM_AUDIO_OUTPUTS> inputAudioBuffer[frames];
-			std::memset(inputAudioBuffer, 0, sizeof(inputAudioBuffer));
+		if (deviceNumInputs > 0) {
+			// Always flush engine output if primary
+			if (isPrimaryCached) {
+				engineOutputBuffer.clear();
+			}
+			// Set up sample rate converter
+			outputSrc.setRates(deviceSampleRate, engineSampleRate);
+			outputSrc.setChannels(deviceNumInputs);
+			// Convert audio input -> engine output
+			dsp::Frame<NUM_AUDIO_OUTPUTS> audioInputBuffer[frames];
+			std::memset(audioInputBuffer, 0, sizeof(audioInputBuffer));
 			for (int i = 0; i < frames; i++) {
-				for (int j = 0; j < std::min(numInputs, NUM_AUDIO_OUTPUTS); j++) {
+				for (int j = 0; j < deviceNumInputs; j++) {
 					float v = input[i * inputStride + j];
-					inputAudioBuffer[i].samples[j] = v;
+					audioInputBuffer[i].samples[j] = v;
 				}
 			}
-			int inputAudioFrames = frames;
-			int outputFrames = outputBuffer.capacity();
-			outputSrc.process(inputAudioBuffer, &inputAudioFrames, outputBuffer.endData(), &outputFrames);
-			outputBuffer.endIncr(outputFrames);
-			// Request exactly as many frames as we have.
-			requestedEngineFrames = outputBuffer.size();
+			int audioInputFrames = frames;
+			int outputFrames = engineOutputBuffer.capacity();
+			outputSrc.process(audioInputBuffer, &audioInputFrames, engineOutputBuffer.endData(), &outputFrames);
+			engineOutputBuffer.endIncr(outputFrames);
+			// Request exactly as many frames as we have in the engine output buffer.
+			requestedEngineFrames = engineOutputBuffer.size();
 		}
 		else {
-			// Upper bound on number of frames so that `outputAudioFrames >= frames` at the end of this method.
-			requestedEngineFrames = (int) std::ceil(frames * sampleRateRatio) - inputBuffer.size();
+			// Upper bound on number of frames so that `audioOutputFrames >= frames` when processOutput() is called.
+			requestedEngineFrames = std::max((int) std::ceil(frames * sampleRateRatio) - (int) engineInputBuffer.size(), 0);
 		}
 	}
 
 	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) override {
 		// Step engine
 		if (isPrimary() && requestedEngineFrames > 0) {
+			DEBUG("%p: %d block, stepping %d", this, frames, requestedEngineFrames);
 			APP->engine->stepBlock(requestedEngineFrames);
 		}
 	}
 
 	void processOutput(float* output, int outputStride, int frames) override {
 		bool isPrimaryCached = isPrimary();
-		int numOutputs = getNumOutputs();
-		int engineSampleRate = (int) APP->engine->getSampleRate();
-		float sampleRate = getSampleRate();
-		inputSrc.setRates(engineSampleRate, sampleRate);
-		inputSrc.setChannels(numOutputs);
+		float engineSampleRate = APP->engine->getSampleRate();
+		float sampleRateRatio = engineSampleRate / deviceSampleRate;
 
-		if (numOutputs > 0) {
-			// engine input -> audio output
-			dsp::Frame<NUM_AUDIO_OUTPUTS> outputAudioBuffer[frames];
-			int inputFrames = inputBuffer.size();
-			DEBUG("frames %d, inputFrames %d", frames, inputFrames);
-			int outputAudioFrames = frames;
-			inputSrc.process(inputBuffer.startData(), &inputFrames, outputAudioBuffer, &outputAudioFrames);
-			inputBuffer.startIncr(inputFrames);
-			for (int i = 0; i < outputAudioFrames; i++) {
-				for (int j = 0; j < std::min(numOutputs, NUM_AUDIO_INPUTS); j++) {
-					float v = outputAudioBuffer[i].samples[j];
+		if (deviceNumOutputs > 0) {
+			// Set up sample rate converter
+			inputSrc.setRates(engineSampleRate, deviceSampleRate);
+			inputSrc.setChannels(deviceNumOutputs);
+			// Convert engine input -> audio output
+			dsp::Frame<NUM_AUDIO_OUTPUTS> audioOutputBuffer[frames];
+			int inputFrames = engineInputBuffer.size();
+			int audioOutputFrames = frames;
+			inputSrc.process(engineInputBuffer.startData(), &inputFrames, audioOutputBuffer, &audioOutputFrames);
+			engineInputBuffer.startIncr(inputFrames);
+			// Copy the audio output buffer
+			for (int i = 0; i < audioOutputFrames; i++) {
+				for (int j = 0; j < deviceNumOutputs; j++) {
+					float v = audioOutputBuffer[i].samples[j];
 					v = clamp(v, -1.f, 1.f);
 					output[i * outputStride + j] = v;
 				}
 			}
+			// Fill the rest of the audio output buffer with zeros
+			for (int i = audioOutputFrames; i < frames; i++) {
+				for (int j = 0; j < deviceNumOutputs; j++) {
+					output[i * outputStride + j] = 0.f;
+				}
+			}
 		}
 
-		// If this is a secondary audio module and the engine input buffer is too full, flush it.
-		if (!isPrimaryCached && (int) inputBuffer.size() > maxEngineFrames) {
-			inputBuffer.clear();
-			// DEBUG("%p: flushing engine input", this);
+		DEBUG("%p: %d block, inputFrames %d", this, frames, (int) engineInputBuffer.size());
+
+		// If the engine input buffer is too full, flush it to keep latency low.
+		int maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 2.0) - 1;
+		if ((int) engineInputBuffer.size() > maxEngineFrames) {
+			engineInputBuffer.clear();
+			DEBUG("%p: flushing engine input", this);
 		}
 
-		// DEBUG("%p %s:\tframes %d requestedEngineFrames %d\toutputBuffer %d inputBuffer %d\t", this, isPrimaryCached ? "primary" : "secondary", frames, requestedEngineFrames, outputBuffer.size(), inputBuffer.size());
+		// DEBUG("%p %s:\tframes %d requestedEngineFrames %d\toutputBuffer %d engineInputBuffer %d\t", this, isPrimaryCached ? "primary" : "secondary", frames, requestedEngineFrames, engineOutputBuffer.size(), engineInputBuffer.size());
 	}
 
-	void onOpenStream() override {
-		inputBuffer.clear();
-		outputBuffer.clear();
+	void onStartStream() override {
+		deviceNumInputs = std::min(getNumInputs(), NUM_AUDIO_OUTPUTS);
+		deviceNumOutputs = std::min(getNumOutputs(), NUM_AUDIO_INPUTS);
+		deviceSampleRate = getSampleRate();
+		engineInputBuffer.clear();
+		engineOutputBuffer.clear();
+		// DEBUG("onStartStream %d %d %f", deviceNumInputs, deviceNumOutputs, deviceSampleRate);
 	}
 
-	void onCloseStream() override {
-		inputBuffer.clear();
-		outputBuffer.clear();
+	void onStopStream() override {
+		deviceNumInputs = 0;
+		deviceNumOutputs = 0;
+		deviceSampleRate = 0.f;
+		engineInputBuffer.clear();
+		engineOutputBuffer.clear();
+		// DEBUG("onStopStream");
 	}
 };
 
