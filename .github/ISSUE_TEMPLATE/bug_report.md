@@ -18,8 +18,8 @@ like this.
 
 ### Details
 
-Operating system:
-Rack version: vX.X.X
+Operating system and version:
+Rack version (vX.Y.Z):
 Hardware relevant to your issue (e.g. graphic card model, audio/MIDI device):
 
 ### Summary
