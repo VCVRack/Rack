@@ -221,6 +221,7 @@ struct AudioInterface : Module, audio::Port {
 	// audio::Port
 
 	void processInput(const float* input, int inputStride, int frames) override {
+		// DEBUG("%p: new device block ____________________________", this);
 		// Claim primary module if there is none
 		if (!APP->engine->getPrimaryModule()) {
 			setPrimary();
@@ -235,18 +236,18 @@ struct AudioInterface : Module, audio::Port {
 		float engineSampleRate = APP->engine->getSampleRate();
 		float sampleRateRatio = engineSampleRate / deviceSampleRate;
 
-		DEBUG("%p: %d block, engineOutputBuffer %d", this, frames, (int) engineOutputBuffer.size());
+		// DEBUG("%p: %d block, engineOutputBuffer still has %d", this, frames, (int) engineOutputBuffer.size());
 
 		// Consider engine buffers "too full" if they contain a bit more than the audio device's number of frames, converted to engine sample rate.
 		int maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 2.0) - 1;
-		// If the engine output buffer is too full, flush it to keep latency low. No need to flush if primary because it's always flushed below.
+		// If the engine output buffer is too full, clear it to keep latency low. No need to clear if primary because it's always cleared below.
 		if (!isPrimaryCached && (int) engineOutputBuffer.size() > maxEngineFrames) {
 			engineOutputBuffer.clear();
-			DEBUG("%p: flushing engine output", this);
+			// DEBUG("%p: clearing engine output", this);
 		}
 
 		if (deviceNumInputs > 0) {
-			// Always flush engine output if primary
+			// Always clear engine output if primary
 			if (isPrimaryCached) {
 				engineOutputBuffer.clear();
 			}
@@ -278,13 +279,13 @@ struct AudioInterface : Module, audio::Port {
 	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) override {
 		// Step engine
 		if (isPrimary() && requestedEngineFrames > 0) {
-			DEBUG("%p: %d block, stepping %d", this, frames, requestedEngineFrames);
+			// DEBUG("%p: %d block, stepping %d", this, frames, requestedEngineFrames);
 			APP->engine->stepBlock(requestedEngineFrames);
 		}
 	}
 
 	void processOutput(float* output, int outputStride, int frames) override {
-		bool isPrimaryCached = isPrimary();
+		// bool isPrimaryCached = isPrimary();
 		float engineSampleRate = APP->engine->getSampleRate();
 		float sampleRateRatio = engineSampleRate / deviceSampleRate;
 
@@ -314,13 +315,13 @@ struct AudioInterface : Module, audio::Port {
 			}
 		}
 
-		DEBUG("%p: %d block, inputFrames %d", this, frames, (int) engineInputBuffer.size());
+		// DEBUG("%p: %d block, engineInputBuffer left %d", this, frames, (int) engineInputBuffer.size());
 
-		// If the engine input buffer is too full, flush it to keep latency low.
+		// If the engine input buffer is too full, clear it to keep latency low.
 		int maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 2.0) - 1;
 		if ((int) engineInputBuffer.size() > maxEngineFrames) {
 			engineInputBuffer.clear();
-			DEBUG("%p: flushing engine input", this);
+			// DEBUG("%p: clearing engine input", this);
 		}
 
 		// DEBUG("%p %s:\tframes %d requestedEngineFrames %d\toutputBuffer %d engineInputBuffer %d\t", this, isPrimaryCached ? "primary" : "secondary", frames, requestedEngineFrames, engineOutputBuffer.size(), engineInputBuffer.size());
