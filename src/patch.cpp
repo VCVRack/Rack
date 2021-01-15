@@ -31,22 +31,40 @@ PatchManager::~PatchManager() {
 }
 
 
-void PatchManager::reset() {
-	if (APP->history) {
-		APP->history->clear();
+void PatchManager::launch(std::string pathArg) {
+	// Load the argument if exists
+	if (pathArg != "") {
+		loadAction(pathArg);
+		return;
 	}
-	if (APP->scene) {
-		APP->scene->rackScroll->reset();
+
+	// Try loading the autosave patch
+	if (hasAutosave()) {
+		try {
+			loadAutosave();
+			// Keep path and save state as it was stored in patch.json
+		}
+		catch (Exception& e) {
+			osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
+		}
+		return;
 	}
+
+	// Try loading the template patch
+	loadTemplate();
 }
 
 
 void PatchManager::clear() {
+	path = "";
 	if (APP->scene) {
 		APP->scene->rack->clear();
+		APP->scene->rackScroll->reset();
+	}
+	if (APP->history) {
+		APP->history->clear();
 	}
 	APP->engine->clear();
-	reset();
 }
 
 
@@ -83,15 +101,18 @@ void PatchManager::saveDialog() {
 		return;
 	}
 
+	// Note: If save() fails below, this should probably be reset. But we need it so toJson() doesn't set the "unsaved" property.
+	APP->history->setSaved();
+	this->path = path;
+
 	try {
 		save(path);
 	}
 	catch (Exception& e) {
-		WARN("Could not save patch: %s", e.what());
+		std::string message = string::f("Could not save patch: %s", e.what());
+		osdialog_message(OSDIALOG_INFO, OSDIALOG_OK, message.c_str());
 		return;
 	}
-
-	APP->history->setSaved();
 }
 
 
@@ -123,16 +144,18 @@ void PatchManager::saveAsDialog() {
 		path += ".vcv";
 	}
 
+	APP->history->setSaved();
+	this->path = path;
+
 	try {
 		save(path);
 	}
 	catch (Exception& e) {
-		WARN("Could not save patch: %s", e.what());
+		std::string message = string::f("Could not save patch: %s", e.what());
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 		return;
 	}
 
-	this->path = path;
-	APP->history->setSaved();
 	pushRecentPath(path);
 }
 
@@ -146,7 +169,8 @@ void PatchManager::saveTemplateDialog() {
 		save(asset::templatePath);
 	}
 	catch (Exception& e) {
-		WARN("Could not save template patch: %s", e.what());
+		std::string message = string::f("Could not save template patch: %s", e.what());
+		osdialog_message(OSDIALOG_INFO, OSDIALOG_OK, message.c_str());
 		return;
 	}
 }
@@ -233,26 +257,24 @@ void PatchManager::load(std::string path) {
 
 
 void PatchManager::loadTemplate() {
-	this->path = "";
-	APP->history->setSaved();
-
 	try {
 		load(asset::templatePath);
-		return;
 	}
 	catch (Exception& e) {
-		INFO("Could not load user template patch, attempting system template patch: %s", e.what());
+		// Do nothing because it's okay for the user template to not exist.
+		try {
+			load(asset::system("template.vcv"));
+		}
+		catch (Exception& e) {
+			std::string message = string::f("Could not load system template patch, clearing rack: %s", e.what());
+			osdialog_message(OSDIALOG_INFO, OSDIALOG_OK, message.c_str());
+			clear();
+		}
 	}
 
-	try {
-		load(asset::system("template.vcv"));
-		return;
-	}
-	catch (Exception& e) {
-		WARN("Could not load system template patch, clearing rack: %s", e.what());
-	}
-
-	clear();
+	// load() sets the patch's original patch, but we don't want to use that.
+	this->path = "";
+	APP->history->setSaved();
 }
 
 
@@ -264,24 +286,29 @@ void PatchManager::loadTemplateDialog() {
 }
 
 
+bool PatchManager::hasAutosave() {
+	std::string patchPath = system::join(asset::autosavePath, "patch.json");
+	INFO("Loading autosave %s", patchPath.c_str());
+	FILE* file = std::fopen(patchPath.c_str(), "r");
+	if (!file)
+		return false;
+	std::fclose(file);
+	return true;
+}
+
+
 void PatchManager::loadAutosave() {
 	std::string patchPath = system::join(asset::autosavePath, "patch.json");
 	INFO("Loading autosave %s", patchPath.c_str());
 	FILE* file = std::fopen(patchPath.c_str(), "r");
-	if (!file) {
-		// Exit silently
-		// TODO Load template without causing infinite recursion
-		return;
-	}
+	if (!file)
+		throw Exception("Could not open autosave patch %s", patchPath.c_str());
 	DEFER({std::fclose(file);});
 
 	json_error_t error;
 	json_t* rootJ = json_loadf(file, 0, &error);
-	if (!rootJ) {
-		std::string message = string::f("Failed to load patch. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
-		return;
-	}
+	if (!rootJ)
+		throw Exception("Failed to load patch. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	DEFER({json_decref(rootJ);});
 
 	fromJson(rootJ);
@@ -293,7 +320,8 @@ void PatchManager::loadAction(std::string path) {
 		load(path);
 	}
 	catch (Exception& e) {
-		WARN("Could not load patch: %s", e.what());
+		std::string message = string::f("Could not load patch: %s", e.what());
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
 		return;
 	}
 
@@ -345,15 +373,7 @@ void PatchManager::revertDialog() {
 	if (!promptClear("Revert patch to the last saved state?"))
 		return;
 
-	try {
-		load(path);
-	}
-	catch (Exception& e) {
-		WARN("Could not load patch: %s", e.what());
-		return;
-	}
-
-	APP->history->setSaved();
+	loadAction(path);
 }
 
 
@@ -380,6 +400,14 @@ json_t* PatchManager::toJson() {
 	// version
 	json_t* versionJ = json_string(APP_VERSION.c_str());
 	json_object_set_new(rootJ, "version", versionJ);
+
+	// path
+	json_t* pathJ = json_string(path.c_str());
+	json_object_set_new(rootJ, "path", pathJ);
+
+	// unsaved
+	if (!APP->history->isSaved())
+		json_object_set_new(rootJ, "unsaved", json_boolean(true));
 
 	// Merge with rootJ
 	json_t* engineJ = APP->engine->toJson();
@@ -418,6 +446,16 @@ void PatchManager::fromJson(json_t* rootJ) {
 	if (legacy) {
 		INFO("Loading patch using legacy mode %d", legacy);
 	}
+
+	// path
+	json_t* pathJ = json_object_get(rootJ, "path");
+	if (pathJ)
+		path = json_string_value(pathJ);
+
+	// unsaved
+	json_t* unsavedJ = json_object_get(rootJ, "unsaved");
+	if (!unsavedJ)
+		APP->history->setSaved();
 
 	APP->engine->fromJson(rootJ);
 	if (APP->scene) {

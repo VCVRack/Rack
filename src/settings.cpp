@@ -39,7 +39,6 @@ bool lockModules = false;
 #endif
 float autosaveInterval = 15.0;
 bool skipLoadOnLaunch = false;
-std::string patchPath;
 std::list<std::string> recentPatchPaths;
 std::vector<NVGcolor> cableColors = {
 	color::fromHexString("#fc2d5aff"), // red
@@ -110,8 +109,6 @@ json_t* toJson() {
 
 	if (skipLoadOnLaunch)
 		json_object_set_new(rootJ, "skipLoadOnLaunch", json_boolean(true));
-
-	json_object_set_new(rootJ, "patchPath", json_string(patchPath.c_str()));
 
 	json_t* recentPatchPathsJ = json_array();
 	for (const std::string& path : recentPatchPaths) {
@@ -245,10 +242,6 @@ void fromJson(json_t* rootJ) {
 	json_t* skipLoadOnLaunchJ = json_object_get(rootJ, "skipLoadOnLaunch");
 	if (skipLoadOnLaunchJ)
 		skipLoadOnLaunch = json_boolean_value(skipLoadOnLaunchJ);
-
-	json_t* patchPathJ = json_object_get(rootJ, "patchPath");
-	if (patchPathJ)
-		patchPath = json_string_value(patchPathJ);
 
 	recentPatchPaths.clear();
 	json_t* recentPatchPathsJ = json_object_get(rootJ, "recentPatchPaths");

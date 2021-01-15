@@ -11,13 +11,12 @@ struct PatchManager {
 	/** The currently loaded patch file path */
 	std::string path;
 	/** Enables certain compatibility behavior based on the value */
-	int legacy;
+	int legacy = 0;
 	std::string warningLog;
 
 	PatchManager();
 	~PatchManager();
-	/** Resets the history and scroll position to prepare for a new patch. */
-	void reset();
+	void launch(std::string pathArg);
 	/** Clears the patch. */
 	void clear();
 	/** Saves the patch and nothing else. */
@@ -34,6 +33,7 @@ struct PatchManager {
 	/** Loads the template patch. */
 	void loadTemplate();
 	void loadTemplateDialog();
+	bool hasAutosave();
 	void loadAutosave();
 	/** Loads a patch, sets the current path, and updates the recent patches. */
 	void loadAction(std::string path);
