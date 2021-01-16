@@ -8,31 +8,10 @@ namespace audio {
 
 static std::vector<std::pair<int, Driver*>> drivers;
 
-static std::string getDetailTemplate(std::string name, int numInputs, int numOutputs, int offset, int maxChannels) {
-	std::string text = name;
-	text += " (";
-	if (offset < numInputs) {
-		text += string::f("%d-%d in", offset + 1, std::min(offset + maxChannels, numInputs));
-	}
-	if (offset < numInputs && offset < numOutputs) {
-		text += ", ";
-	}
-	if (offset < numOutputs) {
-		text += string::f("%d-%d out", offset + 1, std::min(offset + maxChannels, numOutputs));
-	}
-	text += ")";
-	return text;
-}
-
 ////////////////////
 // Driver
 ////////////////////
 
-std::string Driver::getDeviceDetail(int deviceId, int offset, int maxChannels) {
-	if (deviceId < 0)
-		return "";
-	return getDetailTemplate(getDeviceName(deviceId), getDeviceNumInputs(deviceId), getDeviceNumOutputs(deviceId), offset, maxChannels);
-}
 
 ////////////////////
 // Device
@@ -48,10 +27,6 @@ void Device::unsubscribe(Port* port) {
 		subscribed.erase(it);
 }
 
-std::string Device::getDetail(int offset, int maxChannels) {
-	return getDetailTemplate(getName(), getNumInputs(), getNumOutputs(), offset, maxChannels);
-}
-
 void Device::processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) {
 	// Zero output in case no Port writes values to it.
 	std::memset(output, 0, frames * outputStride * sizeof(float));
@@ -59,15 +34,15 @@ void Device::processBuffer(const float* input, int inputStride, float* output, i
 	for (Port* port : subscribed) {
 		// Setting the thread context should probably be the responsibility of Port, but because processInput() etc are overridden, this is the only good place for it.
 		contextSet(port->context);
-		port->processInput(input + port->getOffset(), inputStride, frames);
+		port->processInput(input + port->inputOffset, inputStride, frames);
 	}
 	for (Port* port : subscribed) {
 		contextSet(port->context);
-		port->processBuffer(input + port->getOffset(), inputStride, output + port->getOffset(), outputStride, frames);
+		port->processBuffer(input + port->inputOffset, inputStride, output + port->outputOffset, outputStride, frames);
 	}
 	for (Port* port : subscribed) {
 		contextSet(port->context);
-		port->processOutput(output + port->getOffset(), outputStride, frames);
+		port->processOutput(output + port->outputOffset, outputStride, frames);
 	}
 }
 
@@ -106,7 +81,6 @@ void Port::reset() {
 		firstDriverId = driverIds[0];
 
 	setDriverId(firstDriverId);
-	setOffset(0);
 }
 
 Driver* Port::getDriver() {
@@ -236,19 +210,6 @@ std::string Port::getDeviceName(int deviceId) {
 	}
 }
 
-std::string Port::getDeviceDetail(int deviceId, int offset) {
-	if (!driver)
-		return "";
-	try {
-		// Use maxChannels from Port.
-		return driver->getDeviceDetail(deviceId, offset, maxChannels);
-	}
-	catch (Exception& e) {
-		WARN("Audio port could not get device detail: %s", e.what());
-		return 0;
-	}
-}
-
 std::set<float> Port::getSampleRates() {
 	if (!device)
 		return {};
@@ -319,20 +280,11 @@ void Port::setBlockSize(int blockSize) {
 	}
 }
 
-int Port::getOffset() {
-	return offset;
-}
-
-void Port::setOffset(int offset) {
-	this->offset = offset;
-}
-
-
 int Port::getNumInputs() {
 	if (!device)
 		return 0;
 	try {
-		return std::min(device->getNumInputs() - getOffset(), maxChannels);
+		return std::min(device->getNumInputs() - inputOffset, maxInputs);
 	}
 	catch (Exception& e) {
 		WARN("Audio port could not get device number of inputs: %s", e.what());
@@ -344,7 +296,7 @@ int Port::getNumOutputs() {
 	if (!device)
 		return 0;
 	try {
-		return std::min(device->getNumOutputs() - getOffset(), maxChannels);
+		return std::min(device->getNumOutputs() - outputOffset, maxOutputs);
 	}
 	catch (Exception& e) {
 		WARN("Audio port could not get device number of outputs: %s", e.what());
@@ -363,7 +315,8 @@ json_t* Port::toJson() {
 
 	json_object_set_new(rootJ, "sampleRate", json_real(getSampleRate()));
 	json_object_set_new(rootJ, "blockSize", json_integer(getBlockSize()));
-	json_object_set_new(rootJ, "offset", json_integer(getOffset()));
+	json_object_set_new(rootJ, "inputOffset", json_integer(inputOffset));
+	json_object_set_new(rootJ, "outputOffset", json_integer(outputOffset));
 	return rootJ;
 }
 
@@ -397,9 +350,13 @@ void Port::fromJson(json_t* rootJ) {
 	if (blockSizeJ)
 		setBlockSize(json_integer_value(blockSizeJ));
 
-	json_t* offsetJ = json_object_get(rootJ, "offset");
-	if (offsetJ)
-		setOffset(json_integer_value(offsetJ));
+	json_t* inputOffsetJ = json_object_get(rootJ, "inputOffset");
+	if (inputOffsetJ)
+		inputOffset = json_integer_value(inputOffsetJ);
+
+	json_t* outputOffsetJ = json_object_get(rootJ, "outputOffset");
+	if (outputOffsetJ)
+		outputOffset = json_integer_value(outputOffsetJ);
 }
 
 ////////////////////

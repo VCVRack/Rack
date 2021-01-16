@@ -46,11 +46,6 @@ struct Driver {
 	virtual int getDeviceNumOutputs(int deviceId) {
 		return 0;
 	}
-	/** Returns a detailed description of the device without obtaining it.
-	`offset` specifies the first channel (zero-indexed).
-	E.g. "MySoundcard (1-2 in, 1-2 out)"
-	*/
-	std::string getDeviceDetail(int deviceId, int offset, int maxChannels);
 
 	/** Adds the given port as a reference holder of a device and returns the it.
 	Creates the Device if no ports are subscribed before calling.
@@ -90,11 +85,6 @@ struct Device {
 	virtual int getNumOutputs() {
 		return 0;
 	}
-	/** Returns a detailed description of the device.
-	`offset` specifies the first channel (zero-indexed).
-	E.g. "MySoundcard (1-2 in, 1-2 out)"
-	*/
-	std::string getDetail(int offset, int maxChannels);
 
 	/** Returns a list of all valid (user-selectable) sample rates.
 	The device may accept sample rates not in this list, but it *must* accept sample rates in the list.
@@ -139,9 +129,11 @@ That is, if the active Device throws a `rack::Exception`, it is caught and logge
 */
 struct Port {
 	/** The first channel index of the device to process. */
-	int offset = 0;
+	int inputOffset = 0;
+	int outputOffset = 0;
 	/** Maximum number of channels to process. */
-	int maxChannels = 8;
+	int maxInputs = 8;
+	int maxOutputs = 8;
 
 	// private
 	int driverId = -1;
@@ -176,9 +168,6 @@ struct Port {
 	std::set<int> getBlockSizes();
 	int getBlockSize();
 	void setBlockSize(int blockSize);
-
-	int getOffset();
-	void setOffset(int offset);
 
 	int getNumInputs();
 	int getNumOutputs();

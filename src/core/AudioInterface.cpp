@@ -71,7 +71,8 @@ struct AudioInterface : Module, audio::Port {
 			configLight(OUTPUT_LIGHTS + 2 * i, string::f("Device input %d/%d status", 2 * i + 1, 2 * i + 2));
 
 		lightDivider.setDivision(512);
-		maxChannels = std::max(NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS);
+		maxOutputs = NUM_AUDIO_INPUTS;
+		maxInputs = NUM_AUDIO_OUTPUTS;
 		inputSrc.setQuality(6);
 		outputSrc.setQuality(6);
 

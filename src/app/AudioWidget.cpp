@@ -8,6 +8,23 @@ namespace rack {
 namespace app {
 
 
+static std::string getDetailTemplate(std::string name, int numInputs, int inputOffset, int maxInputs, int numOutputs, int outputOffset, int maxOutputs) {
+	std::string text = name;
+	text += " (";
+	if (inputOffset < numInputs) {
+		text += string::f("%d-%d in", inputOffset + 1, std::min(inputOffset + maxInputs, numInputs));
+	}
+	if (inputOffset < numInputs && outputOffset < numOutputs) {
+		text += ", ";
+	}
+	if (outputOffset < numOutputs) {
+		text += string::f("%d-%d out", outputOffset + 1, std::min(outputOffset + maxOutputs, numOutputs));
+	}
+	text += ")";
+	return text;
+}
+
+
 struct AudioDriverValueItem : ui::MenuItem {
 	audio::Port* port;
 	int driverId;
@@ -67,10 +84,12 @@ struct AudioDriverItem : ui::MenuItem {
 struct AudioDeviceValueItem : ui::MenuItem {
 	audio::Port* port;
 	int deviceId;
-	int offset;
+	int inputOffset;
+	int outputOffset;
 	void onAction(const event::Action& e) override {
 		port->setDeviceId(deviceId);
-		port->setOffset(offset);
+		port->inputOffset = inputOffset;
+		port->outputOffset = outputOffset;
 	}
 };
 
@@ -88,18 +107,24 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 	}
 
 	for (int deviceId : port->getDeviceIds()) {
-		int channels = std::max(port->getDeviceNumInputs(deviceId), port->getDeviceNumOutputs(deviceId));
-		// Prevents devices with a ridiculous number of channels from being displayed
-		const int maxTotalChannels = port->maxChannels * 16;
-		channels = std::min(maxTotalChannels, channels);
+		int numInputs = port->getDeviceNumInputs(deviceId);
+		int numOutputs = port->getDeviceNumOutputs(deviceId);
+		std::string name = port->getDeviceName(deviceId);
 
-		for (int offset = 0; offset < channels; offset += port->maxChannels) {
+		// Prevents devices with a ridiculous number of channels from being displayed
+		for (int i = 0; i < 8; i++) {
+			int inputOffset = i * port->maxInputs;
+			int outputOffset = i * port->maxOutputs;
+			if (inputOffset >= numInputs && outputOffset >= numOutputs)
+				break;
+
 			AudioDeviceValueItem* item = new AudioDeviceValueItem;
 			item->port = port;
 			item->deviceId = deviceId;
-			item->offset = offset;
-			item->text = port->getDeviceDetail(deviceId, offset);
-			item->rightText = CHECKMARK(item->deviceId == port->getDeviceId() && item->offset == port->getOffset());
+			item->inputOffset = inputOffset;
+			item->outputOffset = outputOffset;
+			item->text = getDetailTemplate(name, numInputs, inputOffset, port->maxInputs, numOutputs, outputOffset, port->maxOutputs);
+			item->rightText = CHECKMARK(item->deviceId == port->getDeviceId() && inputOffset == port->inputOffset && outputOffset == port->outputOffset);
 			menu->addChild(item);
 		}
 	}
@@ -117,7 +142,10 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		text = "";
 		if (box.size.x >= 200.0)
 			text += "Device: ";
-		std::string detail = (port && port->device) ? port->device->getDetail(port->getOffset(), port->maxChannels) : "";
+		std::string detail = "";
+		if (port && port->device)
+			detail = getDetailTemplate(port->device->getName(), port->getNumInputs(), port->inputOffset, port->maxInputs, port->getNumOutputs(), port->outputOffset, port->maxOutputs);
+
 		if (detail != "") {
 			text += detail;
 			color.a = 1.0;
