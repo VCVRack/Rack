@@ -3,6 +3,7 @@
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
 ### 2.0.0 (in development)
+- Redesign Module Browser with compact layout, adjustable zoom levels, sorting options, intelligent searching, and multiple tag selection.
 - Add port tooltips with name, voltage, and list of connected ports.
 - Evaluate mathematical expressions (such as `1+2*3`) in parameter context menu fields.
 - Add module whitelist to Module Browser which synchronizes individual modules chosen in the VCV Library.
@@ -39,9 +40,13 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Use randomly-generated 53-bit IDs to identify modules and cables in the patch.
 - Use a fuzzy search algorithm for searching modules in the Module Browser.
 - Add tips window which appears when Rack launches or when choosing "Help > Tips".
+- Check for Library updates every few seconds to avoid needing to restart Rack to check for updates.
+- When clicking on a module in the Module Browser and immediately releasing, place the module in the last cursor position in the rack, rather than the current cursor position.
+- When clicking and dragging a module from the Module Browser, fix the mouse handle offset to the center of the module.
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
+	- Add DC blocker setting to Audio modules. On Audio-2, enable it by default.
 	- Add MPE mode to MIDI-CC and MIDI-Gate.
 	- Add mode to MIDI-CC to process 14-bit MIDI CC via MSB/LSB.
 	- Use MIDI timestamps in MIDI-CV, MIDI-CC, MIDI-Gate, and MIDI-Map to improve overall timing and drastically reduce clock jitter.
@@ -65,6 +70,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add several convenient filesystem routines to `system::`.
 	- Move all `string::` functions dealing with filesystem paths to `system::`.
 	- Change type of `Module::id` and `Cable::id` from `int` to `int64_t`.
+	- Add `system::getTime()` and `getUnixTime()`.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
