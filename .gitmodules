@@ -12,15 +12,15 @@
 	ignore = untracked
 [submodule "dep/oui-blendish"]
 	path = dep/oui-blendish
-	url = https://github.com/AndrewBelt/oui-blendish.git
+	url = https://github.com/VCVRack/oui-blendish.git
 	ignore = untracked
 [submodule "dep/rtaudio"]
 	path = dep/rtaudio
-	url = https://github.com/AndrewBelt/rtaudio.git
+	url = https://github.com/VCVRack/rtaudio.git
 	ignore = untracked
 [submodule "dep/glfw"]
 	path = dep/glfw
-	url = https://github.com/AndrewBelt/glfw.git
+	url = https://github.com/VCVRack/glfw.git
 	ignore = untracked
 [submodule "dep/fuzzysearchdatabase"]
 	path = dep/fuzzysearchdatabase
