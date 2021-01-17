@@ -155,6 +155,14 @@ struct AudioInterface : Module, audio::Port {
 				}
 			}
 		}
+		else {
+			// Audio-2: Clear VU meter
+			if (NUM_AUDIO_INPUTS == 2) {
+				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+					vuMeter[i].reset();
+				}
+			}
+		}
 
 		// Pull outputs from buffer
 		if (!engineOutputBuffer.empty()) {
@@ -182,7 +190,7 @@ struct AudioInterface : Module, audio::Port {
 			float lightTime = args.sampleTime * lightDivider.getDivision();
 			// Audio-2: VU meter
 			if (NUM_AUDIO_INPUTS == 2) {
-				for (int i = 0; i < 2; i++) {
+				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
 					lights[VU_LIGHTS + i * 6 + 0].setBrightness(vuMeter[i].getBrightness(0, 0));
 					lights[VU_LIGHTS + i * 6 + 1].setBrightness(vuMeter[i].getBrightness(-3, 0));
 					lights[VU_LIGHTS + i * 6 + 2].setBrightness(vuMeter[i].getBrightness(-6, -3));
