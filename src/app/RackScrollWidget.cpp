@@ -98,12 +98,12 @@ void RackScrollWidget::onHoverKey(const event::HoverKey& e) {
 
 	// Scroll with arrow keys
 	float arrowSpeed = 32.f;
+	if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
+		arrowSpeed /= 4.f;
+	if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
+		arrowSpeed *= 4.f;
 	if ((e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
 		arrowSpeed /= 16.f;
-	if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
-		arrowSpeed *= 4.f;
-	if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
-		arrowSpeed /= 4.f;
 
 	if (e.action == RACK_HELD) {
 		if (e.key == GLFW_KEY_LEFT) {

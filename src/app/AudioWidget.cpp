@@ -111,7 +111,7 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 		int numOutputs = port->getDeviceNumOutputs(deviceId);
 		std::string name = port->getDeviceName(deviceId);
 
-		// Prevents devices with a ridiculous number of channels from being displayed
+		// Display only 8 channel offsets per device, because some virtual devices (e.g. ALSA) can have thousands of useless channels.
 		for (int i = 0; i < 8; i++) {
 			int inputOffset = i * port->maxInputs;
 			int outputOffset = i * port->maxOutputs;
@@ -124,7 +124,7 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 			item->inputOffset = inputOffset;
 			item->outputOffset = outputOffset;
 			item->text = getDetailTemplate(name, numInputs, inputOffset, port->maxInputs, numOutputs, outputOffset, port->maxOutputs);
-			item->rightText = CHECKMARK(item->deviceId == port->getDeviceId() && inputOffset == port->inputOffset && outputOffset == port->outputOffset);
+			item->rightText = CHECKMARK(deviceId == port->getDeviceId() && inputOffset == port->inputOffset && outputOffset == port->outputOffset);
 			menu->addChild(item);
 		}
 	}
@@ -143,8 +143,8 @@ struct AudioDeviceChoice : LedDisplayChoice {
 		if (box.size.x >= 200.0)
 			text += "Device: ";
 		std::string detail = "";
-		if (port && port->device)
-			detail = getDetailTemplate(port->device->getName(), port->getNumInputs(), port->inputOffset, port->maxInputs, port->getNumOutputs(), port->outputOffset, port->maxOutputs);
+		if (port && port->getDevice())
+			detail = getDetailTemplate(port->getDevice()->getName(), port->getNumInputs(), port->inputOffset, port->maxInputs, port->getNumOutputs(), port->outputOffset, port->maxOutputs);
 
 		if (detail != "") {
 			text += detail;

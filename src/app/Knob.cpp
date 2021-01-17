@@ -125,13 +125,12 @@ void Knob::onDragMove(const event::DragMove& e) {
 		float modScale = 1.f;
 		// Drag slower if Ctrl is held
 		int mods = APP->window->getMods();
-		if ((mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		if ((mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
 			modScale /= 16.f;
-		}
-		// Drag even slower if Ctrl-Shift is held
-		if ((mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
+		if ((mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
+			modScale *= 4.f;
+		if ((mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
 			modScale /= 256.f;
-		}
 
 		// Ratio between parameter value scale / (angle range / 2*pi)
 		float rangeRatio;
