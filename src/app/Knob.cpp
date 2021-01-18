@@ -115,11 +115,11 @@ void Knob::onDragEnd(const event::DragEnd& e) {
 static float getModSpeed() {
 	int mods = APP->window->getMods();
 	if ((mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
-		return 1 / 16.f;
+		return 1 / 10.f;
 	else if ((mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
 		return 4.f;
 	else if ((mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
-		return 1 / 256.f;
+		return 1 / 100.f;
 	else
 		return 1.f;
 }
