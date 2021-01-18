@@ -157,7 +157,7 @@ struct Widget : WeakBase {
 			// Filter child by visibility and position
 			if (!child->visible)
 				continue;
-			if (!child->box.isContaining(e.pos))
+			if (!child->box.contains(e.pos))
 				continue;
 
 			// Clone event and adjust its position

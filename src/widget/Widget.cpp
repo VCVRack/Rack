@@ -32,7 +32,7 @@ math::Vec Widget::getPosition() {
 
 
 void Widget::setPosition(math::Vec pos) {
-	if (pos.isEqual(box.pos))
+	if (pos.equals(box.pos))
 		return;
 	box.pos = pos;
 	// Trigger Reposition event
@@ -47,7 +47,7 @@ math::Vec Widget::getSize() {
 
 
 void Widget::setSize(math::Vec size) {
-	if (size.isEqual(box.size))
+	if (size.equals(box.size))
 		return;
 	box.size = size;
 	// Trigger Resize event
@@ -226,7 +226,7 @@ void Widget::draw(const DrawArgs& args) {
 		if (!child->visible)
 			continue;
 		// Don't draw if child is outside clip box
-		if (!args.clipBox.isIntersecting(child->box))
+		if (!args.clipBox.intersects(child->box))
 			continue;
 
 		DrawArgs childCtx = args;

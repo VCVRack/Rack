@@ -265,7 +265,7 @@ struct Vec {
 	Vec ceil() const {
 		return Vec(std::ceil(x), std::ceil(y));
 	}
-	bool isEqual(Vec b) const {
+	bool equals(Vec b) const {
 		return x == b.x && y == b.y;
 	}
 	bool isZero() const {
@@ -278,6 +278,11 @@ struct Vec {
 	Vec clampSafe(Rect bound) const;
 	Vec crossfade(Vec b, float p) {
 		return this->plus(b.minus(*this).mult(p));
+	}
+
+	// Method aliases
+	bool isEqual(Vec b) const {
+		return equals(b);
 	}
 };
 
@@ -297,22 +302,22 @@ struct Rect {
 	}
 
 	/** Returns whether this Rect contains an entire point, inclusive on the top/left, non-inclusive on the bottom/right. */
-	bool isContaining(Vec v) const {
+	bool contains(Vec v) const {
 		return pos.x <= v.x && v.x < pos.x + size.x
 		       && pos.y <= v.y && v.y < pos.y + size.y;
 	}
 	/** Returns whether this Rect contains an entire Rect. */
-	bool isContaining(Rect r) const {
+	bool contains(Rect r) const {
 		return pos.x <= r.pos.x && r.pos.x + r.size.x <= pos.x + size.x
 		       && pos.y <= r.pos.y && r.pos.y + r.size.y <= pos.y + size.y;
 	}
 	/** Returns whether this Rect overlaps with another Rect. */
-	bool isIntersecting(Rect r) const {
+	bool intersects(Rect r) const {
 		return (pos.x + size.x > r.pos.x && r.pos.x + r.size.x > pos.x)
 		       && (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
 	}
-	bool isEqual(Rect r) const {
-		return pos.isEqual(r.pos) && size.isEqual(r.size);
+	bool equals(Rect r) const {
+		return pos.equals(r.pos) && size.equals(r.size);
 	}
 	float getLeft() const {
 		return pos.x;
@@ -390,14 +395,15 @@ struct Rect {
 		return r;
 	}
 
-	DEPRECATED bool contains(Vec v) const {
-		return isContaining(v);
+	// Method aliases
+	bool isContaining(Vec v) const {
+		return contains(v);
 	}
-	DEPRECATED bool contains(Rect r) const {
-		return isContaining(r);
+	bool isIntersecting(Rect r) const {
+		return intersects(r);
 	}
-	DEPRECATED bool intersects(Rect r) const {
-		return isIntersecting(r);
+	bool isEqual(Rect r) const {
+		return equals(r);
 	}
 };
 
@@ -456,10 +462,10 @@ inline Vec operator/=(Vec& a, const float& b) {
 	return a = a.div(b);
 }
 inline bool operator==(const Vec& a, const Vec& b) {
-	return a.isEqual(b);
+	return a.equals(b);
 }
 inline bool operator!=(const Vec& a, const Vec& b) {
-	return !a.isEqual(b);
+	return !a.equals(b);
 }
 
 

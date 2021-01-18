@@ -95,7 +95,7 @@ void FramebufferWidget::step() {
 	math::Vec newFbSize = internal->fbBox.size.mult(APP->window->pixelRatio).ceil();
 
 	// Create framebuffer if a new size is needed
-	if (!internal->fb || !newFbSize.isEqual(internal->fbSize)) {
+	if (!internal->fb || !newFbSize.equals(internal->fbSize)) {
 		internal->fbSize = newFbSize;
 		// Delete old framebuffer
 		if (internal->fb)
@@ -188,14 +188,14 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 		// DEBUG("%p dirty subpixel", this);
 		dirty = true;
 	}
-	if (!internal->scale.isEqual(internal->fbScale)) {
+	if (!internal->scale.equals(internal->fbScale)) {
 		// If rescaled, rerender in the next frame.
 		// DEBUG("%p dirty scale", this);
 		dirty = true;
 	}
 
 	math::Vec scaleRatio = math::Vec(1, 1);
-	if (!internal->fbScale.isZero() && !internal->scale.isEqual(internal->fbScale)) {
+	if (!internal->fbScale.isZero() && !internal->scale.equals(internal->fbScale)) {
 		// Continue to draw with the last framebuffer, but stretch it to rescale.
 		scaleRatio = internal->scale.div(internal->fbScale);
 	}

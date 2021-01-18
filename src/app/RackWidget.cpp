@@ -101,7 +101,7 @@ void RackWidget::draw(const DrawArgs& args) {
 	math::Rect railBox;
 	railBox.pos = args.clipBox.pos.div(BUS_BOARD_GRID_SIZE).floor().mult(BUS_BOARD_GRID_SIZE);
 	railBox.size = args.clipBox.size.div(BUS_BOARD_GRID_SIZE).ceil().plus(math::Vec(1, 1)).mult(BUS_BOARD_GRID_SIZE);
-	if (!railFb->box.size.isEqual(railBox.size)) {
+	if (!railFb->box.size.equals(railBox.size)) {
 		railFb->dirty = true;
 	}
 	railFb->box = railBox;
@@ -353,12 +353,12 @@ static void RackWidget_updateExpanders(RackWidget* that) {
 			math::Vec p2Right = w2->box.getTopRight().div(RACK_GRID_SIZE).round();
 
 			// Check if this is a left module
-			if (p2Right.isEqual(pLeft)) {
+			if (p2Right.equals(pLeft)) {
 				mwLeft = dynamic_cast<ModuleWidget*>(w2);
 			}
 
 			// Check if this is a right module
-			if (p2Left.isEqual(pRight)) {
+			if (p2Left.equals(pRight)) {
 				mwRight = dynamic_cast<ModuleWidget*>(w2);
 			}
 		}
@@ -414,7 +414,7 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 		if (!w2->visible)
 			continue;
 		// Check intersection
-		if (mwBox.isIntersecting(w2->box))
+		if (mwBox.intersects(w2->box))
 			return false;
 	}
 
@@ -556,7 +556,7 @@ history::ComplexAction* RackWidget::getModuleDragAction() {
 		assert(mw);
 		// Create ModuleMove action if the module was moved.
 		math::Vec oldPos = mw->oldPos();
-		if (!oldPos.isEqual(mw->box.pos)) {
+		if (!oldPos.equals(mw->box.pos)) {
 			history::ModuleMove* mmh = new history::ModuleMove;
 			mmh->moduleId = mw->module->id;
 			mmh->oldPos = oldPos;
