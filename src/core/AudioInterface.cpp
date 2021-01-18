@@ -13,31 +13,8 @@ namespace core {
 
 
 template <int NUM_AUDIO_INPUTS, int NUM_AUDIO_OUTPUTS>
-struct AudioInterface : Module, audio::Port {
-	static constexpr int NUM_INPUT_LIGHTS = (NUM_AUDIO_INPUTS > 2) ? (NUM_AUDIO_INPUTS / 2) : 0;
-	static constexpr int NUM_OUTPUT_LIGHTS = (NUM_AUDIO_OUTPUTS > 2) ? (NUM_AUDIO_OUTPUTS / 2) : 0;
-
-	enum ParamIds {
-		ENUMS(GAIN_PARAM, NUM_AUDIO_INPUTS == 2),
-		NUM_PARAMS
-	};
-	enum InputIds {
-		ENUMS(AUDIO_INPUTS, NUM_AUDIO_INPUTS),
-		NUM_INPUTS
-	};
-	enum OutputIds {
-		ENUMS(AUDIO_OUTPUTS, NUM_AUDIO_OUTPUTS),
-		NUM_OUTPUTS
-	};
-	enum LightIds {
-		ENUMS(INPUT_LIGHTS, NUM_INPUT_LIGHTS * 2),
-		ENUMS(OUTPUT_LIGHTS, NUM_OUTPUT_LIGHTS * 2),
-		ENUMS(VU_LIGHTS, (NUM_AUDIO_INPUTS == 2) ? (2 * 6) : 0),
-		NUM_LIGHTS
-	};
-
-	dsp::RCFilter dcFilters[NUM_AUDIO_INPUTS];
-	bool dcFilterEnabled = false;
+struct AudioInterfacePort : audio::Port {
+	Module* module;
 
 	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_INPUTS>, 32768> engineInputBuffer;
 	dsp::DoubleRingBuffer<dsp::Frame<NUM_AUDIO_OUTPUTS>, 32768> engineOutputBuffer;
@@ -45,221 +22,27 @@ struct AudioInterface : Module, audio::Port {
 	dsp::SampleRateConverter<NUM_AUDIO_INPUTS> inputSrc;
 	dsp::SampleRateConverter<NUM_AUDIO_OUTPUTS> outputSrc;
 
-	dsp::ClockDivider lightDivider;
-	// For each pair of inputs/outputs
-	float inputClipTimers[(NUM_AUDIO_INPUTS > 0) ? NUM_INPUT_LIGHTS : 0] = {};
-	float outputClipTimers[(NUM_AUDIO_INPUTS > 0) ? NUM_OUTPUT_LIGHTS : 0] = {};
-	dsp::VuMeter2 vuMeter[(NUM_AUDIO_INPUTS == 2) ? 2 : 0];
-
 	// Port variable caches
 	int deviceNumInputs = 0;
 	int deviceNumOutputs = 0;
 	float deviceSampleRate = 0.f;
 	int requestedEngineFrames = 0;
 
-	AudioInterface() {
-		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		if (NUM_AUDIO_INPUTS == 2)
-			configParam(GAIN_PARAM, 0.f, 2.f, 1.f, "Level", " dB", -10, 40);
-		for (int i = 0; i < NUM_AUDIO_INPUTS; i++)
-			configInput(AUDIO_INPUTS + i, string::f("To \"device output %d\"", i + 1));
-		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++)
-			configOutput(AUDIO_OUTPUTS + i, string::f("From \"device input %d\"", i + 1));
-		for (int i = 0; i < NUM_INPUT_LIGHTS; i++)
-			configLight(INPUT_LIGHTS + 2 * i, string::f("Device output %d/%d status", 2 * i + 1, 2 * i + 2));
-		for (int i = 0; i < NUM_OUTPUT_LIGHTS; i++)
-			configLight(OUTPUT_LIGHTS + 2 * i, string::f("Device input %d/%d status", 2 * i + 1, 2 * i + 2));
-
-		lightDivider.setDivision(512);
+	AudioInterfacePort(Module* module) {
+		this->module = module;
 		maxOutputs = NUM_AUDIO_INPUTS;
 		maxInputs = NUM_AUDIO_OUTPUTS;
 		inputSrc.setQuality(6);
 		outputSrc.setQuality(6);
-
-		float sampleTime = APP->engine->getSampleTime();
-		for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-			dcFilters[i].setCutoffFreq(10.f * sampleTime);
-		}
-
-		reset();
 	}
 
-	~AudioInterface() {
-		// Close stream here before destructing AudioInterfacePort, so processBuffer() etc are not called on another thread while destructing.
-		setDriverId(-1);
-	}
-
-	void onReset() override {
-		setDriverId(-1);
-
-		if (NUM_AUDIO_INPUTS == 2)
-			dcFilterEnabled = true;
-		else
-			dcFilterEnabled = false;
-	}
-
-	void onSampleRateChange(const SampleRateChangeEvent& e) override {
-		engineInputBuffer.clear();
-		engineOutputBuffer.clear();
-
-		for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-			dcFilters[i].setCutoffFreq(10.f * e.sampleTime);
-		}
-	}
-
-	void process(const ProcessArgs& args) override {
-		const float clipTime = 0.25f;
-
-		// Push inputs to buffer
-		if (deviceNumOutputs > 0) {
-			dsp::Frame<NUM_AUDIO_INPUTS> inputFrame = {};
-			for (int i = 0; i < deviceNumOutputs; i++) {
-				// Get input
-				float v = 0.f;
-				if (inputs[AUDIO_INPUTS + i].isConnected())
-					v = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
-				// Normalize right input to left on Audio-2
-				else if (i == 1 && NUM_AUDIO_INPUTS == 2)
-					v = inputFrame.samples[0];
-
-				// Apply DC filter
-				if (dcFilterEnabled) {
-					dcFilters[i].process(v);
-					v = dcFilters[i].highpass();
-				}
-
-				// Detect clipping
-				if (NUM_AUDIO_INPUTS > 2) {
-					if (std::fabs(v) >= 1.f)
-						inputClipTimers[i / 2] = clipTime;
-				}
-				inputFrame.samples[i] = v;
-			}
-
-			// Audio-2: Apply gain from knob
-			if (NUM_AUDIO_INPUTS == 2) {
-				float gain = std::pow(params[GAIN_PARAM].getValue(), 2.f);
-				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-					inputFrame.samples[i] *= gain;
-				}
-			}
-
-			if (!engineInputBuffer.full()) {
-				engineInputBuffer.push(inputFrame);
-			}
-
-			// Audio-2: VU meter process
-			if (NUM_AUDIO_INPUTS == 2) {
-				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-					vuMeter[i].process(args.sampleTime, inputFrame.samples[i]);
-				}
-			}
-		}
-		else {
-			// Audio-2: Clear VU meter
-			if (NUM_AUDIO_INPUTS == 2) {
-				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-					vuMeter[i].reset();
-				}
-			}
-		}
-
-		// Pull outputs from buffer
-		if (!engineOutputBuffer.empty()) {
-			dsp::Frame<NUM_AUDIO_OUTPUTS> outputFrame = engineOutputBuffer.shift();
-			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
-				float v = outputFrame.samples[i];
-				outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * v);
-
-				// Detect clipping
-				if (NUM_AUDIO_OUTPUTS > 2) {
-					if (std::fabs(v) >= 1.f)
-						outputClipTimers[i / 2] = clipTime;
-				}
-			}
-		}
-		else {
-			// Zero outputs
-			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
-				outputs[AUDIO_OUTPUTS + i].setVoltage(0.f);
-			}
-		}
-
-		// Lights
-		if (lightDivider.process()) {
-			float lightTime = args.sampleTime * lightDivider.getDivision();
-			// Audio-2: VU meter
-			if (NUM_AUDIO_INPUTS == 2) {
-				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-					lights[VU_LIGHTS + i * 6 + 0].setBrightness(vuMeter[i].getBrightness(0, 0));
-					lights[VU_LIGHTS + i * 6 + 1].setBrightness(vuMeter[i].getBrightness(-3, 0));
-					lights[VU_LIGHTS + i * 6 + 2].setBrightness(vuMeter[i].getBrightness(-6, -3));
-					lights[VU_LIGHTS + i * 6 + 3].setBrightness(vuMeter[i].getBrightness(-12, -6));
-					lights[VU_LIGHTS + i * 6 + 4].setBrightness(vuMeter[i].getBrightness(-24, -12));
-					lights[VU_LIGHTS + i * 6 + 5].setBrightness(vuMeter[i].getBrightness(-36, -24));
-				}
-			}
-			// Audio-8 and Audio-16: pair state lights
-			else {
-				// Turn on light if at least one port is enabled in the nearby pair.
-				for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
-					bool active = deviceNumOutputs >= 2 * i + 1;
-					bool clip = inputClipTimers[i] > 0.f;
-					if (clip)
-						inputClipTimers[i] -= lightTime;
-					lights[INPUT_LIGHTS + i * 2 + 0].setBrightness(active && !clip);
-					lights[INPUT_LIGHTS + i * 2 + 1].setBrightness(active && clip);
-				}
-				for (int i = 0; i < NUM_AUDIO_OUTPUTS / 2; i++) {
-					bool active = deviceNumInputs >= 2 * i + 1;
-					bool clip = outputClipTimers[i] > 0.f;
-					if (clip)
-						outputClipTimers[i] -= lightTime;
-					lights[OUTPUT_LIGHTS + i * 2 + 0].setBrightness(active & !clip);
-					lights[OUTPUT_LIGHTS + i * 2 + 1].setBrightness(active & clip);
-				}
-			}
-		}
-	}
-
-	json_t* dataToJson() override {
-		json_t* rootJ = json_object();
-		json_object_set_new(rootJ, "audio", audio::Port::toJson());
-
-		if (isPrimary())
-			json_object_set_new(rootJ, "primary", json_boolean(true));
-
-		json_object_set_new(rootJ, "dcFilter", json_boolean(dcFilterEnabled));
-
-		return rootJ;
-	}
-
-	void dataFromJson(json_t* rootJ) override {
-		json_t* audioJ = json_object_get(rootJ, "audio");
-		if (audioJ)
-			audio::Port::fromJson(audioJ);
-
-		// For not, don't deserialize primary module state.
-		// json_t* primaryJ = json_object_get(rootJ, "primary");
-		// if (primaryJ)
-		// 	setPrimary();
-
-		json_t* dcFilterJ = json_object_get(rootJ, "dcFilter");
-		if (dcFilterJ)
-			dcFilterEnabled = json_boolean_value(dcFilterJ);
-	}
-
-	/** Must be called when the Engine mutex is unlocked.
-	*/
 	void setPrimary() {
-		APP->engine->setPrimaryModule(this);
+		APP->engine->setPrimaryModule(module);
 	}
 
 	bool isPrimary() {
-		return APP->engine->getPrimaryModule() == this;
+		return APP->engine->getPrimaryModule() == module;
 	}
-
-	// audio::Port
 
 	void processInput(const float* input, int inputStride, int frames) override {
 		// DEBUG("%p: new device block ____________________________", this);
@@ -389,6 +172,241 @@ struct AudioInterface : Module, audio::Port {
 
 
 template <int NUM_AUDIO_INPUTS, int NUM_AUDIO_OUTPUTS>
+struct AudioInterface : Module {
+	static constexpr int NUM_INPUT_LIGHTS = (NUM_AUDIO_INPUTS > 2) ? (NUM_AUDIO_INPUTS / 2) : 0;
+	static constexpr int NUM_OUTPUT_LIGHTS = (NUM_AUDIO_OUTPUTS > 2) ? (NUM_AUDIO_OUTPUTS / 2) : 0;
+
+	enum ParamIds {
+		ENUMS(GAIN_PARAM, NUM_AUDIO_INPUTS == 2),
+		NUM_PARAMS
+	};
+	enum InputIds {
+		ENUMS(AUDIO_INPUTS, NUM_AUDIO_INPUTS),
+		NUM_INPUTS
+	};
+	enum OutputIds {
+		ENUMS(AUDIO_OUTPUTS, NUM_AUDIO_OUTPUTS),
+		NUM_OUTPUTS
+	};
+	enum LightIds {
+		ENUMS(INPUT_LIGHTS, NUM_INPUT_LIGHTS * 2),
+		ENUMS(OUTPUT_LIGHTS, NUM_OUTPUT_LIGHTS * 2),
+		ENUMS(VU_LIGHTS, (NUM_AUDIO_INPUTS == 2) ? (2 * 6) : 0),
+		NUM_LIGHTS
+	};
+
+	AudioInterfacePort<NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS> port;
+
+	dsp::RCFilter dcFilters[NUM_AUDIO_INPUTS];
+	bool dcFilterEnabled = false;
+
+	dsp::ClockDivider lightDivider;
+	// For each pair of inputs/outputs
+	float inputClipTimers[(NUM_AUDIO_INPUTS > 0) ? NUM_INPUT_LIGHTS : 0] = {};
+	float outputClipTimers[(NUM_AUDIO_INPUTS > 0) ? NUM_OUTPUT_LIGHTS : 0] = {};
+	dsp::VuMeter2 vuMeter[(NUM_AUDIO_INPUTS == 2) ? 2 : 0];
+
+	AudioInterface() : port(this) {
+		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
+		if (NUM_AUDIO_INPUTS == 2)
+			configParam(GAIN_PARAM, 0.f, 2.f, 1.f, "Level", " dB", -10, 40);
+		for (int i = 0; i < NUM_AUDIO_INPUTS; i++)
+			configInput(AUDIO_INPUTS + i, string::f("To \"device output %d\"", i + 1));
+		for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++)
+			configOutput(AUDIO_OUTPUTS + i, string::f("From \"device input %d\"", i + 1));
+		for (int i = 0; i < NUM_INPUT_LIGHTS; i++)
+			configLight(INPUT_LIGHTS + 2 * i, string::f("Device output %d/%d status", 2 * i + 1, 2 * i + 2));
+		for (int i = 0; i < NUM_OUTPUT_LIGHTS; i++)
+			configLight(OUTPUT_LIGHTS + 2 * i, string::f("Device input %d/%d status", 2 * i + 1, 2 * i + 2));
+
+		lightDivider.setDivision(512);
+
+		float sampleTime = APP->engine->getSampleTime();
+		for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+			dcFilters[i].setCutoffFreq(10.f * sampleTime);
+		}
+
+		onReset();
+	}
+
+	~AudioInterface() {
+		// Close stream here before destructing AudioInterfacePort, so processBuffer() etc are not called on another thread while destructing.
+		port.setDriverId(-1);
+	}
+
+	void onReset() override {
+		port.setDriverId(-1);
+
+		if (NUM_AUDIO_INPUTS == 2)
+			dcFilterEnabled = true;
+		else
+			dcFilterEnabled = false;
+	}
+
+	void onSampleRateChange(const SampleRateChangeEvent& e) override {
+		port.engineInputBuffer.clear();
+		port.engineOutputBuffer.clear();
+
+		for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+			dcFilters[i].setCutoffFreq(10.f * e.sampleTime);
+		}
+	}
+
+	void process(const ProcessArgs& args) override {
+		const float clipTime = 0.25f;
+
+		// Push inputs to buffer
+		if (port.deviceNumOutputs > 0) {
+			dsp::Frame<NUM_AUDIO_INPUTS> inputFrame = {};
+			for (int i = 0; i < port.deviceNumOutputs; i++) {
+				// Get input
+				float v = 0.f;
+				if (inputs[AUDIO_INPUTS + i].isConnected())
+					v = inputs[AUDIO_INPUTS + i].getVoltageSum() / 10.f;
+				// Normalize right input to left on Audio-2
+				else if (i == 1 && NUM_AUDIO_INPUTS == 2)
+					v = inputFrame.samples[0];
+
+				// Apply DC filter
+				if (dcFilterEnabled) {
+					dcFilters[i].process(v);
+					v = dcFilters[i].highpass();
+				}
+
+				// Detect clipping
+				if (NUM_AUDIO_INPUTS > 2) {
+					if (std::fabs(v) >= 1.f)
+						inputClipTimers[i / 2] = clipTime;
+				}
+				inputFrame.samples[i] = v;
+			}
+
+			// Audio-2: Apply gain from knob
+			if (NUM_AUDIO_INPUTS == 2) {
+				float gain = std::pow(params[GAIN_PARAM].getValue(), 2.f);
+				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+					inputFrame.samples[i] *= gain;
+				}
+			}
+
+			if (!port.engineInputBuffer.full()) {
+				port.engineInputBuffer.push(inputFrame);
+			}
+
+			// Audio-2: VU meter process
+			if (NUM_AUDIO_INPUTS == 2) {
+				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+					vuMeter[i].process(args.sampleTime, inputFrame.samples[i]);
+				}
+			}
+		}
+		else {
+			// Audio-2: Clear VU meter
+			if (NUM_AUDIO_INPUTS == 2) {
+				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+					vuMeter[i].reset();
+				}
+			}
+		}
+
+		// Pull outputs from buffer
+		if (!port.engineOutputBuffer.empty()) {
+			dsp::Frame<NUM_AUDIO_OUTPUTS> outputFrame = port.engineOutputBuffer.shift();
+			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
+				float v = outputFrame.samples[i];
+				outputs[AUDIO_OUTPUTS + i].setVoltage(10.f * v);
+
+				// Detect clipping
+				if (NUM_AUDIO_OUTPUTS > 2) {
+					if (std::fabs(v) >= 1.f)
+						outputClipTimers[i / 2] = clipTime;
+				}
+			}
+		}
+		else {
+			// Zero outputs
+			for (int i = 0; i < NUM_AUDIO_OUTPUTS; i++) {
+				outputs[AUDIO_OUTPUTS + i].setVoltage(0.f);
+			}
+		}
+
+		// Lights
+		if (lightDivider.process()) {
+			float lightTime = args.sampleTime * lightDivider.getDivision();
+			// Audio-2: VU meter
+			if (NUM_AUDIO_INPUTS == 2) {
+				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
+					lights[VU_LIGHTS + i * 6 + 0].setBrightness(vuMeter[i].getBrightness(0, 0));
+					lights[VU_LIGHTS + i * 6 + 1].setBrightness(vuMeter[i].getBrightness(-3, 0));
+					lights[VU_LIGHTS + i * 6 + 2].setBrightness(vuMeter[i].getBrightness(-6, -3));
+					lights[VU_LIGHTS + i * 6 + 3].setBrightness(vuMeter[i].getBrightness(-12, -6));
+					lights[VU_LIGHTS + i * 6 + 4].setBrightness(vuMeter[i].getBrightness(-24, -12));
+					lights[VU_LIGHTS + i * 6 + 5].setBrightness(vuMeter[i].getBrightness(-36, -24));
+				}
+			}
+			// Audio-8 and Audio-16: pair state lights
+			else {
+				// Turn on light if at least one port is enabled in the nearby pair.
+				for (int i = 0; i < NUM_AUDIO_INPUTS / 2; i++) {
+					bool active = port.deviceNumOutputs >= 2 * i + 1;
+					bool clip = inputClipTimers[i] > 0.f;
+					if (clip)
+						inputClipTimers[i] -= lightTime;
+					lights[INPUT_LIGHTS + i * 2 + 0].setBrightness(active && !clip);
+					lights[INPUT_LIGHTS + i * 2 + 1].setBrightness(active && clip);
+				}
+				for (int i = 0; i < NUM_AUDIO_OUTPUTS / 2; i++) {
+					bool active = port.deviceNumInputs >= 2 * i + 1;
+					bool clip = outputClipTimers[i] > 0.f;
+					if (clip)
+						outputClipTimers[i] -= lightTime;
+					lights[OUTPUT_LIGHTS + i * 2 + 0].setBrightness(active & !clip);
+					lights[OUTPUT_LIGHTS + i * 2 + 1].setBrightness(active & clip);
+				}
+			}
+		}
+	}
+
+	json_t* dataToJson() override {
+		json_t* rootJ = json_object();
+		json_object_set_new(rootJ, "audio", port.toJson());
+
+		if (isPrimary())
+			json_object_set_new(rootJ, "primary", json_boolean(true));
+
+		json_object_set_new(rootJ, "dcFilter", json_boolean(dcFilterEnabled));
+
+		return rootJ;
+	}
+
+	void dataFromJson(json_t* rootJ) override {
+		json_t* audioJ = json_object_get(rootJ, "audio");
+		if (audioJ)
+			port.fromJson(audioJ);
+
+		// For not, don't deserialize primary module state.
+		// json_t* primaryJ = json_object_get(rootJ, "primary");
+		// if (primaryJ)
+		// 	setPrimary();
+
+		json_t* dcFilterJ = json_object_get(rootJ, "dcFilter");
+		if (dcFilterJ)
+			dcFilterEnabled = json_boolean_value(dcFilterJ);
+	}
+
+	/** Must be called when the Engine mutex is unlocked.
+	*/
+	void setPrimary() {
+		APP->engine->setPrimaryModule(this);
+	}
+
+	bool isPrimary() {
+		return APP->engine->getPrimaryModule() == this;
+	}
+};
+
+
+template <int NUM_AUDIO_INPUTS, int NUM_AUDIO_OUTPUTS>
 struct AudioInterfaceWidget : ModuleWidget {
 	typedef AudioInterface<NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS> TAudioInterface;
 
@@ -432,7 +450,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 			AudioWidget* audioWidget = createWidget<AudioWidget>(mm2px(Vec(3.2122073, 14.837339)));
 			audioWidget->box.size = mm2px(Vec(44, 28));
-			audioWidget->setAudioPort(module);
+			audioWidget->setAudioPort(module ? &module->port : NULL);
 			addChild(audioWidget);
 		}
 		else if (NUM_AUDIO_INPUTS == 16 && NUM_AUDIO_OUTPUTS == 16) {
@@ -496,7 +514,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 			AudioWidget* audioWidget = createWidget<AudioWidget>(mm2px(Vec(2.57, 14.839)));
 			audioWidget->box.size = mm2px(Vec(91.382, 28.0));
-			audioWidget->setAudioPort(module);
+			audioWidget->setAudioPort(module ? &module->port : NULL);
 			addChild(audioWidget);
 		}
 		else if (NUM_AUDIO_INPUTS == 2 && NUM_AUDIO_OUTPUTS == 2) {
@@ -530,7 +548,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 			AudioDeviceWidget* audioWidget = createWidget<AudioDeviceWidget>(mm2px(Vec(2.135, 14.259)));
 			audioWidget->box.size = mm2px(Vec(21.128, 6.725));
-			audioWidget->setAudioPort(module);
+			audioWidget->setAudioPort(module ? &module->port : NULL);
 			// Adjust deviceChoice position
 			audioWidget->deviceChoice->textOffset = Vec(6, 14);
 			addChild(audioWidget);
