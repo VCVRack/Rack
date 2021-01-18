@@ -2,6 +2,16 @@
 #include <string.hpp>
 
 
+#if defined ARCH_WIN
+#include <windows.h>
+
+FILE* fopen_u8(const char* filename, const char* mode) {
+	return _wfopen(rack::string::U8toU16(filename).c_str(), rack::string::U8toU16(mode).c_str());
+}
+
+#endif
+
+
 namespace rack {
 
 
@@ -30,14 +40,3 @@ Exception::Exception(const char* format, ...) {
 
 
 } // namespace rack
-
-
-#if defined ARCH_WIN
-#include <windows.h>
-
-FILE* fopen_u8(const char* filename, const char* mode) {
-	return _wfopen(rack::string::U8toU16(filename).c_str(), rack::string::U8toU16(mode).c_str());
-}
-
-
-#endif

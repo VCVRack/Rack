@@ -18,9 +18,6 @@
 #include <logger.hpp>
 
 
-namespace rack {
-
-
 /** Attribute for deprecated functions and symbols.
 E.g.
 
@@ -120,6 +117,47 @@ to get its size in bytes.
 #endif
 
 
+/** Helpful user-defined literals for specifying exact integer and float types.
+Usage examples:
+	123_i8
+	-1234_u16
+	0x1000_i32
+	0b10000000_u64
+	12.3_f32
+	1e4_f64
+*/
+inline int8_t operator"" _i8(unsigned long long x) {return x;}
+inline int16_t operator"" _i16(unsigned long long x) {return x;}
+inline int32_t operator"" _i32(unsigned long long x) {return x;}
+inline int64_t operator"" _i64(unsigned long long x) {return x;}
+inline uint8_t operator"" _u8(unsigned long long x) {return x;}
+inline uint16_t operator"" _u16(unsigned long long x) {return x;}
+inline uint32_t operator"" _u32(unsigned long long x) {return x;}
+inline uint64_t operator"" _u64(unsigned long long x) {return x;}
+inline float operator"" _f32(long double x) {return x;}
+inline double operator"" _f64(long double x) {return x;}
+
+
+#if defined ARCH_WIN
+// wchar_t on Windows should be 2 bytes
+static_assert(sizeof(wchar_t) == 2);
+
+// Windows C standard functions are ASCII-8 instead of UTF-8, so redirect these functions to wrappers which convert to UTF-8
+#define fopen fopen_u8
+
+extern "C" {
+FILE* fopen_u8(const char* filename, const char* mode);
+}
+
+namespace std {
+	using ::fopen_u8;
+}
+#endif
+
+
+namespace rack {
+
+
 /** C#-style property constructor
 Example:
 
@@ -213,20 +251,3 @@ extern const std::string API_VERSION;
 
 
 } // namespace rack
-
-
-#if defined ARCH_WIN
-// wchar_t on Windows should be 2 bytes
-static_assert(sizeof(wchar_t) == 2);
-
-// Windows C standard functions are ASCII-8 instead of UTF-8, so redirect these functions to wrappers which convert to UTF-8
-#define fopen fopen_u8
-
-extern "C" {
-FILE* fopen_u8(const char* filename, const char* mode);
-}
-
-namespace std {
-	using ::fopen_u8;
-}
-#endif
