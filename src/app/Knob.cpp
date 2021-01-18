@@ -105,9 +105,23 @@ void Knob::onDragEnd(const event::DragEnd& e) {
 			h->newValue = newValue;
 			APP->history->push(h);
 		}
+		// Reset snap delta
+		internal->snapDelta = 0.f;
 	}
 
 	ParamWidget::onDragEnd(e);
+}
+
+static float getModSpeed() {
+	int mods = APP->window->getMods();
+	if ((mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
+		return 1 / 16.f;
+	else if ((mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
+		return 4.f;
+	else if ((mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
+		return 1 / 256.f;
+	else
+		return 1.f;
 }
 
 void Knob::onDragMove(const event::DragMove& e) {
@@ -120,17 +134,6 @@ void Knob::onDragMove(const event::DragMove& e) {
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
 		float value = smooth ? pq->getSmoothValue() : pq->getValue();
-
-		// Scale by mod keys
-		float modScale = 1.f;
-		// Drag slower if Ctrl is held
-		int mods = APP->window->getMods();
-		if ((mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
-			modScale /= 16.f;
-		if ((mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
-			modScale *= 4.f;
-		if ((mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
-			modScale /= 256.f;
 
 		// Ratio between parameter value scale / (angle range / 2*pi)
 		float rangeRatio;
@@ -145,7 +148,7 @@ void Knob::onDragMove(const event::DragMove& e) {
 		if (linearMode) {
 			float delta = (horizontal ? e.mouseDelta.x : -e.mouseDelta.y);
 			delta *= settings::knobLinearSensitivity;
-			delta *= modScale;
+			delta *= getModSpeed();
 			delta *= rangeRatio;
 
 			// Scale delta if in scaled linear knob mode
@@ -188,7 +191,7 @@ void Knob::onDragMove(const event::DragMove& e) {
 				float deltaAngle = math::eucMod(angle - internal->dragAngle + float(M_PI), float(2 * M_PI)) - float(M_PI);
 				internal->dragAngle = angle;
 				float delta = deltaAngle / float(2 * M_PI) * rangeRatio;
-				delta *= modScale;
+				delta *= getModSpeed();
 
 				// Handle value snapping
 				if (pq->snapEnabled) {
@@ -218,6 +221,47 @@ void Knob::onDragLeave(const event::DragLeave& e) {
 	}
 
 	ParamWidget::onDragLeave(e);
+}
+
+
+void Knob::onHoverScroll(const event::HoverScroll& e) {
+	ParamWidget::onHoverScroll(e);
+
+	if (settings::knobScroll) {
+		engine::ParamQuantity* pq = getParamQuantity();
+		if (pq) {
+			float value = smooth ? pq->getSmoothValue() : pq->getValue();
+
+			float rangeRatio;
+			if (pq->isBounded()) {
+				rangeRatio = pq->getRange();
+			}
+			else {
+				rangeRatio = 1.f;
+			}
+
+			float delta = e.scrollDelta.y;
+			delta *= settings::knobScrollSensitivity;
+			delta *= getModSpeed();
+			delta *= rangeRatio;
+
+			// Handle value snapping
+			if (pq->snapEnabled) {
+				// Replace delta with an accumulated delta since the last integer knob.
+				internal->snapDelta += delta;
+				delta = std::trunc(internal->snapDelta);
+				internal->snapDelta -= delta;
+			}
+
+			value += delta;
+			if (smooth)
+				pq->setSmoothValue(value);
+			else
+				pq->setValue(value);
+
+			e.consume(this);
+		}
+	}
 }
 
 

@@ -384,6 +384,12 @@ struct KnobModeItem : ui::MenuItem {
 	}
 };
 
+struct KnobScrollItem : ui::MenuItem {
+	void onAction(const event::Action& e) override {
+		settings::knobScroll ^= true;
+	}
+};
+
 struct LockModulesItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
 		settings::lockModules ^= true;
@@ -432,7 +438,7 @@ struct ViewButton : MenuButton {
 		menu->addChild(tooltipsItem);
 
 		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
-		allowCursorLockItem->text = "Lock cursor when dragging parameters";
+		allowCursorLockItem->text = "Hide cursor when dragging parameters";
 		allowCursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
 		menu->addChild(allowCursorLockItem);
 
@@ -440,6 +446,11 @@ struct ViewButton : MenuButton {
 		knobModeItem->text = "Knob mode";
 		knobModeItem->rightText = RIGHT_ARROW;
 		menu->addChild(knobModeItem);
+
+		KnobScrollItem* knobScrollItem = new KnobScrollItem;
+		knobScrollItem->text = "Scroll wheel knob control";
+		knobScrollItem->rightText = CHECKMARK(settings::knobScroll);
+		menu->addChild(knobScrollItem);
 
 		LockModulesItem* lockModulesItem = new LockModulesItem;
 		lockModulesItem->text = "Lock module positions";

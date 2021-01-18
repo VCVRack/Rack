@@ -25,7 +25,9 @@ float cableOpacity = 0.5;
 float cableTension = 0.5;
 bool allowCursorLock = true;
 KnobMode knobMode = KNOB_MODE_LINEAR;
+bool knobScroll = false;
 float knobLinearSensitivity = 0.001f;
+float knobScrollSensitivity = 0.001f;
 float sampleRate = 0;
 int threadCount = 1;
 bool tooltips = true;
@@ -91,7 +93,11 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "knobMode", json_integer((int) knobMode));
 
+	json_object_set_new(rootJ, "knobScroll", json_boolean(knobScroll));
+
 	json_object_set_new(rootJ, "knobLinearSensitivity", json_real(knobLinearSensitivity));
+
+	json_object_set_new(rootJ, "knobScrollSensitivity", json_real(knobScrollSensitivity));
 
 	json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
 
@@ -207,9 +213,17 @@ void fromJson(json_t* rootJ) {
 	if (knobModeJ)
 		knobMode = (KnobMode) json_integer_value(knobModeJ);
 
+	json_t* knobScrollJ = json_object_get(rootJ, "knobScroll");
+	if (knobScrollJ)
+		knobScroll = json_boolean_value(knobScrollJ);
+
 	json_t* knobLinearSensitivityJ = json_object_get(rootJ, "knobLinearSensitivity");
 	if (knobLinearSensitivityJ)
 		knobLinearSensitivity = json_number_value(knobLinearSensitivityJ);
+
+	json_t* knobScrollSensitivityJ = json_object_get(rootJ, "knobScrollSensitivity");
+	if (knobScrollSensitivityJ)
+		knobScrollSensitivity = json_number_value(knobScrollSensitivityJ);
 
 	json_t* sampleRateJ = json_object_get(rootJ, "sampleRate");
 	if (sampleRateJ)
