@@ -223,7 +223,17 @@ struct ModuleSaveTemplateItem : ui::MenuItem {
 	void onAction(const event::Action& e) override {
 		if (!moduleWidget)
 			return;
-		moduleWidget->saveTemplate();
+		moduleWidget->saveTemplateDialog();
+	}
+};
+
+
+struct ModuleClearTemplateItem : ui::MenuItem {
+	WeakPtr<ModuleWidget> moduleWidget;
+	void onAction(const event::Action& e) override {
+		if (!moduleWidget)
+			return;
+		moduleWidget->clearTemplateDialog();
 	}
 };
 
@@ -287,6 +297,12 @@ struct ModulePresetItem : ui::MenuItem {
 		saveTemplateItem->text = "Save template";
 		saveTemplateItem->moduleWidget = moduleWidget;
 		menu->addChild(saveTemplateItem);
+
+		ModuleClearTemplateItem* clearTemplateItem = new ModuleClearTemplateItem;
+		clearTemplateItem->text = "Clear template";
+		clearTemplateItem->moduleWidget = moduleWidget;
+		clearTemplateItem->disabled = !moduleWidget->hasTemplate();
+		menu->addChild(clearTemplateItem);
 
 		// Create ModulePresetPathItems for each patch in a directory.
 		auto createPresetItems = [&](std::string presetDir) {
@@ -791,8 +807,13 @@ void ModuleWidget::loadDialog() {
 
 	// Delete directories if empty
 	DEFER({
-		system::remove(presetDir);
-		system::remove(system::getDirectory(presetDir));
+		try {
+			system::remove(presetDir);
+			system::remove(system::getDirectory(presetDir));
+		}
+		catch (Exception& e) {
+			// Ignore exceptions if directory cannot be removed.
+		}
 	});
 
 	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);
@@ -822,7 +843,9 @@ void ModuleWidget::save(std::string filename) {
 
 	FILE* file = std::fopen(filename.c_str(), "w");
 	if (!file) {
-		WARN("Could not write to patch file %s", filename.c_str());
+		std::string message = string::f("Could not save preset to file %s", filename.c_str());
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+		return;
 	}
 	DEFER({std::fclose(file);});
 
@@ -832,9 +855,36 @@ void ModuleWidget::save(std::string filename) {
 void ModuleWidget::saveTemplate() {
 	std::string presetDir = model->getUserPresetDir();
 	system::createDirectories(presetDir);
-
 	std::string templatePath = system::join(presetDir, "template.vcvm");
 	save(templatePath);
+}
+
+void ModuleWidget::saveTemplateDialog() {
+	if (hasTemplate()) {
+		std::string message = string::f("Overwrite template preset for %s?", model->getFullName().c_str());
+		if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
+			return;
+	}
+	saveTemplate();
+}
+
+bool ModuleWidget::hasTemplate() {
+	std::string presetDir = model->getUserPresetDir();
+	std::string templatePath = system::join(presetDir, "template.vcvm");
+	return system::exists(templatePath);;
+}
+
+void ModuleWidget::clearTemplate() {
+	std::string presetDir = model->getUserPresetDir();
+	std::string templatePath = system::join(presetDir, "template.vcvm");
+	system::remove(templatePath);
+}
+
+void ModuleWidget::clearTemplateDialog() {
+	std::string message = string::f("Delete template preset for %s?", model->getFullName().c_str());
+	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
+		return;
+	clearTemplate();
 }
 
 void ModuleWidget::saveDialog() {
@@ -843,9 +893,13 @@ void ModuleWidget::saveDialog() {
 
 	// Delete directories if empty
 	DEFER({
-		// These fail silently if the directories are not empty
-		system::remove(presetDir);
-		system::remove(system::getDirectory(presetDir));
+		try {
+			system::remove(presetDir);
+			system::remove(system::getDirectory(presetDir));
+		}
+		catch (Exception& e) {
+			// Ignore exceptions if directory cannot be removed.
+		}
 	});
 
 	osdialog_filters* filters = osdialog_filters_parse(PRESET_FILTERS);

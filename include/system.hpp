@@ -27,7 +27,7 @@ std::string join(const std::string& path1, const std::string& path2, Paths... pa
 `depth` is the number of directories to recurse. 0 depth does not recurse. -1 depth recurses infinitely.
 */
 std::list<std::string> getEntries(const std::string& dirPath, int depth = 0);
-bool doesExist(const std::string& path);
+bool exists(const std::string& path);
 /** Returns whether the given path is a file. */
 bool isFile(const std::string& path);
 /** Returns whether the given path is a directory. */

@@ -69,6 +69,10 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void loadDialog();
 	void save(std::string filename);
 	void saveTemplate();
+	void saveTemplateDialog();
+	bool hasTemplate();
+	void clearTemplate();
+	void clearTemplateDialog();
 	void saveDialog();
 
 	/** Disconnects cables from all ports

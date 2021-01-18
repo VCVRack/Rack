@@ -239,9 +239,10 @@ struct AudioInterface : Module, audio::Port {
 		if (audioJ)
 			audio::Port::fromJson(audioJ);
 
-		json_t* primaryJ = json_object_get(rootJ, "primary");
-		if (primaryJ)
-			setPrimary();
+		// For not, don't deserialize primary module state.
+		// json_t* primaryJ = json_object_get(rootJ, "primary");
+		// if (primaryJ)
+		// 	setPrimary();
 
 		json_t* dcFilterJ = json_object_get(rootJ, "dcFilter");
 		if (dcFilterJ)

@@ -80,7 +80,7 @@ std::list<std::string> getEntries(const std::string& dirPath, int depth) {
 }
 
 
-bool doesExist(const std::string& path) {
+bool exists(const std::string& path) {
 	try {
 		return fs::exists(fs::u8path(path));
 	}
