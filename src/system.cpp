@@ -75,7 +75,7 @@ std::list<std::string> getEntries(const std::string& dirPath, int depth) {
 		return entries;
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -85,7 +85,7 @@ bool doesExist(const std::string& path) {
 		return fs::exists(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -95,7 +95,7 @@ bool isFile(const std::string& path) {
 		return fs::is_regular_file(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -105,7 +105,7 @@ bool isDirectory(const std::string& path) {
 		return fs::is_directory(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -115,7 +115,7 @@ uint64_t getFileSize(const std::string& path) {
 		return fs::file_size(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -125,7 +125,7 @@ void rename(const std::string& srcPath, const std::string& destPath) {
 		fs::rename(fs::u8path(srcPath), fs::u8path(destPath));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -135,7 +135,7 @@ void copy(const std::string& srcPath, const std::string& destPath) {
 		fs::copy(fs::u8path(srcPath), fs::u8path(destPath), fs::copy_options::recursive);
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -145,7 +145,7 @@ bool createDirectory(const std::string& path) {
 		return fs::create_directory(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -155,7 +155,7 @@ bool createDirectories(const std::string& path) {
 		return fs::create_directories(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -165,7 +165,7 @@ bool remove(const std::string& path) {
 		return fs::remove(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -175,7 +175,7 @@ int removeRecursively(const std::string& path) {
 		return fs::remove_all(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -185,7 +185,7 @@ std::string getWorkingDirectory() {
 		return fs::current_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -195,7 +195,7 @@ void setWorkingDirectory(const std::string& path) {
 		fs::current_path(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -205,7 +205,7 @@ std::string getTempDir() {
 		return fs::temp_directory_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -215,7 +215,7 @@ std::string getAbsolute(const std::string& path) {
 		return fs::absolute(fs::u8path(path)).generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -225,7 +225,7 @@ std::string getCanonical(const std::string& path) {
 		return fs::canonical(fs::u8path(path)).generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -235,7 +235,7 @@ std::string getDirectory(const std::string& path) {
 		return fs::u8path(path).parent_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -245,7 +245,7 @@ std::string getFilename(const std::string& path) {
 		return fs::u8path(path).filename().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -255,7 +255,7 @@ std::string getStem(const std::string& path) {
 		return fs::u8path(path).stem().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -265,7 +265,7 @@ std::string getExtension(const std::string& path) {
 		return fs::u8path(path).extension().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 }
 
@@ -279,7 +279,7 @@ static std::string getRelativePath(std::string path, std::string base) {
 		base = fs::absolute(fs::u8path(base)).generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception(e.what());
+		throw Exception("%s", e.what());
 	}
 	if (path.size() < base.size())
 		throw Exception("getRelativePath() error: path is shorter than base");

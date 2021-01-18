@@ -120,7 +120,7 @@ void Plugin::fromJson(json_t* rootJ) {
 			// Get model slug
 			json_t* modelSlugJ = json_object_get(moduleJ, "slug");
 			if (!modelSlugJ) {
-				throw Exception("No slug found for module entry %" PRId64, moduleId);
+				throw Exception("No slug found for module entry #%d", (int) moduleId);
 			}
 			std::string modelSlug = json_string_value(modelSlugJ);
 
