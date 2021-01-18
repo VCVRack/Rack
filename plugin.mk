@@ -20,9 +20,6 @@ FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
 LDFLAGS += -shared
 LDFLAGS += -L$(RACK_DIR) -lRack
 
-# Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
-LDFLAGS += -static-libstdc++
-
 include $(RACK_DIR)/arch.mk
 
 ifdef ARCH_LIN
@@ -31,6 +28,8 @@ ifdef ARCH_LIN
 	# I don't really understand the side effects (see GCC manual), but so far tests are positive.
 	FLAGS += -fno-gnu-unique
 	LDFLAGS += -Wl,-rpath=.
+	# Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
+	LDFLAGS += -static-libstdc++
 	RACK_USER_DIR ?= $(HOME)/.Rack
 endif
 
@@ -42,6 +41,7 @@ endif
 
 ifdef ARCH_WIN
 	TARGET := plugin.dll
+	LDFLAGS += -static-libstdc++
 	RACK_USER_DIR ?= "$(USERPROFILE)"/Documents/Rack
 endif
 
