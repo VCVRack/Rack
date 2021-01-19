@@ -77,7 +77,8 @@ endif
 	cd dist && ZSTD_CLEVEL=19 tar -cf "$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin --zstd "$(SLUG)"
 
 install: dist
-	cp dist/"$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin $(RACK_USER_DIR)/plugins-v2/
+	mkdir -p "$(RACK_USER_DIR)"/plugins-v2/
+	cp dist/"$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin "$(RACK_USER_DIR)"/plugins-v2/
 
 .PHONY: clean dist
 .DEFAULT_GOAL := all
