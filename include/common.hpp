@@ -119,12 +119,12 @@ to get its size in bytes.
 
 /** Helpful user-defined literals for specifying exact integer and float types.
 Usage examples:
-	123_i8
-	-1234_u16
-	0x1000_i32
-	0b10000000_u64
-	12.3_f32
-	1e4_f64
+	42_i8
+	-4242_u16
+	0x4a2b_i32
+	0b11010111000000_u64
+	42_f32
+	4.2e-4_f64
 */
 inline int8_t operator"" _i8(unsigned long long x) {return x;}
 inline int16_t operator"" _i16(unsigned long long x) {return x;}
@@ -135,7 +135,9 @@ inline uint16_t operator"" _u16(unsigned long long x) {return x;}
 inline uint32_t operator"" _u32(unsigned long long x) {return x;}
 inline uint64_t operator"" _u64(unsigned long long x) {return x;}
 inline float operator"" _f32(long double x) {return x;}
+inline float operator"" _f32(unsigned long long x) {return x;}
 inline double operator"" _f64(long double x) {return x;}
+inline double operator"" _f64(unsigned long long x) {return x;}
 
 
 #if defined ARCH_WIN
