@@ -1,7 +1,54 @@
 #include <ui/TextField.hpp>
+#include <ui/MenuItem.hpp>
+#include <helpers.hpp>
+#include <context.hpp>
 
 namespace rack {
 namespace ui {
+
+
+struct TextFieldCopyItem : ui::MenuItem {
+	WeakPtr<TextField> textField;
+	void onAction(const event::Action& e) override {
+		if (!textField)
+			return;
+		textField->copyClipboard();
+		APP->event->setSelected(textField);
+	}
+};
+
+
+struct TextFieldCutItem : ui::MenuItem {
+	WeakPtr<TextField> textField;
+	void onAction(const event::Action& e) override {
+		if (!textField)
+			return;
+		textField->cutClipboard();
+		APP->event->setSelected(textField);
+	}
+};
+
+
+struct TextFieldPasteItem : ui::MenuItem {
+	WeakPtr<TextField> textField;
+	void onAction(const event::Action& e) override {
+		if (!textField)
+			return;
+		textField->pasteClipboard();
+		APP->event->setSelected(textField);
+	}
+};
+
+
+struct TextFieldSelectAllItem : ui::MenuItem {
+	WeakPtr<TextField> textField;
+	void onAction(const event::Action& e) override {
+		if (!textField)
+			return;
+		textField->selectAll();
+		APP->event->setSelected(textField);
+	}
+};
 
 
 TextField::TextField() {
@@ -45,6 +92,11 @@ void TextField::onButton(const event::Button& e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		cursor = selection = getTextPosition(e.pos);
 	}
+
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		createContextMenu();
+		e.consume(this);
+	}
 }
 
 void TextField::onSelectText(const event::SelectText& e) {
@@ -56,20 +108,6 @@ void TextField::onSelectText(const event::SelectText& e) {
 }
 
 void TextField::onSelectKey(const event::SelectKey& e) {
-	auto cursorToPrevWord = [&]() {
-		size_t pos = text.rfind(' ', std::max(cursor - 2, 0));
-		if (pos == std::string::npos)
-			cursor = 0;
-		else
-			cursor = std::min((int) pos + 1, (int) text.size());
-	};
-	auto cursorToNextWord = [&]() {
-		size_t pos = text.find(' ', std::min(cursor + 1, (int) text.size()));
-		if (pos == std::string::npos)
-			pos = text.size();
-		cursor = pos;
-	};
-
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		// Backspace
 		if (e.key == GLFW_KEY_BACKSPACE && (e.mods & RACK_MOD_MASK) == 0) {
@@ -151,28 +189,17 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 		}
 		// Ctrl+V
 		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			const char* newText = glfwGetClipboardString(APP->window->win);
-			if (newText)
-				insertText(newText);
+			pasteClipboard();
 			e.consume(this);
 		}
-		// Ctrl+C
+		// Ctrl+X
 		if (e.keyName == "x" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (cursor != selection) {
-				int begin = std::min(cursor, selection);
-				std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-				glfwSetClipboardString(APP->window->win, selectedText.c_str());
-				insertText("");
-			}
+			cutClipboard();
 			e.consume(this);
 		}
 		// Ctrl+C
 		if (e.keyName == "c" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (cursor != selection) {
-				int begin = std::min(cursor, selection);
-				std::string selectedText = text.substr(begin, std::abs(selection - cursor));
-				glfwSetClipboardString(APP->window->win, selectedText.c_str());
-			}
+			copyClipboard();
 			e.consume(this);
 		}
 		// Ctrl+A
@@ -211,25 +238,12 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 	e.consume(this);
 }
 
-void TextField::insertText(std::string text) {
-	bool changed = false;
-	if (cursor != selection) {
-		// Delete selected text
-		int begin = std::min(cursor, selection);
-		this->text.erase(begin, std::abs(selection - cursor));
-		cursor = selection = begin;
-		changed = true;
-	}
-	if (!text.empty()) {
-		this->text.insert(cursor, text);
-		cursor += text.size();
-		selection = cursor;
-		changed = true;
-	}
-	if (changed) {
-		event::Change eChange;
-		onChange(eChange);
-	}
+int TextField::getTextPosition(math::Vec mousePos) {
+	return bndTextFieldTextPosition(APP->window->vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
+}
+
+std::string TextField::getText() {
+	return text;
 }
 
 void TextField::setText(std::string text) {
@@ -247,8 +261,93 @@ void TextField::selectAll() {
 	selection = 0;
 }
 
-int TextField::getTextPosition(math::Vec mousePos) {
-	return bndTextFieldTextPosition(APP->window->vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str(), mousePos.x, mousePos.y);
+std::string TextField::getSelectedText() {
+	int begin = std::min(cursor, selection);
+	int len = std::abs(selection - cursor);
+	return text.substr(begin, len);
+}
+
+void TextField::insertText(std::string text) {
+	bool changed = false;
+	if (cursor != selection) {
+		// Delete selected text
+		int begin = std::min(cursor, selection);
+		int len = std::abs(selection - cursor);
+		this->text.erase(begin, len);
+		cursor = selection = begin;
+		changed = true;
+	}
+	if (!text.empty()) {
+		this->text.insert(cursor, text);
+		cursor += text.size();
+		selection = cursor;
+		changed = true;
+	}
+	if (changed) {
+		event::Change eChange;
+		onChange(eChange);
+	}
+}
+
+void TextField::copyClipboard() {
+	if (cursor == selection)
+		return;
+	glfwSetClipboardString(APP->window->win, getSelectedText().c_str());
+}
+
+void TextField::cutClipboard() {
+	copyClipboard();
+	insertText("");
+}
+
+void TextField::pasteClipboard() {
+	const char* newText = glfwGetClipboardString(APP->window->win);
+	if (!newText)
+		return;
+	insertText(newText);
+}
+
+void TextField::cursorToPrevWord() {
+	size_t pos = text.rfind(' ', std::max(cursor - 2, 0));
+	if (pos == std::string::npos)
+		cursor = 0;
+	else
+		cursor = std::min((int) pos + 1, (int) text.size());
+}
+
+void TextField::cursorToNextWord() {
+	size_t pos = text.find(' ', std::min(cursor + 1, (int) text.size()));
+	if (pos == std::string::npos)
+		pos = text.size();
+	cursor = pos;
+}
+
+void TextField::createContextMenu() {
+	ui::Menu* menu = createMenu();
+
+	TextFieldCutItem* cutItem = new TextFieldCutItem;
+	cutItem->text = "Cut";
+	cutItem->rightText = RACK_MOD_CTRL_NAME "+X";
+	cutItem->textField = this;
+	menu->addChild(cutItem);
+
+	TextFieldCopyItem* copyItem = new TextFieldCopyItem;
+	copyItem->text = "Copy";
+	copyItem->rightText = RACK_MOD_CTRL_NAME "+C";
+	copyItem->textField = this;
+	menu->addChild(copyItem);
+
+	TextFieldPasteItem* pasteItem = new TextFieldPasteItem;
+	pasteItem->text = "Paste";
+	pasteItem->rightText = RACK_MOD_CTRL_NAME "+V";
+	pasteItem->textField = this;
+	menu->addChild(pasteItem);
+
+	TextFieldSelectAllItem* selectAllItem = new TextFieldSelectAllItem;
+	selectAllItem->text = "Select all";
+	selectAllItem->rightText = RACK_MOD_CTRL_NAME "+A";
+	selectAllItem->textField = this;
+	menu->addChild(selectAllItem);
 }
 
 

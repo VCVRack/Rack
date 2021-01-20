@@ -25,14 +25,21 @@ struct TextField : widget::OpaqueWidget {
 	void onButton(const event::Button& e) override;
 	void onSelectText(const event::SelectText& e) override;
 	void onSelectKey(const event::SelectKey& e) override;
+	virtual int getTextPosition(math::Vec mousePos);
 
-	/** Inserts text at the cursor, replacing the selection if necessary */
-	void insertText(std::string text);
-
+	std::string getText();
 	/** Replaces the entire text */
 	void setText(std::string text);
 	void selectAll();
-	virtual int getTextPosition(math::Vec mousePos);
+	std::string getSelectedText();
+	/** Inserts text at the cursor, replacing the selection if necessary */
+	void insertText(std::string text);
+	void copyClipboard();
+	void cutClipboard();
+	void pasteClipboard();
+	void cursorToPrevWord();
+	void cursorToNextWord();
+	void createContextMenu();
 };
 
 

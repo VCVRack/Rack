@@ -146,14 +146,14 @@ TParamWidget* createLightParamCentered(math::Vec pos, engine::Module* module, in
 }
 
 template <class TMenuLabel = ui::MenuLabel>
-TMenuLabel * createMenuLabel(std::string text) {
+TMenuLabel* createMenuLabel(std::string text) {
 	TMenuLabel* o = new TMenuLabel;
 	o->text = text;
 	return o;
 }
 
 template <class TMenuItem = ui::MenuItem>
-TMenuItem * createMenuItem(std::string text, std::string rightText = "") {
+TMenuItem* createMenuItem(std::string text, std::string rightText = "") {
 	TMenuItem* o = new TMenuItem;
 	o->text = text;
 	o->rightText = rightText;
@@ -161,7 +161,7 @@ TMenuItem * createMenuItem(std::string text, std::string rightText = "") {
 }
 
 template <class TMenu = ui::Menu>
-TMenu * createMenu() {
+TMenu* createMenu() {
 	TMenu* o = new TMenu;
 	o->box.pos = APP->scene->mousePos;
 
