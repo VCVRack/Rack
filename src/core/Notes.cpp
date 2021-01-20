@@ -9,6 +9,11 @@ struct NotesModule : Module {
 	std::string text;
 	bool dirty = false;
 
+	void onReset() override {
+		text = "";
+		dirty = true;
+	}
+
 	/** Legacy for <=v1 patches */
 	void fromJson(json_t* rootJ) override {
 		Module::fromJson(rootJ);
