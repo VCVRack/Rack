@@ -166,6 +166,7 @@ struct FileButton : MenuButton {
 		OpenRecentItem* openRecentItem = new OpenRecentItem;
 		openRecentItem->text = "Open recent";
 		openRecentItem->rightText = RIGHT_ARROW;
+		openRecentItem->disabled = settings::recentPatchPaths.empty();
 		menu->addChild(openRecentItem);
 
 		SaveItem* saveItem = new SaveItem;
@@ -438,7 +439,7 @@ struct ViewButton : MenuButton {
 		menu->addChild(tooltipsItem);
 
 		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
-		allowCursorLockItem->text = "Hide cursor when dragging parameters";
+		allowCursorLockItem->text = "Lock cursor when dragging parameters";
 		allowCursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
 		menu->addChild(allowCursorLockItem);
 
