@@ -129,6 +129,11 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	if (e.isConsumed())
 		return;
 
+	int mods = APP->window->getMods();
+	// Don't scroll when Ctrl is held because this interferes with RackScrollWidget zooming.
+	if ((mods & RACK_MOD_MASK) & RACK_MOD_CTRL)
+		return;
+
 	// Check if scrollable
 	math::Rect offsetBound = getContainerOffsetBound();
 	if (offsetBound.size.x <= 0.f && offsetBound.size.y <= 0.f)
@@ -138,7 +143,7 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 	// Flip coordinates if shift is held
 	// Mac (or GLFW?) already does this for us.
 #if !defined ARCH_MAC
-	if ((APP->window->getMods() & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
+	if ((mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
 		scrollDelta = scrollDelta.flip();
 #endif
 
