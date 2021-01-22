@@ -318,23 +318,24 @@ void RackWidget::pastePresetClipboardAction() {
 	json_object_del(moduleJ, "leftModuleId");
 	json_object_del(moduleJ, "rightModuleId");
 
+	ModuleWidget* mw;
 	try {
-		ModuleWidget* mw = moduleWidgetFromJson(moduleJ);
-		assert(mw);
-		assert(mw->module);
-
-		APP->engine->addModule(mw->module);
-		addModuleAtMouse(mw);
-
-		// history::ModuleAdd
-		history::ModuleAdd* h = new history::ModuleAdd;
-		h->setModule(mw);
-		APP->history->push(h);
+		mw = moduleWidgetFromJson(moduleJ);
 	}
 	catch (Exception& e) {
 		WARN("%s", e.what());
 		return;
 	}
+	assert(mw);
+	assert(mw->module);
+
+	APP->engine->addModule(mw->module);
+	addModuleAtMouse(mw);
+
+	// history::ModuleAdd
+	history::ModuleAdd* h = new history::ModuleAdd;
+	h->setModule(mw);
+	APP->history->push(h);
 }
 
 static void RackWidget_updateExpanders(RackWidget* that) {

@@ -738,19 +738,22 @@ void ModuleWidget::pasteClipboardAction() {
 	json_object_del(moduleJ, "leftModuleId");
 	json_object_del(moduleJ, "rightModuleId");
 
-	// history::ModuleChange
-	history::ModuleChange* h = new history::ModuleChange;
-	h->name = "paste module preset";
-	h->moduleId = module->id;
-	h->oldModuleJ = toJson();
+	json_t* oldModuleJ = toJson();
 
 	try {
 		fromJson(moduleJ);
 	}
 	catch (Exception& e) {
 		WARN("%s", e.what());
+		json_decref(oldModuleJ);
+		return;
 	}
 
+	// history::ModuleChange
+	history::ModuleChange* h = new history::ModuleChange;
+	h->name = "paste module preset";
+	h->moduleId = module->id;
+	h->oldModuleJ = oldModuleJ;
 	h->newModuleJ = toJson();
 	APP->history->push(h);
 }
