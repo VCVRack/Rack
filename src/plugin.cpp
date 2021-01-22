@@ -1,6 +1,7 @@
 #include <thread>
 #include <map>
 #include <stdexcept>
+#include <tuple>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -250,24 +251,53 @@ void destroy() {
 }
 
 
+// To request fallback slugs to be added to this list, open a GitHub issue.
+static const std::map<std::string, std::string> pluginSlugFallbacks = {
+	// {"", ""},
+};
+
+
 Plugin* getPlugin(const std::string& pluginSlug) {
+	if (pluginSlug.empty())
+		return NULL;
 	for (Plugin* plugin : plugins) {
 		if (plugin->slug == pluginSlug) {
 			return plugin;
 		}
 	}
+	// Use fallback plugin slug
+	auto it = pluginSlugFallbacks.find(pluginSlug);
+	if (it != pluginSlugFallbacks.end()) {
+		return getPlugin(it->second);
+	}
 	return NULL;
 }
 
 
+// To request fallback slugs to be added to this list, open a GitHub issue.
+using PluginModuleSlug = std::tuple<std::string, std::string>;
+static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
+	{{"AudibleInstrumentsPreview", "Plaits"}, {"AudibleInstruments", "Plaits"}},
+	{{"AudibleInstrumentsPreview", "Marbles"}, {"AudibleInstruments", "Marbles"}},
+	// {{"", ""}, {"", ""}},
+};
+
+
 Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
+	if (pluginSlug.empty() || modelSlug.empty())
+		return NULL;
 	Plugin* plugin = getPlugin(pluginSlug);
-	if (!plugin)
-		return NULL;
-	Model* model = plugin->getModel(modelSlug);
-	if (!model)
-		return NULL;
-	return model;
+	if (plugin) {
+		Model* model = plugin->getModel(modelSlug);
+		if (model)
+			return model;
+	}
+	// Use fallback (module slug, plugin slug)
+	auto it = moduleSlugFallbacks.find(std::make_tuple(pluginSlug, modelSlug));
+	if (it != moduleSlugFallbacks.end()) {
+		return getModel(std::get<0>(it->second), std::get<1>(it->second));
+	}
+	return NULL;
 }
 
 

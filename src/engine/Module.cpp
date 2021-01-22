@@ -105,11 +105,11 @@ json_t* Module::toJson() {
 	// plugin
 	json_object_set_new(rootJ, "plugin", json_string(model->plugin->slug.c_str()));
 
-	// version
-	json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
-
 	// model
 	json_object_set_new(rootJ, "model", json_string(model->slug.c_str()));
+
+	// version
+	json_object_set_new(rootJ, "version", json_string(model->plugin->version.c_str()));
 
 	// params
 	json_t* paramsJ = paramsToJson();
@@ -139,35 +139,17 @@ json_t* Module::toJson() {
 
 
 void Module::fromJson(json_t* rootJ) {
-	// Check if plugin and model are incorrect
-	json_t* pluginJ = json_object_get(rootJ, "plugin");
-	std::string pluginSlug;
-	if (pluginJ) {
-		pluginSlug = json_string_value(pluginJ);
-		pluginSlug = plugin::normalizeSlug(pluginSlug);
-		if (pluginSlug != model->plugin->slug) {
-			WARN("Plugin %s does not match Module's plugin %s.", pluginSlug.c_str(), model->plugin->slug.c_str());
-			return;
-		}
-	}
-
-	json_t* modelJ = json_object_get(rootJ, "model");
-	std::string modelSlug;
-	if (modelJ) {
-		modelSlug = json_string_value(modelJ);
-		modelSlug = plugin::normalizeSlug(modelSlug);
-		if (modelSlug != model->slug) {
-			WARN("Model %s does not match Module's model %s.", modelSlug.c_str(), model->slug.c_str());
-			return;
-		}
-	}
+	plugin::Model* model = plugin::modelFromJson(rootJ);
+	assert(model);
+	if (model != this->model)
+		throw Exception("Model %s %s does not match Module's model %s %s.", model->plugin->slug.c_str(), model->slug.c_str(), this->model->plugin->slug.c_str(), this->model->slug.c_str());
 
 	// Check plugin version
 	json_t* versionJ = json_object_get(rootJ, "version");
 	if (versionJ) {
 		std::string version = json_string_value(versionJ);
-		if (version != model->plugin->version) {
-			INFO("Patch created with %s v%s, currently using v%s.", pluginSlug.c_str(), version.c_str(), model->plugin->version.c_str());
+		if (version != this->model->plugin->version) {
+			INFO("Patch created with %s v%s, currently using v%s.", this->model->plugin->slug.c_str(), version.c_str(), this->model->plugin->version.c_str());
 		}
 	}
 
@@ -243,13 +225,14 @@ void Module::paramsFromJson(json_t* rootJ) {
 		if (paramId >= paramQuantities.size())
 			continue;
 
+		ParamQuantity* pq = paramQuantities[paramId];
 		// Check that the Param is bounded
-		if (!paramQuantities[paramId]->isBounded())
+		if (!pq->isBounded())
 			continue;
 
 		json_t* valueJ = json_object_get(paramJ, "value");
 		if (valueJ)
-			paramQuantities[paramId]->setValue(json_number_value(valueJ));
+			pq->setValue(json_number_value(valueJ));
 	}
 }
 

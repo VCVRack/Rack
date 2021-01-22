@@ -460,9 +460,15 @@ void PatchManager::fromJson(json_t* rootJ) {
 	if (!unsavedJ)
 		APP->history->setSaved();
 
-	APP->engine->fromJson(rootJ);
-	if (APP->scene) {
-		APP->scene->rack->fromJson(rootJ);
+	try {
+		APP->engine->fromJson(rootJ);
+		if (APP->scene) {
+			APP->scene->rack->fromJson(rootJ);
+		}
+	}
+	catch (Exception& e) {
+		warningLog += "\n";
+		warningLog += e.what();
 	}
 	// At this point, ModuleWidgets and CableWidgets should own all Modules and Cables.
 	// TODO Assert this

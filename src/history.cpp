@@ -63,7 +63,12 @@ void ModuleAdd::undo() {
 void ModuleAdd::redo() {
 	engine::Module* module = model->createModule();
 	module->id = moduleId;
-	module->fromJson(moduleJ);
+	try {
+		module->fromJson(moduleJ);
+	}
+	catch (Exception& e) {
+		WARN("%s", e.what());
+	}
 	APP->engine->addModule(module);
 
 	app::ModuleWidget* mw = model->createModuleWidget(module);

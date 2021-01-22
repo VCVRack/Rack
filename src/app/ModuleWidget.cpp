@@ -744,7 +744,12 @@ void ModuleWidget::pasteClipboardAction() {
 	h->moduleId = module->id;
 	h->oldModuleJ = toJson();
 
-	fromJson(moduleJ);
+	try {
+		fromJson(moduleJ);
+	}
+	catch (Exception& e) {
+		WARN("%s", e.what());
+	}
 
 	h->newModuleJ = toJson();
 	APP->history->push(h);
@@ -1006,7 +1011,12 @@ void ModuleWidget::cloneAction() {
 	// Clone Module
 	engine::Module* clonedModule = model->createModule();
 	// This doesn't need a lock (via Engine::moduleFromJson()) because the Module is not added to the Engine yet.
-	clonedModule->fromJson(moduleJ);
+	try {
+		clonedModule->fromJson(moduleJ);
+	}
+	catch (Exception& e) {
+		WARN("%s", e.what());
+	}
 	json_decref(moduleJ);
 	APP->engine->addModule(clonedModule);
 
