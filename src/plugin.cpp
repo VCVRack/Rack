@@ -318,7 +318,7 @@ Model* modelFromJson(json_t* moduleJ) {
 	// Get Model
 	Model* model = getModel(pluginSlug, modelSlug);
 	if (!model)
-		throw Exception("Could not find module \"%s\" of plugin \"%s\"", modelSlug.c_str(), pluginSlug.c_str());
+		throw Exception("Could not find module \"%s\" \"%s\"", pluginSlug.c_str(), modelSlug.c_str());
 	return model;
 }
 

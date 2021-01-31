@@ -1111,15 +1111,27 @@ void Engine::fromJson(json_t* rootJ) {
 	size_t moduleIndex;
 	json_t* moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
+		// Get model
+		plugin::Model* model;
 		try {
-			plugin::Model* model = plugin::modelFromJson(moduleJ);
-			Module* module = model->createModule();
-			assert(module);
+			model = plugin::modelFromJson(moduleJ);
+		}
+		catch (Exception& e) {
+			WARN("Cannot load model: %s", e.what());
+			APP->patch->log(e.what());
+			continue;
+		}
+
+		// Create module
+		Module* module = model->createModule();
+		assert(module);
+
+		try {
 			// This doesn't need a lock because the Module is not added to the Engine yet.
 			module->fromJson(moduleJ);
 
 			// Before 1.0, the module ID was the index in the "modules" array
-			if (APP->patch->isLegacy(2)) {
+			if (module->id < 0) {
 				module->id = moduleIndex;
 			}
 
@@ -1127,8 +1139,10 @@ void Engine::fromJson(json_t* rootJ) {
 			addModule(module);
 		}
 		catch (Exception& e) {
-			WARN("Cannot deserialize module: %s", e.what());
+			WARN("Cannot load module: %s", e.what());
 			APP->patch->log(e.what());
+			delete module;
+			continue;
 		}
 	}
 
@@ -1144,15 +1158,23 @@ void Engine::fromJson(json_t* rootJ) {
 	json_array_foreach(cablesJ, cableIndex, cableJ) {
 		// cable
 		Cable* cable = new Cable;
+
 		try {
 			cable->fromJson(cableJ);
+
+			// Before 1.0, the cable ID was the index in the "cables" array
+			if (cable->id < 0) {
+				cable->id = cableIndex;
+			}
+
 			// Write-locks
 			addCable(cable);
 		}
 		catch (Exception& e) {
-			WARN("Cannot deserialize cable: %s", e.what());
+			WARN("Cannot load cable: %s", e.what());
 			delete cable;
 			// Don't log exceptions because missing modules create unnecessary complaining when cables try to connect to them.
+			continue;
 		}
 	}
 }

@@ -187,7 +187,7 @@ void RackWidget::mergeJson(json_t* rootJ) {
 		// TODO Legacy v0.6?
 		ModuleWidget* moduleWidget = getModule(id);
 		if (!moduleWidget) {
-			WARN("Cannot find ModuleWidget with ID %" PRId64 "", id);
+			WARN("Cannot find ModuleWidget %" PRId64, id);
 			continue;
 		}
 
@@ -212,7 +212,7 @@ void RackWidget::mergeJson(json_t* rootJ) {
 		int64_t id = json_integer_value(idJ);
 		CableWidget* cw = getCable(id);
 		if (!cw) {
-			WARN("Cannot find CableWidget with ID %" PRId64 "", id);
+			WARN("Cannot find CableWidget %" PRId64, id);
 			continue;
 		}
 
@@ -226,32 +226,33 @@ void RackWidget::mergeJson(json_t* rootJ) {
 void RackWidget::fromJson(json_t* rootJ) {
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
-	assert(modulesJ);
+	if (!modulesJ)
+		return;
+
 	size_t moduleIndex;
 	json_t* moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
-		// module
-		// Create ModuleWidget and attach it to existing Module from Engine.
+		// Get module ID
 		json_t* idJ = json_object_get(moduleJ, "id");
-		if (!idJ)
-			continue;
-		int64_t id = json_integer_value(idJ);
+		int64_t id;
+		if (idJ)
+			id = json_integer_value(idJ);
+		else
+			id = moduleIndex;
+
+		// Get Module
 		engine::Module* module = APP->engine->getModule(id);
 		if (!module) {
-			WARN("Cannot find module with ID %" PRId64 "", id);
+			WARN("Cannot find Module %" PRId64, id);
 			continue;
 		}
 
+		// Create ModuleWidget
 		ModuleWidget* moduleWidget = module->model->createModuleWidget(module);
-
-		// Before 1.0, the module ID was the index in the "modules" array
-		if (APP->patch->isLegacy(2)) {
-			module->id = moduleIndex;
-		}
 
 		// pos
 		json_t* posJ = json_object_get(moduleJ, "pos");
-		double x, y;
+		double x = 0.0, y = 0.0;
 		json_unpack(posJ, "[F, F]", &x, &y);
 		math::Vec pos = math::Vec(x, y);
 		if (APP->patch->isLegacy(1)) {
@@ -271,22 +272,27 @@ void RackWidget::fromJson(json_t* rootJ) {
 	// In <=v0.6, cables were called wires
 	if (!cablesJ)
 		cablesJ = json_object_get(rootJ, "wires");
-	assert(cablesJ);
+	if (!cablesJ)
+		return;
 	size_t cableIndex;
 	json_t* cableJ;
 	json_array_foreach(cablesJ, cableIndex, cableJ) {
-		// cable
-		// Get Cable from Engine
+		// Get cable ID
 		json_t* idJ = json_object_get(cableJ, "id");
-		if (!idJ)
-			continue;
-		int64_t id = json_integer_value(idJ);
+		int64_t id;
+		if (idJ)
+			id = json_integer_value(idJ);
+		else
+			id = cableIndex;
+
+		// Get Cable
 		engine::Cable* cable = APP->engine->getCable(id);
 		if (!cable) {
-			WARN("Cannot find cable with ID %" PRId64 "", id);
+			WARN("Cannot find Cable %" PRId64, id);
 			continue;
 		}
 
+		// Create CableWidget
 		CableWidget* cw = new CableWidget;
 		cw->setCable(cable);
 		cw->fromJson(cableJ);

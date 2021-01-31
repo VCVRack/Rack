@@ -154,9 +154,12 @@ void Module::fromJson(json_t* rootJ) {
 	}
 
 	// id
-	json_t* idJ = json_object_get(rootJ, "id");
-	if (idJ)
-		id = json_integer_value(idJ);
+	// Only set ID if unset
+	if (id < 0) {
+		json_t* idJ = json_object_get(rootJ, "id");
+		if (idJ)
+			id = json_integer_value(idJ);
+	}
 
 	// params
 	json_t* paramsJ = json_object_get(rootJ, "params");
