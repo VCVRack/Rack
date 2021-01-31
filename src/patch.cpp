@@ -219,7 +219,7 @@ void PatchManager::cleanAutosave() {
 }
 
 
-static bool isPatchLegacyPre2(std::string path) {
+static bool isPatchLegacyV1(std::string path) {
 	FILE* f = std::fopen(path.c_str(), "rb");
 	if (!f)
 		return false;
@@ -239,7 +239,7 @@ void PatchManager::load(std::string path) {
 	system::removeRecursively(asset::autosavePath);
 	system::createDirectories(asset::autosavePath);
 
-	if (isPatchLegacyPre2(path)) {
+	if (isPatchLegacyV1(path)) {
 		// Copy the .vcv file directly to "patch.json".
 		system::copy(path, system::join(asset::autosavePath, "patch.json"));
 	}
@@ -425,7 +425,6 @@ json_t* PatchManager::toJson() {
 
 void PatchManager::fromJson(json_t* rootJ) {
 	clear();
-	legacy = 0;
 
 	// version
 	std::string version;
@@ -434,18 +433,6 @@ void PatchManager::fromJson(json_t* rootJ) {
 		version = json_string_value(versionJ);
 	if (version != APP_VERSION) {
 		INFO("Patch was made with Rack v%s, current Rack version is v%s", version.c_str(), APP_VERSION.c_str());
-	}
-
-	// Detect old patches with ModuleWidget::params/inputs/outputs indices.
-	if (string::startsWith(version, "0.3.") || string::startsWith(version, "0.4.") || string::startsWith(version, "0.5.") || version == "" || version == "dev") {
-		// Use ModuleWidget::params/inputs/outputs indices instead of Module.
-		legacy = 1;
-	}
-	else if (string::startsWith(version, "0.6.")) {
-		legacy = 2;
-	}
-	if (legacy) {
-		INFO("Loading patch using legacy mode %d", legacy);
 	}
 
 	// path
@@ -478,11 +465,6 @@ void PatchManager::fromJson(json_t* rootJ) {
 		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, warningLog.c_str());
 	}
 	warningLog = "";
-}
-
-
-bool PatchManager::isLegacy(int level) {
-	return legacy && legacy <= level;
 }
 
 

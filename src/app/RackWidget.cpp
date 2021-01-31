@@ -224,6 +224,18 @@ void RackWidget::mergeJson(json_t* rootJ) {
 }
 
 void RackWidget::fromJson(json_t* rootJ) {
+	// version
+	std::string version;
+	json_t* versionJ = json_object_get(rootJ, "version");
+	if (versionJ)
+		version = json_string_value(versionJ);
+
+	bool legacyV05 = false;
+	if (string::startsWith(version, "0.3.") || string::startsWith(version, "0.4.") || string::startsWith(version, "0.5.") || version == "dev") {
+		legacyV05 = true;
+	}
+
+
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)
@@ -255,7 +267,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 		double x = 0.0, y = 0.0;
 		json_unpack(posJ, "[F, F]", &x, &y);
 		math::Vec pos = math::Vec(x, y);
-		if (APP->patch->isLegacy(1)) {
+		if (legacyV05) {
 			// In <=v0.5, positions were in pixel units
 			moduleWidget->box.pos = pos;
 		}

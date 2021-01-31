@@ -10,8 +10,6 @@ namespace rack {
 struct PatchManager {
 	/** The currently loaded patch file path */
 	std::string path;
-	/** Enables certain compatibility behavior based on the value */
-	int legacy = 0;
 	std::string warningLog;
 
 	PatchManager();
@@ -47,7 +45,6 @@ struct PatchManager {
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
-	bool isLegacy(int level);
 	void log(std::string msg);
 };
 
