@@ -1,8 +1,9 @@
 !include "MUI2.nsh"
 
-Name "VCV Rack ${VERSION}"
+Name "VCV Rack v${VERSION}"
 OutFile "installer.exe"
 SetCompressor /solid "lzma"
+SetCompressorDictSize 8
 CRCCheck On
 
 ; Default installation folder
@@ -15,7 +16,7 @@ InstallDirRegKey HKLM "Software\VCV\Rack" ""
 RequestExecutionLevel admin
 
 
-; MUI pages
+; MUI installer pages
 
 !define MUI_ICON "icon.ico"
 !define MUI_HEADERIMAGE
@@ -24,8 +25,18 @@ RequestExecutionLevel admin
 ;!define MUI_UNWELCOMEFINISHPAGE_BITMAP  "${NSISDIR}\Contrib\Graphics\Wizard\win.bmp" ; 164x314
 
 !define MUI_COMPONENTSPAGE_NODESC
-!insertmacro MUI_PAGE_COMPONENTS
+; !insertmacro MUI_PAGE_COMPONENTS
 
+; Prevent user from choosing an installation directory that already exists, such as C:\Program Files.
+; This is necessary because the uninstaller removes the installation directory, which is dangerous for directories that existed before Rack was installed.
+!define MUI_PAGE_CUSTOMFUNCTION_LEAVE directoryLeave
+Function directoryLeave
+	IfFileExists "$INSTDIR" directoryExists directoryNotExists
+	directoryExists:
+		MessageBox MB_OK|MB_ICONSTOP "Cannot install to $INSTDIR. Folder already exists."
+		Abort
+	directoryNotExists:
+FunctionEnd
 !insertmacro MUI_PAGE_DIRECTORY
 
 !insertmacro MUI_PAGE_INSTFILES
@@ -34,8 +45,9 @@ RequestExecutionLevel admin
 !define MUI_FINISHPAGE_RUN_TEXT "Launch VCV Rack"
 !insertmacro MUI_PAGE_FINISH
 
-!insertmacro MUI_UNPAGE_CONFIRM
+; MUI uninstaller pages
 
+!insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
 
 !insertmacro MUI_LANGUAGE "English"
@@ -80,10 +92,9 @@ SectionEnd
 
 
 Section "Uninstall"
-	Delete "$INSTDIR\Uninstall.exe"
-	Delete "$INSTDIR\*"
-	RMDir /r "$INSTDIR\res"
-	RMDir "$INSTDIR"
+	; directoryLeave above ensures that INSTDIR is safe to remove.
+	RMDir /r "$INSTDIR"
+	; Attempt to remove C:\Program Files\VCV if empty
 	RMDir "$INSTDIR\.."
 
 	Delete "$SMPROGRAMS\VCV Rack.lnk"
