@@ -64,7 +64,8 @@ dist: all
 	cp $(TARGET) dist/$(SLUG)/
 ifdef ARCH_MAC
 	$(STRIP) -S dist/$(SLUG)/$(TARGET)
-	install_name_tool -change libRack.dylib @executable_path/libRack.dylib dist/$(SLUG)/$(TARGET)
+	install_name_tool -change libRack.dylib @rpath/libRack.dylib dist/$(SLUG)/$(TARGET)
+	install_name_tool -add_rpath . dist/$(SLUG)/$(TARGET)
 	otool -L dist/$(SLUG)/$(TARGET)
 else
 	$(STRIP) -s dist/$(SLUG)/$(TARGET)

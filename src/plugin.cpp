@@ -54,9 +54,7 @@ static void* loadLibrary(std::string libraryPath) {
 #else
 	// As of Rack v2.0, plugins are linked with `-rpath=.` so change current directory so it can find libRack.
 	std::string cwd = system::getWorkingDirectory();
-	std::string libDir = asset::systemDir;
-	DEBUG("Setting working directory to %s", libDir.c_str());
-	system::setWorkingDirectory(libDir);
+	system::setWorkingDirectory(asset::systemDir);
 	// Change it back when we're finished
 	DEFER({system::setWorkingDirectory(cwd);});
 	// Load library with dlopen

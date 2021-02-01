@@ -163,19 +163,19 @@ endif
 ifdef ARCH_MAC
 	mkdir -p dist/Rack.app
 	mkdir -p dist/Rack.app/Contents
-	cp Info.plist dist/Rack.app/Contents/
-	$(SED) 's/{VERSION}/$(VERSION)/g' dist/Rack.app/Contents/Info.plist
+	mkdir -p dist/Rack.app/Contents/Resources
 	mkdir -p dist/Rack.app/Contents/MacOS
-	cp $(TARGET) dist/Rack.app/Contents/MacOS/
+	cp $(TARGET) dist/Rack.app/Contents/Resources/
 	cp $(STANDALONE_TARGET) dist/Rack.app/Contents/MacOS/
-	$(STRIP) -S dist/Rack.app/Contents/MacOS/$(TARGET)
+	$(STRIP) -S dist/Rack.app/Contents/Resources/$(TARGET)
 	$(STRIP) -S dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)
-	install_name_tool -change $(TARGET) @executable_path/$(TARGET) dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)
+	install_name_tool -change $(TARGET) @executable_path/../Resources/$(TARGET) dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)
 	# Manually check that no nonstandard shared libraries are linked
-	otool -L dist/Rack.app/Contents/MacOS/$(TARGET)
+	otool -L dist/Rack.app/Contents/Resources/$(TARGET)
 	otool -L dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)
 	# Copy resources
-	mkdir -p dist/Rack.app/Contents/Resources
+	cp Info.plist dist/Rack.app/Contents/
+	$(SED) 's/{VERSION}/$(VERSION)/g' dist/Rack.app/Contents/Info.plist
 	cp -R $(DIST_RES) dist/Rack.app/Contents/Resources/
 	cp -R icon.icns dist/Rack.app/Contents/Resources/
 	cp Fundamental.vcvplugin dist/Rack.app/Contents/Resources/

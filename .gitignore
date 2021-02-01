@@ -13,8 +13,7 @@
 /presets
 /licenses
 .DS_Store
-/autosave.vcv
 /autosave
 /settings.json
 /screenshots
-/Fundamental.zip
+/Fundamental.vcvplugin
