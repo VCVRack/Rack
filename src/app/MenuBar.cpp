@@ -1010,6 +1010,10 @@ struct MenuBar : widget::OpaqueWidget {
 		HelpButton* helpButton = new HelpButton;
 		helpButton->text = "Help";
 		layout->addChild(helpButton);
+
+		MenuButton* alphaButton = new MenuButton;
+		alphaButton->text = "Pre-alpha built for Christoph Scholtes. Not for release";
+		layout->addChild(alphaButton);
 	}
 
 	void draw(const DrawArgs& args) override {

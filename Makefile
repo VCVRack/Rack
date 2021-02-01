@@ -139,19 +139,24 @@ DIST_RES := LICENSE* CHANGELOG.md res cacert.pem Core.json template.vcv
 DIST_NAME := Rack-$(VERSION)-$(ARCH)
 DIST_SDK := Rack-SDK-$(VERSION).zip
 
-# This target is not intended for public use
+# This target is not supported for public use
 dist: $(TARGET) $(STANDALONE_TARGET)
 	rm -rf dist
 	mkdir -p dist
 
+	# Copy Rack to dist
 ifdef ARCH_LIN
 	mkdir -p dist/Rack
-	cp $(TARGET) $(STANDALONE_TARGET) dist/Rack/
-	$(STRIP) -s dist/Rack/$(TARGET) dist/Rack/$(STANDALONE_TARGET)
-	cp -R $(DIST_RES) dist/Rack/
+	cp $(TARGET) dist/Rack/
+	cp $(STANDALONE_TARGET) dist/Rack/
+	$(STRIP) -s dist/Rack/$(TARGET)
+	$(STRIP) -s dist/Rack/$(STANDALONE_TARGET)
 	# Manually check that no nonstandard shared libraries are linked
 	ldd dist/Rack/$(TARGET)
-	# cp Fundamental.zip dist/Rack/
+	ldd dist/Rack/$(STANDALONE_TARGET)
+	# Copy resources
+	cp -R $(DIST_RES) dist/Rack/
+	cp Fundamental.vcvplugin dist/Rack/
 	# Make ZIP
 	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack
 endif
@@ -162,14 +167,17 @@ ifdef ARCH_MAC
 	$(SED) 's/{VERSION}/$(VERSION)/g' dist/Rack.app/Contents/Info.plist
 	mkdir -p dist/Rack.app/Contents/MacOS
 	cp $(TARGET) dist/Rack.app/Contents/MacOS/
+	cp $(STANDALONE_TARGET) dist/Rack.app/Contents/MacOS/
 	$(STRIP) -S dist/Rack.app/Contents/MacOS/$(TARGET)
-	mkdir -p dist/Rack.app/Contents/Resources
-	cp -R $(DIST_RES) icon.icns dist/Rack.app/Contents/Resources/
-
+	$(STRIP) -S dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)
 	# Manually check that no nonstandard shared libraries are linked
 	otool -L dist/Rack.app/Contents/MacOS/$(TARGET)
-
-	cp Fundamental.zip dist/Rack.app/Contents/Resources/Fundamental.txt
+	otool -L dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)
+	# Copy resources
+	mkdir -p dist/Rack.app/Contents/Resources
+	cp -R $(DIST_RES) dist/Rack.app/Contents/Resources/
+	cp -R icon.icns dist/Rack.app/Contents/Resources/
+	cp Fundamental.vcvplugin dist/Rack.app/Contents/Resources/
 	# Clean up and sign bundle
 	xattr -cr dist/Rack.app
 	# This will only work if you have the private key to my certificate
@@ -180,13 +188,16 @@ ifdef ARCH_MAC
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/Rack
-	cp $(TARGET) $(STANDALONE_TARGET) dist/Rack/
-	$(STRIP) -s dist/Rack/$(TARGET) dist/Rack/$(STANDALONE_TARGET)
+	cp $(TARGET) dist/Rack/
+	cp $(STANDALONE_TARGET) dist/Rack/
+	$(STRIP) -s dist/Rack/$(TARGET)
+	$(STRIP) -s dist/Rack/$(STANDALONE_TARGET)
+	# Copy resources
 	cp -R $(DIST_RES) dist/Rack/
 	cp /mingw64/bin/libwinpthread-1.dll dist/Rack/
 	cp /mingw64/bin/libstdc++-6.dll dist/Rack/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/Rack/
-# 	cp Fundamental.zip dist/Rack/
+	cp Fundamental.vcvplugin dist/Rack/
 	# Make ZIP
 	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack
 	# Make NSIS installer
@@ -195,7 +206,7 @@ ifdef ARCH_WIN
 # 	mv installer.exe dist/$(DIST_NAME).exe
 endif
 
-	# Rack SDK
+	# Build Rack SDK
 	mkdir -p dist/Rack-SDK
 	cp -R LICENSE* *.mk include helper.py dist/Rack-SDK/
 	mkdir -p dist/Rack-SDK/dep/
