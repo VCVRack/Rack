@@ -121,6 +121,7 @@ void PatchManager::saveAsDialog() {
 	if (this->path == "") {
 		dir = asset::user("patches");
 		system::createDirectories(dir);
+		filename = "Untitled.vcv";
 	}
 	else {
 		dir = system::getDirectory(this->path);
