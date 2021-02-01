@@ -100,7 +100,11 @@
 
 
 #undef INTERNAL
-#define INTERNAL __attribute__((visibility("hidden"))) __attribute__((error("Using function or symbol internal to Rack")))
+#if defined ARCH_WIN
+	#define INTERNAL __attribute__((error("Using internal Rack function or symbol")))
+#elif
+	#define INTERNAL __attribute__((visibility("hidden"))) __attribute__((error("Using internal Rack function or symbol")))
+#endif
 
 
 namespace rack {

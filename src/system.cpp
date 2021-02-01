@@ -520,7 +520,7 @@ std::string getStackTrace() {
 
 	for (int i = 1; i < stackLen; i++) {
 		SymFromAddr(process, (DWORD64) stack[i], 0, symbol);
-		s += string::f("%d: %s 0x%0x\n", stackLen - i - 1, symbol->Name, symbol->Address);
+		s += string::f("%d: %s 0x%" PRIx64 "\n", stackLen - i - 1, symbol->Name, symbol->Address);
 	}
 	free(symbol);
 #endif
@@ -608,7 +608,7 @@ std::string getOperatingSystemInfo() {
 	info.dwOSVersionInfoSize = sizeof(info);
 	GetVersionExW(&info);
 	// See https://docs.microsoft.com/en-us/windows/desktop/api/winnt/ns-winnt-_osversioninfoa for a list of Windows version numbers.
-	return string::f("Windows %u.%u", info.dwMajorVersion, info.dwMinorVersion);
+	return string::f("Windows %lu.%lu", info.dwMajorVersion, info.dwMinorVersion);
 #endif
 }
 

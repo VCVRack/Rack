@@ -23,16 +23,20 @@ E.g.
 
 	DEPRECATED void foo();
 */
-#if defined(__GNUC__) || defined(__clang__)
+#if defined __GNUC__ || defined __clang__
 	#define DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
+#elif defined _MSC_VER
 	#define DEPRECATED __declspec(deprecated)
 #endif
 
 /** Attribute for private functions and symbols not intended to be used by plugins.
 By default this does nothing, but when #including rack.hpp, it prints a compile-time warning.
 */
-#define INTERNAL __attribute__((visibility("hidden")))
+#if defined ARCH_WIN
+	#define INTERNAL
+#else
+	#define INTERNAL __attribute__((visibility("hidden")))
+#endif
 
 
 /** Concatenates two literals or two macros
