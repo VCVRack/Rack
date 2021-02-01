@@ -170,6 +170,7 @@ ifdef ARCH_MAC
 	cp $(STANDALONE_TARGET) dist/Rack.app/Contents/MacOS/
 	$(STRIP) -S dist/Rack.app/Contents/MacOS/$(TARGET)
 	$(STRIP) -S dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)
+	install_name_tool -change $(TARGET) @executable_path/$(TARGET) dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)
 	# Manually check that no nonstandard shared libraries are linked
 	otool -L dist/Rack.app/Contents/MacOS/$(TARGET)
 	otool -L dist/Rack.app/Contents/MacOS/$(STANDALONE_TARGET)

@@ -42,7 +42,7 @@ endif
 ifdef ARCH_WIN
 	TARGET := plugin.dll
 	LDFLAGS += -static-libstdc++
-	RACK_USER_DIR ?= "$(USERPROFILE)"/Documents/Rack
+	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack
 endif
 
 
@@ -59,26 +59,28 @@ clean:
 
 dist: all
 	rm -rf dist
-	mkdir -p dist/"$(SLUG)"
+	mkdir -p dist/$(SLUG)
 	@# Strip and copy plugin binary
-	cp $(TARGET) dist/"$(SLUG)"/
+	cp $(TARGET) dist/$(SLUG)/
 ifdef ARCH_MAC
-	$(STRIP) -S dist/"$(SLUG)"/$(TARGET)
+	$(STRIP) -S dist/$(SLUG)/$(TARGET)
+	install_name_tool -change libRack.dylib @executable_path/libRack.dylib dist/$(SLUG)/$(TARGET)
+	otool -L dist/$(SLUG)/$(TARGET)
 else
-	$(STRIP) -s dist/"$(SLUG)"/$(TARGET)
+	$(STRIP) -s dist/$(SLUG)/$(TARGET)
 endif
 	@# Copy distributables
 ifdef ARCH_MAC
-	rsync -rR $(DISTRIBUTABLES) dist/"$(SLUG)"/
+	rsync -rR $(DISTRIBUTABLES) dist/$(SLUG)/
 else
-	cp -r --parents $(DISTRIBUTABLES) dist/"$(SLUG)"/
+	cp -r --parents $(DISTRIBUTABLES) dist/$(SLUG)/
 endif
 	@# Create ZIP package
-	cd dist && ZSTD_CLEVEL=19 tar -cf "$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin --zstd "$(SLUG)"
+	cd dist && tar -c $(SLUG) | zstd -19 -o $(SLUG)-"$(VERSION)"-$(ARCH).vcvplugin
 
 install: dist
 	mkdir -p "$(RACK_USER_DIR)"/plugins-v2/
-	cp dist/"$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin "$(RACK_USER_DIR)"/plugins-v2/
+	cp dist/$(SLUG)-"$(VERSION)"-$(ARCH).vcvplugin "$(RACK_USER_DIR)"/plugins-v2/
 
 .PHONY: clean dist
 .DEFAULT_GOAL := all
