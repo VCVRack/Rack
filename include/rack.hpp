@@ -102,7 +102,7 @@
 #undef INTERNAL
 #if defined ARCH_WIN
 	#define INTERNAL __attribute__((error("Using internal Rack function or symbol")))
-#elif
+#else
 	#define INTERNAL __attribute__((visibility("hidden"))) __attribute__((error("Using internal Rack function or symbol")))
 #endif
 
