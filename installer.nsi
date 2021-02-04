@@ -86,7 +86,7 @@ Section "VCV Rack" VCV_RACK_SECTION
 	WriteRegStr HKLM "Software\Classes\VCVRack.Patch\shell\open\command" "" '"$INSTDIR\Rack.exe" "%1"'
 
 	; Create shortcuts
-	CreateDirectory "$SMPROGRAMS"
+	CreateShortcut "$DESKTOP\VCV Rack.lnk" "$INSTDIR\Rack.exe"
 	CreateShortcut "$SMPROGRAMS\VCV Rack.lnk" "$INSTDIR\Rack.exe"
 SectionEnd
 
@@ -97,6 +97,7 @@ Section "Uninstall"
 	; Attempt to remove C:\Program Files\VCV if empty
 	RMDir "$INSTDIR\.."
 
+	Delete "$DESKTOP\VCV Rack.lnk"
 	Delete "$SMPROGRAMS\VCV Rack.lnk"
 
 	DeleteRegKey HKLM "Software\VCV\Rack"
