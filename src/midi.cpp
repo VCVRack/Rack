@@ -12,6 +12,23 @@ namespace midi {
 
 static std::vector<std::pair<int, Driver*>> drivers;
 
+std::string Message::toString() {
+	std::string s;
+	for (size_t i = 0; i < bytes.size(); i++) {
+		if (i > 0)
+			s += " ";
+		uint8_t b = bytes[i];
+		// We could use string::f() here, but use faster method instead.
+		// s += string::f("%02x", b);
+		uint8_t b1 = (b & 0x0f) >> 0;
+		uint8_t b2 = (b & 0xf0) >> 4;
+		s += b2 < 0xa ? ('0' + b2) : ('a' + b2 - 0xa);
+		s += b1 < 0xa ? ('0' + b1) : ('a' + b1 - 0xa);
+	}
+	return s;
+}
+
+
 ////////////////////
 // Device
 ////////////////////

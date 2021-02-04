@@ -11,7 +11,10 @@ namespace rack {
 
 
 Context::~Context() {
+	// Deleting NULL is safe in C++.
+
 	// Set pointers to NULL so other objects will segfault when attempting to access them
+
 	delete patch;
 	patch = NULL;
 

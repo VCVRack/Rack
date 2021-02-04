@@ -75,6 +75,8 @@ struct Message {
 			return;
 		bytes[2] = value & 0x7f;
 	}
+
+	std::string toString();
 };
 
 ////////////////////
@@ -151,7 +153,7 @@ struct InputDevice : Device {
 	/** Not public. Use Driver::unsubscribeInput(). */
 	void unsubscribe(Input* input);
 	/** Called when a MIDI message is received from the device. */
-	void onMessage(const Message &message);
+	void onMessage(const Message& message);
 };
 
 struct OutputDevice : Device {
@@ -161,7 +163,7 @@ struct OutputDevice : Device {
 	/** Not public. Use Driver::unsubscribeOutput(). */
 	void unsubscribe(Output* output);
 	/** Sends a MIDI message to the device. */
-	virtual void sendMessage(const Message &message) {}
+	virtual void sendMessage(const Message& message) {}
 };
 
 ////////////////////
@@ -229,14 +231,14 @@ struct Input : Port {
 
 	std::vector<int> getChannels() override;
 
-	virtual void onMessage(const Message &message) {}
+	virtual void onMessage(const Message& message) {}
 };
 
 
 struct InputQueue : Input {
 	int queueMaxSize = 8192;
 	std::queue<Message> queue;
-	void onMessage(const Message &message) override;
+	void onMessage(const Message& message) override;
 };
 
 
@@ -254,7 +256,7 @@ struct Output : Port {
 
 	std::vector<int> getChannels() override;
 
-	void sendMessage(const Message &message);
+	void sendMessage(const Message& message);
 };
 
 
