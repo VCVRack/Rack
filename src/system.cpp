@@ -537,7 +537,7 @@ std::string getStackTrace() {
 	static int64_t startTime = 0;
 #endif
 
-static void initRuntime() {
+static void initTime() {
 #if defined ARCH_WIN
 	assert(startCounter == 0);
 	LARGE_INTEGER counter;
@@ -564,6 +564,7 @@ static void initRuntime() {
 	startTime = int64_t(mts.tv_sec) * 1000000000LL + mts.tv_nsec;
 #endif
 }
+
 
 double getTime() {
 #if defined ARCH_WIN
@@ -665,7 +666,7 @@ void runProcessDetached(const std::string& path) {
 
 
 void init() {
-	initRuntime();
+	initTime();
 }
 
 
