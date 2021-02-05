@@ -6,7 +6,7 @@ namespace core {
 
 
 struct MidiOutput : dsp::MidiGenerator<PORT_MAX_CHANNELS>, midi::Output {
-	void onMessage(const midi::Message &message) override {
+	void onMessage(const midi::Message& message) override {
 		Output::sendMessage(message);
 	}
 
@@ -76,7 +76,7 @@ struct CV_MIDI : Module {
 		if (rateLimiterTriggered)
 			rateLimiterTimer.time -= rateLimiterPeriod;
 
-		midiOutput.setTimestamp(APP->engine->getFrameTime());
+		midiOutput.setFrame(args.frame + APP->engine->getBlockFrames());
 
 		for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
 			int vel = (int) std::round(inputs[VEL_INPUT].getNormalPolyVoltage(10.f * 100 / 127, c) / 10.f * 127);

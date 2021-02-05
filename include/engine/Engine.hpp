@@ -66,10 +66,10 @@ struct Engine {
 	/** Returns the number of audio samples since the Engine was created.
 	*/
 	int64_t getFrame();
-	/** Returns the estimated time corresponding to the current frame, based on the time of when stepBlock() was last called.
-	Calculated by `stepTime + framesSinceStep / sampleRate`.
+	/** Sets the frame of the next stepBlock() call.
+	There is no reason to reset the frame in standalone Rack.
 	*/
-	double getFrameTime();
+	void setFrame(int64_t frame);
 	/** Returns the frame when stepBlock() was last called.
 	*/
 	int64_t getBlockFrame();

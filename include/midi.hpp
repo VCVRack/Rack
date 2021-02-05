@@ -20,8 +20,12 @@ namespace midi {
 struct Message {
 	/** Initialized to 3 empty bytes. */
 	std::vector<uint8_t> bytes;
-	/** Timestamp of MIDI message in nanoseconds. NAN if not set. */
-	double timestamp = NAN;
+	/** The Engine frame timestamp of the Message.
+	For output messages, the frame when the message was generated.
+	For input messages, the frame when it is intended to be processed.
+	-1 for undefined, to be sent or processed immediately.
+	*/
+	int64_t frame = -1;
 
 	Message() : bytes(3) {}
 

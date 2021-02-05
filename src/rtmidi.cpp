@@ -16,6 +16,8 @@
 #include <midi.hpp>
 #include <string.hpp>
 #include <system.hpp>
+#include <context.hpp>
+#include <engine/Engine.hpp>
 
 
 namespace rack {
@@ -78,14 +80,9 @@ struct RtMidiInputDevice : midi::InputDevice {
 
 		midi::Message msg;
 		msg.bytes = std::vector<uint8_t>(message->begin(), message->end());
+		// Don't set msg.frame from timeStamp here, because it's set in onMessage().
 		midiInputDevice->onMessage(msg);
 	}
-};
-
-
-/** Makes priority_queue prioritize by the earliest MIDI message. */
-static auto messageEarlier = [](const midi::Message& a, const midi::Message& b) {
-	return a.timestamp > b.timestamp;
 };
 
 
@@ -93,14 +90,22 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	RtMidiOut* rtMidiOut;
 	std::string name;
 
-	std::priority_queue<midi::Message, std::vector<midi::Message>, decltype(messageEarlier)> messageQueue;
+	struct MessageSchedule {
+		midi::Message message;
+		double timestamp;
+
+		bool operator<(const MessageSchedule& other) const {
+			return timestamp > other.timestamp;
+		}
+	};
+	std::priority_queue<MessageSchedule, std::vector<MessageSchedule>> messageQueue;
 
 	std::thread thread;
 	std::mutex mutex;
 	std::condition_variable cv;
 	bool stopped = false;
 
-	RtMidiOutputDevice(int driverId, int deviceId) : messageQueue(messageEarlier) {
+	RtMidiOutputDevice(int driverId, int deviceId) {
 		try {
 			rtMidiOut = new RtMidiOut((RtMidi::Api) driverId, "VCV Rack");
 		}
@@ -137,10 +142,21 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 		return name;
 	}
 
-	void sendMessage(const midi::Message &message) override {
-		// sendMessageNow(message);
+	void sendMessage(const midi::Message& message) override {
+		// If frame is undefined, send message immediately
+		if (message.frame < 0) {
+			sendMessageNow(message);
+			return;
+		}
+		// Schedule message to be sent by worker thread
+		MessageSchedule ms;
+		ms.message = message;
+		// Compute time in next Engine block to send message
+		double deltaTime = (message.frame - APP->engine->getBlockFrame()) * APP->engine->getSampleTime();
+		ms.timestamp = APP->engine->getBlockTime() + deltaTime;
+
 		std::lock_guard<decltype(mutex)> lock(mutex);
-		messageQueue.push(message);
+		messageQueue.push(ms);
 		cv.notify_one();
 	}
 
@@ -159,8 +175,8 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 			}
 			else {
 				// Get earliest message
-				const midi::Message& message = messageQueue.top();
-				double duration = message.timestamp - system::getTime();
+				const MessageSchedule& ms = messageQueue.top();
+				double duration = ms.timestamp - system::getTime();
 
 				// If we need to wait, release the lock and wait for the timeout, or if the CV is notified.
 				// This correctly handles MIDI messages with no timestamp, because duration will be NAN.
@@ -170,13 +186,13 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 				}
 
 				// Send and remove from queue
-				sendMessageNow(message);
+				sendMessageNow(ms.message);
 				messageQueue.pop();
 			}
 		}
 	}
 
-	void sendMessageNow(const midi::Message &message) {
+	void sendMessageNow(const midi::Message& message) {
 		try {
 			rtMidiOut->sendMessage(message.bytes.data(), message.bytes.size());
 		}

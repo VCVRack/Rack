@@ -4,6 +4,8 @@
 #include <midi.hpp>
 #include <string.hpp>
 #include <system.hpp>
+#include <context.hpp>
+#include <engine/Engine.hpp>
 
 
 namespace rack {
@@ -44,15 +46,24 @@ void InputDevice::unsubscribe(Input* input) {
 		subscribed.erase(it);
 }
 
-void InputDevice::onMessage(const Message &message) {
-	// Set timestamp to now if unset
+void InputDevice::onMessage(const Message& message) {
 	Message msg = message;
-	if (msg.timestamp == 0.0)
-		msg.timestamp = system::getTime();
 
 	for (Input* input : subscribed) {
 		// We're probably in the MIDI driver's thread, so set the Rack context.
 		contextSet(input->context);
+
+		// Set timestamp to now if unset
+		if (message.frame < 0) {
+			double deltaTime = system::getTime() - APP->engine->getBlockTime();
+			int deltaFrames = std::floor(deltaTime * APP->engine->getSampleRate());
+			int64_t nextBlockFrame = APP->engine->getBlockFrame() + APP->engine->getBlockFrames();
+			msg.frame = nextBlockFrame + deltaFrames;
+		}
+		else {
+			msg.frame = message.frame;
+		}
+
 		// Filter channel if message is not a system MIDI message
 		if (msg.getStatus() != 0xf && input->channel >= 0 && msg.getChannel() != input->channel)
 			continue;
@@ -245,7 +256,7 @@ std::vector<int> Input::getChannels() {
 	return channels;
 }
 
-void InputQueue::onMessage(const Message &message) {
+void InputQueue::onMessage(const Message& message) {
 	if ((int) queue.size() >= queueMaxSize)
 		return;
 	// Push to queue
@@ -326,7 +337,7 @@ std::vector<int> Output::getChannels() {
 	return channels;
 }
 
-void Output::sendMessage(const Message &message) {
+void Output::sendMessage(const Message& message) {
 	if (!outputDevice)
 		return;
 

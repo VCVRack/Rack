@@ -618,9 +618,8 @@ int64_t Engine::getFrame() {
 }
 
 
-double Engine::getFrameTime() {
-	double timeSinceBlock = (internal->frame - internal->blockFrame) * internal->sampleTime;
-	return internal->blockTime + timeSinceBlock;
+void Engine::setFrame(int64_t frame) {
+	internal->frame = frame;
 }
 
 

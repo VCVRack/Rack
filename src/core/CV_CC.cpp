@@ -7,7 +7,7 @@ namespace core {
 
 struct CCMidiOutput : midi::Output {
 	int lastValues[128];
-	double timestamp = 0.0;
+	double frame = 0.0;
 
 	CCMidiOutput() {
 		reset();
@@ -29,12 +29,12 @@ struct CCMidiOutput : midi::Output {
 		m.setStatus(0xb);
 		m.setNote(cc);
 		m.setValue(value);
-		m.timestamp = timestamp;
+		m.frame = frame;
 		sendMessage(m);
 	}
 
-	void setTimestamp(double timestamp) {
-		this->timestamp = timestamp;
+	void setFrame(double frame) {
+		this->frame = frame;
 	}
 };
 
@@ -83,7 +83,7 @@ struct CV_CC : Module {
 		else
 			return;
 
-		midiOutput.setTimestamp(APP->engine->getFrameTime());
+		midiOutput.setFrame(args.frame + APP->engine->getBlockFrames());
 
 		for (int i = 0; i < 16; i++) {
 			int value = (int) std::round(inputs[CC_INPUTS + i].getVoltage() / 10.f * 127);

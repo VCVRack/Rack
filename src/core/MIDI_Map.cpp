@@ -84,8 +84,8 @@ struct MIDI_Map : Module {
 
 		while (!midiInput.queue.empty()) {
 			midi::Message& msg = midiInput.queue.front();
-			// Don't process MIDI message until its timestamp corresponds with the audio frame time when played back in the next block.
-			if (msg.timestamp + APP->engine->getBlockDuration() > APP->engine->getFrameTime())
+			// Don't process MIDI message until we've reached its frame.
+			if (msg.frame > args.frame)
 				break;
 			processMessage(msg);
 			midiInput.queue.pop();
