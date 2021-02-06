@@ -318,7 +318,7 @@ void Output::setDeviceId(int deviceId) {
 }
 
 std::string Output::getDeviceName(int deviceId) {
-	if (driver)
+	if (!driver)
 		return "";
 	try {
 		return driver->getOutputDeviceName(deviceId);
