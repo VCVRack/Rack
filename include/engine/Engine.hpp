@@ -63,11 +63,13 @@ struct Engine {
 	/** Returns the number of stepBlock() calls since the Engine was created.
 	*/
 	int64_t getBlock();
-	/** Returns the number of audio samples since the Engine was created.
+	/** Returns the frame counter which increases every sample step.
+	Not necessarily monotonically increasing. Can be reset at any time.
 	*/
 	int64_t getFrame();
-	/** Sets the frame of the next stepBlock() call.
-	There is no reason to reset the frame in standalone Rack.
+	/** Sets the frame counter.
+	Useful for when the DAW playhead position jumps to a new position.
+	Rack plugins and standalone Rack should not call this function.
 	*/
 	void setFrame(int64_t frame);
 	/** Returns the frame when stepBlock() was last called.

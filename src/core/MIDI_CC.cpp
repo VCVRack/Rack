@@ -71,7 +71,7 @@ struct MIDI_CC : Module {
 
 	void process(const ProcessArgs& args) override {
 		while (!midiInput.queue.empty()) {
-			midi::Message& msg = midiInput.queue.front();
+			const midi::Message& msg = midiInput.queue.front();
 			// Don't process MIDI message until we've reached its frame.
 			if (msg.frame > args.frame)
 				break;

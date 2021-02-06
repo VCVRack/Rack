@@ -122,7 +122,7 @@ struct MIDI_CV : Module {
 
 	void process(const ProcessArgs& args) override {
 		while (!midiInput.queue.empty()) {
-			midi::Message& msg = midiInput.queue.front();
+			const midi::Message& msg = midiInput.queue.front();
 			// Don't process MIDI message until we've reached its frame.
 			if (msg.frame > args.frame)
 				break;
@@ -184,8 +184,8 @@ struct MIDI_CV : Module {
 		outputs[CONTINUE_OUTPUT].setVoltage(continuePulse.process(args.sampleTime) ? 10.f : 0.f);
 	}
 
-	void processMessage(const midi::Message &msg) {
-		// DEBUG("MIDI: %01x %01x %02x %02x", msg.getStatus(), msg.getChannel(), msg.getNote(), msg.getValue());
+	void processMessage(const midi::Message& msg) {
+		// DEBUG("MIDI: %ld %s", msg.frame, msg.toString().c_str());
 
 		switch (msg.getStatus()) {
 			// note off

@@ -83,7 +83,7 @@ struct MIDI_Map : Module {
 			return;
 
 		while (!midiInput.queue.empty()) {
-			midi::Message& msg = midiInput.queue.front();
+			const midi::Message& msg = midiInput.queue.front();
 			// Don't process MIDI message until we've reached its frame.
 			if (msg.frame > args.frame)
 				break;
@@ -130,7 +130,7 @@ struct MIDI_Map : Module {
 		}
 	}
 
-	void processMessage(const midi::Message &msg) {
+	void processMessage(const midi::Message& msg) {
 		// DEBUG("MIDI: %01x %01x %02x %02x", msg.getStatus(), msg.getChannel(), msg.getNote(), msg.getValue());
 
 		switch (msg.getStatus()) {
@@ -142,7 +142,7 @@ struct MIDI_Map : Module {
 		}
 	}
 
-	void processCC(const midi::Message &msg) {
+	void processCC(const midi::Message& msg) {
 		uint8_t cc = msg.getNote();
 		int8_t value = msg.getValue();
 		// Learn

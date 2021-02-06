@@ -80,7 +80,7 @@ struct Message {
 		bytes[2] = value & 0x7f;
 	}
 
-	std::string toString();
+	std::string toString() const;
 };
 
 ////////////////////

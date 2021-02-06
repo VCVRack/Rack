@@ -14,7 +14,7 @@ namespace midi {
 
 static std::vector<std::pair<int, Driver*>> drivers;
 
-std::string Message::toString() {
+std::string Message::toString() const {
 	std::string s;
 	for (size_t i = 0; i < bytes.size(); i++) {
 		if (i > 0)
