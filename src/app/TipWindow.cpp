@@ -67,7 +67,7 @@ struct TipWindow : widget::OpaqueWidget {
 		// header->box.size.x = box.size.x - margin*2;
 		header->box.size.y = 20;
 		header->fontSize = 20;
-		header->text = "Welcome to VCV Rack v" + APP_VERSION;
+		header->text = "Welcome to VCV Rack " + APP_VERSION;
 		addChild(header);
 
 		label = new ui::Label;
