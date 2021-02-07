@@ -129,20 +129,20 @@ struct ModuleInfoItem : ui::MenuItem {
 			menu->addChild(donateItem);
 		}
 
-		// changelog
-		if (model->plugin->changelogUrl != "") {
-			ModuleUrlItem* changelogItem = new ModuleUrlItem;
-			changelogItem->text = "Changelog";
-			changelogItem->url = model->plugin->changelogUrl;
-			menu->addChild(changelogItem);
-		}
-
 		// source code
 		if (model->plugin->sourceUrl != "") {
 			ModuleUrlItem* sourceItem = new ModuleUrlItem;
 			sourceItem->text = "Source code";
 			sourceItem->url = model->plugin->sourceUrl;
 			menu->addChild(sourceItem);
+		}
+
+		// changelog
+		if (model->plugin->changelogUrl != "") {
+			ModuleUrlItem* changelogItem = new ModuleUrlItem;
+			changelogItem->text = "Changelog";
+			changelogItem->url = model->plugin->changelogUrl;
+			menu->addChild(changelogItem);
 		}
 
 		// plugin folder
