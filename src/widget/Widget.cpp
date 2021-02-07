@@ -36,7 +36,7 @@ void Widget::setPosition(math::Vec pos) {
 		return;
 	box.pos = pos;
 	// Trigger Reposition event
-	event::Reposition eReposition;
+	RepositionEvent eReposition;
 	onReposition(eReposition);
 }
 
@@ -51,7 +51,7 @@ void Widget::setSize(math::Vec size) {
 		return;
 	box.size = size;
 	// Trigger Resize event
-	event::Resize eResize;
+	ResizeEvent eResize;
 	onResize(eResize);
 }
 
@@ -72,12 +72,12 @@ void Widget::setVisible(bool visible) {
 	this->visible = visible;
 	if (visible) {
 		// Trigger Show event
-		event::Show eShow;
+		ShowEvent eShow;
 		onShow(eShow);
 	}
 	else {
 		// Trigger Hide event
-		event::Hide eHide;
+		HideEvent eHide;
 		onHide(eHide);
 	}
 }
@@ -151,7 +151,7 @@ void Widget::addChild(Widget* child) {
 	child->parent = this;
 	children.push_back(child);
 	// Trigger Add event
-	event::Add eAdd;
+	AddEvent eAdd;
 	child->onAdd(eAdd);
 }
 
@@ -162,7 +162,7 @@ void Widget::addChildBottom(Widget* child) {
 	child->parent = this;
 	children.push_front(child);
 	// Trigger Add event
-	event::Add eAdd;
+	AddEvent eAdd;
 	child->onAdd(eAdd);
 }
 
@@ -172,7 +172,7 @@ void Widget::removeChild(Widget* child) {
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
 	// Trigger Remove event
-	event::Remove eRemove;
+	RemoveEvent eRemove;
 	child->onRemove(eRemove);
 	// Prepare to remove widget from the event state
 	APP->event->finalizeWidget(child);
@@ -188,7 +188,7 @@ void Widget::removeChild(Widget* child) {
 void Widget::clearChildren() {
 	for (Widget* child : children) {
 		// Trigger Remove event
-		event::Remove eRemove;
+		RemoveEvent eRemove;
 		child->onRemove(eRemove);
 		APP->event->finalizeWidget(child);
 		child->parent = NULL;
@@ -204,7 +204,7 @@ void Widget::step() {
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
 			// Trigger Remove event
-			event::Remove eRemove;
+			RemoveEvent eRemove;
 			child->onRemove(eRemove);
 			APP->event->finalizeWidget(child);
 			it = children.erase(it);

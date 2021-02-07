@@ -48,7 +48,7 @@ struct NotesTextField : LedDisplayTextField {
 			module->dirty = false;
 		}
 	}
-	void onChange(const event::Change& e) override {
+	void onChange(const ChangeEvent& e) override {
 		if (module)
 			module->text = text;
 	}

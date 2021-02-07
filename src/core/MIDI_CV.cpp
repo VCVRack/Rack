@@ -515,7 +515,7 @@ struct MIDI_CVWidget : ModuleWidget {
 
 		struct SmoothItem : MenuItem {
 			MIDI_CV* module;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->smooth ^= true;
 			}
 		};
@@ -529,7 +529,7 @@ struct MIDI_CVWidget : ModuleWidget {
 		struct ClockDivisionValueItem : MenuItem {
 			MIDI_CV* module;
 			int clockDivision;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->clockDivision = clockDivision;
 			}
 		};
@@ -561,7 +561,7 @@ struct MIDI_CVWidget : ModuleWidget {
 		struct ChannelValueItem : MenuItem {
 			MIDI_CV* module;
 			int channels;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->setChannels(channels);
 			}
 		};
@@ -594,7 +594,7 @@ struct MIDI_CVWidget : ModuleWidget {
 		struct PolyModeValueItem : MenuItem {
 			MIDI_CV* module;
 			MIDI_CV::PolyMode polyMode;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->setPolyMode(polyMode);
 			}
 		};
@@ -630,7 +630,7 @@ struct MIDI_CVWidget : ModuleWidget {
 
 		struct PanicItem : MenuItem {
 			MIDI_CV* module;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->panic();
 			}
 		};

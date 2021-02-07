@@ -34,7 +34,7 @@ struct AudioDeviceWidget : LedDisplay {
 struct AudioButton : SvgButton {
 	audio::Port* port;
 	void setAudioPort(audio::Port* port);
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 };
 
 

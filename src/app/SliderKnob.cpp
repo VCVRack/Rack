@@ -9,12 +9,12 @@ SliderKnob::SliderKnob() {
 	forceLinear = true;
 }
 
-void SliderKnob::onHover(const event::Hover& e) {
+void SliderKnob::onHover(const HoverEvent& e) {
 	// Bypass Knob's circular hitbox detection
 	ParamWidget::onHover(e);
 }
 
-void SliderKnob::onButton(const event::Button& e) {
+void SliderKnob::onButton(const ButtonEvent& e) {
 	ParamWidget::onButton(e);
 }
 

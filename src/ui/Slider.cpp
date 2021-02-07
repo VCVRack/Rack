@@ -24,24 +24,24 @@ void Slider::draw(const DrawArgs& args) {
 	bndSlider(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, progress, text.c_str(), NULL);
 }
 
-void Slider::onDragStart(const event::DragStart& e) {
+void Slider::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
 	APP->window->cursorLock();
 }
 
-void Slider::onDragMove(const event::DragMove& e) {
+void Slider::onDragMove(const DragMoveEvent& e) {
 	if (quantity) {
 		quantity->moveScaledValue(SENSITIVITY * e.mouseDelta.x);
 	}
 }
 
-void Slider::onDragEnd(const event::DragEnd& e) {
+void Slider::onDragEnd(const DragEndEvent& e) {
 	APP->window->cursorUnlock();
 }
 
-void Slider::onDoubleClick(const event::DoubleClick& e) {
+void Slider::onDoubleClick(const DoubleClickEvent& e) {
 	if (quantity)
 		quantity->reset();
 }

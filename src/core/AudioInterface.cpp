@@ -562,7 +562,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 		struct PrimaryModuleItem : MenuItem {
 			TAudioInterface* module;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->setPrimary();
 			}
 		};
@@ -575,7 +575,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 		struct DCFilterItem : MenuItem {
 			TAudioInterface* module;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->dcFilterEnabled ^= true;
 			}
 		};

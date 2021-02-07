@@ -37,11 +37,11 @@ void Switch::step() {
 	ParamWidget::step();
 }
 
-void Switch::onDoubleClick(const event::DoubleClick& e) {
+void Switch::onDoubleClick(const DoubleClickEvent& e) {
 	// Don't reset parameter on double-click
 }
 
-void Switch::onDragStart(const event::DragStart& e) {
+void Switch::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -80,7 +80,7 @@ void Switch::onDragStart(const event::DragStart& e) {
 	}
 }
 
-void Switch::onDragEnd(const event::DragEnd& e) {
+void Switch::onDragEnd(const DragEndEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 

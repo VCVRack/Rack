@@ -17,13 +17,13 @@ struct MenuItem : MenuEntry {
 
 	void draw(const DrawArgs& args) override;
 	void step() override;
-	void onEnter(const event::Enter& e) override;
-	void onDragDrop(const event::DragDrop& e) override;
+	void onEnter(const EnterEvent& e) override;
+	void onDragDrop(const DragDropEvent& e) override;
 	void doAction();
 	virtual Menu* createChildMenu() {
 		return NULL;
 	}
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 };
 
 

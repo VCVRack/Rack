@@ -19,7 +19,7 @@ void Button::draw(const DrawArgs& args) {
 	bndToolButton(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str());
 }
 
-void Button::onDragStart(const event::DragStart& e) {
+void Button::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -27,14 +27,14 @@ void Button::onDragStart(const event::DragStart& e) {
 		quantity->setMax();
 }
 
-void Button::onDragEnd(const event::DragEnd& e) {
+void Button::onDragEnd(const DragEndEvent& e) {
 	if (quantity)
 		quantity->setMin();
 }
 
-void Button::onDragDrop(const event::DragDrop& e) {
+void Button::onDragDrop(const DragDropEvent& e) {
 	if (e.origin == this) {
-		event::Action eAction;
+		ActionEvent eAction;
 		onAction(eAction);
 	}
 }

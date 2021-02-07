@@ -24,13 +24,13 @@ void MenuOverlay::step() {
 }
 
 
-void MenuOverlay::onButton(const event::Button& e) {
+void MenuOverlay::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 	if (e.isConsumed() && e.getTarget() != this)
 		return;
 
 	if (e.action == GLFW_PRESS) {
-		event::Action eAction;
+		ActionEvent eAction;
 		onAction(eAction);
 	}
 
@@ -39,13 +39,13 @@ void MenuOverlay::onButton(const event::Button& e) {
 }
 
 
-void MenuOverlay::onHoverKey(const event::HoverKey& e) {
+void MenuOverlay::onHoverKey(const HoverKeyEvent& e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;
 
 	if (e.action == GLFW_PRESS && e.key == GLFW_KEY_ESCAPE) {
-		event::Action eAction;
+		ActionEvent eAction;
 		onAction(eAction);
 	}
 
@@ -55,7 +55,7 @@ void MenuOverlay::onHoverKey(const event::HoverKey& e) {
 }
 
 
-void MenuOverlay::onAction(const event::Action& e) {
+void MenuOverlay::onAction(const ActionEvent& e) {
 	requestDelete();
 }
 

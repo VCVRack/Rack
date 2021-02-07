@@ -153,7 +153,7 @@ void PortWidget::draw(const DrawArgs& args) {
 	Widget::draw(args);
 }
 
-void PortWidget::onButton(const event::Button& e) {
+void PortWidget::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
@@ -172,15 +172,15 @@ void PortWidget::onButton(const event::Button& e) {
 	}
 }
 
-void PortWidget::onEnter(const event::Enter& e) {
+void PortWidget::onEnter(const EnterEvent& e) {
 	createTooltip();
 }
 
-void PortWidget::onLeave(const event::Leave& e) {
+void PortWidget::onLeave(const LeaveEvent& e) {
 	destroyTooltip();
 }
 
-void PortWidget::onDragStart(const event::DragStart& e) {
+void PortWidget::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -235,7 +235,7 @@ void PortWidget::onDragStart(const event::DragStart& e) {
 	APP->scene->rack->setIncompleteCable(cw);
 }
 
-void PortWidget::onDragEnd(const event::DragEnd& e) {
+void PortWidget::onDragEnd(const DragEndEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -256,7 +256,7 @@ void PortWidget::onDragEnd(const event::DragEnd& e) {
 	}
 }
 
-void PortWidget::onDragDrop(const event::DragDrop& e) {
+void PortWidget::onDragDrop(const DragDropEvent& e) {
 	// HACK: Only delete tooltip if we're not (normal) dragging it.
 	if (e.origin == this)
 		createTooltip();
@@ -281,7 +281,7 @@ void PortWidget::onDragDrop(const event::DragDrop& e) {
 	}
 }
 
-void PortWidget::onDragEnter(const event::DragEnter& e) {
+void PortWidget::onDragEnter(const DragEnterEvent& e) {
 	PortWidget* pw = dynamic_cast<PortWidget*>(e.origin);
 	if (pw) {
 		createTooltip();
@@ -305,7 +305,7 @@ void PortWidget::onDragEnter(const event::DragEnter& e) {
 	}
 }
 
-void PortWidget::onDragLeave(const event::DragLeave& e) {
+void PortWidget::onDragLeave(const DragLeaveEvent& e) {
 	destroyTooltip();
 
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)

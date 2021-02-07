@@ -26,7 +26,7 @@ struct LedDisplayChoice : widget::OpaqueWidget {
 	NVGcolor bgColor;
 	LedDisplayChoice();
 	void draw(const DrawArgs& args) override;
-	void onButton(const event::Button& e) override;
+	void onButton(const ButtonEvent& e) override;
 };
 
 struct LedDisplayTextField : ui::TextField {

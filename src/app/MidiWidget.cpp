@@ -10,7 +10,7 @@ namespace app {
 struct MidiDriverValueItem : ui::MenuItem {
 	midi::Port* port;
 	int driverId;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		port->setDriverId(driverId);
 	}
 };
@@ -31,7 +31,7 @@ static void appendMidiDriverMenu(ui::Menu* menu, midi::Port* port) {
 
 struct MidiDriverChoice : LedDisplayChoice {
 	midi::Port* port;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI driver"));
 		appendMidiDriverMenu(menu, port);
@@ -61,7 +61,7 @@ struct MidiDriverItem : ui::MenuItem {
 struct MidiDeviceValueItem : ui::MenuItem {
 	midi::Port* port;
 	int deviceId;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		port->setDeviceId(deviceId);
 	}
 };
@@ -91,7 +91,7 @@ static void appendMidiDeviceMenu(ui::Menu* menu, midi::Port* port) {
 
 struct MidiDeviceChoice : LedDisplayChoice {
 	midi::Port* port;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI device"));
 		appendMidiDeviceMenu(menu, port);
@@ -121,7 +121,7 @@ struct MidiDeviceItem : ui::MenuItem {
 struct MidiChannelValueItem : ui::MenuItem {
 	midi::Port* port;
 	int channel;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		port->setChannel(channel);
 	}
 };
@@ -142,7 +142,7 @@ static void appendMidiChannelMenu(ui::Menu* menu, midi::Port* port) {
 
 struct MidiChannelChoice : LedDisplayChoice {
 	midi::Port* port;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("MIDI channel"));
 		appendMidiChannelMenu(menu, port);
@@ -202,7 +202,7 @@ void MidiButton::setMidiPort(midi::Port* port) {
 }
 
 
-void MidiButton::onAction(const event::Action& e) {
+void MidiButton::onAction(const ActionEvent& e) {
 	ui::Menu* menu = createMenu();
 	appendMidiMenu(menu, port);
 }

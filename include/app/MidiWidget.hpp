@@ -24,7 +24,7 @@ struct MidiWidget : LedDisplay {
 struct MidiButton : SvgButton {
 	midi::Port* port;
 	void setMidiPort(midi::Port* port);
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 };
 
 

@@ -301,7 +301,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		this->module = module;
 	}
 
-	void onButton(const event::Button& e) override {
+	void onButton(const ButtonEvent& e) override {
 		e.stopPropagating();
 		if (!module)
 			return;
@@ -316,7 +316,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		}
 	}
 
-	void onSelect(const event::Select& e) override {
+	void onSelect(const SelectEvent& e) override {
 		if (!module)
 			return;
 
@@ -328,7 +328,7 @@ struct MIDI_MapChoice : LedDisplayChoice {
 		module->enableLearn(id);
 	}
 
-	void onDeselect(const event::Deselect& e) override {
+	void onDeselect(const DeselectEvent& e) override {
 		if (!module)
 			return;
 		// Check if a ParamWidget was touched
@@ -498,7 +498,7 @@ struct MIDI_MapWidget : ModuleWidget {
 
 		struct SmoothItem : MenuItem {
 			MIDI_Map* module;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->smooth ^= true;
 			}
 		};

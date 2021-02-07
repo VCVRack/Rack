@@ -31,11 +31,11 @@ struct ScrollWidget : widget::OpaqueWidget {
 	math::Vec getHandleSize();
 	void draw(const DrawArgs& args) override;
 	void step() override;
-	void onButton(const event::Button& e) override;
-	void onDragStart(const event::DragStart& e) override;
-	void onDragMove(const event::DragMove& e) override;
-	void onHoverScroll(const event::HoverScroll& e) override;
-	void onHoverKey(const event::HoverKey& e) override;
+	void onButton(const ButtonEvent& e) override;
+	void onDragStart(const DragStartEvent& e) override;
+	void onDragMove(const DragMoveEvent& e) override;
+	void onHoverScroll(const HoverScrollEvent& e) override;
+	void onHoverKey(const HoverKeyEvent& e) override;
 };
 
 

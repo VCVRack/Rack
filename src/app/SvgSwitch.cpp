@@ -30,7 +30,7 @@ void SvgSwitch::addFrame(std::shared_ptr<Svg> svg) {
 	}
 }
 
-void SvgSwitch::onChange(const event::Change& e) {
+void SvgSwitch::onChange(const ChangeEvent& e) {
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (!frames.empty() && pq) {
 		int index = (int) std::round(pq->getValue() - pq->getMinValue());

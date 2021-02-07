@@ -10,8 +10,8 @@ namespace app {
 struct SliderKnob : Knob {
 	SliderKnob();
 
-	void onHover(const event::Hover& e) override;
-	void onButton(const event::Button& e) override;
+	void onHover(const HoverEvent& e) override;
+	void onButton(const ButtonEvent& e) override;
 };
 
 

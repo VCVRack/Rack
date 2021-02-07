@@ -28,10 +28,10 @@ struct Scene : widget::OpaqueWidget {
 	~Scene();
 	void step() override;
 	void draw(const DrawArgs& args) override;
-	void onHover(const event::Hover& e) override;
-	void onDragHover(const event::DragHover& e) override;
-	void onHoverKey(const event::HoverKey& e) override;
-	void onPathDrop(const event::PathDrop& e) override;
+	void onHover(const HoverEvent& e) override;
+	void onDragHover(const DragHoverEvent& e) override;
+	void onHoverKey(const HoverKeyEvent& e) override;
+	void onPathDrop(const PathDropEvent& e) override;
 };
 
 

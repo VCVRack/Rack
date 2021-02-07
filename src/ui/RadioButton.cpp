@@ -23,7 +23,7 @@ void RadioButton::draw(const DrawArgs& args) {
 	bndRadioButton(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, label.c_str());
 }
 
-void RadioButton::onDragDrop(const event::DragDrop& e) {
+void RadioButton::onDragDrop(const DragDropEvent& e) {
 	if (e.origin == this) {
 		if (quantity) {
 			if (quantity->isMax())
@@ -32,7 +32,7 @@ void RadioButton::onDragDrop(const event::DragDrop& e) {
 				quantity->setMax();
 		}
 
-		event::Action eAction;
+		ActionEvent eAction;
 		onAction(eAction);
 	}
 }

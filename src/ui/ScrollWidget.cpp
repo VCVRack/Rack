@@ -88,7 +88,7 @@ void ScrollWidget::step() {
 }
 
 
-void ScrollWidget::onButton(const event::Button& e) {
+void ScrollWidget::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 	if (e.isConsumed())
 		return;
@@ -104,7 +104,7 @@ void ScrollWidget::onButton(const event::Button& e) {
 }
 
 
-void ScrollWidget::onDragStart(const event::DragStart& e) {
+void ScrollWidget::onDragStart(const DragStartEvent& e) {
 	// Check if scrollable
 	math::Rect offsetBound = getContainerOffsetBound();
 	if (offsetBound.size.x <= 0.f && offsetBound.size.y <= 0.f)
@@ -116,7 +116,7 @@ void ScrollWidget::onDragStart(const event::DragStart& e) {
 }
 
 
-void ScrollWidget::onDragMove(const event::DragMove& e) {
+void ScrollWidget::onDragMove(const DragMoveEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
 		math::Vec offsetDelta = e.mouseDelta.div(getAbsoluteZoom());
 		offset = offset.minus(offsetDelta);
@@ -124,7 +124,7 @@ void ScrollWidget::onDragMove(const event::DragMove& e) {
 }
 
 
-void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
+void ScrollWidget::onHoverScroll(const HoverScrollEvent& e) {
 	OpaqueWidget::onHoverScroll(e);
 	if (e.isConsumed())
 		return;
@@ -152,7 +152,7 @@ void ScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 }
 
 
-void ScrollWidget::onHoverKey(const event::HoverKey& e) {
+void ScrollWidget::onHoverKey(const HoverKeyEvent& e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;

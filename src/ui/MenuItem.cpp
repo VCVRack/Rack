@@ -44,7 +44,7 @@ void MenuItem::step() {
 	Widget::step();
 }
 
-void MenuItem::onEnter(const event::Enter& e) {
+void MenuItem::onEnter(const EnterEvent& e) {
 	Menu* parentMenu = dynamic_cast<Menu*>(parent);
 	if (!parentMenu)
 		return;
@@ -60,7 +60,7 @@ void MenuItem::onEnter(const event::Enter& e) {
 	parentMenu->setChildMenu(childMenu);
 }
 
-void MenuItem::onDragDrop(const event::DragDrop& e) {
+void MenuItem::onDragDrop(const DragDropEvent& e) {
 	if (e.origin != this)
 		return;
 	doAction();
@@ -71,7 +71,7 @@ void MenuItem::doAction() {
 		return;
 
 	widget::EventContext cAction;
-	event::Action eAction;
+	ActionEvent eAction;
 	eAction.context = &cAction;
 	// Consume event by default, but allow action to un-consume it to prevent the menu from being removed.
 	eAction.consume(this);
@@ -86,7 +86,7 @@ void MenuItem::doAction() {
 }
 
 
-void MenuItem::onAction(const event::Action& e) {
+void MenuItem::onAction(const ActionEvent& e) {
 }
 
 

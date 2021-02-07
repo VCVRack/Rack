@@ -458,7 +458,7 @@ struct Widget : WeakBase {
 } // namespace widget
 
 /** Deprecated Rack v1 event namespace.
-Use `ExampleWidget` instead of `event::Example` in new code.
+Use `FooEvent` instead of `event::Foo` in new code.
 */
 namespace event {
 using Base = widget::BaseEvent;

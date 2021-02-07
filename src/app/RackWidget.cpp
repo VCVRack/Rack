@@ -112,13 +112,13 @@ void RackWidget::draw(const DrawArgs& args) {
 	Widget::draw(args);
 }
 
-void RackWidget::onHover(const event::Hover& e) {
+void RackWidget::onHover(const HoverEvent& e) {
 	// Set before calling children's onHover()
 	mousePos = e.pos;
 	OpaqueWidget::onHover(e);
 }
 
-void RackWidget::onHoverKey(const event::HoverKey& e) {
+void RackWidget::onHoverKey(const HoverKeyEvent& e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;
@@ -131,13 +131,13 @@ void RackWidget::onHoverKey(const event::HoverKey& e) {
 	}
 }
 
-void RackWidget::onDragHover(const event::DragHover& e) {
+void RackWidget::onDragHover(const DragHoverEvent& e) {
 	// Set before calling children's onDragHover()
 	mousePos = e.pos;
 	OpaqueWidget::onDragHover(e);
 }
 
-void RackWidget::onButton(const event::Button& e) {
+void RackWidget::onButton(const ButtonEvent& e) {
 	Widget::onButton(e);
 	e.stopPropagating();
 	if (e.isConsumed())

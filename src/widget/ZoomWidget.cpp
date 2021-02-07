@@ -34,7 +34,7 @@ void ZoomWidget::setZoom(float zoom) {
 
 	// Trigger Dirty event
 	widget::EventContext cDirty;
-	event::Dirty eDirty;
+	DirtyEvent eDirty;
 	eDirty.context = &cDirty;
 	Widget::onDirty(eDirty);
 }

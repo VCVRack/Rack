@@ -30,10 +30,10 @@ struct ParamWidget : widget::OpaqueWidget {
 	void step() override;
 	void draw(const DrawArgs& args) override;
 
-	void onButton(const event::Button& e) override;
-	void onDoubleClick(const event::DoubleClick& e) override;
-	void onEnter(const event::Enter& e) override;
-	void onLeave(const event::Leave& e) override;
+	void onButton(const ButtonEvent& e) override;
+	void onDoubleClick(const DoubleClickEvent& e) override;
+	void onEnter(const EnterEvent& e) override;
+	void onLeave(const LeaveEvent& e) override;
 
 	void createContextMenu();
 	virtual void appendContextMenu(ui::Menu* menu) {}

@@ -18,7 +18,7 @@ namespace app {
 
 struct UrlButton : ui::Button {
 	std::string url;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		std::thread t([=] {
 			system::openBrowser(url);
 		});
@@ -108,7 +108,7 @@ struct TipWindow : widget::OpaqueWidget {
 
 		struct PreviousButton : ui::Button {
 			TipWindow* tipWindow;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				tipWindow->advanceTip(-1);
 			}
 		};
@@ -120,7 +120,7 @@ struct TipWindow : widget::OpaqueWidget {
 
 		struct NextButton : ui::Button {
 			TipWindow* tipWindow;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				tipWindow->advanceTip();
 			}
 		};
@@ -132,7 +132,7 @@ struct TipWindow : widget::OpaqueWidget {
 
 		struct CloseButton : ui::Button {
 			TipWindow* tipWindow;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				tipWindow->getParent()->requestDelete();
 			}
 		};

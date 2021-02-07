@@ -18,12 +18,12 @@ void OptionButton::draw(const DrawArgs& args) {
 }
 
 
-void OptionButton::onDragDrop(const event::DragDrop& e) {
+void OptionButton::onDragDrop(const DragDropEvent& e) {
 	if (e.origin == this) {
 		if (quantity)
 			quantity->toggle();
 
-		event::Action eAction;
+		ActionEvent eAction;
 		onAction(eAction);
 	}
 }

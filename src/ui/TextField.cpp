@@ -9,7 +9,7 @@ namespace ui {
 
 struct TextFieldCopyItem : ui::MenuItem {
 	WeakPtr<TextField> textField;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!textField)
 			return;
 		textField->copyClipboard();
@@ -20,7 +20,7 @@ struct TextFieldCopyItem : ui::MenuItem {
 
 struct TextFieldCutItem : ui::MenuItem {
 	WeakPtr<TextField> textField;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!textField)
 			return;
 		textField->cutClipboard();
@@ -31,7 +31,7 @@ struct TextFieldCutItem : ui::MenuItem {
 
 struct TextFieldPasteItem : ui::MenuItem {
 	WeakPtr<TextField> textField;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!textField)
 			return;
 		textField->pasteClipboard();
@@ -42,7 +42,7 @@ struct TextFieldPasteItem : ui::MenuItem {
 
 struct TextFieldSelectAllItem : ui::MenuItem {
 	WeakPtr<TextField> textField;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!textField)
 			return;
 		textField->selectAll();
@@ -77,7 +77,7 @@ void TextField::draw(const DrawArgs& args) {
 	nvgResetScissor(args.vg);
 }
 
-void TextField::onDragHover(const event::DragHover& e) {
+void TextField::onDragHover(const DragHoverEvent& e) {
 	OpaqueWidget::onDragHover(e);
 
 	if (e.origin == this) {
@@ -86,7 +86,7 @@ void TextField::onDragHover(const event::DragHover& e) {
 	}
 }
 
-void TextField::onButton(const event::Button& e) {
+void TextField::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
@@ -99,7 +99,7 @@ void TextField::onButton(const event::Button& e) {
 	}
 }
 
-void TextField::onSelectText(const event::SelectText& e) {
+void TextField::onSelectText(const SelectTextEvent& e) {
 	if (e.codepoint < 128) {
 		std::string newText(1, (char) e.codepoint);
 		insertText(newText);
@@ -107,7 +107,7 @@ void TextField::onSelectText(const event::SelectText& e) {
 	e.consume(this);
 }
 
-void TextField::onSelectKey(const event::SelectKey& e) {
+void TextField::onSelectKey(const SelectKeyEvent& e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		// Backspace
 		if (e.key == GLFW_KEY_BACKSPACE && (e.mods & RACK_MOD_MASK) == 0) {
@@ -213,7 +213,7 @@ void TextField::onSelectKey(const event::SelectKey& e) {
 				insertText("\n");
 			}
 			else {
-				event::Action eAction;
+				ActionEvent eAction;
 				onAction(eAction);
 			}
 			e.consume(this);
@@ -249,8 +249,8 @@ std::string TextField::getText() {
 void TextField::setText(std::string text) {
 	if (this->text != text) {
 		this->text = text;
-		// event::Change
-		event::Change eChange;
+		// ChangeEvent
+		ChangeEvent eChange;
 		onChange(eChange);
 	}
 	selection = cursor = text.size();
@@ -284,7 +284,7 @@ void TextField::insertText(std::string text) {
 		changed = true;
 	}
 	if (changed) {
-		event::Change eChange;
+		ChangeEvent eChange;
 		onChange(eChange);
 	}
 }

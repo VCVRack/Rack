@@ -20,9 +20,9 @@ struct RackScrollWidget : ui::ScrollWidget {
 	void reset();
 	void step() override;
 	void draw(const DrawArgs& args) override;
-	void onHoverKey(const event::HoverKey& e) override;
-	void onHoverScroll(const event::HoverScroll& e) override;
-	void onHover(const event::Hover& e) override;
+	void onHoverKey(const HoverKeyEvent& e) override;
+	void onHoverScroll(const HoverScrollEvent& e) override;
+	void onHover(const HoverEvent& e) override;
 };
 
 

@@ -91,7 +91,7 @@ void RackScrollWidget::draw(const DrawArgs& args) {
 }
 
 
-void RackScrollWidget::onHoverKey(const event::HoverKey& e) {
+void RackScrollWidget::onHoverKey(const HoverKeyEvent& e) {
 	ScrollWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;
@@ -126,7 +126,7 @@ void RackScrollWidget::onHoverKey(const event::HoverKey& e) {
 }
 
 
-void RackScrollWidget::onHoverScroll(const event::HoverScroll& e) {
+void RackScrollWidget::onHoverScroll(const HoverScrollEvent& e) {
 	ScrollWidget::onHoverScroll(e);
 	if (e.isConsumed())
 		return;
@@ -143,7 +143,7 @@ void RackScrollWidget::onHoverScroll(const event::HoverScroll& e) {
 }
 
 
-void RackScrollWidget::onHover(const event::Hover& e) {
+void RackScrollWidget::onHover(const HoverEvent& e) {
 	ScrollWidget::onHover(e);
 
 	// Hide menu bar if fullscreen and moving mouse over the RackScrollWidget

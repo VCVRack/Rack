@@ -21,10 +21,10 @@ struct TextField : widget::OpaqueWidget {
 
 	TextField();
 	void draw(const DrawArgs& args) override;
-	void onDragHover(const event::DragHover& e) override;
-	void onButton(const event::Button& e) override;
-	void onSelectText(const event::SelectText& e) override;
-	void onSelectKey(const event::SelectKey& e) override;
+	void onDragHover(const DragHoverEvent& e) override;
+	void onButton(const ButtonEvent& e) override;
+	void onSelectText(const SelectTextEvent& e) override;
+	void onSelectKey(const SelectKeyEvent& e) override;
 	virtual int getTextPosition(math::Vec mousePos);
 
 	std::string getText();

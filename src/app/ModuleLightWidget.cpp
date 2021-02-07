@@ -118,7 +118,7 @@ void ModuleLightWidget::step() {
 }
 
 
-void ModuleLightWidget::onHover(const event::Hover& e) {
+void ModuleLightWidget::onHover(const HoverEvent& e) {
 	// Adapted from OpaqueWidget::onHover()
 	Widget::onHover(e);
 	e.stopPropagating();
@@ -128,12 +128,12 @@ void ModuleLightWidget::onHover(const event::Hover& e) {
 }
 
 
-void ModuleLightWidget::onEnter(const event::Enter& e) {
+void ModuleLightWidget::onEnter(const EnterEvent& e) {
 	createTooltip();
 }
 
 
-void ModuleLightWidget::onLeave(const event::Leave& e) {
+void ModuleLightWidget::onLeave(const LeaveEvent& e) {
 	destroyTooltip();
 }
 

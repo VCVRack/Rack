@@ -30,13 +30,13 @@ struct Knob : ParamWidget {
 	Knob();
 	~Knob();
 	void initParamQuantity() override;
-	void onHover(const event::Hover& e) override;
-	void onButton(const event::Button& e) override;
-	void onDragStart(const event::DragStart& e) override;
-	void onDragEnd(const event::DragEnd& e) override;
-	void onDragMove(const event::DragMove& e) override;
-	void onDragLeave(const event::DragLeave& e) override;
-	void onHoverScroll(const event::HoverScroll& e) override;
+	void onHover(const HoverEvent& e) override;
+	void onButton(const ButtonEvent& e) override;
+	void onDragStart(const DragStartEvent& e) override;
+	void onDragEnd(const DragEndEvent& e) override;
+	void onDragMove(const DragMoveEvent& e) override;
+	void onDragLeave(const DragLeaveEvent& e) override;
+	void onHoverScroll(const HoverScrollEvent& e) override;
 };
 
 

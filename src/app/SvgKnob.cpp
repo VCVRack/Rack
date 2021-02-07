@@ -31,7 +31,7 @@ void SvgKnob::setSvg(std::shared_ptr<Svg> svg) {
 	// shadow->box = shadow->box.grow(math::Vec(2, 2));
 }
 
-void SvgKnob::onChange(const event::Change& e) {
+void SvgKnob::onChange(const ChangeEvent& e) {
 	// Re-transform the widget::TransformWidget
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {

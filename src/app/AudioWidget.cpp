@@ -28,7 +28,7 @@ static std::string getDetailTemplate(std::string name, int numInputs, int inputO
 struct AudioDriverValueItem : ui::MenuItem {
 	audio::Port* port;
 	int driverId;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		port->setDriverId(driverId);
 	}
 };
@@ -49,7 +49,7 @@ static void appendAudioDriverMenu(ui::Menu* menu, audio::Port* port) {
 
 struct AudioDriverChoice : LedDisplayChoice {
 	audio::Port* port;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Audio driver"));
 		appendAudioDriverMenu(menu, port);
@@ -86,7 +86,7 @@ struct AudioDeviceValueItem : ui::MenuItem {
 	int deviceId;
 	int inputOffset;
 	int outputOffset;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		port->setDeviceId(deviceId);
 		port->inputOffset = inputOffset;
 		port->outputOffset = outputOffset;
@@ -133,7 +133,7 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 struct AudioDeviceChoice : LedDisplayChoice {
 	audio::Port* port;
 
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Audio device"));
 		appendAudioDeviceMenu(menu, port);
@@ -173,7 +173,7 @@ struct AudioDeviceItem : ui::MenuItem {
 struct AudioSampleRateValueItem : ui::MenuItem {
 	audio::Port* port;
 	float sampleRate;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		port->setSampleRate(sampleRate);
 	}
 };
@@ -203,7 +203,7 @@ static void appendAudioSampleRateMenu(ui::Menu* menu, audio::Port* port) {
 
 struct AudioSampleRateChoice : LedDisplayChoice {
 	audio::Port* port;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Sample rate"));
 		appendAudioSampleRateMenu(menu, port);
@@ -238,7 +238,7 @@ struct AudioSampleRateItem : ui::MenuItem {
 struct AudioBlockSizeValueItem : ui::MenuItem {
 	audio::Port* port;
 	int blockSize;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		port->setBlockSize(blockSize);
 	}
 };
@@ -269,7 +269,7 @@ static void appendAudioBlockSizeMenu(ui::Menu* menu, audio::Port* port) {
 
 struct AudioBlockSizeChoice : LedDisplayChoice {
 	audio::Port* port;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->addChild(createMenuLabel("Block size"));
 		appendAudioBlockSizeMenu(menu, port);
@@ -348,7 +348,7 @@ void AudioWidget::setAudioPort(audio::Port* port) {
 
 
 struct AudioDeviceMenuChoice : AudioDeviceChoice {
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		appendAudioMenu(menu, port);
 	}
@@ -370,7 +370,7 @@ void AudioButton::setAudioPort(audio::Port* port) {
 }
 
 
-void AudioButton::onAction(const event::Action& e) {
+void AudioButton::onAction(const ActionEvent& e) {
 	ui::Menu* menu = createMenu();
 	appendAudioMenu(menu, port);
 }

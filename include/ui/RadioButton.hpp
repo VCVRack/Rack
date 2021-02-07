@@ -15,7 +15,7 @@ struct RadioButton : widget::OpaqueWidget {
 
 	RadioButton();
 	void draw(const DrawArgs& args) override;
-	void onDragDrop(const event::DragDrop& e) override;
+	void onDragDrop(const DragDropEvent& e) override;
 };
 
 

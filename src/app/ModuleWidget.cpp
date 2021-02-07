@@ -28,7 +28,7 @@ static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
 
 struct ModuleUrlItem : ui::MenuItem {
 	std::string url;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		std::thread t(system::openBrowser, url);
 		t.detach();
 	}
@@ -37,7 +37,7 @@ struct ModuleUrlItem : ui::MenuItem {
 
 struct ModuleFolderItem : ui::MenuItem {
 	std::string path;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		std::thread t(system::openFolder, path);
 		t.detach();
 	}
@@ -160,7 +160,7 @@ struct ModuleInfoItem : ui::MenuItem {
 
 struct ModuleDisconnectItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->disconnectAction();
@@ -170,7 +170,7 @@ struct ModuleDisconnectItem : ui::MenuItem {
 
 struct ModuleResetItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->resetAction();
@@ -180,7 +180,7 @@ struct ModuleResetItem : ui::MenuItem {
 
 struct ModuleRandomizeItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->randomizeAction();
@@ -190,7 +190,7 @@ struct ModuleRandomizeItem : ui::MenuItem {
 
 struct ModuleCopyItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->copyClipboard();
@@ -200,7 +200,7 @@ struct ModuleCopyItem : ui::MenuItem {
 
 struct ModulePasteItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->pasteClipboardAction();
@@ -210,7 +210,7 @@ struct ModulePasteItem : ui::MenuItem {
 
 struct ModuleSaveItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->saveDialog();
@@ -220,7 +220,7 @@ struct ModuleSaveItem : ui::MenuItem {
 
 struct ModuleSaveTemplateItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->saveTemplateDialog();
@@ -230,7 +230,7 @@ struct ModuleSaveTemplateItem : ui::MenuItem {
 
 struct ModuleClearTemplateItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->clearTemplateDialog();
@@ -240,7 +240,7 @@ struct ModuleClearTemplateItem : ui::MenuItem {
 
 struct ModuleLoadItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->loadDialog();
@@ -251,7 +251,7 @@ struct ModuleLoadItem : ui::MenuItem {
 struct ModulePresetPathItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
 	std::string presetPath;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		try {
@@ -348,7 +348,7 @@ struct ModulePresetItem : ui::MenuItem {
 
 struct ModuleCloneItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->cloneAction();
@@ -358,7 +358,7 @@ struct ModuleCloneItem : ui::MenuItem {
 
 struct ModuleBypassItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->bypassAction();
@@ -368,7 +368,7 @@ struct ModuleBypassItem : ui::MenuItem {
 
 struct ModuleDeleteItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		moduleWidget->removeAction();
@@ -500,7 +500,7 @@ void ModuleWidget::drawShadow(const DrawArgs& args) {
 	nvgFill(args.vg);
 }
 
-void ModuleWidget::onButton(const event::Button& e) {
+void ModuleWidget::onButton(const ButtonEvent& e) {
 	// Don't consume left button if `lockModules` is enabled.
 	if (settings::lockModules)
 		Widget::onButton(e);
@@ -521,7 +521,7 @@ void ModuleWidget::onButton(const event::Button& e) {
 	}
 }
 
-void ModuleWidget::onHoverKey(const event::HoverKey& e) {
+void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;
@@ -565,7 +565,7 @@ void ModuleWidget::onHoverKey(const event::HoverKey& e) {
 	}
 }
 
-void ModuleWidget::onDragStart(const event::DragStart& e) {
+void ModuleWidget::onDragStart(const DragStartEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		// Clear dragRack so dragging in not enabled until mouse is moved a bit.
 		internal->dragRackPos = math::Vec(NAN, NAN);
@@ -575,7 +575,7 @@ void ModuleWidget::onDragStart(const event::DragStart& e) {
 	}
 }
 
-void ModuleWidget::onDragEnd(const event::DragEnd& e) {
+void ModuleWidget::onDragEnd(const DragEndEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		// The next time the module is dragged, it should always move immediately
 		internal->dragEnabled = true;
@@ -587,7 +587,7 @@ void ModuleWidget::onDragEnd(const event::DragEnd& e) {
 	}
 }
 
-void ModuleWidget::onDragMove(const event::DragMove& e) {
+void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (!settings::lockModules) {
 			math::Vec mousePos = APP->scene->rack->mousePos;

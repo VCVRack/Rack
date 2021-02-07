@@ -140,7 +140,7 @@ struct CV_MIDI : Module {
 
 struct CV_MIDIPanicItem : MenuItem {
 	CV_MIDI* module;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		module->midiOutput.panic();
 	}
 };

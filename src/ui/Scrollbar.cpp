@@ -36,7 +36,7 @@ void Scrollbar::draw(const DrawArgs& args) {
 }
 
 
-void Scrollbar::onButton(const event::Button& e) {
+void Scrollbar::onButton(const ButtonEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
 		ScrollWidget* sw = dynamic_cast<ScrollWidget*>(parent);
 		assert(sw);
@@ -58,15 +58,15 @@ void Scrollbar::onButton(const event::Button& e) {
 }
 
 
-void Scrollbar::onDragStart(const event::DragStart& e) {
+void Scrollbar::onDragStart(const DragStartEvent& e) {
 }
 
 
-void Scrollbar::onDragEnd(const event::DragEnd& e) {
+void Scrollbar::onDragEnd(const DragEndEvent& e) {
 }
 
 
-void Scrollbar::onDragMove(const event::DragMove& e) {
+void Scrollbar::onDragMove(const DragMoveEvent& e) {
 	ScrollWidget* sw = dynamic_cast<ScrollWidget*>(parent);
 	assert(sw);
 

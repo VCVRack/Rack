@@ -255,7 +255,7 @@ struct MIDI_CCWidget : ModuleWidget {
 
 		struct SmoothItem : MenuItem {
 			MIDI_CC* module;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->smooth ^= true;
 			}
 		};
@@ -268,7 +268,7 @@ struct MIDI_CCWidget : ModuleWidget {
 
 		struct MpeModeItem : MenuItem {
 			MIDI_CC* module;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->mpeMode ^= true;
 			}
 		};
@@ -281,7 +281,7 @@ struct MIDI_CCWidget : ModuleWidget {
 
 		struct LSBItem : MenuItem {
 			MIDI_CC* module;
-			void onAction(const event::Action& e) override {
+			void onAction(const ActionEvent& e) override {
 				module->lsbEnabled ^= true;
 			}
 		};

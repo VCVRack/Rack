@@ -23,7 +23,7 @@ struct SvgKnob : Knob {
 	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {
 		setSvg(svg);
 	}
-	void onChange(const event::Change& e) override;
+	void onChange(const ChangeEvent& e) override;
 };
 
 

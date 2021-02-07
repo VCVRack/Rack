@@ -62,11 +62,11 @@ void LedDisplayChoice::draw(const DrawArgs& args) {
 	nvgResetScissor(args.vg);
 }
 
-void LedDisplayChoice::onButton(const event::Button& e) {
+void LedDisplayChoice::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
-		event::Action eAction;
+		ActionEvent eAction;
 		onAction(eAction);
 		e.consume(this);
 	}

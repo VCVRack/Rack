@@ -49,7 +49,7 @@ void FramebufferWidget::setDirty(bool dirty) {
 }
 
 
-void FramebufferWidget::onDirty(const event::Dirty& e) {
+void FramebufferWidget::onDirty(const DirtyEvent& e) {
 	dirty = true;
 	Widget::onDirty(e);
 }

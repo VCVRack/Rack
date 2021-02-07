@@ -121,7 +121,7 @@ struct BrowserOverlay : ui::MenuOverlay {
 			MenuOverlay::step();
 	}
 
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		hide();
 	}
 };
@@ -217,7 +217,7 @@ struct ModelBox : widget::OpaqueWidget {
 		}
 	}
 
-	void onButton(const event::Button& e) override {
+	void onButton(const ButtonEvent& e) override {
 		OpaqueWidget::onButton(e);
 		if (e.getTarget() != this)
 			return;
@@ -235,7 +235,7 @@ struct ModelBox : widget::OpaqueWidget {
 		}
 	}
 
-	void onEnter(const event::Enter& e) override {
+	void onEnter(const EnterEvent& e) override {
 		std::string text;
 		text = model->plugin->brand;
 		text += " " + model->name;
@@ -256,11 +256,11 @@ struct ModelBox : widget::OpaqueWidget {
 		setTooltip(tooltip);
 	}
 
-	void onLeave(const event::Leave& e) override {
+	void onLeave(const LeaveEvent& e) override {
 		setTooltip(NULL);
 	}
 
-	void onHide(const event::Hide& e) override {
+	void onHide(const HideEvent& e) override {
 		// Hide tooltip
 		setTooltip(NULL);
 		OpaqueWidget::onHide(e);
@@ -277,16 +277,16 @@ struct BrowserSearchField : ui::TextField {
 		TextField::step();
 	}
 
-	void onSelectKey(const event::SelectKey& e) override;
-	void onChange(const event::Change& e) override;
-	void onAction(const event::Action& e) override;
+	void onSelectKey(const SelectKeyEvent& e) override;
+	void onChange(const ChangeEvent& e) override;
+	void onAction(const ActionEvent& e) override;
 
-	void onHide(const event::Hide& e) override {
+	void onHide(const HideEvent& e) override {
 		APP->event->setSelected(NULL);
 		ui::TextField::onHide(e);
 	}
 
-	void onShow(const event::Show& e) override {
+	void onShow(const ShowEvent& e) override {
 		selectAll();
 		TextField::onShow(e);
 	}
@@ -295,14 +295,14 @@ struct BrowserSearchField : ui::TextField {
 
 struct ClearButton : ui::Button {
 	ModuleBrowser* browser;
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 };
 
 
 struct BrandItem : ui::MenuItem {
 	ModuleBrowser* browser;
 	std::string brand;
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 	void step() override;
 };
 
@@ -310,7 +310,7 @@ struct BrandItem : ui::MenuItem {
 struct BrandButton : ui::ChoiceButton {
 	ModuleBrowser* browser;
 
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 	void step() override;
 };
 
@@ -318,7 +318,7 @@ struct BrandButton : ui::ChoiceButton {
 struct TagItem : ui::MenuItem {
 	ModuleBrowser* browser;
 	int tagId;
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 	void step() override;
 };
 
@@ -326,7 +326,7 @@ struct TagItem : ui::MenuItem {
 struct TagButton : ui::ChoiceButton {
 	ModuleBrowser* browser;
 
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 	void step() override;
 };
 
@@ -344,7 +344,7 @@ static const std::string sortNames[] = {
 struct SortItem : ui::MenuItem {
 	ModuleBrowser* browser;
 	settings::ModuleBrowserSort sort;
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 	void step() override {
 		rightText = CHECKMARK(settings::moduleBrowserSort == sort);
 		MenuItem::step();
@@ -355,7 +355,7 @@ struct SortItem : ui::MenuItem {
 struct SortButton : ui::ChoiceButton {
 	ModuleBrowser* browser;
 
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -380,7 +380,7 @@ struct SortButton : ui::ChoiceButton {
 struct ZoomItem : ui::MenuItem {
 	ModuleBrowser* browser;
 	float zoom;
-	void onAction(const event::Action& e) override;
+	void onAction(const ActionEvent& e) override;
 	void step() override {
 		rightText = CHECKMARK(settings::moduleBrowserZoom == zoom);
 		MenuItem::step();
@@ -391,7 +391,7 @@ struct ZoomItem : ui::MenuItem {
 struct ZoomButton : ui::ChoiceButton {
 	ModuleBrowser* browser;
 
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
@@ -415,7 +415,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 struct UrlButton : ui::Button {
 	std::string url;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		std::thread t([=] {
 			system::openBrowser(url);
 		});
@@ -698,7 +698,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		refresh();
 	}
 
-	void onShow(const event::Show& e) override {
+	void onShow(const ShowEvent& e) override {
 		refresh();
 		OpaqueWidget::onShow(e);
 	}
@@ -708,11 +708,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 // Implementations to resolve dependencies
 
 
-inline void ClearButton::onAction(const event::Action& e) {
+inline void ClearButton::onAction(const ActionEvent& e) {
 	browser->clear();
 }
 
-inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
+inline void BrowserSearchField::onSelectKey(const SelectKeyEvent& e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		if (e.key == GLFW_KEY_ESCAPE) {
 			BrowserOverlay* overlay = browser->getAncestorOfType<BrowserOverlay>();
@@ -732,12 +732,12 @@ inline void BrowserSearchField::onSelectKey(const event::SelectKey& e) {
 		ui::TextField::onSelectKey(e);
 }
 
-inline void BrowserSearchField::onChange(const event::Change& e) {
+inline void BrowserSearchField::onChange(const ChangeEvent& e) {
 	browser->search = string::trim(text);
 	browser->refresh();
 }
 
-inline void BrowserSearchField::onAction(const event::Action& e) {
+inline void BrowserSearchField::onAction(const ActionEvent& e) {
 	// Get first ModelBox
 	ModelBox* mb = NULL;
 	for (Widget* w : browser->modelContainer->children) {
@@ -752,7 +752,7 @@ inline void BrowserSearchField::onAction(const event::Action& e) {
 	}
 }
 
-inline void BrandItem::onAction(const event::Action& e) {
+inline void BrandItem::onAction(const ActionEvent& e) {
 	if (browser->brand == brand)
 		browser->brand = "";
 	else
@@ -765,7 +765,7 @@ inline void BrandItem::step() {
 	MenuItem::step();
 }
 
-inline void BrandButton::onAction(const event::Action& e) {
+inline void BrandButton::onAction(const ActionEvent& e) {
 	ui::Menu* menu = createMenu();
 	menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 	menu->box.size.x = box.size.x;
@@ -804,7 +804,7 @@ inline void BrandButton::step() {
 	ChoiceButton::step();
 }
 
-inline void TagItem::onAction(const event::Action& e) {
+inline void TagItem::onAction(const ActionEvent& e) {
 	auto it = browser->tagIds.find(tagId);
 	bool isSelected = (it != browser->tagIds.end());
 
@@ -849,7 +849,7 @@ inline void TagItem::step() {
 	MenuItem::step();
 }
 
-inline void TagButton::onAction(const event::Action& e) {
+inline void TagButton::onAction(const ActionEvent& e) {
 	ui::Menu* menu = createMenu();
 	menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 	menu->box.size.x = box.size.x;
@@ -889,12 +889,12 @@ inline void TagButton::step() {
 	ChoiceButton::step();
 }
 
-inline void SortItem::onAction(const event::Action& e) {
+inline void SortItem::onAction(const ActionEvent& e) {
 	settings::moduleBrowserSort = sort;
 	browser->refresh();
 }
 
-inline void ZoomItem::onAction(const event::Action& e) {
+inline void ZoomItem::onAction(const ActionEvent& e) {
 	if (zoom != settings::moduleBrowserZoom) {
 		settings::moduleBrowserZoom = zoom;
 		browser->updateZoom();

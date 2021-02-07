@@ -31,7 +31,7 @@ struct ParamField : ui::TextField {
 		selectAll();
 	}
 
-	void onSelectKey(const event::SelectKey& e) override {
+	void onSelectKey(const SelectKeyEvent& e) override {
 		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
 			engine::ParamQuantity* pq = paramWidget->getParamQuantity();
 			assert(pq);
@@ -65,7 +65,7 @@ struct ParamValueItem : ui::MenuItem {
 	ParamWidget* paramWidget;
 	float value;
 
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		engine::ParamQuantity* pq = paramWidget->getParamQuantity();
 		if (pq) {
 			float oldValue = pq->getValue();
@@ -124,7 +124,7 @@ struct ParamLabel : ui::MenuLabel {
 
 struct ParamResetItem : ui::MenuItem {
 	ParamWidget* paramWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		paramWidget->resetAction();
 	}
 };
@@ -136,7 +136,7 @@ struct ParamFineItem : ui::MenuItem {
 
 struct ParamUnmapItem : ui::MenuItem {
 	ParamWidget* paramWidget;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		engine::ParamHandle* paramHandle = APP->engine->getParamHandle(paramWidget->module->id, paramWidget->paramId);
 		if (paramHandle) {
 			APP->engine->updateParamHandle(paramHandle, -1, 0);
@@ -178,7 +178,7 @@ void ParamWidget::step() {
 		float value = pq->getSmoothValue();
 		// Trigger change event when the ParamQuantity value changes
 		if (value != lastValue) {
-			event::Change eChange;
+			ChangeEvent eChange;
 			onChange(eChange);
 			lastValue = value;
 		}
@@ -206,7 +206,7 @@ void ParamWidget::draw(const DrawArgs& args) {
 	}
 }
 
-void ParamWidget::onButton(const event::Button& e) {
+void ParamWidget::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 
 	// Touch parameter
@@ -225,15 +225,15 @@ void ParamWidget::onButton(const event::Button& e) {
 	}
 }
 
-void ParamWidget::onDoubleClick(const event::DoubleClick& e) {
+void ParamWidget::onDoubleClick(const DoubleClickEvent& e) {
 	resetAction();
 }
 
-void ParamWidget::onEnter(const event::Enter& e) {
+void ParamWidget::onEnter(const EnterEvent& e) {
 	createTooltip();
 }
 
-void ParamWidget::onLeave(const event::Leave& e) {
+void ParamWidget::onLeave(const LeaveEvent& e) {
 	destroyTooltip();
 }
 

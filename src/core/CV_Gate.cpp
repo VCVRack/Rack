@@ -164,7 +164,7 @@ struct CV_Gate : Module {
 
 struct CV_GateVelocityItem : MenuItem {
 	CV_Gate* module;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		module->velocityMode ^= true;
 	}
 };
@@ -172,7 +172,7 @@ struct CV_GateVelocityItem : MenuItem {
 
 struct CV_GatePanicItem : MenuItem {
 	CV_Gate* module;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		module->midiOutput.panic();
 	}
 };

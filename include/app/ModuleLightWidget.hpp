@@ -25,9 +25,9 @@ struct ModuleLightWidget : MultiLightWidget {
 	void destroyTooltip();
 
 	void step() override;
-	void onHover(const event::Hover& e) override;
-	void onEnter(const event::Enter& e) override;
-	void onLeave(const event::Leave& e) override;
+	void onHover(const HoverEvent& e) override;
+	void onEnter(const EnterEvent& e) override;
+	void onLeave(const LeaveEvent& e) override;
 };
 
 

@@ -15,10 +15,10 @@ struct Slider : widget::OpaqueWidget {
 
 	Slider();
 	void draw(const DrawArgs& args) override;
-	void onDragStart(const event::DragStart& e) override;
-	void onDragMove(const event::DragMove& e) override;
-	void onDragEnd(const event::DragEnd& e) override;
-	void onDoubleClick(const event::DoubleClick& e) override;
+	void onDragStart(const DragStartEvent& e) override;
+	void onDragMove(const DragMoveEvent& e) override;
+	void onDragEnd(const DragEndEvent& e) override;
+	void onDoubleClick(const DoubleClickEvent& e) override;
 };
 
 

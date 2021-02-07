@@ -43,7 +43,7 @@ void Knob::initParamQuantity() {
 	}
 }
 
-void Knob::onHover(const event::Hover& e) {
+void Knob::onHover(const HoverEvent& e) {
 	// Only call super if mouse position is in the circle
 	math::Vec c = box.size.div(2);
 	float dist = e.pos.minus(c).norm();
@@ -52,7 +52,7 @@ void Knob::onHover(const event::Hover& e) {
 	}
 }
 
-void Knob::onButton(const event::Button& e) {
+void Knob::onButton(const ButtonEvent& e) {
 	math::Vec c = box.size.div(2);
 	float dist = e.pos.minus(c).norm();
 	if (dist <= c.x) {
@@ -60,7 +60,7 @@ void Knob::onButton(const event::Button& e) {
 	}
 }
 
-void Knob::onDragStart(const event::DragStart& e) {
+void Knob::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -83,7 +83,7 @@ void Knob::onDragStart(const event::DragStart& e) {
 	ParamWidget::onDragStart(e);
 }
 
-void Knob::onDragEnd(const event::DragEnd& e) {
+void Knob::onDragEnd(const DragEndEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -124,7 +124,7 @@ static float getModSpeed() {
 		return 1.f;
 }
 
-void Knob::onDragMove(const event::DragMove& e) {
+void Knob::onDragMove(const DragMoveEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
@@ -215,7 +215,7 @@ void Knob::onDragMove(const event::DragMove& e) {
 	ParamWidget::onDragMove(e);
 }
 
-void Knob::onDragLeave(const event::DragLeave& e) {
+void Knob::onDragLeave(const DragLeaveEvent& e) {
 	if (e.origin == this) {
 		internal->rotaryDragEnabled = true;
 	}
@@ -224,7 +224,7 @@ void Knob::onDragLeave(const event::DragLeave& e) {
 }
 
 
-void Knob::onHoverScroll(const event::HoverScroll& e) {
+void Knob::onHoverScroll(const HoverScrollEvent& e) {
 	ParamWidget::onHoverScroll(e);
 
 	if (settings::knobScroll) {

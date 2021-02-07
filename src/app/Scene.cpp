@@ -94,7 +94,7 @@ void Scene::draw(const DrawArgs& args) {
 	Widget::draw(args);
 }
 
-void Scene::onHover(const event::Hover& e) {
+void Scene::onHover(const HoverEvent& e) {
 	mousePos = e.pos;
 	if (mousePos.y < menuBar->box.size.y) {
 		menuBar->show();
@@ -102,12 +102,12 @@ void Scene::onHover(const event::Hover& e) {
 	OpaqueWidget::onHover(e);
 }
 
-void Scene::onDragHover(const event::DragHover& e) {
+void Scene::onDragHover(const DragHoverEvent& e) {
 	mousePos = e.pos;
 	OpaqueWidget::onDragHover(e);
 }
 
-void Scene::onHoverKey(const event::HoverKey& e) {
+void Scene::onHoverKey(const HoverKeyEvent& e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.isConsumed())
 		return;
@@ -197,7 +197,7 @@ void Scene::onHoverKey(const event::HoverKey& e) {
 	}
 }
 
-void Scene::onPathDrop(const event::PathDrop& e) {
+void Scene::onPathDrop(const PathDropEvent& e) {
 	if (e.paths.size() >= 1) {
 		const std::string& path = e.paths[0];
 		if (system::getExtension(path) == ".vcv") {

@@ -64,7 +64,7 @@ struct ModuleResizeHandle : OpaqueWidget {
 		box.size = Vec(RACK_GRID_WIDTH * 1, RACK_GRID_HEIGHT);
 	}
 
-	void onDragStart(const event::DragStart& e) override {
+	void onDragStart(const DragStartEvent& e) override {
 		if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 			return;
 
@@ -74,7 +74,7 @@ struct ModuleResizeHandle : OpaqueWidget {
 		originalBox = mw->box;
 	}
 
-	void onDragMove(const event::DragMove& e) override {
+	void onDragMove(const DragMoveEvent& e) override {
 		ModuleWidget* mw = getAncestorOfType<ModuleWidget>();
 		assert(mw);
 

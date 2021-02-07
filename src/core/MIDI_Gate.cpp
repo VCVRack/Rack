@@ -183,7 +183,7 @@ struct MIDI_Gate : Module {
 
 struct MIDI_GateVelocityItem : MenuItem {
 	MIDI_Gate* module;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		module->velocityMode ^= true;
 	}
 };
@@ -191,7 +191,7 @@ struct MIDI_GateVelocityItem : MenuItem {
 
 struct MIDI_GateMpeModeItem : MenuItem {
 	MIDI_Gate* module;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		module->mpeMode ^= true;
 	}
 };
@@ -199,7 +199,7 @@ struct MIDI_GateMpeModeItem : MenuItem {
 
 struct MIDI_GatePanicItem : MenuItem {
 	MIDI_Gate* module;
-	void onAction(const event::Action& e) override {
+	void onAction(const ActionEvent& e) override {
 		module->panic();
 	}
 };
