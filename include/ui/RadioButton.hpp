@@ -3,7 +3,6 @@
 #include <widget/OpaqueWidget.hpp>
 #include <Quantity.hpp>
 #include <context.hpp>
-#include <event.hpp>
 
 
 namespace rack {

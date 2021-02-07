@@ -70,7 +70,7 @@ void MenuItem::doAction() {
 	if (disabled)
 		return;
 
-	event::Context cAction;
+	widget::EventContext cAction;
 	event::Action eAction;
 	eAction.context = &cAction;
 	// Consume event by default, but allow action to un-consume it to prevent the menu from being removed.

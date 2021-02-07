@@ -16,6 +16,7 @@
 #include <helpers.hpp>
 #include <componentlibrary.hpp>
 
+#include <widget/event.hpp>
 #include <widget/Widget.hpp>
 #include <widget/TransparentWidget.hpp>
 #include <widget/OpaqueWidget.hpp>

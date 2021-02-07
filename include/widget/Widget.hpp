@@ -5,7 +5,7 @@
 #include <math.hpp>
 #include <window.hpp>
 #include <color.hpp>
-#include <event.hpp>
+#include <widget/event.hpp>
 #include <weakptr.hpp>
 
 
@@ -168,60 +168,333 @@ struct Widget : WeakBase {
 		}
 	}
 
-	/** Override these event callbacks to respond to events.
-	See event.hpp for a description of each event.
+	using BaseEvent = widget::BaseEvent;
+
+	/** An event prototype with a vector position. */
+	struct PositionBaseEvent {
+		/** The pixel coordinate where the event occurred, relative to the Widget it is called on. */
+		math::Vec pos;
+	};
+
+	/** Occurs every frame when the mouse is hovering over a Widget.
+	Recurses.
+	Consume this event to allow Enter and Leave to occur.
 	*/
-	virtual void onHover(const event::Hover& e) {
+	struct HoverEvent : BaseEvent, PositionBaseEvent {
+		/** Change in mouse position since the last frame. Can be zero. */
+		math::Vec mouseDelta;
+	};
+	virtual void onHover(const HoverEvent& e) {
 		recursePositionEvent(&Widget::onHover, e);
 	}
-	virtual void onButton(const event::Button& e) {
+
+	/** Occurs each mouse button press or release.
+	Recurses.
+	Consume this event to allow DoubleClick, Select, Deselect, SelectKey, SelectText, DragStart, DragEnd, DragMove, and DragDrop to occur.
+	*/
+	struct ButtonEvent : BaseEvent, PositionBaseEvent {
+		/** GLFW_MOUSE_BUTTON_LEFT, GLFW_MOUSE_BUTTON_RIGHT, GLFW_MOUSE_BUTTON_MIDDLE, etc. */
+		int button;
+		/** GLFW_PRESS or GLFW_RELEASE */
+		int action;
+		/** GLFW_MOD_* */
+		int mods;
+	};
+	virtual void onButton(const ButtonEvent& e) {
 		recursePositionEvent(&Widget::onButton, e);
 	}
-	virtual void onDoubleClick(const event::DoubleClick& e) {}
-	virtual void onHoverKey(const event::HoverKey& e) {
+
+	/** Occurs when the left mouse button is pressed a second time on the same Widget within a time duration.
+	Must consume the Button event (on left button press) to receive this event.
+	*/
+	struct DoubleClickEvent : BaseEvent {};
+	virtual void onDoubleClick(const DoubleClickEvent& e) {}
+
+	/** An event prototype with a GLFW key. */
+	struct KeyBaseEvent {
+		/** The key corresponding to what it would be called in its position on a QWERTY US keyboard.
+		For example, the WASD directional keys used for first-person shooters will always be reported as "WASD", regardless if they say "ZQSD" on an AZERTY keyboard.
+		You should usually not use these for printable characters such as "Ctrl+V" key commands. Instead, use `keyName`.
+		You *should* use these for non-printable keys, such as Escape, arrow keys, Home, F1-12, etc.
+		You should also use this for Enter, Tab, and Space. Although they are printable keys, they do not appear in `keyName`.
+		See GLFW_KEY_* for the list of possible values.
+		*/
+		int key;
+		/** Platform-dependent "software" key code.
+		This variable is only included for completion. There should be no reason for you to use this.
+		You should instead use `key` (for non-printable characters) or `keyName` (for printable characters).
+		Values are platform independent and can change between different keyboards or keyboard layouts on the same OS.
+		*/
+		int scancode;
+		/** String containing the lowercase key name, if it produces a printable character.
+		This is the only variable that correctly represents the label printed on any keyboard layout, whether it's QWERTY, AZERTY, QWERTZ, Dvorak, etc.
+		For example, if the user presses the key labeled "q" regardless of the key position, `keyName` will be "q".
+		For non-printable characters this is an empty string.
+		Enter, Tab, and Space do not give a `keyName`. Use `key` instead.
+		Shift has no effect on the key name. Shift+1 results in "1", Shift+q results in "q", etc.
+		*/
+		std::string keyName;
+		/** The type of event occurring with the key.
+		Possible values are GLFW_RELEASE, GLFW_PRESS, GLFW_REPEAT, or RACK_HELD.
+		RACK_HELD is sent every frame while the key is held.
+		*/
+		int action;
+		/** Bitwise OR of key modifiers, such as Ctrl or Shift.
+		Use (mods & RACK_MOD_MASK) == RACK_MOD_CTRL to check for Ctrl on Linux and Windows but Cmd on Mac.
+		See GLFW_MOD_* for the list of possible values.
+		*/
+		int mods;
+	};
+
+	/** Occurs when a key is pressed, released, or repeated while the mouse is hovering a Widget.
+	Recurses.
+	*/
+	struct HoverKeyEvent : BaseEvent, PositionBaseEvent, KeyBaseEvent {};
+	virtual void onHoverKey(const HoverKeyEvent& e) {
 		recursePositionEvent(&Widget::onHoverKey, e);
 	}
-	virtual void onHoverText(const event::HoverText& e) {
+
+	/** An event prototype with a Unicode character. */
+	struct TextBaseEvent {
+		/** Unicode code point of the character */
+		int codepoint;
+	};
+	/** Occurs when a character is typed while the mouse is hovering a Widget.
+	Recurses.
+	*/
+	struct HoverTextEvent : BaseEvent, PositionBaseEvent, TextBaseEvent {};
+	virtual void onHoverText(const HoverTextEvent& e) {
 		recursePositionEvent(&Widget::onHoverText, e);
 	}
-	virtual void onHoverScroll(const event::HoverScroll& e) {
+
+	/** Occurs when the mouse scroll wheel is moved while the mouse is hovering a Widget.
+	Recurses.
+	*/
+	struct HoverScrollEvent : BaseEvent, PositionBaseEvent {
+		/** Change of scroll wheel position. */
+		math::Vec scrollDelta;
+	};
+	virtual void onHoverScroll(const HoverScrollEvent& e) {
 		recursePositionEvent(&Widget::onHoverScroll, e);
 	}
-	virtual void onEnter(const event::Enter& e) {}
-	virtual void onLeave(const event::Leave& e) {}
-	virtual void onSelect(const event::Select& e) {}
-	virtual void onDeselect(const event::Deselect& e) {}
-	virtual void onSelectKey(const event::SelectKey& e) {}
-	virtual void onSelectText(const event::SelectText& e) {}
-	virtual void onDragStart(const event::DragStart& e) {}
-	virtual void onDragEnd(const event::DragEnd& e) {}
-	virtual void onDragMove(const event::DragMove& e) {}
-	virtual void onDragHover(const event::DragHover& e) {
+
+	/** Occurs when a Widget begins consuming the Hover event.
+	Must consume the Hover event to receive this event.
+	The target sets `hoveredWidget`, which allows Leave to occur.
+	*/
+	struct EnterEvent : BaseEvent {};
+	virtual void onEnter(const EnterEvent& e) {}
+
+	/** Occurs when a different Widget is entered.
+	Must consume the Hover event (when a Widget is entered) to receive this event.
+	*/
+	struct LeaveEvent : BaseEvent {};
+	virtual void onLeave(const LeaveEvent& e) {}
+
+	/** Occurs when a Widget begins consuming the Button press event for the left mouse button.
+	Must consume the Button event (on left button press) to receive this event.
+	The target sets `selectedWidget`, which allows SelectText and SelectKey to occur.
+	*/
+	struct SelectEvent : BaseEvent {};
+	virtual void onSelect(const SelectEvent& e) {}
+
+	/** Occurs when a different Widget is selected.
+	Must consume the Button event (on left button press, when the Widget is selected) to receive this event.
+	*/
+	struct DeselectEvent : BaseEvent {};
+	virtual void onDeselect(const DeselectEvent& e) {}
+
+	/** Occurs when a key is pressed, released, or repeated while a Widget is selected.
+	Must consume to prevent HoverKey from being triggered.
+	*/
+	struct SelectKeyEvent : BaseEvent, KeyBaseEvent {};
+	virtual void onSelectKey(const SelectKeyEvent& e) {}
+
+	/** Occurs when text is typed while a Widget is selected.
+	Must consume to prevent HoverKey from being triggered.
+	*/
+	struct SelectTextEvent : BaseEvent, TextBaseEvent {};
+	virtual void onSelectText(const SelectTextEvent& e) {}
+
+	struct DragBaseEvent : BaseEvent {
+		/** The mouse button held while dragging. */
+		int button;
+	};
+	/** Occurs when a Widget begins being dragged.
+	Must consume the Button event (on press) to receive this event.
+	The target sets `draggedWidget`, which allows DragEnd, DragMove, DragHover, DragEnter, and DragDrop to occur.
+	*/
+	struct DragStartEvent : DragBaseEvent {};
+	virtual void onDragStart(const DragStartEvent& e) {}
+
+	/** Occurs when a Widget stops being dragged by releasing the mouse button.
+	Must consume the Button event (on press, when the Widget drag begins) to receive this event.
+	*/
+	struct DragEndEvent : DragBaseEvent {};
+	virtual void onDragEnd(const DragEndEvent& e) {}
+
+	/** Occurs every frame on the dragged Widget.
+	Must consume the Button event (on press, when the Widget drag begins) to receive this event.
+	*/
+	struct DragMoveEvent : DragBaseEvent {
+		/** Change in mouse position since the last frame. Can be zero. */
+		math::Vec mouseDelta;
+	};
+	virtual void onDragMove(const DragMoveEvent& e) {}
+
+	/** Occurs every frame when the mouse is hovering over a Widget while another Widget (possibly the same one) is being dragged.
+	Recurses.
+	Consume this event to allow DragEnter and DragLeave to occur.
+	*/
+	struct DragHoverEvent : DragBaseEvent, PositionBaseEvent {
+		/** The dragged widget */
+		Widget* origin = NULL;
+		/** Change in mouse position since the last frame. Can be zero. */
+		math::Vec mouseDelta;
+	};
+	virtual void onDragHover(const DragHoverEvent& e) {
 		recursePositionEvent(&Widget::onDragHover, e);
 	}
-	virtual void onDragEnter(const event::DragEnter& e) {}
-	virtual void onDragLeave(const event::DragLeave& e) {}
-	virtual void onDragDrop(const event::DragDrop& e) {}
-	virtual void onPathDrop(const event::PathDrop& e) {
+
+	/** Occurs when the mouse enters a Widget while dragging.
+	Must consume the DragHover event to receive this event.
+	The target sets `draggedWidget`, which allows DragLeave to occur.
+	*/
+	struct DragEnterEvent : DragBaseEvent {
+		/** The dragged widget */
+		Widget* origin = NULL;
+	};
+	virtual void onDragEnter(const DragEnterEvent& e) {}
+
+	/** Occurs when the mouse leaves a Widget while dragging.
+	Must consume the DragHover event (when the Widget is entered) to receive this event.
+	*/
+	struct DragLeaveEvent : DragBaseEvent {
+		/** The dragged widget */
+		Widget* origin = NULL;
+	};
+	virtual void onDragLeave(const DragLeaveEvent& e) {}
+
+	/** Occurs when the mouse button is released over a Widget while dragging.
+	Must consume the Button event (on release) to receive this event.
+	*/
+	struct DragDropEvent : DragBaseEvent {
+		/** The dragged widget */
+		Widget* origin = NULL;
+	};
+	virtual void onDragDrop(const DragDropEvent& e) {}
+
+	/** Occurs when a selection of files from the operating system is dropped onto a Widget.
+	Recurses.
+	*/
+	struct PathDropEvent : BaseEvent, PositionBaseEvent {
+		PathDropEvent(const std::vector<std::string>& paths) : paths(paths) {}
+
+		/** List of file paths in the dropped selection */
+		const std::vector<std::string>& paths;
+	};
+	virtual void onPathDrop(const PathDropEvent& e) {
 		recursePositionEvent(&Widget::onPathDrop, e);
 	}
-	virtual void onAction(const event::Action& e) {}
-	virtual void onChange(const event::Change& e) {}
-	virtual void onDirty(const event::Dirty& e) {
+
+	/** Occurs after a certain action is triggered on a Widget.
+	The concept of an "action" is defined by the type of Widget.
+	*/
+	struct ActionEvent : BaseEvent {};
+	virtual void onAction(const ActionEvent& e) {}
+
+	/** Occurs after the value of a Widget changes.
+	The concept of a "value" is defined by the type of Widget.
+	*/
+	struct ChangeEvent : BaseEvent {};
+	virtual void onChange(const ChangeEvent& e) {}
+
+	/** Occurs when the pixel buffer of this module must be refreshed.
+	Recurses.
+	*/
+	struct DirtyEvent : BaseEvent {};
+	virtual void onDirty(const DirtyEvent& e) {
 		recurseEvent(&Widget::onDirty, e);
 	}
-	virtual void onReposition(const event::Reposition& e) {}
-	virtual void onResize(const event::Resize& e) {}
-	virtual void onAdd(const event::Add& e) {}
-	virtual void onRemove(const event::Remove& e) {}
-	virtual void onShow(const event::Show& e) {
+
+	/** Occurs after a Widget's position is set by Widget::setPosition().
+	*/
+	struct RepositionEvent : BaseEvent {};
+	virtual void onReposition(const RepositionEvent& e) {}
+
+	/** Occurs after a Widget's size is set by Widget::setSize().
+	*/
+	struct ResizeEvent : BaseEvent {};
+	virtual void onResize(const ResizeEvent& e) {}
+
+	/** Occurs after a Widget is added to a parent.
+	*/
+	struct AddEvent : BaseEvent {};
+	virtual void onAdd(const AddEvent& e) {}
+
+	/** Occurs before a Widget is removed from its parent.
+	*/
+	struct RemoveEvent : BaseEvent {};
+	virtual void onRemove(const RemoveEvent& e) {}
+
+	/** Occurs after a Widget is shown with Widget::show().
+	Recurses.
+	*/
+	struct ShowEvent : BaseEvent {};
+	virtual void onShow(const ShowEvent& e) {
 		recurseEvent(&Widget::onShow, e);
 	}
-	virtual void onHide(const event::Hide& e) {
+
+	/** Occurs after a Widget is hidden with Widget::hide().
+	Recurses.
+	*/
+	struct HideEvent : BaseEvent {};
+	virtual void onHide(const HideEvent& e) {
 		recurseEvent(&Widget::onHide, e);
 	}
 };
 
 
 } // namespace widget
+
+/** Deprecated Rack v1 event namespace.
+Use `ExampleWidget` instead of `event::Example` in new code.
+*/
+namespace event {
+using Base = widget::BaseEvent;
+using PositionBase = widget::Widget::PositionBaseEvent;
+using KeyBase = widget::Widget::KeyBaseEvent;
+using TextBase = widget::Widget::TextBaseEvent;
+using Hover = widget::Widget::HoverEvent;
+using Button = widget::Widget::ButtonEvent;
+using DoubleClick = widget::Widget::DoubleClickEvent;
+using HoverKey = widget::Widget::HoverKeyEvent;
+using HoverText = widget::Widget::HoverTextEvent;
+using HoverScroll = widget::Widget::HoverScrollEvent;
+using Enter = widget::Widget::EnterEvent;
+using Leave = widget::Widget::LeaveEvent;
+using Select = widget::Widget::SelectEvent;
+using Deselect = widget::Widget::DeselectEvent;
+using SelectKey = widget::Widget::SelectKeyEvent;
+using SelectText = widget::Widget::SelectTextEvent;
+using DragBase = widget::Widget::DragBaseEvent;
+using DragStart = widget::Widget::DragStartEvent;
+using DragEnd = widget::Widget::DragEndEvent;
+using DragMove = widget::Widget::DragMoveEvent;
+using DragHover = widget::Widget::DragHoverEvent;
+using DragEnter = widget::Widget::DragEnterEvent;
+using DragLeave = widget::Widget::DragLeaveEvent;
+using DragDrop = widget::Widget::DragDropEvent;
+using PathDrop = widget::Widget::PathDropEvent;
+using Action = widget::Widget::ActionEvent;
+using Change = widget::Widget::ChangeEvent;
+using Dirty = widget::Widget::DirtyEvent;
+using Reposition = widget::Widget::RepositionEvent;
+using Resize = widget::Widget::ResizeEvent;
+using Add = widget::Widget::AddEvent;
+using Remove = widget::Widget::RemoveEvent;
+using Show = widget::Widget::ShowEvent;
+using Hide = widget::Widget::HideEvent;
+}
+
 } // namespace rack

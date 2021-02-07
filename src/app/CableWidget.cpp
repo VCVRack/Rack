@@ -5,7 +5,6 @@
 #include <context.hpp>
 #include <patch.hpp>
 #include <settings.hpp>
-#include <event.hpp>
 #include <engine/Engine.hpp>
 #include <engine/Port.hpp>
 

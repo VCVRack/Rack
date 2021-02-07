@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
 	contextSet(new Context);
 	APP->engine = new engine::Engine;
 	if (!settings::headless) {
-		APP->event = new event::State;
+		APP->event = new widget::EventState;
 		APP->history = new history::State;
 		APP->window = new Window;
 		APP->scene = new app::Scene;
