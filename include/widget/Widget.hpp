@@ -452,13 +452,33 @@ struct Widget : WeakBase {
 	virtual void onHide(const HideEvent& e) {
 		recurseEvent(&Widget::onHide, e);
 	}
+
+	/** Occurs after the Window, OpenGL context, and Nanovg are created.
+	Recurses.
+	*/
+	struct ContextCreateEvent : BaseEvent {
+		NVGcontext* vg;
+	};
+	virtual void onContextCreate(const ContextCreateEvent& e) {
+		recurseEvent(&Widget::onContextCreate, e);
+	}
+
+	/** Occurs before the Window, OpenGL context, and Nanovg are destroyed.
+	Recurses.
+	*/
+	struct ContextDestroyEvent : BaseEvent {
+		NVGcontext* vg;
+	};
+	virtual void onContextDestroy(const ContextDestroyEvent& e) {
+		recurseEvent(&Widget::onContextDestroy, e);
+	}
 };
 
 
 } // namespace widget
 
 /** Deprecated Rack v1 event namespace.
-Use `FooEvent` instead of `event::Foo` in new code.
+Use `FooEvent` (defined in widget::Widget) instead of `event::Foo` in new code.
 */
 namespace event {
 using Base = widget::BaseEvent;

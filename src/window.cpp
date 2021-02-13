@@ -327,6 +327,11 @@ Window::Window() {
 	// Load default Blendish font
 	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
 	bndSetFont(uiFont->handle);
+
+	if (APP->scene) {
+		widget::Widget::ContextCreateEvent e;
+		APP->scene->onContextCreate(e);
+	}
 }
 
 
@@ -342,6 +347,11 @@ Window::~Window() {
 		glfwGetWindowPos(win, &winX, &winY);
 		settings::windowSize = math::Vec(winWidth, winHeight);
 		settings::windowPos = math::Vec(winX, winY);
+	}
+
+	if (APP->scene) {
+		widget::Widget::ContextDestroyEvent e;
+		APP->scene->onContextDestroy(e);
 	}
 
 #if defined NANOVG_GL2
@@ -422,30 +432,32 @@ void Window::step() {
 	glfwGetWindowSize(win, &winWidth, &winHeight);
 	windowRatio = (float)fbWidth / winWidth;
 
-	// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
-	// Resize scene
-	APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
+	if (APP->scene) {
+		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
+		// Resize scene
+		APP->scene->box.size = math::Vec(fbWidth, fbHeight).div(pixelRatio);
 
-	// Step scene
-	APP->scene->step();
+		// Step scene
+		APP->scene->step();
 
-	// Render scene
-	bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
-	if (visible) {
-		// Update and render
-		nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
-		nvgScale(vg, pixelRatio, pixelRatio);
+		// Render scene
+		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
+		if (visible) {
+			// Update and render
+			nvgBeginFrame(vg, fbWidth, fbHeight, pixelRatio);
+			nvgScale(vg, pixelRatio, pixelRatio);
 
-		// Draw scene
-		widget::Widget::DrawArgs args;
-		args.vg = vg;
-		args.clipBox = APP->scene->box.zeroPos();
-		APP->scene->draw(args);
+			// Draw scene
+			widget::Widget::DrawArgs args;
+			args.vg = vg;
+			args.clipBox = APP->scene->box.zeroPos();
+			APP->scene->draw(args);
 
-		glViewport(0, 0, fbWidth, fbHeight);
-		glClearColor(0.0, 0.0, 0.0, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		nvgEndFrame(vg);
+			glViewport(0, 0, fbWidth, fbHeight);
+			glClearColor(0.0, 0.0, 0.0, 1.0);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+			nvgEndFrame(vg);
+		}
 	}
 
 	glfwSwapBuffers(win);

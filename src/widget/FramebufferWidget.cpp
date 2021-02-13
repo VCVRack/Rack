@@ -50,7 +50,7 @@ void FramebufferWidget::setDirty(bool dirty) {
 
 
 void FramebufferWidget::onDirty(const DirtyEvent& e) {
-	dirty = true;
+	setDirty();
 	Widget::onDirty(e);
 }
 
@@ -71,7 +71,7 @@ void FramebufferWidget::step() {
 		return;
 
 	// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
-	dirty = false;
+	setDirty(false);
 	NVGcontext* vg = APP->window->vg;
 
 	internal->fbScale = internal->scale;
@@ -186,12 +186,12 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	if (dirtyOnSubpixelChange && !(math::isNear(internal->offsetF.x, internal->fbOffsetF.x, 0.01f) && math::isNear(internal->offsetF.y, internal->fbOffsetF.y, 0.01f))) {
 		// If drawing to a new subpixel location, rerender in the next frame.
 		// DEBUG("%p dirty subpixel", this);
-		dirty = true;
+		setDirty();
 	}
 	if (!internal->scale.equals(internal->fbScale)) {
 		// If rescaled, rerender in the next frame.
 		// DEBUG("%p dirty scale", this);
-		dirty = true;
+		setDirty();
 	}
 
 	math::Vec scaleRatio = math::Vec(1, 1);
@@ -282,6 +282,19 @@ math::Vec FramebufferWidget::getFramebufferSize() {
 
 void FramebufferWidget::setScale(math::Vec scale) {
 	internal->scale = scale;
+}
+
+
+void FramebufferWidget::onContextCreate(const ContextCreateEvent& e) {
+	setDirty();
+	Widget::onContextCreate(e);
+}
+
+
+void FramebufferWidget::onContextDestroy(const ContextDestroyEvent& e) {
+	if (internal->fb)
+		nvgluDeleteFramebuffer(internal->fb);
+	Widget::onContextDestroy(e);
 }
 
 
