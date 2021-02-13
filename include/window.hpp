@@ -12,6 +12,7 @@
 #include <nanovg_gl.h>
 #include <nanovg_gl_utils.h>
 #include <nanosvg.h>
+#include <svg.hpp>
 
 #include <common.hpp>
 #include <math.hpp>
@@ -42,17 +43,6 @@ struct Image {
 	DEPRECATED static std::shared_ptr<Image> load(const std::string& filename);
 };
 
-struct Svg {
-	NSVGimage* handle = NULL;
-	/** Don't call this directly but instead use `APP->window->loadSvg()` */
-	void loadFile(const std::string& filename);
-	~Svg();
-	/** Use `APP->window->loadSvg()` instead. */
-	DEPRECATED static std::shared_ptr<Svg> load(const std::string& filename);
-};
-
-DEPRECATED typedef Svg SVG;
-
 
 struct Window {
 	struct Internal;
@@ -71,7 +61,6 @@ struct Window {
 	/** Use load*() instead of modifying these directly. */
 	std::map<std::string, std::weak_ptr<Font>> fontCache;
 	std::map<std::string, std::weak_ptr<Image>> imageCache;
-	std::map<std::string, std::weak_ptr<Svg>> svgCache;
 
 	Window();
 	~Window();
@@ -100,7 +89,11 @@ struct Window {
 
 	std::shared_ptr<Font> loadFont(const std::string& filename);
 	std::shared_ptr<Image> loadImage(const std::string& filename);
-	std::shared_ptr<Svg> loadSvg(const std::string& filename);
+
+	/** Use `Svg::load(filename)` in new code. */
+	DEPRECATED std::shared_ptr<Svg> loadSvg(const std::string& filename) {
+		return Svg::load(filename);
+	}
 };
 
 

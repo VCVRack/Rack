@@ -72,28 +72,6 @@ std::shared_ptr<Image> Image::load(const std::string& filename) {
 }
 
 
-void Svg::loadFile(const std::string& filename) {
-	handle = nsvgParseFromFile(filename.c_str(), "px", app::SVG_DPI);
-	if (handle) {
-		INFO("Loaded SVG %s", filename.c_str());
-	}
-	else {
-		WARN("Failed to load SVG %s", filename.c_str());
-	}
-}
-
-
-Svg::~Svg() {
-	if (handle)
-		nsvgDelete(handle);
-}
-
-
-std::shared_ptr<Svg> Svg::load(const std::string& filename) {
-	return APP->window->loadSvg(filename);
-}
-
-
 struct Window::Internal {
 	std::string lastWindowTitle;
 
@@ -647,16 +625,6 @@ std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 	if (!sp) {
 		imageCache[filename] = sp = std::make_shared<Image>();
 		sp->loadFile(filename, vg);
-	}
-	return sp;
-}
-
-
-std::shared_ptr<Svg> Window::loadSvg(const std::string& filename) {
-	auto sp = svgCache[filename].lock();
-	if (!sp) {
-		svgCache[filename] = sp = std::make_shared<Svg>();
-		sp->loadFile(filename);
 	}
 	return sp;
 }

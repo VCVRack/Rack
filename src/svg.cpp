@@ -1,11 +1,44 @@
 #include <svg.hpp>
+#include <map>
 #include <math.hpp>
+#include <app/common.hpp>
 
 
 // #define DEBUG_ONLY(x) x
 #define DEBUG_ONLY(x)
 
 namespace rack {
+
+
+void Svg::loadFile(const std::string& filename) {
+	handle = nsvgParseFromFile(filename.c_str(), "px", app::SVG_DPI);
+	if (handle) {
+		INFO("Loaded SVG %s", filename.c_str());
+	}
+	else {
+		WARN("Failed to load SVG %s", filename.c_str());
+	}
+}
+
+
+Svg::~Svg() {
+	if (handle)
+		nsvgDelete(handle);
+}
+
+
+
+static std::map<std::string, std::weak_ptr<Svg>> svgCache;
+
+
+std::shared_ptr<Svg> Svg::load(const std::string& filename) {
+	auto sp = svgCache[filename].lock();
+	if (!sp) {
+		svgCache[filename] = sp = std::make_shared<Svg>();
+		sp->load(filename);
+	}
+	return sp;
+}
 
 
 static NVGcolor getNVGColor(uint32_t color) {
