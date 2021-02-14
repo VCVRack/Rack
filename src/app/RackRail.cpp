@@ -9,7 +9,7 @@ namespace app {
 
 
 RackRail::RackRail() {
-	busBoardSvg = APP->window->loadSvg(asset::system("res/ComponentLibrary/RackBusboard.svg"));
+	busBoardSvg = Svg::load(asset::system("res/ComponentLibrary/RackBusboard.svg"));
 }
 
 

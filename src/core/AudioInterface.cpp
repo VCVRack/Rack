@@ -414,7 +414,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 		setModule(module);
 
 		if (NUM_AUDIO_INPUTS == 8 && NUM_AUDIO_OUTPUTS == 8) {
-			setPanel(APP->window->loadSvg(asset::system("res/Core/AudioInterface.svg")));
+			setPanel(Svg::load(asset::system("res/Core/AudioInterface.svg")));
 
 			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
@@ -454,7 +454,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 			addChild(audioWidget);
 		}
 		else if (NUM_AUDIO_INPUTS == 16 && NUM_AUDIO_OUTPUTS == 16) {
-			setPanel(APP->window->loadSvg(asset::system("res/Core/AudioInterface16.svg")));
+			setPanel(Svg::load(asset::system("res/Core/AudioInterface16.svg")));
 
 			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
@@ -518,7 +518,7 @@ struct AudioInterfaceWidget : ModuleWidget {
 			addChild(audioWidget);
 		}
 		else if (NUM_AUDIO_INPUTS == 2 && NUM_AUDIO_OUTPUTS == 2) {
-			setPanel(APP->window->loadSvg(asset::system("res/Core/AudioInterface2.svg")));
+			setPanel(Svg::load(asset::system("res/Core/AudioInterface2.svg")));
 
 			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

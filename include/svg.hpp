@@ -12,9 +12,12 @@ namespace rack {
 
 struct Svg {
 	NSVGimage* handle = NULL;
+
+	~Svg();
 	/** Don't call this directly. Use `Svg::load()` for caching. */
 	void loadFile(const std::string& filename);
-	~Svg();
+	/** Loads SVG data from a string. */
+	void loadString(const std::string& str);
 
 	/** Loads Svg from a cache. */
 	static std::shared_ptr<Svg> load(const std::string& filename);

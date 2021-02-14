@@ -1,13 +1,20 @@
 #include <svg.hpp>
 #include <map>
 #include <math.hpp>
-#include <app/common.hpp>
+#include <app/common.hpp> // for app::SVG_DPI
 
 
 // #define DEBUG_ONLY(x) x
 #define DEBUG_ONLY(x)
 
+
 namespace rack {
+
+
+Svg::~Svg() {
+	if (handle)
+		nsvgDelete(handle);
+}
 
 
 void Svg::loadFile(const std::string& filename) {
@@ -21,11 +28,17 @@ void Svg::loadFile(const std::string& filename) {
 }
 
 
-Svg::~Svg() {
-	if (handle)
-		nsvgDelete(handle);
+void Svg::loadString(const std::string& str) {
+	// nsvgParse modifies the input string
+	std::string strCopy = str;
+	handle = nsvgParse(&strCopy[0], "px", app::SVG_DPI);
+	if (handle) {
+		INFO("Loaded SVG");
+	}
+	else {
+		WARN("Failed to load SVG");
+	}
 }
-
 
 
 static std::map<std::string, std::weak_ptr<Svg>> svgCache;
@@ -35,7 +48,7 @@ std::shared_ptr<Svg> Svg::load(const std::string& filename) {
 	auto sp = svgCache[filename].lock();
 	if (!sp) {
 		svgCache[filename] = sp = std::make_shared<Svg>();
-		sp->load(filename);
+		sp->loadFile(filename);
 	}
 	return sp;
 }
@@ -43,10 +56,10 @@ std::shared_ptr<Svg> Svg::load(const std::string& filename) {
 
 static NVGcolor getNVGColor(uint32_t color) {
 	return nvgRGBA(
-	         (color >> 0) & 0xff,
-	         (color >> 8) & 0xff,
-	         (color >> 16) & 0xff,
-	         (color >> 24) & 0xff);
+		(color >> 0) & 0xff,
+		(color >> 8) & 0xff,
+		(color >> 16) & 0xff,
+		(color >> 24) & 0xff);
 }
 
 static NVGpaint getPaint(NVGcontext* vg, NSVGpaint* p) {

@@ -1,5 +1,7 @@
 // This source file compiles those annoying implementation-in-header libraries
 
+#include <common.hpp> // for fopen_u8
+
 #define GLEW_STATIC
 #define GLEW_NO_GLU
 #include <GL/glew.h>

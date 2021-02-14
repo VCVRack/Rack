@@ -125,7 +125,7 @@ struct CV_CC : Module {
 struct CV_CCWidget : ModuleWidget {
 	CV_CCWidget(CV_CC* module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::system("res/Core/CV-CC.svg")));
+		setPanel(Svg::load(asset::system("res/Core/CV-CC.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

@@ -477,7 +477,7 @@ struct MIDI_MapDisplay : MidiWidget {
 struct MIDI_MapWidget : ModuleWidget {
 	MIDI_MapWidget(MIDI_Map* module) {
 		setModule(module);
-		setPanel(APP->window->loadSvg(asset::system("res/Core/MIDI-Map.svg")));
+		setPanel(Svg::load(asset::system("res/Core/MIDI-Map.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));

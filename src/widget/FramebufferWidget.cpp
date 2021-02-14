@@ -71,7 +71,7 @@ void FramebufferWidget::step() {
 		return;
 
 	// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
-	setDirty(false);
+	dirty = false;
 	NVGcontext* vg = APP->window->vg;
 
 	internal->fbScale = internal->scale;
@@ -98,8 +98,10 @@ void FramebufferWidget::step() {
 	if (!internal->fb || !newFbSize.equals(internal->fbSize)) {
 		internal->fbSize = newFbSize;
 		// Delete old framebuffer
-		if (internal->fb)
+		if (internal->fb) {
 			nvgluDeleteFramebuffer(internal->fb);
+			internal->fb = NULL;
+		}
 		// Create a framebuffer
 		if (internal->fbSize.isFinite() && !internal->fbSize.isZero()) {
 			internal->fb = nvgluCreateFramebuffer(vg, internal->fbSize.x, internal->fbSize.y, 0);
@@ -292,8 +294,11 @@ void FramebufferWidget::onContextCreate(const ContextCreateEvent& e) {
 
 
 void FramebufferWidget::onContextDestroy(const ContextDestroyEvent& e) {
-	if (internal->fb)
+	if (internal->fb) {
 		nvgluDeleteFramebuffer(internal->fb);
+		internal->fb = NULL;
+	}
+	setDirty();
 	Widget::onContextDestroy(e);
 }
 
