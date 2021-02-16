@@ -182,14 +182,14 @@ int main(int argc, char* argv[]) {
 	INFO("Initializing context");
 	contextSet(new Context);
 	APP->engine = new engine::Engine;
-	if (!settings::headless) {
-		APP->event = new widget::EventState;
-		APP->history = new history::State;
-		APP->window = new Window;
-		APP->scene = new app::Scene;
-		APP->event->rootWidget = APP->scene;
-	}
+	APP->history = new history::State;
+	APP->event = new widget::EventState;
+	APP->scene = new app::Scene;
+	APP->event->rootWidget = APP->scene;
 	APP->patch = new PatchManager;
+	if (!settings::headless) {
+		APP->window = new Window;
+	}
 
 	// On Mac, use a hacked-in GLFW addition to get the launched path.
 #if defined ARCH_MAC
