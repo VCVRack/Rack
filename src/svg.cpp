@@ -1,7 +1,6 @@
 #include <svg.hpp>
 #include <map>
 #include <math.hpp>
-#include <app/common.hpp> // for app::SVG_DPI
 
 
 // #define DEBUG_ONLY(x) x
@@ -18,7 +17,7 @@ Svg::~Svg() {
 
 
 void Svg::loadFile(const std::string& filename) {
-	handle = nsvgParseFromFile(filename.c_str(), "px", app::SVG_DPI);
+	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
 	if (handle) {
 		INFO("Loaded SVG %s", filename.c_str());
 	}
@@ -31,7 +30,7 @@ void Svg::loadFile(const std::string& filename) {
 void Svg::loadString(const std::string& str) {
 	// nsvgParse modifies the input string
 	std::string strCopy = str;
-	handle = nsvgParse(&strCopy[0], "px", app::SVG_DPI);
+	handle = nsvgParse(&strCopy[0], "px", SVG_DPI);
 	if (handle) {
 		INFO("Loaded SVG");
 	}

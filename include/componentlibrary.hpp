@@ -133,7 +133,7 @@ typedef TRedGreenBlueLight<> RedGreenBlueLight;
 template <typename TBase>
 struct LargeLight : TBase {
 	LargeLight() {
-		this->box.size = app::mm2px(math::Vec(5.179, 5.179));
+		this->box.size = mm2px(math::Vec(5.179, 5.179));
 	}
 };
 
@@ -141,7 +141,7 @@ struct LargeLight : TBase {
 template <typename TBase>
 struct MediumLight : TBase {
 	MediumLight() {
-		this->box.size = app::mm2px(math::Vec(3.176, 3.176));
+		this->box.size = mm2px(math::Vec(3.176, 3.176));
 	}
 };
 
@@ -149,7 +149,7 @@ struct MediumLight : TBase {
 template <typename TBase>
 struct SmallLight : TBase {
 	SmallLight() {
-		this->box.size = app::mm2px(math::Vec(2.176, 2.176));
+		this->box.size = mm2px(math::Vec(2.176, 2.176));
 	}
 };
 
@@ -157,7 +157,7 @@ struct SmallLight : TBase {
 template <typename TBase>
 struct TinyLight : TBase {
 	TinyLight() {
-		this->box.size = app::mm2px(math::Vec(1.088, 1.088));
+		this->box.size = mm2px(math::Vec(1.088, 1.088));
 	}
 };
 
@@ -193,18 +193,18 @@ template <typename TBase>
 struct LEDBezelLight : TBase {
 	LEDBezelLight() {
 		this->bgColor = color::BLACK_TRANSPARENT;
-		this->box.size = app::mm2px(math::Vec(6.0, 6.0));
+		this->box.size = mm2px(math::Vec(6.0, 6.0));
 	}
 };
 
 /** A light to displayed over PB61303. Must add a color by subclassing or templating.
-Don't add this as a child of the PB61303 itself. Instead, just place it over it as a sibling in the scene graph, offset by app::mm2px(math::Vec(0.5, 0.5)).
+Don't add this as a child of the PB61303 itself. Instead, just place it over it as a sibling in the scene graph, offset by mm2px(math::Vec(0.5, 0.5)).
 */
 template <typename TBase>
 struct PB61303Light : TBase {
 	PB61303Light() {
 		this->bgColor = color::BLACK_TRANSPARENT;
-		this->box.size = app::mm2px(math::Vec(9.0, 9.0));
+		this->box.size = mm2px(math::Vec(9.0, 9.0));
 	}
 };
 
@@ -529,8 +529,8 @@ struct BefacoSlidePot : app::SvgSlider {
 
 struct LEDSlider : app::SvgSlider {
 	LEDSlider() {
-		maxHandlePos = app::mm2px(math::Vec(0.738, 0.738).plus(math::Vec(2, 0)));
-		minHandlePos = app::mm2px(math::Vec(0.738, 22.078).plus(math::Vec(2, 0)));
+		maxHandlePos = mm2px(math::Vec(0.738, 0.738).plus(math::Vec(2, 0)));
+		minHandlePos = mm2px(math::Vec(0.738, 22.078).plus(math::Vec(2, 0)));
 		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSlider.svg")));
 	}
 };
@@ -569,8 +569,8 @@ struct LEDSliderWhite : LEDSlider {
 struct LEDSliderHorizontal : app::SvgSlider {
 	LEDSliderHorizontal() {
 		horizontal = true;
-		maxHandlePos = app::mm2px(math::Vec(22.078, 0.738).plus(math::Vec(0, 2)));
-		minHandlePos = app::mm2px(math::Vec(0.738, 0.738).plus(math::Vec(0, 2)));
+		maxHandlePos = mm2px(math::Vec(22.078, 0.738).plus(math::Vec(0, 2)));
+		minHandlePos = mm2px(math::Vec(0.738, 0.738).plus(math::Vec(0, 2)));
 		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHorizontal.svg")));
 	}
 };
@@ -602,7 +602,7 @@ template <typename TLightBase = RedLight>
 struct LEDLightSlider : LightSlider<LEDSlider, TLightBase> {
 	LEDLightSlider() {
 		this->setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHandle.svg")));
-		this->light->box.size = app::mm2px(math::Vec(1.524, 3.276));
+		this->light->box.size = mm2px(math::Vec(1.524, 3.276));
 	}
 };
 
@@ -610,7 +610,7 @@ template <typename TLightBase = RedLight>
 struct LEDLightSliderHorizontal : LightSlider<LEDSliderHorizontal, TLightBase> {
 	LEDLightSliderHorizontal() {
 		this->setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHorizontalHandle.svg")));
-		this->light->box.size = app::mm2px(math::Vec(3.276, 1.524));
+		this->light->box.size = mm2px(math::Vec(3.276, 1.524));
 	}
 };
 
@@ -768,7 +768,7 @@ struct ScrewBlack : app::SvgScrew {
 struct SegmentDisplay : widget::Widget {
 	int lightsLen = 0;
 	bool vertical = false;
-	float margin = app::mm2px(0.5);
+	float margin = mm2px(0.5);
 
 	void draw(const DrawArgs& args) override {
 		// Background

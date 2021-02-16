@@ -5,9 +5,33 @@
 #include <nanosvg.h>
 
 #include <common.hpp>
+#include <math.hpp>
 
 
 namespace rack {
+
+
+static const float SVG_DPI = 75.f;
+static const float MM_PER_IN = 25.4f;
+
+
+/** Converts inch measurements to pixels */
+inline float in2px(float in) {
+	return in * SVG_DPI;
+}
+
+inline math::Vec in2px(math::Vec in) {
+	return in.mult(SVG_DPI);
+}
+
+/** Converts millimeter measurements to pixels */
+inline float mm2px(float mm) {
+	return mm * (SVG_DPI / MM_PER_IN);
+}
+
+inline math::Vec mm2px(math::Vec mm) {
+	return mm.mult(SVG_DPI / MM_PER_IN);
+}
 
 
 struct Svg {
