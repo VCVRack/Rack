@@ -18,6 +18,7 @@ struct Svg {
 	void loadFile(const std::string& filename);
 	/** Loads SVG data from a string. */
 	void loadString(const std::string& str);
+	void draw(NVGcontext* vg);
 
 	/** Loads Svg from a cache. */
 	static std::shared_ptr<Svg> load(const std::string& filename);

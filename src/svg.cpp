@@ -41,6 +41,12 @@ void Svg::loadString(const std::string& str) {
 }
 
 
+void Svg::draw(NVGcontext* vg) {
+	svgDraw(vg, handle);
+}
+
+
+
 static std::map<std::string, std::weak_ptr<Svg>> svgCache;
 
 
