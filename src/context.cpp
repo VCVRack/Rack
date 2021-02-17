@@ -24,11 +24,11 @@ Context::~Context() {
 	delete history;
 	history = NULL;
 
-	delete event;
-	event = NULL;
-
 	delete scene;
 	scene = NULL;
+
+	delete event;
+	event = NULL;
 
 	delete engine;
 	engine = NULL;
