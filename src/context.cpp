@@ -21,14 +21,14 @@ Context::~Context() {
 	delete patch;
 	patch = NULL;
 
-	delete history;
-	history = NULL;
-
 	delete scene;
 	scene = NULL;
 
 	delete event;
 	event = NULL;
+
+	delete history;
+	history = NULL;
 
 	delete engine;
 	engine = NULL;
