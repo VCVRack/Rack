@@ -11,7 +11,8 @@ namespace plugin {
 
 Plugin::~Plugin() {
 	for (Model* model : models) {
-		delete model;
+		model->plugin = NULL;
+		// Don't delete model because it's allocated once and referenced by a global.
 	}
 }
 

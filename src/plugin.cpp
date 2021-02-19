@@ -208,8 +208,7 @@ static void extractPackages(std::string path) {
 
 void init() {
 	// Don't re-initialize
-	if (!plugins.empty())
-		return;
+	assert(plugins.empty());
 
 	// Load Core
 	loadPlugin("");

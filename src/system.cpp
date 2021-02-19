@@ -539,7 +539,6 @@ std::string getStackTrace() {
 
 static void initTime() {
 #if defined ARCH_WIN
-	assert(startCounter == 0);
 	LARGE_INTEGER counter;
 	QueryPerformanceCounter(&counter);
 	startCounter = counter.QuadPart;
@@ -549,13 +548,11 @@ static void initTime() {
 	counterTime = 1.0 / frequency.QuadPart;
 #endif
 #if defined ARCH_LIN
-	assert(startTime == 0);
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
 	startTime = int64_t(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
 #endif
 #if defined ARCH_MAC
-	assert(startTime == 0);
 	clock_serv_t cclock;
 	mach_timespec_t mts;
 	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
