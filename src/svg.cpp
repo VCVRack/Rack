@@ -1,6 +1,7 @@
 #include <svg.hpp>
 #include <map>
 #include <math.hpp>
+#include <string.hpp>
 
 
 // #define DEBUG_ONLY(x) x
@@ -18,12 +19,9 @@ Svg::~Svg() {
 
 void Svg::loadFile(const std::string& filename) {
 	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
-	if (handle) {
-		INFO("Loaded SVG %s", filename.c_str());
-	}
-	else {
-		WARN("Failed to load SVG %s", filename.c_str());
-	}
+	if (!handle)
+		throw Exception("Failed to load SVG %s", filename.c_str());
+	INFO("Loaded SVG %s", filename.c_str());
 }
 
 
@@ -31,12 +29,10 @@ void Svg::loadString(const std::string& str) {
 	// nsvgParse modifies the input string
 	std::string strCopy = str;
 	handle = nsvgParse(&strCopy[0], "px", SVG_DPI);
-	if (handle) {
-		INFO("Loaded SVG");
-	}
-	else {
-		WARN("Failed to load SVG");
-	}
+	std::string strEllip = string::ellipsize(str, 40);
+	if (!handle)
+		throw Exception("Failed to load SVG \"%s\"", strEllip.c_str());
+	INFO("Loaded SVG \"%s\"", strEllip.c_str());
 }
 
 
@@ -46,16 +42,26 @@ void Svg::draw(NVGcontext* vg) {
 
 
 
-static std::map<std::string, std::weak_ptr<Svg>> svgCache;
+static std::map<std::string, std::shared_ptr<Svg>> svgCache;
 
 
 std::shared_ptr<Svg> Svg::load(const std::string& filename) {
-	auto sp = svgCache[filename].lock();
-	if (!sp) {
-		svgCache[filename] = sp = std::make_shared<Svg>();
-		sp->loadFile(filename);
+	const auto& pair = svgCache.find(filename);
+	if (pair != svgCache.end())
+		return pair->second;
+
+	// Load svg
+	std::shared_ptr<Svg> svg;
+	try {
+		svg = std::make_shared<Svg>();
+		svg->loadFile(filename);
 	}
-	return sp;
+	catch (Exception& e) {
+		WARN("%s", e.what());
+		svg = NULL;
+	}
+	svgCache[filename] = svg;
+	return svg;
 }
 
 

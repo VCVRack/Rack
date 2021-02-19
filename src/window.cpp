@@ -29,12 +29,9 @@ namespace rack {
 void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
 	handle = nvgCreateFont(vg, filename.c_str(), filename.c_str());
-	if (handle >= 0) {
-		INFO("Loaded font %s", filename.c_str());
-	}
-	else {
-		WARN("Failed to load font %s", filename.c_str());
-	}
+	if (handle < 0)
+		throw Exception("Failed to load font %s", filename.c_str());
+	INFO("Loaded font %s", filename.c_str());
 }
 
 
@@ -51,12 +48,9 @@ std::shared_ptr<Font> Font::load(const std::string& filename) {
 void Image::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
 	handle = nvgCreateImage(vg, filename.c_str(), NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY);
-	if (handle > 0) {
-		INFO("Loaded image %s", filename.c_str());
-	}
-	else {
-		WARN("Failed to load image %s", filename.c_str());
-	}
+	if (handle <= 0)
+		throw Exception("Failed to load image %s", filename.c_str());
+	INFO("Loaded image %s", filename.c_str());
 }
 
 
@@ -88,6 +82,9 @@ struct Window::Internal {
 	double lastFrameTime = 0.0;
 
 	math::Vec lastMousePos;
+
+	std::map<std::string, std::shared_ptr<Font>> fontCache;
+	std::map<std::string, std::shared_ptr<Image>> imageCache;
 };
 
 
@@ -611,22 +608,42 @@ double Window::getFrameTimeOverdue() {
 
 
 std::shared_ptr<Font> Window::loadFont(const std::string& filename) {
-	auto sp = fontCache[filename].lock();
-	if (!sp) {
-		fontCache[filename] = sp = std::make_shared<Font>();
-		sp->loadFile(filename, vg);
+	const auto& pair = internal->fontCache.find(filename);
+	if (pair != internal->fontCache.end())
+		return pair->second;
+
+	// Load font
+	std::shared_ptr<Font> font;
+	try {
+		font = std::make_shared<Font>();
+		font->loadFile(filename, vg);
 	}
-	return sp;
+	catch (Exception& e) {
+		WARN("%s", e.what());
+		font = NULL;
+	}
+	internal->fontCache[filename] = font;
+	return font;
 }
 
 
 std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
-	auto sp = imageCache[filename].lock();
-	if (!sp) {
-		imageCache[filename] = sp = std::make_shared<Image>();
-		sp->loadFile(filename, vg);
+	const auto& pair = internal->imageCache.find(filename);
+	if (pair != internal->imageCache.end())
+		return pair->second;
+
+	// Load image
+	std::shared_ptr<Image> image;
+	try {
+		image = std::make_shared<Image>();
+		image->loadFile(filename, vg);
 	}
-	return sp;
+	catch (Exception& e) {
+		WARN("%s", e.what());
+		image = NULL;
+	}
+	internal->imageCache[filename] = image;
+	return image;
 }
 
 

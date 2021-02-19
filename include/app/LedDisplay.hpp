@@ -20,7 +20,7 @@ struct LedDisplaySeparator : widget::Widget {
 
 struct LedDisplayChoice : widget::OpaqueWidget {
 	std::string text;
-	std::shared_ptr<Font> font;
+	std::string fontPath;
 	math::Vec textOffset;
 	NVGcolor color;
 	NVGcolor bgColor;
@@ -30,7 +30,7 @@ struct LedDisplayChoice : widget::OpaqueWidget {
 };
 
 struct LedDisplayTextField : ui::TextField {
-	std::shared_ptr<Font> font;
+	std::string fontPath;
 	math::Vec textOffset;
 	NVGcolor color;
 	LedDisplayTextField();

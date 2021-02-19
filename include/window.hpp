@@ -58,10 +58,6 @@ struct Window {
 	float windowRatio = 1.f;
 	std::shared_ptr<Font> uiFont;
 
-	/** Use load*() instead of modifying these directly. */
-	std::map<std::string, std::weak_ptr<Font>> fontCache;
-	std::map<std::string, std::weak_ptr<Image>> imageCache;
-
 	Window();
 	~Window();
 	void run();

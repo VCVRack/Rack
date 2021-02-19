@@ -24,6 +24,7 @@ LedDisplaySeparator::LedDisplaySeparator() {
 	box.size = math::Vec();
 }
 
+
 void LedDisplaySeparator::draw(const DrawArgs& args) {
 	nvgBeginPath(args.vg);
 	nvgMoveTo(args.vg, 0, 0);
@@ -36,11 +37,12 @@ void LedDisplaySeparator::draw(const DrawArgs& args) {
 
 LedDisplayChoice::LedDisplayChoice() {
 	box.size = mm2px(math::Vec(0, 28.0 / 3));
-	font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+	fontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	bgColor = nvgRGBAf(0, 0, 0, 0);
 	textOffset = math::Vec(10, 18);
 }
+
 
 void LedDisplayChoice::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
@@ -51,7 +53,8 @@ void LedDisplayChoice::draw(const DrawArgs& args) {
 		nvgFill(args.vg);
 	}
 
-	if (font->handle >= 0) {
+	std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+	if (font && font->handle >= 0) {
 		nvgFillColor(args.vg, color);
 		nvgFontFaceId(args.vg, font->handle);
 		nvgTextLetterSpacing(args.vg, 0.0);
@@ -61,6 +64,7 @@ void LedDisplayChoice::draw(const DrawArgs& args) {
 	}
 	nvgResetScissor(args.vg);
 }
+
 
 void LedDisplayChoice::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
@@ -74,7 +78,7 @@ void LedDisplayChoice::onButton(const ButtonEvent& e) {
 
 
 LedDisplayTextField::LedDisplayTextField() {
-	font = APP->window->loadFont(asset::system("res/fonts/ShareTechMono-Regular.ttf"));
+	fontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	textOffset = math::Vec(5, 5);
 }
@@ -90,16 +94,18 @@ void LedDisplayTextField::draw(const DrawArgs& args) {
 	nvgFill(args.vg);
 
 	// Text
-	if (font->handle >= 0) {
+	std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+	if (font && font->handle >= 0) {
 		bndSetFont(font->handle);
 
 		NVGcolor highlightColor = color;
 		highlightColor.a = 0.5;
 		int begin = std::min(cursor, selection);
 		int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
-		bndIconLabelCaret(args.vg, textOffset.x, textOffset.y,
-		                  box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
-		                  -1, color, 12, text.c_str(), highlightColor, begin, end);
+		bndIconLabelCaret(args.vg,
+			textOffset.x, textOffset.y,
+			box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
+			-1, color, 12, text.c_str(), highlightColor, begin, end);
 
 		bndSetFont(APP->window->uiFont->handle);
 	}
@@ -107,11 +113,17 @@ void LedDisplayTextField::draw(const DrawArgs& args) {
 	nvgResetScissor(args.vg);
 }
 
+
 int LedDisplayTextField::getTextPosition(math::Vec mousePos) {
+	std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+	if (!font || !font->handle)
+		return 0;
+
 	bndSetFont(font->handle);
-	int textPos = bndIconLabelTextPosition(APP->window->vg, textOffset.x, textOffset.y,
-	                                       box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
-	                                       -1, 12, text.c_str(), mousePos.x, mousePos.y);
+	int textPos = bndIconLabelTextPosition(APP->window->vg,
+		textOffset.x, textOffset.y,
+		box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
+		-1, 12, text.c_str(), mousePos.x, mousePos.y);
 	bndSetFont(APP->window->uiFont->handle);
 	return textPos;
 }
