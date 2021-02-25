@@ -223,12 +223,13 @@ int main(int argc, char* argv[]) {
 		INFO("Running window");
 		APP->window->run();
 		INFO("Stopped window");
-		delete APP->window;
-		APP->window = NULL;
 
-		INFO("Re-creating window");
-		APP->window = new Window;
-		APP->window->run();
+		// INFO("Destroying window");
+		// delete APP->window;
+		// APP->window = NULL;
+		// INFO("Re-creating window");
+		// APP->window = new Window;
+		// APP->window->run();
 	}
 
 	// Destroy context

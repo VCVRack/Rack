@@ -2,9 +2,8 @@
 
 #include <common.hpp>
 #include <asset.hpp>
-#include <settings.hpp>
 #include <system.hpp>
-#include <unistd.h> // for dup2
+// #include <unistd.h> // for dup2
 
 
 namespace rack {
@@ -17,9 +16,10 @@ static std::mutex logMutex;
 
 
 void init() {
+	std::lock_guard<std::mutex> lock(logMutex);
 	startTime = system::getTime();
 	// Don't open a file in development mode.
-	if (settings::devMode) {
+	if (asset::logPath.empty()) {
 		outputFile = stderr;
 		return;
 	}
@@ -37,6 +37,7 @@ void init() {
 }
 
 void destroy() {
+	std::lock_guard<std::mutex> lock(logMutex);
 	if (outputFile && outputFile != stderr) {
 		// Print end token so we know if the logger exited cleanly.
 		std::fprintf(outputFile, "END");
@@ -96,7 +97,7 @@ static bool fileEndsWith(FILE* file, std::string str) {
 }
 
 bool isTruncated() {
-	if (settings::devMode)
+	if (asset::logPath.empty())
 		return false;
 
 	// Open existing log file
