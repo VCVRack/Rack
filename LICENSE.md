@@ -1,6 +1,6 @@
 # VCV Rack Licenses
 
-All VCV Rack **source code** is copyright © 2019 Andrew Belt and licensed under the [GNU General Public License v3.0](LICENSE-GPLv3.txt) with the "VCV Rack Non-Commercial Plugin License Exception", allowed under section 7 of GPLv3, and a commercial licensing option.
+All VCV Rack **source code** is copyright © 2019 [VCV](https://vcvrack.com/) and licensed under the [GNU General Public License v3.0](LICENSE-GPLv3.txt) with the "VCV Rack Non-Commercial Plugin License Exception", allowed under section 7 of GPLv3, and a commercial licensing option.
 
 >#### VCV Rack Non-Commercial Plugin License Exception
 >
@@ -18,15 +18,15 @@ If you wish to release a proprietary commercial plugin, email contact@vcvrack.co
 
 Licenses of **third-party libraries** are listed in [LICENSE-dist.txt](LICENSE-dist.txt).
 
-The **Component Library graphics** for Rack are copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
+The **Component Library graphics** for Rack are copyright © 2019 [VCV](https://vcvrack.com/) and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
 Non-commercial use is allowed with appropriate credit and indication of the original license.
 Commercial use is allowed only for plugins sold through the [VCV Library](https://vcvrack.com/plugins.html) or with a commercial license.
 Email contact@vcvrack.com for more information about selling plugins through the VCV Library.
 
-The **visual design of the Core modules** is copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+The **visual design of the Core modules** is copyright © 2019 [VCV](https://vcvrack.com/) and licensed under [CC BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
 Commercial use and derivative works are not allowed.
 
-The **VCV logo and icon** are copyright © 2017 Andrew Belt and may not be used in derivative works.
+The **VCV logo and icon** are copyright © 2017 VCV and may not be used in derivative works.
 
 The **"VCV" name** is trademarked and may not be used for unofficial products.
 However, it is acceptable to use the phrase "for VCV Rack" for promotion of your Rack plugin.
