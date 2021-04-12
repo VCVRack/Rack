@@ -145,9 +145,18 @@ math::Rect Widget::getViewport(math::Rect r) {
 }
 
 
+bool Widget::hasChild(Widget* child) {
+	if (!child)
+		return false;
+	auto it = std::find(children.begin(), children.end(), child);
+	return (it != children.end());
+}
+
+
 void Widget::addChild(Widget* child) {
 	assert(child);
 	assert(!child->parent);
+	// Add child
 	child->parent = this;
 	children.push_back(child);
 	// Trigger Add event
@@ -159,8 +168,38 @@ void Widget::addChild(Widget* child) {
 void Widget::addChildBottom(Widget* child) {
 	assert(child);
 	assert(!child->parent);
+	// Add child
 	child->parent = this;
 	children.push_front(child);
+	// Trigger Add event
+	AddEvent eAdd;
+	child->onAdd(eAdd);
+}
+
+
+void Widget::addChildBefore(Widget* child, Widget* sibling) {
+	assert(child);
+	assert(!child->parent);
+	auto it = std::find(children.begin(), children.end(), sibling);
+	assert(it != children.end());
+	// Add child
+	child->parent = this;
+	children.insert(it, child);
+	// Trigger Add event
+	AddEvent eAdd;
+	child->onAdd(eAdd);
+}
+
+
+void Widget::addChildAfter(Widget* child, Widget* sibling) {
+	assert(child);
+	assert(!child->parent);
+	auto it = std::find(children.begin(), children.end(), sibling);
+	assert(it != children.end());
+	// Add child
+	child->parent = this;
+	it++;
+	children.insert(it, child);
 	// Trigger Add event
 	AddEvent eAdd;
 	child->onAdd(eAdd);
