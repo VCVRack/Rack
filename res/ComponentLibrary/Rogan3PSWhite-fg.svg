@@ -15,15 +15,15 @@
 		<circle fill="url(#SVGID_1_)" cx="25.92185" cy="25.92185" r="25.92185"/>
 	</g>
 </g>
-<g id="anim">
-	<g>
+<g id="anim" display="none">
+	<g display="inline">
 		<circle fill="none" cx="25.92185" cy="25.92185" r="25.92185"/>
 		<polygon fill="#333333" points="25.92185,1.6 31.4729,18.68437 49.43646,18.68437 34.90363,29.24309 40.45468,46.32745 
 			25.92185,35.76873 11.38902,46.32745 16.94007,29.24309 2.40724,18.68437 20.3708,18.68437 		"/>
 	</g>
 </g>
-<g id="fixed_fg" display="none">
-	<g display="inline">
+<g id="fixed_fg">
+	<g>
 		<circle fill="none" cx="25.92185" cy="25.92185" r="25.92185"/>
 		<rect x="19.8687" y="19.86677" fill="#F2F2F2" width="12.1063" height="12.1063"/>
 	</g>

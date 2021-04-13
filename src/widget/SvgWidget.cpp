@@ -21,9 +21,12 @@ void SvgWidget::setSvg(std::shared_ptr<Svg> svg) {
 }
 
 void SvgWidget::draw(const DrawArgs& args) {
-	if (svg && svg->handle) {
-		svgDraw(args.vg, svg->handle);
-	}
+	if (!svg)
+		return;
+	if (!svg->handle)
+		return;
+
+	svgDraw(args.vg, svg->handle);
 }
 
 

@@ -99,14 +99,21 @@ struct Widget : WeakBase {
 		return NULL;
 	}
 
+	/** Checks if the given widget is a child of `this` widget.
+	*/
 	bool hasChild(Widget* child);
-	/** Adds widget to list of children.
+	/** Adds widget to the top of the children.
 	Gives ownership of widget to this widget instance.
 	*/
 	void addChild(Widget* child);
+	/** Adds widget to the bottom of the children.
+	*/
 	void addChildBottom(Widget* child);
-	void addChildBefore(Widget* child, Widget* sibling);
-	void addChildAfter(Widget* child, Widget* sibling);
+	/** Adds widget directly below another widget.
+	The sibling widget must already be a child of `this` widget.
+	*/
+	void addChildBelow(Widget* child, Widget* sibling);
+	void addChildAbove(Widget* child, Widget* sibling);
 	/** Removes widget from list of children if it exists.
 	Does not delete widget but transfers ownership to caller
 	*/

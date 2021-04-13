@@ -11,6 +11,7 @@
 namespace rack {
 
 
+/** Arbitrary DPI, standardized for Rack. */
 static const float SVG_DPI = 75.f;
 static const float MM_PER_IN = 25.4f;
 

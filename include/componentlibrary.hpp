@@ -341,6 +341,14 @@ struct Rogan3PSGreen : Rogan {
 struct Rogan3PSWhite : Rogan {
 	Rogan3PSWhite() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PSWhite.svg")));
+
+		widget::SvgWidget* bg = new widget::SvgWidget;
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PSWhite-bg.svg")));
+		fb->addChildBelow(bg, tw);
+
+		widget::SvgWidget* fg = new widget::SvgWidget;
+		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PSWhite-fg.svg")));
+		fb->addChildAbove(fg, tw);
 	}
 };
 

@@ -177,7 +177,7 @@ void Widget::addChildBottom(Widget* child) {
 }
 
 
-void Widget::addChildBefore(Widget* child, Widget* sibling) {
+void Widget::addChildBelow(Widget* child, Widget* sibling) {
 	assert(child);
 	assert(!child->parent);
 	auto it = std::find(children.begin(), children.end(), sibling);
@@ -191,7 +191,7 @@ void Widget::addChildBefore(Widget* child, Widget* sibling) {
 }
 
 
-void Widget::addChildAfter(Widget* child, Widget* sibling) {
+void Widget::addChildAbove(Widget* child, Widget* sibling) {
 	assert(child);
 	assert(!child->parent);
 	auto it = std::find(children.begin(), children.end(), sibling);
