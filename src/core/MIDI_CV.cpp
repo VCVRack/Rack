@@ -15,11 +15,11 @@ struct MIDI_CV : Module {
 		NUM_INPUTS
 	};
 	enum OutputIds {
-		CV_OUTPUT,
+		PITCH_OUTPUT,
 		GATE_OUTPUT,
 		VELOCITY_OUTPUT,
 		AFTERTOUCH_OUTPUT,
-		PITCH_OUTPUT,
+		PW_OUTPUT,
 		MOD_OUTPUT,
 		RETRIGGER_OUTPUT,
 		CLOCK_OUTPUT,
@@ -59,10 +59,14 @@ struct MIDI_CV : Module {
 
 	int rotateIndex;
 
-	// 16 channels for MPE. When MPE is disabled, only the first channel is used.
-	uint16_t pitches[16];
+	/** Pitch wheel.
+	When MPE is disabled, only the first channel is used.
+	[channel]
+	*/
+	uint16_t pws[16];
+	/** [channel] */
 	uint8_t mods[16];
-	dsp::ExponentialFilter pitchFilters[16];
+	dsp::ExponentialFilter pwFilters[16];
 	dsp::ExponentialFilter modFilters[16];
 
 	dsp::PulseGenerator clockPulse;
@@ -74,11 +78,11 @@ struct MIDI_CV : Module {
 
 	MIDI_CV() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configOutput(CV_OUTPUT, "V/oct");
+		configOutput(PITCH_OUTPUT, "Pitch (1V/oct)");
 		configOutput(GATE_OUTPUT, "Gate");
 		configOutput(VELOCITY_OUTPUT, "Velocity");
 		configOutput(AFTERTOUCH_OUTPUT, "Aftertouch");
-		configOutput(PITCH_OUTPUT, "Pitch wheel");
+		configOutput(PW_OUTPUT, "Pitch wheel");
 		configOutput(MOD_OUTPUT, "Mod wheel");
 		configOutput(RETRIGGER_OUTPUT, "Retrigger");
 		configOutput(CLOCK_OUTPUT, "Clock");
@@ -88,7 +92,7 @@ struct MIDI_CV : Module {
 		configOutput(CONTINUE_OUTPUT, "Continue");
 		heldNotes.reserve(128);
 		for (int c = 0; c < 16; c++) {
-			pitchFilters[c].setTau(1 / 30.f);
+			pwFilters[c].setTau(1 / 30.f);
 			modFilters[c].setTau(1 / 30.f);
 		}
 		onReset();
@@ -110,9 +114,9 @@ struct MIDI_CV : Module {
 			gates[c] = false;
 			velocities[c] = 0;
 			aftertouches[c] = 0;
-			pitches[c] = 8192;
+			pws[c] = 8192;
 			mods[c] = 0;
-			pitchFilters[c].reset();
+			pwFilters[c].reset();
 			modFilters[c].reset();
 		}
 		pedal = false;
@@ -130,13 +134,13 @@ struct MIDI_CV : Module {
 			midiInput.queue.pop();
 		}
 
-		outputs[CV_OUTPUT].setChannels(channels);
+		outputs[PITCH_OUTPUT].setChannels(channels);
 		outputs[GATE_OUTPUT].setChannels(channels);
 		outputs[VELOCITY_OUTPUT].setChannels(channels);
 		outputs[AFTERTOUCH_OUTPUT].setChannels(channels);
 		outputs[RETRIGGER_OUTPUT].setChannels(channels);
 		for (int c = 0; c < channels; c++) {
-			outputs[CV_OUTPUT].setVoltage((notes[c] - 60.f) / 12.f, c);
+			outputs[PITCH_OUTPUT].setVoltage((notes[c] - 60.f) / 12.f, c);
 			outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
 			outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[c], 0, 127, 0.f, 10.f), c);
 			outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[c], 0, 127, 0.f, 10.f), c);
@@ -144,37 +148,25 @@ struct MIDI_CV : Module {
 		}
 
 		// Set pitch and mod wheel
-		auto updatePitch = [&](int c) {
-			float pitch = ((int) pitches[c] - 8192) / 8191.f;
-			pitch = clamp(pitch, -1.f, 1.f);
+		int wheelChannels = (polyMode == MPE_MODE) ? 16 : 1;
+		outputs[PW_OUTPUT].setChannels(wheelChannels);
+		outputs[MOD_OUTPUT].setChannels(wheelChannels);
+		for (int c = 0; c < wheelChannels; c++) {
+			float pw = ((int) pws[c] - 8192) / 8191.f;
+			pw = clamp(pw, -1.f, 1.f);
 			if (smooth)
-				pitch = pitchFilters[c].process(args.sampleTime, pitch);
+				pw = pwFilters[c].process(args.sampleTime, pw);
 			else
-				pitchFilters[c].out = pitch;
-			outputs[PITCH_OUTPUT].setVoltage(pitchFilters[c].out * 5.f);
-		};
-		auto updateMod = [&](int c) {
+				pwFilters[c].out = pw;
+			outputs[PW_OUTPUT].setVoltage(pw * 5.f);
+
 			float mod = mods[c] / 127.f;
 			mod = clamp(mod, 0.f, 1.f);
 			if (smooth)
-				modFilters[c].process(args.sampleTime, mod);
+				mod = modFilters[c].process(args.sampleTime, mod);
 			else
 				modFilters[c].out = mod;
-			outputs[MOD_OUTPUT].setVoltage(modFilters[c].out * 10.f);
-		};
-		if (polyMode == MPE_MODE) {
-			for (int c = 0; c < channels; c++) {
-				updatePitch(c);
-				outputs[PITCH_OUTPUT].setChannels(1);
-				updateMod(c);
-				outputs[MOD_OUTPUT].setChannels(1);
-			}
-		}
-		else {
-			updatePitch(0);
-			outputs[PITCH_OUTPUT].setChannels(1);
-			updateMod(0);
-			outputs[MOD_OUTPUT].setChannels(1);
+			outputs[MOD_OUTPUT].setVoltage(mod * 10.f);
 		}
 
 		outputs[CLOCK_OUTPUT].setVoltage(clockPulse.process(args.sampleTime) ? 10.f : 0.f);
@@ -233,7 +225,7 @@ struct MIDI_CV : Module {
 			// pitch wheel
 			case 0xe: {
 				int c = (polyMode == MPE_MODE) ? msg.getChannel() : 0;
-				pitches[c] = ((uint16_t) msg.getValue() << 7) | msg.getNote();
+				pws[c] = ((uint16_t) msg.getValue() << 7) | msg.getNote();
 			} break;
 			case 0xf: {
 				processSystem(msg);
@@ -440,7 +432,7 @@ struct MIDI_CV : Module {
 		json_object_set_new(rootJ, "clockDivision", json_integer(clockDivision));
 		// Saving/restoring pitch and mod doesn't make much sense for MPE.
 		if (polyMode != MPE_MODE) {
-			json_object_set_new(rootJ, "lastPitch", json_integer(pitches[0]));
+			json_object_set_new(rootJ, "lastPitch", json_integer(pws[0]));
 			json_object_set_new(rootJ, "lastMod", json_integer(mods[0]));
 		}
 		json_object_set_new(rootJ, "midi", midiInput.toJson());
@@ -466,7 +458,7 @@ struct MIDI_CV : Module {
 
 		json_t* lastPitchJ = json_object_get(rootJ, "lastPitch");
 		if (lastPitchJ)
-			pitches[0] = json_integer_value(lastPitchJ);
+			pws[0] = json_integer_value(lastPitchJ);
 
 		json_t* lastModJ = json_object_get(rootJ, "lastMod");
 		if (lastModJ)
@@ -489,11 +481,11 @@ struct MIDI_CVWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 60.1445)), module, MIDI_CV::CV_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 60.1445)), module, MIDI_CV::PITCH_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 60.1445)), module, MIDI_CV::GATE_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 60.1445)), module, MIDI_CV::VELOCITY_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 76.1449)), module, MIDI_CV::AFTERTOUCH_OUTPUT));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 76.1449)), module, MIDI_CV::PITCH_OUTPUT));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 76.1449)), module, MIDI_CV::PW_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.8143, 76.1449)), module, MIDI_CV::MOD_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(4.61505, 92.1439)), module, MIDI_CV::CLOCK_OUTPUT));
 		addOutput(createOutput<PJ301MPort>(mm2px(Vec(16.214, 92.1439)), module, MIDI_CV::CLOCK_DIV_OUTPUT));
@@ -519,7 +511,6 @@ struct MIDI_CVWidget : ModuleWidget {
 				module->smooth ^= true;
 			}
 		};
-
 		SmoothItem* smoothItem = new SmoothItem;
 		smoothItem->text = "Smooth pitch/mod wheel";
 		smoothItem->rightText = CHECKMARK(module->smooth);
@@ -533,7 +524,6 @@ struct MIDI_CVWidget : ModuleWidget {
 				module->clockDivision = clockDivision;
 			}
 		};
-
 		struct ClockDivisionItem : MenuItem {
 			MIDI_CV* module;
 			Menu* createChildMenu() override {
@@ -551,7 +541,6 @@ struct MIDI_CVWidget : ModuleWidget {
 				return menu;
 			}
 		};
-
 		ClockDivisionItem* clockDivisionItem = new ClockDivisionItem;
 		clockDivisionItem->text = "CLK/N divider";
 		clockDivisionItem->rightText = RIGHT_ARROW;
@@ -565,7 +554,6 @@ struct MIDI_CVWidget : ModuleWidget {
 				module->setChannels(channels);
 			}
 		};
-
 		struct ChannelItem : MenuItem {
 			MIDI_CV* module;
 			Menu* createChildMenu() override {
@@ -584,7 +572,6 @@ struct MIDI_CVWidget : ModuleWidget {
 				return menu;
 			}
 		};
-
 		ChannelItem* channelItem = new ChannelItem;
 		channelItem->text = "Polyphony channels";
 		channelItem->rightText = string::f("%d", module->channels) + " " + RIGHT_ARROW;
@@ -598,7 +585,6 @@ struct MIDI_CVWidget : ModuleWidget {
 				module->setPolyMode(polyMode);
 			}
 		};
-
 		struct PolyModeItem : MenuItem {
 			MIDI_CV* module;
 			Menu* createChildMenu() override {
@@ -621,7 +607,6 @@ struct MIDI_CVWidget : ModuleWidget {
 				return menu;
 			}
 		};
-
 		PolyModeItem* polyModeItem = new PolyModeItem;
 		polyModeItem->text = "Polyphony mode";
 		polyModeItem->rightText = RIGHT_ARROW;
@@ -634,7 +619,6 @@ struct MIDI_CVWidget : ModuleWidget {
 				module->panic();
 			}
 		};
-
 		PanicItem* panicItem = new PanicItem;
 		panicItem->text = "Panic";
 		panicItem->module = module;

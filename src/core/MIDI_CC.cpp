@@ -21,6 +21,7 @@ struct MIDI_CC : Module {
 	};
 
 	midi::InputQueue midiInput;
+
 	/** [cc][channel] */
 	int8_t ccValues[128][16];
 	/** When LSB is enabled for CC 0-31, the MSB is stored here until the LSB is received.
@@ -33,7 +34,7 @@ struct MIDI_CC : Module {
 	dsp::ExponentialFilter valueFilters[16][16];
 	bool smooth;
 	bool mpeMode;
-	bool lsbEnabled;
+	bool lsbMode;
 
 	MIDI_CC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -66,7 +67,7 @@ struct MIDI_CC : Module {
 		midiInput.reset();
 		smooth = true;
 		mpeMode = false;
-		lsbEnabled = false;
+		lsbMode = false;
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -80,6 +81,7 @@ struct MIDI_CC : Module {
 		}
 
 		int channels = mpeMode ? 16 : 1;
+
 		for (int i = 0; i < 16; i++) {
 			if (!outputs[CC_OUTPUT + i].isConnected())
 				continue;
@@ -89,7 +91,7 @@ struct MIDI_CC : Module {
 
 			for (int c = 0; c < channels; c++) {
 				int16_t cellValue = int16_t(ccValues[cc][c]) * 128;
-				if (lsbEnabled && cc < 32)
+				if (lsbMode && cc < 32)
 					cellValue += ccValues[cc + 32][c];
 				// Maximum value for 14-bit CC should be MSB=127 LSB=0, not MSB=127 LSB=127, because this is the maximum value that 7-bit controllers can send.
 				float value = float(cellValue) / (128 * 127);
@@ -135,11 +137,11 @@ struct MIDI_CC : Module {
 			learningId = -1;
 		}
 
-		if (lsbEnabled && cc < 32) {
+		if (lsbMode && cc < 32) {
 			// Don't set MSB yet. Wait for LSB to be received.
 			msbValues[cc][c] = value;
 		}
-		else if (lsbEnabled && 32 <= cc && cc < 64) {
+		else if (lsbMode && 32 <= cc && cc < 64) {
 			// Apply MSB when LSB is received
 			ccValues[cc - 32][c] = msbValues[cc - 32][c];
 			ccValues[cc][c] = value;
@@ -170,7 +172,7 @@ struct MIDI_CC : Module {
 
 		json_object_set_new(rootJ, "smooth", json_boolean(smooth));
 		json_object_set_new(rootJ, "mpeMode", json_boolean(mpeMode));
-		json_object_set_new(rootJ, "lsbEnabled", json_boolean(lsbEnabled));
+		json_object_set_new(rootJ, "lsbMode", json_boolean(lsbMode));
 		return rootJ;
 	}
 
@@ -206,9 +208,9 @@ struct MIDI_CC : Module {
 		if (mpeModeJ)
 			mpeMode = json_boolean_value(mpeModeJ);
 
-		json_t* lsbEnabledJ = json_object_get(rootJ, "lsbEnabled");
+		json_t* lsbEnabledJ = json_object_get(rootJ, "lsbMode");
 		if (lsbEnabledJ)
-			lsbEnabled = json_boolean_value(lsbEnabledJ);
+			lsbMode = json_boolean_value(lsbEnabledJ);
 	}
 };
 
@@ -259,7 +261,6 @@ struct MIDI_CCWidget : ModuleWidget {
 				module->smooth ^= true;
 			}
 		};
-
 		SmoothItem* smoothItem = new SmoothItem;
 		smoothItem->text = "Smooth CC";
 		smoothItem->rightText = CHECKMARK(module->smooth);
@@ -272,25 +273,23 @@ struct MIDI_CCWidget : ModuleWidget {
 				module->mpeMode ^= true;
 			}
 		};
-
 		MpeModeItem* mpeModeItem = new MpeModeItem;
 		mpeModeItem->text = "MPE mode";
 		mpeModeItem->rightText = CHECKMARK(module->mpeMode);
 		mpeModeItem->module = module;
 		menu->addChild(mpeModeItem);
 
-		struct LSBItem : MenuItem {
+		struct LsbModeItem : MenuItem {
 			MIDI_CC* module;
 			void onAction(const ActionEvent& e) override {
-				module->lsbEnabled ^= true;
+				module->lsbMode ^= true;
 			}
 		};
-
-		LSBItem* highResolutionItem = new LSBItem;
-		highResolutionItem->text = "CC 0-31 controls are 14-bit";
-		highResolutionItem->rightText = CHECKMARK(module->lsbEnabled);
-		highResolutionItem->module = module;
-		menu->addChild(highResolutionItem);
+		LsbModeItem* lsbItem = new LsbModeItem;
+		lsbItem->text = "CC 0-31 controls are 14-bit";
+		lsbItem->rightText = CHECKMARK(module->lsbMode);
+		lsbItem->module = module;
+		menu->addChild(lsbItem);
 	}
 };
 

@@ -13,7 +13,7 @@ struct MIDI_Gate : Module {
 		NUM_INPUTS
 	};
 	enum OutputIds {
-		ENUMS(TRIG_OUTPUT, 16),
+		ENUMS(GATE_OUTPUTS, 16),
 		NUM_OUTPUTS
 	};
 	enum LightIds {
@@ -22,21 +22,23 @@ struct MIDI_Gate : Module {
 
 	midi::InputQueue midiInput;
 
-	/** [cell][c] */
+	/** [cell][channel] */
 	bool gates[16][16];
-	/** [cell][c] */
+	/** [cell][channel] */
 	float gateTimes[16][16];
-	/** [cell][c] */
+	/** [cell][channel] */
 	uint8_t velocities[16][16];
-	int learningId = -1;
-	uint8_t learnedNotes[16] = {};
-	bool velocityMode = false;
-	bool mpeMode = false;
+	/** Cell ID in learn mode, or -1 if none. */
+	int learningId;
+	/** [cell] */
+	uint8_t learnedNotes[16];
+	bool velocityMode;
+	bool mpeMode;
 
 	MIDI_Gate() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 16; i++)
-			configOutput(TRIG_OUTPUT + i, string::f("Cell %d", i + 1));
+			configOutput(GATE_OUTPUTS + i, string::f("Gate %d", i + 1));
 
 		onReset();
 	}
@@ -76,16 +78,16 @@ struct MIDI_Gate : Module {
 		int channels = mpeMode ? 16 : 1;
 
 		for (int i = 0; i < 16; i++) {
-			outputs[TRIG_OUTPUT + i].setChannels(channels);
+			outputs[GATE_OUTPUTS + i].setChannels(channels);
 			for (int c = 0; c < channels; c++) {
 				// Make sure all pulses last longer than 1ms
 				if (gates[i][c] || gateTimes[i][c] > 0.f) {
 					float velocity = velocityMode ? (velocities[i][c] / 127.f) : 1.f;
-					outputs[TRIG_OUTPUT + i].setVoltage(velocity * 10.f, c);
+					outputs[GATE_OUTPUTS + i].setVoltage(velocity * 10.f, c);
 					gateTimes[i][c] -= args.sampleTime;
 				}
 				else {
-					outputs[TRIG_OUTPUT + i].setVoltage(0.f, c);
+					outputs[GATE_OUTPUTS + i].setVoltage(0.f, c);
 				}
 			}
 		}
@@ -181,30 +183,6 @@ struct MIDI_Gate : Module {
 };
 
 
-struct MIDI_GateVelocityItem : MenuItem {
-	MIDI_Gate* module;
-	void onAction(const ActionEvent& e) override {
-		module->velocityMode ^= true;
-	}
-};
-
-
-struct MIDI_GateMpeModeItem : MenuItem {
-	MIDI_Gate* module;
-	void onAction(const ActionEvent& e) override {
-		module->mpeMode ^= true;
-	}
-};
-
-
-struct MIDI_GatePanicItem : MenuItem {
-	MIDI_Gate* module;
-	void onAction(const ActionEvent& e) override {
-		module->panic();
-	}
-};
-
-
 struct MIDI_GateWidget : ModuleWidget {
 	MIDI_GateWidget(MIDI_Gate* module) {
 		setModule(module);
@@ -215,22 +193,22 @@ struct MIDI_GateWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.894335, 73.344704)), module, MIDI_Gate::TRIG_OUTPUT + 0));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.494659, 73.344704)), module, MIDI_Gate::TRIG_OUTPUT + 1));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.094982, 73.344704)), module, MIDI_Gate::TRIG_OUTPUT + 2));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 73.344704)), module, MIDI_Gate::TRIG_OUTPUT + 3));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.8943355, 84.945023)), module, MIDI_Gate::TRIG_OUTPUT + 4));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.49466, 84.945023)), module, MIDI_Gate::TRIG_OUTPUT + 5));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.094982, 84.945023)), module, MIDI_Gate::TRIG_OUTPUT + 6));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 84.945023)), module, MIDI_Gate::TRIG_OUTPUT + 7));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.8943343, 96.543976)), module, MIDI_Gate::TRIG_OUTPUT + 8));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.494659, 96.543976)), module, MIDI_Gate::TRIG_OUTPUT + 9));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 96.543976)), module, MIDI_Gate::TRIG_OUTPUT + 10));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 96.543976)), module, MIDI_Gate::TRIG_OUTPUT + 11));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.894335, 108.14429)), module, MIDI_Gate::TRIG_OUTPUT + 12));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.49466, 108.14429)), module, MIDI_Gate::TRIG_OUTPUT + 13));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), module, MIDI_Gate::TRIG_OUTPUT + 14));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), module, MIDI_Gate::TRIG_OUTPUT + 15));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.894335, 73.344704)), module, MIDI_Gate::GATE_OUTPUTS + 0));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.494659, 73.344704)), module, MIDI_Gate::GATE_OUTPUTS + 1));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.094982, 73.344704)), module, MIDI_Gate::GATE_OUTPUTS + 2));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 73.344704)), module, MIDI_Gate::GATE_OUTPUTS + 3));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.8943355, 84.945023)), module, MIDI_Gate::GATE_OUTPUTS + 4));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.49466, 84.945023)), module, MIDI_Gate::GATE_OUTPUTS + 5));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.094982, 84.945023)), module, MIDI_Gate::GATE_OUTPUTS + 6));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 84.945023)), module, MIDI_Gate::GATE_OUTPUTS + 7));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.8943343, 96.543976)), module, MIDI_Gate::GATE_OUTPUTS + 8));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.494659, 96.543976)), module, MIDI_Gate::GATE_OUTPUTS + 9));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 96.543976)), module, MIDI_Gate::GATE_OUTPUTS + 10));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 96.543976)), module, MIDI_Gate::GATE_OUTPUTS + 11));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.894335, 108.14429)), module, MIDI_Gate::GATE_OUTPUTS + 12));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.49466, 108.14429)), module, MIDI_Gate::GATE_OUTPUTS + 13));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), module, MIDI_Gate::GATE_OUTPUTS + 14));
+		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), module, MIDI_Gate::GATE_OUTPUTS + 15));
 
 		typedef Grid16MidiWidget<NoteChoice<MIDI_Gate>> TMidiWidget;
 		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
@@ -243,18 +221,36 @@ struct MIDI_GateWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		MIDI_Gate* module = dynamic_cast<MIDI_Gate*>(this->module);
 
+		struct VelocityItem : MenuItem {
+			MIDI_Gate* module;
+			void onAction(const ActionEvent& e) override {
+				module->velocityMode ^= true;
+			}
+		};
 		menu->addChild(new MenuSeparator);
-		MIDI_GateVelocityItem* velocityItem = createMenuItem<MIDI_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
+		VelocityItem* velocityItem = createMenuItem<VelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
 		velocityItem->module = module;
 		menu->addChild(velocityItem);
 
-		MIDI_GateMpeModeItem* mpeModeItem = new MIDI_GateMpeModeItem;
+		struct MpeModeItem : MenuItem {
+			MIDI_Gate* module;
+			void onAction(const ActionEvent& e) override {
+				module->mpeMode ^= true;
+			}
+		};
+		MpeModeItem* mpeModeItem = new MpeModeItem;
 		mpeModeItem->text = "MPE mode";
 		mpeModeItem->rightText = CHECKMARK(module->mpeMode);
 		mpeModeItem->module = module;
 		menu->addChild(mpeModeItem);
 
-		MIDI_GatePanicItem* panicItem = new MIDI_GatePanicItem;
+		struct PanicItem : MenuItem {
+			MIDI_Gate* module;
+			void onAction(const ActionEvent& e) override {
+				module->panic();
+			}
+		};
+		PanicItem* panicItem = new PanicItem;
 		panicItem->text = "Panic";
 		panicItem->module = module;
 		menu->addChild(panicItem);
