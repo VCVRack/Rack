@@ -164,6 +164,17 @@ namespace std {
 namespace rack {
 
 
+/** Casts a primitive, preserving its bits instead of converting. */
+template <typename To, typename From>
+To bitCast(From from) {
+	static_assert(sizeof(From) == sizeof(To), "Types must be the same size");
+	To to;
+	// This is optimized out
+	std::memcpy(&to, &from, sizeof(From));
+	return to;
+}
+
+
 /** C#-style property constructor
 Example:
 
@@ -180,6 +191,7 @@ T* construct(F f, V v, Args... args) {
 	o->*f = v;
 	return o;
 }
+
 
 /** Defers code until the scope is destructed
 From http://www.gingerbill.org/article/defer-in-cpp.html
@@ -243,6 +255,7 @@ typename C::mapped_type get(const C& m, const typename C::key_type& key, const t
 		return def;
 	return it->second;
 }
+
 
 // config
 

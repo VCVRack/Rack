@@ -39,10 +39,11 @@ inline simd::float_4 approxExp2Floor(simd::float_4 x, simd::float_4* xf) {
 
 template <>
 inline float approxExp2Floor(float x, float* xf) {
-	int xi = x;
+	int32_t xi = x;
 	if (xf)
 		*xf = x - xi;
-	return 1 << xi;
+	int32_t y = (xi + 127) << 23;
+	return bitCast<float>(y);
 }
 
 
