@@ -106,14 +106,14 @@ T sgn(T x) {
 /** Limits `x` between `a` and `b`.
 If `b < a`, returns a.
 */
-inline float clamp(float x, float a, float b) {
+inline float clamp(float x, float a = 0.f, float b = 1.f) {
 	return std::fmax(std::fmin(x, b), a);
 }
 
 /** Limits `x` between `a` and `b`.
 If `b < a`, switches the two values.
 */
-inline float clampSafe(float x, float a, float b) {
+inline float clampSafe(float x, float a = 0.f, float b = 1.f) {
 	return (a <= b) ? clamp(x, a, b) : clamp(x, b, a);
 }
 
@@ -145,7 +145,7 @@ inline float chop(float x, float epsilon = 1e-6f) {
 
 /** Rescales `x` from the range `[xMin, xMax]` to `[yMin, yMax]`.
 */
-inline float rescale(float x, float xMin, float xMax, float yMin, float yMax) {
+inline float rescale(float x, float xMin, float xMax, float yMin = 0.f, float yMax = 1.f) {
 	return yMin + (x - xMin) / (xMax - xMin) * (yMax - yMin);
 }
 
