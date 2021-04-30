@@ -10,6 +10,9 @@ namespace rack {
 struct PatchManager {
 	/** The currently loaded patch file path */
 	std::string path;
+	/** Path to autosave folder */
+	std::string autosavePath;
+	/** Append to this while loading/saving a patch to display messages to the user after success. */
 	std::string warningLog;
 
 	PatchManager();

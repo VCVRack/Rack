@@ -218,6 +218,11 @@ struct Module {
 		bypassRoutes.push_back(br);
 	}
 
+	/** Creates and returns the module's patch storage folder path.
+	Since the folder is created when this is called, do not call it frequently or in an audio/engine thread such as process().
+	*/
+	std::string createPatchStorageDir();
+
 	struct ProcessArgs {
 		/** The current sample rate in Hz. */
 		float sampleRate;

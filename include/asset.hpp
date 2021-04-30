@@ -33,15 +33,6 @@ Examples:
 */
 std::string plugin(plugin::Plugin* plugin, std::string filename = "");
 
-/** Returns the path to an asset in the module patch folder.
-The module patch folder is *not* created automatically. Before creating files at these paths, call
-	system::createDirectories(asset::module(module))
-
-Examples:
-	asset::module(module, "recordings/00.wav") // "/path/to/Rack/user/folder/autosave/modules/1234/recordings/00.wav"
-*/
-std::string module(engine::Module* module, const std::string& filename = "");
-
 
 // Set these before calling init() to override the default paths
 extern std::string systemDir;
@@ -50,7 +41,6 @@ extern std::string userDir;
 extern std::string logPath;
 extern std::string pluginsPath;
 extern std::string settingsPath;
-extern std::string autosavePath;
 extern std::string templatePath;
 // Only defined on Mac
 extern std::string bundlePath;

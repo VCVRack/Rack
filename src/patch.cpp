@@ -23,6 +23,12 @@ static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 
 
 PatchManager::PatchManager() {
+	if (settings::devMode) {
+		autosavePath = asset::user("autosave");
+	}
+	else {
+		autosavePath = asset::user("autosave-v" + ABI_VERSION);
+	}
 }
 
 
@@ -85,11 +91,11 @@ void PatchManager::save(std::string path) {
 	cleanAutosave();
 
 	// Take screenshot (disabled because there is currently no way to quickly view them on any OS or website.)
-	// APP->window->screenshot(system::join(asset::autosavePath, "screenshot.png"));
+	// APP->window->screenshot(system::join(autosavePath, "screenshot.png"));
 
 	double startTime = system::getTime();
 	// Set compression level to 1 so that a 500MB/s SSD is almost bottlenecked
-	system::archiveFolder(path, asset::autosavePath, 1);
+	system::archiveFolder(path, autosavePath, 1);
 	double endTime = system::getTime();
 	INFO("Archived patch in %lf seconds", (endTime - startTime));
 }
@@ -177,7 +183,7 @@ void PatchManager::saveTemplateDialog() {
 
 
 void PatchManager::saveAutosave() {
-	std::string patchPath = system::join(asset::autosavePath, "patch.json");
+	std::string patchPath = system::join(autosavePath, "patch.json");
 	INFO("Saving autosave %s", patchPath.c_str());
 	json_t* rootJ = toJson();
 	if (!rootJ)
@@ -185,7 +191,7 @@ void PatchManager::saveAutosave() {
 	DEFER({json_decref(rootJ);});
 
 	// Write to temporary path and then rename it to the correct path
-	system::createDirectories(asset::autosavePath);
+	system::createDirectories(autosavePath);
 	std::string tmpPath = patchPath + ".tmp";
 	FILE* file = std::fopen(tmpPath.c_str(), "w");
 	if (!file) {
@@ -202,7 +208,7 @@ void PatchManager::saveAutosave() {
 
 void PatchManager::cleanAutosave() {
 	// Remove files and folders in the `autosave/modules` folder that doesn't match a module in the rack.
-	std::string modulesDir = system::join(asset::autosavePath, "modules");
+	std::string modulesDir = system::join(autosavePath, "modules");
 	if (system::isDirectory(modulesDir)) {
 		for (const std::string& entry : system::getEntries(modulesDir)) {
 			try {
@@ -237,17 +243,17 @@ static bool isPatchLegacyV1(std::string path) {
 void PatchManager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
-	system::removeRecursively(asset::autosavePath);
-	system::createDirectories(asset::autosavePath);
+	system::removeRecursively(autosavePath);
+	system::createDirectories(autosavePath);
 
 	if (isPatchLegacyV1(path)) {
 		// Copy the .vcv file directly to "patch.json".
-		system::copy(path, system::join(asset::autosavePath, "patch.json"));
+		system::copy(path, system::join(autosavePath, "patch.json"));
 	}
 	else {
 		// Extract the .vcv file as a .tar.zst archive.
 		double startTime = system::getTime();
-		system::unarchiveToFolder(path, asset::autosavePath);
+		system::unarchiveToFolder(path, autosavePath);
 		double endTime = system::getTime();
 		INFO("Unarchived patch in %lf seconds", (endTime - startTime));
 	}
@@ -287,7 +293,7 @@ void PatchManager::loadTemplateDialog() {
 
 
 bool PatchManager::hasAutosave() {
-	std::string patchPath = system::join(asset::autosavePath, "patch.json");
+	std::string patchPath = system::join(autosavePath, "patch.json");
 	INFO("Loading autosave %s", patchPath.c_str());
 	FILE* file = std::fopen(patchPath.c_str(), "r");
 	if (!file)
@@ -298,7 +304,7 @@ bool PatchManager::hasAutosave() {
 
 
 void PatchManager::loadAutosave() {
-	std::string patchPath = system::join(asset::autosavePath, "patch.json");
+	std::string patchPath = system::join(autosavePath, "patch.json");
 	INFO("Loading autosave %s", patchPath.c_str());
 	FILE* file = std::fopen(patchPath.c_str(), "r");
 	if (!file)

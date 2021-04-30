@@ -5,6 +5,7 @@
 #include <settings.hpp>
 #include <asset.hpp>
 #include <context.hpp>
+#include <patch.hpp>
 
 
 namespace rack {
@@ -78,6 +79,13 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 	}
 	// Initialize LightInfos with null
 	lightInfos.resize(numLights);
+}
+
+
+std::string Module::createPatchStorageDir() {
+	std::string path = system::join(APP->patch->autosavePath, "modules", std::to_string(id));
+	system::createDirectories(path);
+	return path;
 }
 
 

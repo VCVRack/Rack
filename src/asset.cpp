@@ -120,14 +120,12 @@ void init() {
 	if (settings::devMode) {
 		pluginsPath = system::join(userDir, "plugins");
 		settingsPath = system::join(userDir, "settings.json");
-		autosavePath = system::join(userDir, "autosave");
 		templatePath = system::join(userDir, "template.vcv");
 	}
 	else {
 		logPath = system::join(userDir, "log.txt");
 		pluginsPath = system::join(userDir, "plugins-v" + ABI_VERSION);
 		settingsPath = system::join(userDir, "settings-v" + ABI_VERSION + ".json");
-		autosavePath = system::join(userDir, "autosave-v" + ABI_VERSION);
 		templatePath = system::join(userDir, "template-v" + ABI_VERSION + ".vcv");
 	}
 }
@@ -146,12 +144,6 @@ std::string user(std::string filename) {
 std::string plugin(plugin::Plugin* plugin, std::string filename) {
 	assert(plugin);
 	return system::join(plugin->path, filename);
-}
-
-
-std::string module(engine::Module* module, const std::string& filename) {
-	assert(module);
-	return system::join(autosavePath, "modules", std::to_string(module->id), filename);
 }
 
 
