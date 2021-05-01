@@ -3,6 +3,7 @@
 #include <common.hpp>
 #include <asset.hpp>
 #include <system.hpp>
+#include <settings.hpp>
 // #include <unistd.h> // for dup2
 
 
@@ -10,24 +11,26 @@ namespace rack {
 namespace logger {
 
 
+std::string path;
 static FILE* outputFile = NULL;
-static double startTime = 0.0;
-static std::mutex logMutex;
+static std::mutex mutex;
 
 
 void init() {
-	std::lock_guard<std::mutex> lock(logMutex);
-	startTime = system::getTime();
-	// Don't open a file in development mode.
-	if (asset::logPath.empty()) {
-		outputFile = stderr;
-		return;
-	}
-
 	assert(!outputFile);
-	outputFile = std::fopen(asset::logPath.c_str(), "w");
-	if (!outputFile) {
-		std::fprintf(stderr, "Could not open log at %s\n", asset::logPath.c_str());
+	std::lock_guard<std::mutex> lock(mutex);
+
+	// Don't open a file in development mode.
+	if (settings::devMode) {
+		outputFile = stderr;
+	}
+	else {
+		path = asset::user("log.txt");
+
+		outputFile = std::fopen(path.c_str(), "w");
+		if (!outputFile) {
+			std::fprintf(stderr, "Could not open log at %s\n", path.c_str());
+		}
 	}
 
 	// Redirect stdout and stderr to the file
@@ -37,7 +40,7 @@ void init() {
 }
 
 void destroy() {
-	std::lock_guard<std::mutex> lock(logMutex);
+	std::lock_guard<std::mutex> lock(mutex);
 	if (outputFile && outputFile != stderr) {
 		// Print end token so we know if the logger exited cleanly.
 		std::fprintf(outputFile, "END");
@@ -61,15 +64,14 @@ static const int levelColors[] = {
 };
 
 static void logVa(Level level, const char* filename, int line, const char* func, const char* format, va_list args) {
-	std::lock_guard<std::mutex> lock(logMutex);
+	std::lock_guard<std::mutex> lock(mutex);
 	if (!outputFile)
 		return;
 
 	double nowTime = system::getTime();
-	double duration = nowTime - startTime;
 	if (outputFile == stderr)
 		std::fprintf(outputFile, "\x1B[%dm", levelColors[level]);
-	std::fprintf(outputFile, "[%.03f %s %s:%d %s] ", duration, levelLabels[level], filename, line, func);
+	std::fprintf(outputFile, "[%.03f %s %s:%d %s] ", nowTime, levelLabels[level], filename, line, func);
 	if (outputFile == stderr)
 		std::fprintf(outputFile, "\x1B[0m");
 	std::vfprintf(outputFile, format, args);
@@ -97,11 +99,11 @@ static bool fileEndsWith(FILE* file, std::string str) {
 }
 
 bool isTruncated() {
-	if (asset::logPath.empty())
+	if (path.empty())
 		return false;
 
 	// Open existing log file
-	FILE* file = std::fopen(asset::logPath.c_str(), "r");
+	FILE* file = std::fopen(path.c_str(), "r");
 	if (!file)
 		return false;
 	DEFER({std::fclose(file);});

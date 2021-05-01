@@ -23,6 +23,9 @@ namespace rack {
 namespace logger {
 
 
+extern std::string path;
+
+
 enum Level {
 	DEBUG_LEVEL,
 	INFO_LEVEL,

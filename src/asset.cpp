@@ -123,7 +123,6 @@ void init() {
 		templatePath = system::join(userDir, "template.vcv");
 	}
 	else {
-		logPath = system::join(userDir, "log.txt");
 		pluginsPath = system::join(userDir, "plugins-v" + ABI_VERSION);
 		settingsPath = system::join(userDir, "settings-v" + ABI_VERSION + ".json");
 		templatePath = system::join(userDir, "template-v" + ABI_VERSION + ".vcv");
@@ -150,10 +149,8 @@ std::string plugin(plugin::Plugin* plugin, std::string filename) {
 std::string systemDir;
 std::string userDir;
 
-std::string logPath;
 std::string pluginsPath;
 std::string settingsPath;
-std::string autosavePath;
 std::string templatePath;
 std::string bundlePath;
 
