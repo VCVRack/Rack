@@ -317,7 +317,7 @@ void syncUpdate(const std::string& slug) {
 
 	// Get file path
 	std::string packageFilename = slug + "-" + update.version + "-" + APP_ARCH + ".vcvplugin";
-	std::string packagePath = system::join(asset::pluginsPath, packageFilename);
+	std::string packagePath = system::join(plugin::pluginsPath, packageFilename);
 
 	// Download plugin package
 	if (!network::requestDownload(downloadUrl, packagePath, &updateProgress, getTokenCookies())) {

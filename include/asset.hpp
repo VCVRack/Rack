@@ -40,10 +40,6 @@ extern std::string userDir;
 // Only defined on Mac
 extern std::string bundlePath;
 
-extern std::string pluginsPath;
-extern std::string settingsPath;
-extern std::string templatePath;
-
 
 } // namespace asset
 } // namespace rack

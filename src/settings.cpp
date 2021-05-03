@@ -8,10 +8,14 @@
 #include <engine/Engine.hpp>
 #include <context.hpp>
 #include <patch.hpp>
+#include <asset.hpp>
 
 
 namespace rack {
 namespace settings {
+
+
+std::string settingsPath;
 
 
 bool devMode = false;
@@ -57,6 +61,16 @@ ModuleBrowserSort moduleBrowserSort = MODULE_BROWSER_SORT_UPDATED;
 float moduleBrowserZoom = -1.f;
 std::map<std::string, std::set<std::string>> moduleWhitelist = {};
 std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages = {};
+
+
+void init() {
+	if (devMode) {
+		settingsPath = asset::user("settings.json");
+	}
+	else {
+		settingsPath = asset::user("settings-v" + ABI_VERSION + ".json");
+	}
+}
 
 
 ModuleUsage* getModuleUsage(const std::string& pluginSlug, const std::string& moduleSlug) {

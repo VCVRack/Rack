@@ -23,7 +23,7 @@ namespace rack {
 namespace logger {
 
 
-extern std::string path;
+extern std::string logPath;
 
 
 enum Level {

@@ -213,19 +213,26 @@ void init() {
 	// Load Core
 	loadPlugin("");
 
+	if (settings::devMode) {
+		pluginsPath = asset::user("plugins");
+	}
+	else {
+		pluginsPath = asset::user("plugins-v" + ABI_VERSION);
+	}
+
 	// Get user plugins directory
-	system::createDirectory(asset::pluginsPath);
+	system::createDirectory(pluginsPath);
 
 	// Extract packages and load plugins
-	extractPackages(asset::pluginsPath);
-	loadPlugins(asset::pluginsPath);
+	extractPackages(pluginsPath);
+	loadPlugins(pluginsPath);
 
 	// If Fundamental wasn't loaded, copy the bundled Fundamental package and load it
 	std::string fundamentalSrc = asset::system("Fundamental.vcvplugin");
-	std::string fundamentalDir = system::join(asset::pluginsPath, "Fundamental");
+	std::string fundamentalDir = system::join(pluginsPath, "Fundamental");
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		INFO("Extracting bundled Fundamental package");
-		system::unarchiveToFolder(fundamentalSrc.c_str(), asset::pluginsPath.c_str());
+		system::unarchiveToFolder(fundamentalSrc.c_str(), pluginsPath.c_str());
 		loadPlugin(fundamentalDir);
 	}
 }
@@ -342,6 +349,7 @@ std::string normalizeSlug(const std::string& slug) {
 }
 
 
+std::string pluginsPath;
 std::vector<Plugin*> plugins;
 
 

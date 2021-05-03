@@ -49,7 +49,7 @@ static void fatalSignalHandler(int sig) {
 
 	// This might fail because we might not be in the main thread.
 	// But oh well, we're crashing anyway.
-	std::string text = APP_NAME + " has crashed. See " + logger::path + " for details.";
+	std::string text = APP_NAME + " has crashed. See " + logger::logPath + " for details.";
 	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, text.c_str());
 
 	abort();
@@ -144,8 +144,9 @@ int main(int argc, char* argv[]) {
 #endif
 
 	// Load settings
+	settings::init();
 	try {
-		settings::load(asset::settingsPath);
+		settings::load(settings::settingsPath);
 	}
 	catch (Exception& e) {
 		std::string msg = e.what();
@@ -240,7 +241,7 @@ int main(int argc, char* argv[]) {
 	delete APP;
 	contextSet(NULL);
 	if (!settings::headless) {
-		settings::save(asset::settingsPath);
+		settings::save(settings::settingsPath);
 	}
 
 	// Destroy environment

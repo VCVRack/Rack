@@ -11,7 +11,7 @@ namespace rack {
 namespace logger {
 
 
-std::string path;
+std::string logPath;
 static FILE* outputFile = NULL;
 static std::mutex mutex;
 
@@ -25,11 +25,11 @@ void init() {
 		outputFile = stderr;
 	}
 	else {
-		path = asset::user("log.txt");
+		logPath = asset::user("log.txt");
 
-		outputFile = std::fopen(path.c_str(), "w");
+		outputFile = std::fopen(logPath.c_str(), "w");
 		if (!outputFile) {
-			std::fprintf(stderr, "Could not open log at %s\n", path.c_str());
+			std::fprintf(stderr, "Could not open log at %s\n", logPath.c_str());
 		}
 	}
 
@@ -99,11 +99,11 @@ static bool fileEndsWith(FILE* file, std::string str) {
 }
 
 bool isTruncated() {
-	if (path.empty())
+	if (logPath.empty())
 		return false;
 
 	// Open existing log file
-	FILE* file = std::fopen(path.c_str(), "r");
+	FILE* file = std::fopen(logPath.c_str(), "r");
 	if (!file)
 		return false;
 	DEFER({std::fclose(file);});

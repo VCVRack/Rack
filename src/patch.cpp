@@ -25,10 +25,13 @@ static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 PatchManager::PatchManager() {
 	if (settings::devMode) {
 		autosavePath = asset::user("autosave");
+		templatePath = asset::user("template.vcv");
 	}
 	else {
 		autosavePath = asset::user("autosave-v" + ABI_VERSION);
+		templatePath = asset::user("template-v" + ABI_VERSION + ".vcv");
 	}
+	factoryTemplatePath = asset::system("template.vcv");
 }
 
 
@@ -172,7 +175,7 @@ void PatchManager::saveTemplateDialog() {
 		return;
 
 	try {
-		save(asset::templatePath);
+		save(templatePath);
 	}
 	catch (Exception& e) {
 		std::string message = string::f("Could not save template patch: %s", e.what());
@@ -264,12 +267,12 @@ void PatchManager::load(std::string path) {
 
 void PatchManager::loadTemplate() {
 	try {
-		load(asset::templatePath);
+		load(templatePath);
 	}
 	catch (Exception& e) {
-		// Do nothing because it's okay for the user template to not exist.
+		// Try loading the system template patch
 		try {
-			load(asset::system("template.vcv"));
+			load(factoryTemplatePath);
 		}
 		catch (Exception& e) {
 			std::string message = string::f("Could not load system template patch, clearing rack: %s", e.what());

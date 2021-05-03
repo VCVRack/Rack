@@ -12,6 +12,10 @@ struct PatchManager {
 	std::string path;
 	/** Path to autosave folder */
 	std::string autosavePath;
+	/** Path to user template patch */
+	std::string templatePath;
+	/** Path to factory template patch */
+	std::string factoryTemplatePath;
 	/** Append to this while loading/saving a patch to display messages to the user after success. */
 	std::string warningLog;
 

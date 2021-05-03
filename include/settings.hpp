@@ -19,6 +19,10 @@ namespace rack {
 namespace settings {
 
 
+/** Path to settings.json */
+extern std::string settingsPath;
+
+
 // Runtime state, not serialized.
 
 extern bool devMode;
@@ -86,6 +90,7 @@ struct ModuleUsage {
 extern std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages;
 ModuleUsage* getModuleUsage(const std::string& pluginSlug, const std::string& moduleSlug);
 
+void init();
 json_t* toJson();
 void fromJson(json_t* rootJ);
 void save(const std::string& path);

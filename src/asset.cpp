@@ -115,18 +115,6 @@ void init() {
 	initUserDir();
 
 	system::createDirectory(userDir);
-
-	// Set paths
-	if (settings::devMode) {
-		pluginsPath = system::join(userDir, "plugins");
-		settingsPath = system::join(userDir, "settings.json");
-		templatePath = system::join(userDir, "template.vcv");
-	}
-	else {
-		pluginsPath = system::join(userDir, "plugins-v" + ABI_VERSION);
-		settingsPath = system::join(userDir, "settings-v" + ABI_VERSION + ".json");
-		templatePath = system::join(userDir, "template-v" + ABI_VERSION + ".vcv");
-	}
 }
 
 
@@ -149,9 +137,6 @@ std::string plugin(plugin::Plugin* plugin, std::string filename) {
 std::string systemDir;
 std::string userDir;
 
-std::string pluginsPath;
-std::string settingsPath;
-std::string templatePath;
 std::string bundlePath;
 
 
