@@ -93,8 +93,8 @@ ModuleUsage* getModuleUsage(const std::string& pluginSlug, const std::string& mo
 void init();
 json_t* toJson();
 void fromJson(json_t* rootJ);
-void save(const std::string& path);
-void load(const std::string& path);
+void save(std::string path = "");
+void load(std::string path = "");
 
 
 } // namespace settings

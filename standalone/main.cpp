@@ -146,7 +146,7 @@ int main(int argc, char* argv[]) {
 	// Load settings
 	settings::init();
 	try {
-		settings::load(settings::settingsPath);
+		settings::load();
 	}
 	catch (Exception& e) {
 		std::string msg = e.what();
@@ -241,7 +241,7 @@ int main(int argc, char* argv[]) {
 	delete APP;
 	contextSet(NULL);
 	if (!settings::headless) {
-		settings::save(settings::settingsPath);
+		settings::save();
 	}
 
 	// Destroy environment

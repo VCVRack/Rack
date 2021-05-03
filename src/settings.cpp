@@ -351,7 +351,10 @@ void fromJson(json_t* rootJ) {
 	}
 }
 
-void save(const std::string& path) {
+void save(std::string path) {
+	if (path.empty())
+		path = settingsPath;
+
 	INFO("Saving settings %s", path.c_str());
 	json_t* rootJ = toJson();
 	if (!rootJ)
@@ -367,7 +370,10 @@ void save(const std::string& path) {
 	json_decref(rootJ);
 }
 
-void load(const std::string& path) {
+void load(std::string path) {
+	if (path.empty())
+		path = settingsPath;
+
 	INFO("Loading settings %s", path.c_str());
 	FILE* file = std::fopen(path.c_str(), "r");
 	if (!file)

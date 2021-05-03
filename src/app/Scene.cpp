@@ -83,7 +83,7 @@ void Scene::step() {
 		if (time - lastAutosaveTime >= settings::autosaveInterval) {
 			lastAutosaveTime = time;
 			APP->patch->saveAutosave();
-			settings::save(settings::settingsPath);
+			settings::save();
 		}
 	}
 
