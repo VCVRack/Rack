@@ -505,7 +505,6 @@ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 			nvgluBindFramebuffer(fbw->getFramebuffer());
 			int width, height;
 			nvgImageSize(vg, fbw->getImageHandle(), &width, &height);
-			DEBUG("fb size %d %d", width, height);
 			uint8_t* pixels = new uint8_t[height * width * 4];
 			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
