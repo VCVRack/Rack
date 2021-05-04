@@ -67,7 +67,7 @@ static void initSystemDir() {
 	assert(length > 0);
 	// Get folder of executable
 	PathRemoveFileSpecW(moduleBufW);
-	systemDir = string::U16toU8(moduleBufW);
+	systemDir = string::UTF16toUTF8(moduleBufW);
 #endif
 #if defined ARCH_LIN
 	// Use the current working directory as the default path on Linux.
@@ -90,7 +90,7 @@ static void initUserDir() {
 	wchar_t documentsBufW[MAX_PATH] = L".";
 	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufW);
 	assert(result == S_OK);
-	userDir = system::join(string::U16toU8(documentsBufW), "Rack");
+	userDir = system::join(string::UTF16toUTF8(documentsBufW), "Rack");
 #endif
 #if defined ARCH_MAC
 	// Get home directory

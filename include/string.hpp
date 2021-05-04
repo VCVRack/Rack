@@ -60,8 +60,8 @@ These are only defined on Windows because the implementation uses Windows' API, 
 std::string and char* variables are considered UTF-8, anywhere in the program.
 See https://utf8everywhere.org/ for more information about VCV Rack's philosophy on string encoding, especially section 10 for rules VCV follows for handling text on Windows.
 */
-std::string U16toU8(const std::wstring& w);
-std::wstring U8toU16(const std::string& s);
+std::string UTF16toUTF8(const std::wstring& w);
+std::wstring UTF8toUTF16(const std::string& s);
 #endif
 
 

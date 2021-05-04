@@ -206,7 +206,7 @@ bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string&
 
 
 #if defined ARCH_WIN
-std::string U16toU8(const std::wstring& w) {
+std::string UTF16toUTF8(const std::wstring& w) {
 	if (w.empty())
 		return "";
 	// Compute length of output buffer
@@ -221,7 +221,7 @@ std::string U16toU8(const std::wstring& w) {
 }
 
 
-std::wstring U8toU16(const std::string& s) {
+std::wstring UTF8toUTF16(const std::string& s) {
 	if (s.empty())
 		return L"";
 	// Compute length of output buffer

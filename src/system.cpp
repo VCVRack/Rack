@@ -306,7 +306,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 		throw Exception("Archiver could not set filter option: %s", archive_error_string(a));
 
 #if defined ARCH_WIN
-	r = archive_write_open_filename_w(a, string::U8toU16(archivePath).c_str());
+	r = archive_write_open_filename_w(a, string::UTF8toUTF16(archivePath).c_str());
 #else
 	r = archive_write_open_filename(a, archivePath.c_str());
 #endif
@@ -318,7 +318,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 	struct archive* disk = archive_read_disk_new();
 	DEFER({archive_read_free(disk);});
 #if defined ARCH_WIN
-	r = archive_read_disk_open_w(disk, string::U8toU16(folderPath).c_str());
+	r = archive_read_disk_open_w(disk, string::UTF8toUTF16(folderPath).c_str());
 #else
 	r = archive_read_disk_open(disk, folderPath.c_str());
 #endif
@@ -343,14 +343,14 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 		// Convert absolute path to relative path
 		std::string entryPath;
 #if defined ARCH_WIN
-		entryPath = string::U16toU8(archive_entry_pathname_w(entry));
+		entryPath = string::UTF16toUTF8(archive_entry_pathname_w(entry));
 #else
 		entryPath = archive_entry_pathname(entry);
 #endif
 		entryPath = getRelativePath(entryPath, folderPath);
 #if defined ARCH_WIN
 		// FIXME This doesn't seem to set UTF-8 paths on Windows.
-		archive_entry_copy_pathname_w(entry, string::U8toU16(entryPath).c_str());
+		archive_entry_copy_pathname_w(entry, string::UTF8toUTF16(entryPath).c_str());
 #else
 		archive_entry_set_pathname(entry, entryPath.c_str());
 #endif
@@ -362,7 +362,7 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 
 		// Manually copy data
 #if defined ARCH_WIN
-		std::string entrySourcePath = string::U16toU8(archive_entry_sourcepath_w(entry));
+		std::string entrySourcePath = string::UTF16toUTF8(archive_entry_sourcepath_w(entry));
 #else
 		std::string entrySourcePath = archive_entry_sourcepath(entry);
 #endif
@@ -389,7 +389,7 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 	archive_read_support_format_tar(a);
 	// archive_read_support_format_all(a);
 #if defined ARCH_WIN
-	r = archive_read_open_filename_w(a, string::U8toU16(archivePath).c_str(), 1 << 16);
+	r = archive_read_open_filename_w(a, string::UTF8toUTF16(archivePath).c_str(), 1 << 16);
 #else
 	r = archive_read_open_filename(a, archivePath.c_str(), 1 << 14);
 #endif
@@ -420,7 +420,7 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 			throw Exception("Unarchiver does not support absolute tar paths: %s", entryPath.c_str());
 		entryPath = (fs::u8path(folderPath) / fs::u8path(entryPath)).generic_u8string();
 #if defined ARCH_WIN
-		archive_entry_copy_pathname_w(entry, string::U8toU16(entryPath).c_str());
+		archive_entry_copy_pathname_w(entry, string::UTF8toUTF16(entryPath).c_str());
 #else
 		archive_entry_set_pathname(entry, entryPath.c_str());
 #endif
@@ -621,7 +621,7 @@ void openBrowser(const std::string& url) {
 	std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	ShellExecuteW(NULL, L"open", string::U8toU16(url).c_str(), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecuteW(NULL, L"open", string::UTF8toUTF16(url).c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
 
@@ -636,7 +636,7 @@ void openFolder(const std::string& path) {
 	std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	ShellExecuteW(NULL, L"explore", string::U8toU16(path).c_str(), NULL, NULL, SW_SHOWDEFAULT);
+	ShellExecuteW(NULL, L"explore", string::UTF8toUTF16(path).c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
 }
 
@@ -648,7 +648,7 @@ void runProcessDetached(const std::string& path) {
 	shExInfo.cbSize = sizeof(shExInfo);
 	shExInfo.lpVerb = L"runas";
 
-	std::wstring pathW = string::U8toU16(path);
+	std::wstring pathW = string::UTF8toUTF16(path);
 	shExInfo.lpFile = pathW.c_str();
 	shExInfo.nShow = SW_SHOW;
 

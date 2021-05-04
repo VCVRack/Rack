@@ -44,7 +44,7 @@ namespace plugin {
 static void* loadLibrary(std::string libraryPath) {
 #if defined ARCH_WIN
 	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
-	std::wstring libraryFilenameW = string::U8toU16(libraryPath);
+	std::wstring libraryFilenameW = string::UTF8toUTF16(libraryPath);
 	HINSTANCE handle = LoadLibraryW(libraryFilenameW.c_str());
 	SetErrorMode(0);
 	if (!handle) {

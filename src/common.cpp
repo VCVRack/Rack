@@ -6,7 +6,7 @@
 #include <windows.h>
 
 FILE* fopen_u8(const char* filename, const char* mode) {
-	return _wfopen(rack::string::U8toU16(filename).c_str(), rack::string::U8toU16(mode).c_str());
+	return _wfopen(rack::string::UTF8toUTF16(filename).c_str(), rack::string::UTF8toUTF16(mode).c_str());
 }
 
 #endif
