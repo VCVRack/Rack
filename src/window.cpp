@@ -480,9 +480,11 @@ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 		system::createDirectory(dir);
 		for (plugin::Model* model : p->models) {
 			std::string filename = system::join(dir, model->slug + ".png");
+
 			// Skip model if screenshot already exists
 			if (system::isFile(filename))
 				continue;
+
 			INFO("Screenshotting %s %s to %s", p->slug.c_str(), model->slug.c_str(), filename.c_str());
 
 			// Create widgets
@@ -493,16 +495,17 @@ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 			app::ModuleWidget* mw = model->createModuleWidget(NULL);
 			fbw->addChild(mw);
 
-			// Reset the frame time so FramebufferWidgets are guaranteed to draw
-			internal->lastFrameTime = 0.0;
+			// Hack the frame time so FramebufferWidgets are never overdue and therefore guaranteed to draw
+			internal->lastFrameTime = INFINITY;
 
 			// Draw to framebuffer
 			fbw->step();
-			nvgluBindFramebuffer(fbw->getFramebuffer());
 
 			// Read pixels
+			nvgluBindFramebuffer(fbw->getFramebuffer());
 			int width, height;
 			nvgImageSize(vg, fbw->getImageHandle(), &width, &height);
+			DEBUG("fb size %d %d", width, height);
 			uint8_t* pixels = new uint8_t[height * width * 4];
 			glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 

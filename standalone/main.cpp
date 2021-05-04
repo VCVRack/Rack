@@ -89,7 +89,6 @@ int main(int argc, char* argv[]) {
 			} break;
 			case 't': {
 				screenshot = true;
-				// If parsing number failed, use default value
 				std::sscanf(optarg, "%f", &screenshotZoom);
 			} break;
 			case 's': {
