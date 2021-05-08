@@ -45,7 +45,7 @@ struct Module {
 	std::vector<Output> outputs;
 	std::vector<Light> lights;
 
-	/** Arrays of components.
+	/** Arrays of component metadata.
 	Initialized with configParam(), configInput(), configOutput(), and configLight().
 	LightInfos are initialized to null unless configLight() is called.
 	*/
@@ -233,6 +233,47 @@ struct Module {
 		/** Number of audio samples since the Engine's first sample. */
 		int64_t frame;
 	};
+
+	/** Getters for members */
+	plugin::Model* getModel() {
+		return model;
+	}
+	int64_t getId() {
+		return id;
+	}
+	Param& getParam(int index) {
+		return params[index];
+	}
+	Input& getInput(int index) {
+		return inputs[index];
+	}
+	Output& getOutput(int index) {
+		return outputs[index];
+	}
+	Light& getLight(int index) {
+		return lights[index];
+	}
+	ParamQuantity* getParamQuantity(int index) {
+		return paramQuantities[index];
+	}
+	PortInfo* getInputInfo(int index) {
+		return inputInfos[index];
+	}
+	PortInfo* getOutputInfo(int index) {
+		return outputInfos[index];
+	}
+	LightInfo* getLightInfo(int index) {
+		return lightInfos[index];
+	}
+	Expander& getLeftExpander() {
+		return leftExpander;
+	}
+	Expander& getRightExpander() {
+		return rightExpander;
+	}
+
+	// Virtual methods
+
 	/** Advances the module by one audio sample.
 	Override this method to read Inputs and Params and to write Outputs and Lights.
 	*/
