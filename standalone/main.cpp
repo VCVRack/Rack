@@ -16,7 +16,7 @@
 #include <window.hpp>
 #include <patch.hpp>
 #include <history.hpp>
-#include <ui.hpp>
+#include <ui/common.hpp>
 #include <system.hpp>
 #include <string.hpp>
 #include <library.hpp>
