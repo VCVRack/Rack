@@ -222,6 +222,7 @@ struct Module {
 	Since the folder is created when this is called, do not call it frequently or in an audio/engine thread such as process().
 	*/
 	std::string createPatchStorageDir();
+	std::string getPatchStorageDir();
 
 	struct ProcessArgs {
 		/** The current sample rate in Hz. */
