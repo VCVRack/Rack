@@ -27,14 +27,12 @@ struct ModuleWidget : widget::OpaqueWidget {
 	}
 	~ModuleWidget();
 
-	void draw(const DrawArgs& args) override;
-	void drawShadow(const DrawArgs& args);
-
-	void onButton(const ButtonEvent& e) override;
-	void onHoverKey(const HoverKeyEvent& e) override;
-	void onDragStart(const DragStartEvent& e) override;
-	void onDragEnd(const DragEndEvent& e) override;
-	void onDragMove(const DragMoveEvent& e) override;
+	plugin::Model* getModel() {
+		return model;
+	}
+	engine::Module* getModule() {
+		return module;
+	}
 
 	/** Associates this ModuleWidget with the Module.
 	Transfers ownership.
@@ -58,6 +56,20 @@ struct ModuleWidget : widget::OpaqueWidget {
 	ParamWidget* getParam(int paramId);
 	PortWidget* getInput(int portId);
 	PortWidget* getOutput(int portId);
+
+	void draw(const DrawArgs& args) override;
+	void drawShadow(const DrawArgs& args);
+
+	/** Override to add context menu entries to your subclass.
+	It is recommended to add a blank ui::MenuEntry first for spacing.
+	*/
+	virtual void appendContextMenu(ui::Menu* menu) {}
+
+	void onButton(const ButtonEvent& e) override;
+	void onHoverKey(const HoverKeyEvent& e) override;
+	void onDragStart(const DragStartEvent& e) override;
+	void onDragEnd(const DragEndEvent& e) override;
+	void onDragMove(const DragMoveEvent& e) override;
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
@@ -94,10 +106,6 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Deletes `this` */
 	void removeAction();
 	void createContextMenu();
-	/** Override to add context menu entries to your subclass.
-	It is recommended to add a blank ui::MenuEntry first for spacing.
-	*/
-	virtual void appendContextMenu(ui::Menu* menu) {}
 
 	INTERNAL math::Vec& dragOffset();
 	INTERNAL bool& dragEnabled();

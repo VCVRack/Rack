@@ -407,6 +407,93 @@ ModuleWidget::~ModuleWidget() {
 	delete internal;
 }
 
+void ModuleWidget::setModule(engine::Module* module) {
+	if (this->module) {
+		APP->engine->removeModule(this->module);
+		delete this->module;
+		this->module = NULL;
+	}
+	this->module = module;
+}
+
+void ModuleWidget::setPanel(widget::Widget* panel) {
+	// Remove existing panel
+	if (internal->panel) {
+		removeChild(internal->panel);
+		delete internal->panel;
+		internal->panel = NULL;
+	}
+
+	if (panel) {
+		addChildBottom(panel);
+		internal->panel = panel;
+		box.size.x = std::round(panel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+	}
+}
+
+void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
+	// Create SvgPanel
+	SvgPanel* panel = new SvgPanel;
+	panel->setBackground(svg);
+	setPanel(panel);
+}
+
+void ModuleWidget::addParam(ParamWidget* param) {
+	addChild(param);
+}
+
+void ModuleWidget::addInput(PortWidget* input) {
+	// Check that the port is an input
+	assert(input->type == engine::Port::INPUT);
+	// Check that the port doesn't have a duplicate ID
+	PortWidget* input2 = getInput(input->portId);
+	assert(!input2);
+	// Add port
+	addChild(input);
+}
+
+void ModuleWidget::addOutput(PortWidget* output) {
+	// Check that the port is an output
+	assert(output->type == engine::Port::OUTPUT);
+	// Check that the port doesn't have a duplicate ID
+	PortWidget* output2 = getOutput(output->portId);
+	assert(!output2);
+	// Add port
+	addChild(output);
+}
+
+template <class T, typename F>
+T* getFirstDescendantOfTypeWithCondition(widget::Widget* w, F f) {
+	T* t = dynamic_cast<T*>(w);
+	if (t && f(t))
+		return t;
+
+	for (widget::Widget* child : w->children) {
+		T* foundT = getFirstDescendantOfTypeWithCondition<T>(child, f);
+		if (foundT)
+			return foundT;
+	}
+	return NULL;
+}
+
+ParamWidget* ModuleWidget::getParam(int paramId) {
+	return getFirstDescendantOfTypeWithCondition<ParamWidget>(this, [&](ParamWidget* pw) -> bool {
+		return pw->paramId == paramId;
+	});
+}
+
+PortWidget* ModuleWidget::getInput(int portId) {
+	return getFirstDescendantOfTypeWithCondition<PortWidget>(this, [&](PortWidget* pw) -> bool {
+		return pw->type == engine::Port::INPUT && pw->portId == portId;
+	});
+}
+
+PortWidget* ModuleWidget::getOutput(int portId) {
+	return getFirstDescendantOfTypeWithCondition<PortWidget>(this, [&](PortWidget* pw) -> bool {
+		return pw->type == engine::Port::OUTPUT && pw->portId == portId;
+	});
+}
+
 void ModuleWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
@@ -612,93 +699,6 @@ void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 			}
 		}
 	}
-}
-
-void ModuleWidget::setModule(engine::Module* module) {
-	if (this->module) {
-		APP->engine->removeModule(this->module);
-		delete this->module;
-		this->module = NULL;
-	}
-	this->module = module;
-}
-
-void ModuleWidget::setPanel(widget::Widget* panel) {
-	// Remove existing panel
-	if (internal->panel) {
-		removeChild(internal->panel);
-		delete internal->panel;
-		internal->panel = NULL;
-	}
-
-	if (panel) {
-		addChildBottom(panel);
-		internal->panel = panel;
-		box.size.x = std::round(panel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
-	}
-}
-
-void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
-	// Create SvgPanel
-	SvgPanel* panel = new SvgPanel;
-	panel->setBackground(svg);
-	setPanel(panel);
-}
-
-void ModuleWidget::addParam(ParamWidget* param) {
-	addChild(param);
-}
-
-void ModuleWidget::addInput(PortWidget* input) {
-	// Check that the port is an input
-	assert(input->type == engine::Port::INPUT);
-	// Check that the port doesn't have a duplicate ID
-	PortWidget* input2 = getInput(input->portId);
-	assert(!input2);
-	// Add port
-	addChild(input);
-}
-
-void ModuleWidget::addOutput(PortWidget* output) {
-	// Check that the port is an output
-	assert(output->type == engine::Port::OUTPUT);
-	// Check that the port doesn't have a duplicate ID
-	PortWidget* output2 = getOutput(output->portId);
-	assert(!output2);
-	// Add port
-	addChild(output);
-}
-
-template <class T, typename F>
-T* getFirstDescendantOfTypeWithCondition(widget::Widget* w, F f) {
-	T* t = dynamic_cast<T*>(w);
-	if (t && f(t))
-		return t;
-
-	for (widget::Widget* child : w->children) {
-		T* foundT = getFirstDescendantOfTypeWithCondition<T>(child, f);
-		if (foundT)
-			return foundT;
-	}
-	return NULL;
-}
-
-ParamWidget* ModuleWidget::getParam(int paramId) {
-	return getFirstDescendantOfTypeWithCondition<ParamWidget>(this, [&](ParamWidget* pw) -> bool {
-		return pw->paramId == paramId;
-	});
-}
-
-PortWidget* ModuleWidget::getInput(int portId) {
-	return getFirstDescendantOfTypeWithCondition<PortWidget>(this, [&](PortWidget* pw) -> bool {
-		return pw->type == engine::Port::INPUT && pw->portId == portId;
-	});
-}
-
-PortWidget* ModuleWidget::getOutput(int portId) {
-	return getFirstDescendantOfTypeWithCondition<PortWidget>(this, [&](PortWidget* pw) -> bool {
-		return pw->type == engine::Port::OUTPUT && pw->portId == portId;
-	});
 }
 
 json_t* ModuleWidget::toJson() {
