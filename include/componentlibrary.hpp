@@ -328,7 +328,7 @@ struct Rogan6PSWhite : Rogan {
 struct Rogan5PSGray : Rogan {
 	Rogan5PSGray() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan5PSGray.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan5P-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan5PS-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan5PSGray-fg.svg")));
 	}
 };
@@ -336,7 +336,7 @@ struct Rogan5PSGray : Rogan {
 struct Rogan3PSBlue : Rogan {
 	Rogan3PSBlue() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PSBlue.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3P-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PS-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PSBlue-fg.svg")));
 	}
 };
@@ -344,7 +344,7 @@ struct Rogan3PSBlue : Rogan {
 struct Rogan3PSRed : Rogan {
 	Rogan3PSRed() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PSRed.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PS-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PSRed-fg.svg")));
 	}
 };
@@ -368,7 +368,7 @@ struct Rogan3PSWhite : Rogan {
 struct Rogan3PBlue : Rogan {
 	Rogan3PBlue() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PBlue.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3P-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PBlue-fg.svg")));
 	}
 };
@@ -376,7 +376,7 @@ struct Rogan3PBlue : Rogan {
 struct Rogan3PRed : Rogan {
 	Rogan3PRed() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PRed.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3P-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan3PRed-fg.svg")));
 	}
 };
@@ -400,7 +400,7 @@ struct Rogan3PWhite : Rogan {
 struct Rogan2SGray : Rogan {
 	Rogan2SGray() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2SGray.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2S-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2SGray-fg.svg")));
 	}
 };
@@ -408,7 +408,7 @@ struct Rogan2SGray : Rogan {
 struct Rogan2PSBlue : Rogan {
 	Rogan2PSBlue() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PSBlue.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2P-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PS-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PSBlue-fg.svg")));
 	}
 };
@@ -416,7 +416,7 @@ struct Rogan2PSBlue : Rogan {
 struct Rogan2PSRed : Rogan {
 	Rogan2PSRed() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PSRed.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PS-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PSRed-fg.svg")));
 	}
 };
@@ -440,7 +440,7 @@ struct Rogan2PSWhite : Rogan {
 struct Rogan2PBlue : Rogan {
 	Rogan2PBlue() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PBlue.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2P-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PBlue-fg.svg")));
 	}
 };
@@ -448,7 +448,7 @@ struct Rogan2PBlue : Rogan {
 struct Rogan2PRed : Rogan {
 	Rogan2PRed() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PRed.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2P-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan2PRed-fg.svg")));
 	}
 };
@@ -472,7 +472,7 @@ struct Rogan2PWhite : Rogan {
 struct Rogan1PSBlue : Rogan {
 	Rogan1PSBlue() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PSBlue.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1P-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PS-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PSBlue-fg.svg")));
 	}
 };
@@ -480,7 +480,7 @@ struct Rogan1PSBlue : Rogan {
 struct Rogan1PSRed : Rogan {
 	Rogan1PSRed() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PSRed.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PS-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PSRed-fg.svg")));
 	}
 };
@@ -504,7 +504,7 @@ struct Rogan1PSWhite : Rogan {
 struct Rogan1PBlue : Rogan {
 	Rogan1PBlue() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PBlue.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1P-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PBlue-fg.svg")));
 	}
 };
@@ -512,7 +512,7 @@ struct Rogan1PBlue : Rogan {
 struct Rogan1PRed : Rogan {
 	Rogan1PRed() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PRed.svg")));
-		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan-bg.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1P-bg.svg")));
 		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rogan1PRed-fg.svg")));
 	}
 };
