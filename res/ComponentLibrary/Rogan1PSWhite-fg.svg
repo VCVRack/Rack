@@ -7,12 +7,12 @@
 <sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="0" fit-margin-left="0" fit-margin-right="0" fit-margin-top="0" id="base" inkscape:current-layer="layer1" inkscape:cx="34.656219" inkscape:cy="23.675099" inkscape:document-units="mm" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="1434" inkscape:window-maximized="0" inkscape:window-width="1274" inkscape:window-x="1280" inkscape:window-y="0" inkscape:zoom="5.6" pagecolor="#ffffff" showgrid="false" units="px">
 	</sodipodi:namedview>
 <g>
-	<circle opacity="0.31" cx="19.84183" cy="20.80716" r="11.65969"/>
-	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="19.84183" y1="8.28145" x2="19.84183" y2="31.43035">
+	<circle opacity="0.31" cx="19.84178" cy="20.79307" r="11.65969"/>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="19.84178" y1="8.26736" x2="19.84178" y2="31.41626">
 		<stop  offset="0" style="stop-color:#FFFCFC"/>
 		<stop  offset="1" style="stop-color:#C2C2C2"/>
 	</linearGradient>
-	<circle fill="url(#SVGID_1_)" cx="19.84183" cy="19.8559" r="11.57445"/>
-	<circle fill="#F2F2F2" cx="19.84183" cy="19.8559" r="10.70843"/>
+	<circle fill="url(#SVGID_1_)" cx="19.84178" cy="19.84181" r="11.57445"/>
+	<circle fill="#F2F2F2" cx="19.84178" cy="19.84181" r="10.70843"/>
 </g>
 </svg>

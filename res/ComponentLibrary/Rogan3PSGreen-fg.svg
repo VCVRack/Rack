@@ -9,23 +9,17 @@
 		</sodipodi:namedview>
 	<g display="inline">
 		
-			<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="25.92185" y1="946" x2="25.92185" y2="997.84369" gradientTransform="matrix(1 0 0 1 0 -946)">
+			<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="25.92185" y1="1892" x2="25.92185" y2="1943.84375" gradientTransform="matrix(1 0 0 1 0 -1892)">
 			<stop  offset="0" style="stop-color:#FFFBFD"/>
 			<stop  offset="1" style="stop-color:#000000"/>
 		</linearGradient>
 		<circle fill="url(#SVGID_1_)" cx="25.92185" cy="25.92185" r="25.92185"/>
 	</g>
 </g>
-<g id="anim" display="none">
+<g id="fixed_fg" display="none">
 	<g display="inline">
 		<circle fill="none" cx="25.92185" cy="25.92185" r="25.92185"/>
-		<polygon fill="#333333" points="25.92185,1.6 31.4729,18.68437 49.43646,18.68437 34.90363,29.24309 40.45468,46.32745 
-			25.92185,35.76873 11.38902,46.32745 16.94007,29.24309 2.40724,18.68437 20.3708,18.68437 		"/>
-	</g>
-</g>
-<g id="fixed_fg">
-	<g>
-		<circle fill="none" cx="25.92185" cy="25.92185" r="25.92185"/>
+		<rect x="19.8687" y="19.86677" fill="#F2F2F2" width="12.1063" height="12.1063"/>
 	</g>
 </g>
 <g>

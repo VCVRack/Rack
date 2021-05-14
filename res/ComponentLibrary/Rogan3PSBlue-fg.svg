@@ -23,11 +23,13 @@
 	</g>
 </g>
 <g>
-	
-		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="25.92185" y1="54" x2="25.92185" y2="2.1563" gradientTransform="matrix(1 0 0 -1 0 54)">
-		<stop  offset="0" style="stop-color:#FFFBFD"/>
-		<stop  offset="1" style="stop-color:#000000"/>
+	<circle opacity="0.31" cx="25.92183" cy="27.00564" r="17.18588"/>
+	<circle fill="#FAFAFA" stroke="#B2B2B2" stroke-width="0.75" stroke-miterlimit="10" cx="25.92183" cy="25.93815" r="16.68843"/>
+	<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="25.92183" y1="8.75227" x2="25.92183" y2="43.12403">
+		<stop  offset="0" style="stop-color:#7696ED"/>
+		<stop  offset="1" style="stop-color:#203466"/>
 	</linearGradient>
-	<circle fill="url(#SVGID_2_)" cx="25.92185" cy="25.92185" r="25.92185"/>
+	<circle fill="url(#SVGID_2_)" cx="25.92183" cy="25.93815" r="17.18588"/>
+	<circle fill="#384CCF" cx="25.92183" cy="25.93815" r="16.30198"/>
 </g>
 </svg>

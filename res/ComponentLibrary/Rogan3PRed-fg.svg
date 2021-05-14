@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.0"
+	 id="svg15246" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="41.76172px"
+	 height="41.76172px" viewBox="0 0 41.76172 41.76172" enable-background="new 0 0 41.76172 41.76172" xml:space="preserve">
+<g>
+	<circle opacity="0.31" cx="20.90432" cy="21.78952" r="15.32175"/>
+	
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="625.10217" y1="-3677.6582" x2="655.74567" y2="-3677.6582" gradientTransform="matrix(0 1 -1 0 -3656.75391 -619.66223)">
+		<stop  offset="0" style="stop-color:#FF6998"/>
+		<stop  offset="1" style="stop-color:#8F0130"/>
+	</linearGradient>
+	<circle fill="url(#SVGID_1_)" cx="20.90432" cy="20.76173" r="15.32175"/>
+	<circle fill="#DB1255" cx="20.90432" cy="20.76173" r="14.48785"/>
+</g>
+</svg>
