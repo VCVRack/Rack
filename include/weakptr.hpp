@@ -51,6 +51,9 @@ struct WeakPtr {
 	WeakPtr(T* ptr) {
 		set(ptr);
 	}
+	WeakPtr(const WeakPtr& other) {
+		set(other.get());
+	}
 	WeakPtr& operator=(const WeakPtr& other) {
 		set(other.get());
 		return *this;
