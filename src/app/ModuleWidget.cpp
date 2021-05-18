@@ -248,18 +248,72 @@ struct ModuleLoadItem : ui::MenuItem {
 };
 
 
-struct ModulePresetPathItem : ui::MenuItem {
+static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir);
+
+
+struct ModulePresetFileItem : ui::MenuItem {
 	WeakPtr<ModuleWidget> moduleWidget;
-	std::string presetPath;
+	std::string path;
 	void onAction(const ActionEvent& e) override {
 		if (!moduleWidget)
 			return;
 		try {
-			moduleWidget->loadAction(presetPath);
+			moduleWidget->loadAction(path);
 		}
 		catch (Exception& e) {
 			osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
 		}
+	}
+};
+
+
+struct ModulePresetDirItem : ui::MenuItem {
+	WeakPtr<ModuleWidget> moduleWidget;
+	std::string path;
+	ui::Menu* createChildMenu() override {
+		if (!moduleWidget)
+			return NULL;
+		ui::Menu* menu = new ui::Menu;
+		appendPresetItems(menu, moduleWidget, path);
+		return menu;
+	}
+};
+
+
+// Create ModulePresetPathItems for each patch in a directory.
+static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
+	bool hasPresets = false;
+	// Note: This is not cached, so opening this menu each time might have a bit of latency.
+	if (system::isDirectory(presetDir)) {
+		for (const std::string& path : system::getEntries(presetDir)) {
+			std::string name = system::getStem(path);
+			// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
+			std::regex r("^\\d*_");
+			name = std::regex_replace(name, r, "");
+
+			if (system::isDirectory(path)) {
+				hasPresets = true;
+
+				ModulePresetDirItem* dirItem = new ModulePresetDirItem;
+				dirItem->rightText = RIGHT_ARROW;
+				dirItem->text = name;
+				dirItem->path = path;
+				dirItem->moduleWidget = moduleWidget;
+				menu->addChild(dirItem);
+			}
+			else if (system::getExtension(path) == ".vcvm") {
+				hasPresets = true;
+
+				ModulePresetFileItem* presetItem = new ModulePresetFileItem;
+				presetItem->text = name;
+				presetItem->path = path;
+				presetItem->moduleWidget = moduleWidget;
+				menu->addChild(presetItem);
+			}
+		}
+	}
+	if (!hasPresets) {
+		menu->addChild(createMenuLabel("(None)"));
 	}
 };
 
@@ -304,42 +358,15 @@ struct ModulePresetItem : ui::MenuItem {
 		clearTemplateItem->disabled = !moduleWidget->hasTemplate();
 		menu->addChild(clearTemplateItem);
 
-		// Create ModulePresetPathItems for each patch in a directory.
-		auto createPresetItems = [&](std::string presetDir) {
-			bool hasPresets = false;
-			// Note: This is not cached, so opening this menu each time might have a bit of latency.
-			if (system::isDirectory(presetDir)) {
-				for (const std::string& presetPath : system::getEntries(presetDir)) {
-					if (system::getExtension(presetPath) != ".vcvm")
-						continue;
-					hasPresets = true;
-
-					std::string presetName = system::getStem(presetPath);
-					// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
-					std::regex r("^\\d*_");
-					presetName = std::regex_replace(presetName, r, "");
-
-					ModulePresetPathItem* presetItem = new ModulePresetPathItem;
-					presetItem->text = presetName;
-					presetItem->presetPath = presetPath;
-					presetItem->moduleWidget = moduleWidget;
-					menu->addChild(presetItem);
-				}
-			}
-			if (!hasPresets) {
-				menu->addChild(createMenuLabel("(None)"));
-			}
-		};
-
 		// Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("User presets"));
-		createPresetItems(moduleWidget->model->getUserPresetDir());
+		appendPresetItems(menu, moduleWidget, moduleWidget->model->getUserPresetDir());
 
 		// Scan `<plugin dir>/presets/<module slug>` for presets.
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("Factory presets"));
-		createPresetItems(moduleWidget->model->getFactoryPresetDir());
+		appendPresetItems(menu, moduleWidget, moduleWidget->model->getFactoryPresetDir());
 
 		return menu;
 	}
