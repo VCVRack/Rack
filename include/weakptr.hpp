@@ -41,7 +41,8 @@ Example:
 	delete foo;
 	weakFoo.get(); // returns nullptr
 
-Caveat: In multithreaded environments, the object pointed to by the WeakPtr could be deleted at any time after obtaining its pointer from WeakPtr.
+Not thread safe.
+In multithreaded environments, the object pointed to by the WeakPtr could be deleted at any time after obtaining its pointer from WeakPtr.
 */
 template <typename T>
 struct WeakPtr {
