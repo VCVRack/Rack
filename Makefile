@@ -17,7 +17,7 @@ SOURCES += dep/pffft/pffft.c dep/pffft/fftpack.c
 SOURCES += $(wildcard src/*.c src/*/*.c)
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
-STANDALONE_SOURCES += $(wildcard standalone/*.cpp)
+STANDALONE_SOURCES += adapters/standalone.cpp
 
 FLAGS += -fPIC
 LDFLAGS += -shared
