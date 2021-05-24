@@ -76,7 +76,7 @@ endif
 
 include compile.mk
 
-# Standalone launcher
+# Standalone adapter
 
 ifdef ARCH_MAC
 	STANDALONE_LDFLAGS += $(MAC_SDK_FLAGS)
