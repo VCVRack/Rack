@@ -398,7 +398,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 		for (float zoom = 0.f; zoom >= -2.f; zoom -= 0.5f) {
 			ZoomItem* sortItem = new ZoomItem;
-			sortItem->text = string::f("%.3g%%", std::pow(2.f, zoom) * 100.f);
+			sortItem->text = string::f("%.0f%%", std::pow(2.f, zoom) * 100.f);
 			sortItem->zoom = zoom;
 			sortItem->browser = browser;
 			menu->addChild(sortItem);
@@ -407,7 +407,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 	void step() override {
 		text = "Zoom: ";
-		text += string::f("%.3g%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
+		text += string::f("%.0f%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
 		ChoiceButton::step();
 	}
 };
