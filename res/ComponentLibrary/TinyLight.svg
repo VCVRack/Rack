@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.0"
+   id="svg164153"
+   x="0mm"
+   y="0mm"
+   width="1mm"
+   height="1mm"
+   viewBox="0 0 1 1"
+   enable-background="new 0 0 1 1"
+   xml:space="preserve"
+   sodipodi:docname="TinyLed.svg"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15, custom)"><metadata
+   id="metadata22"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs20" />
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   fit-margin-bottom="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-top="0"
+   id="base"
+   inkscape:current-layer="svg164153"
+   inkscape:cx="-15.084364"
+   inkscape:cy="-0.73704599"
+   inkscape:document-units="mm"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="882"
+   inkscape:window-maximized="0"
+   inkscape:window-width="1600"
+   inkscape:window-x="0"
+   inkscape:window-y="18"
+   inkscape:zoom="22.165173"
+   pagecolor="#ffffff"
+   showgrid="false"
+   inkscape:document-rotation="0">
+	</sodipodi:namedview>
+
+<linearGradient
+   id="SVGID_1_"
+   gradientUnits="userSpaceOnUse"
+   x1="0.5"
+   y1="0.09135"
+   x2="0.5"
+   y2="0.45946">
+	<stop
+   offset="0"
+   style="stop-color:#FDFDFF"
+   id="stop5" />
+	<stop
+   offset="1"
+   style="stop-color:#FCFEFF;stop-opacity:0"
+   id="stop7" />
+</linearGradient>
+<ellipse
+   fill="url(#SVGID_1_)"
+   cx="0.5"
+   cy="0.27541"
+   rx="0.30385"
+   ry="0.18406"
+   id="ellipse10" />
+<linearGradient
+   id="SVGID_2_"
+   gradientUnits="userSpaceOnUse"
+   x1="-1248.25732"
+   y1="-998.49945"
+   x2="-1248.25732"
+   y2="-998.13135"
+   gradientTransform="matrix(-1 0 0 -1 -1247.75732 -997.58325)">
+	<stop
+   offset="0"
+   style="stop-color:#FDFDFF"
+   id="stop12" />
+	<stop
+   offset="1"
+   style="stop-color:#FCFEFF;stop-opacity:0"
+   id="stop14" />
+</linearGradient>
+<ellipse
+   opacity="0.3"
+   fill="url(#SVGID_2_)"
+   cx="0.5"
+   cy="0.73214"
+   rx="0.30385"
+   ry="0.18406"
+   id="ellipse17" />
+</svg>

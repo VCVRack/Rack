@@ -115,6 +115,8 @@ void ModuleLightWidget::step() {
 	}
 
 	setBrightnesses(brightnesses);
+
+	MultiLightWidget::step();
 }
 
 

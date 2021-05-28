@@ -9,6 +9,7 @@ namespace app {
 void LightWidget::draw(const DrawArgs& args) {
 	drawLight(args);
 	drawHalo(args);
+	TransparentWidget::draw(args);
 }
 
 void LightWidget::drawLight(const DrawArgs& args) {
