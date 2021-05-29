@@ -8,8 +8,8 @@ namespace app {
 
 void LightWidget::draw(const DrawArgs& args) {
 	drawLight(args);
-	drawHalo(args);
 	TransparentWidget::draw(args);
+	drawHalo(args);
 }
 
 void LightWidget::drawLight(const DrawArgs& args) {
@@ -39,21 +39,19 @@ void LightWidget::drawLight(const DrawArgs& args) {
 }
 
 void LightWidget::drawHalo(const DrawArgs& args) {
-	// Halo is now deprecated
+	float radius = std::min(box.size.x, box.size.y) / 2.0;
+	float oradius = radius + 20.0;
 
-	// float radius = std::min(box.size.x, box.size.y) / 2.0;
-	// float oradius = 4.0 * radius;
+	nvgBeginPath(args.vg);
+	nvgRect(args.vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
 
-	// nvgBeginPath(args.vg);
-	// nvgRect(args.vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
-
-	// NVGpaint paint;
-	// NVGcolor icol = color::mult(color, 0.04);
-	// NVGcolor ocol = nvgRGB(0, 0, 0);
-	// paint = nvgRadialGradient(args.vg, radius, radius, radius, oradius, icol, ocol);
-	// nvgFillPaint(args.vg, paint);
-	// nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
-	// nvgFill(args.vg);
+	NVGpaint paint;
+	NVGcolor icol = color::mult(color, 0.2);
+	NVGcolor ocol = nvgRGB(0, 0, 0);
+	paint = nvgRadialGradient(args.vg, radius, radius, radius, oradius, icol, ocol);
+	nvgFillPaint(args.vg, paint);
+	nvgGlobalCompositeOperation(args.vg, NVG_LIGHTER);
+	nvgFill(args.vg);
 }
 
 
