@@ -27,6 +27,8 @@ float zoom = 0.25;
 bool invertZoom = false;
 float cableOpacity = 0.5;
 float cableTension = 0.5;
+float rackBrightness = 1.0;
+float haloBrightness = 0.0;
 bool allowCursorLock = true;
 KnobMode knobMode = KNOB_MODE_LINEAR;
 bool knobScroll = false;
@@ -102,6 +104,10 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "cableOpacity", json_real(cableOpacity));
 
 	json_object_set_new(rootJ, "cableTension", json_real(cableTension));
+
+	json_object_set_new(rootJ, "rackBrightness", json_real(rackBrightness));
+
+	json_object_set_new(rootJ, "haloBrightness", json_real(haloBrightness));
 
 	json_object_set_new(rootJ, "allowCursorLock", json_boolean(allowCursorLock));
 
@@ -218,6 +224,14 @@ void fromJson(json_t* rootJ) {
 	json_t* cableTensionJ = json_object_get(rootJ, "cableTension");
 	if (cableTensionJ)
 		cableTension = json_number_value(cableTensionJ);
+
+	json_t* rackBrightnessJ = json_object_get(rootJ, "rackBrightness");
+	if (rackBrightnessJ)
+		rackBrightness = json_number_value(rackBrightnessJ);
+
+	json_t* haloBrightnessJ = json_object_get(rootJ, "haloBrightness");
+	if (haloBrightnessJ)
+		haloBrightness = json_number_value(haloBrightnessJ);
 
 	json_t* allowCursorLockJ = json_object_get(rootJ, "allowCursorLock");
 	if (allowCursorLockJ)
@@ -365,8 +379,8 @@ void save(std::string path) {
 		return;
 	DEFER({std::fclose(file);});
 
-	// Because settings include doubles, it should use 17 decimal digits of precision instead of just 9 for float32.
-	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(17));
+	// 11 is enough precision to handle double UNIX time values to 0.1 seconds.
+	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(11));
 	json_decref(rootJ);
 }
 

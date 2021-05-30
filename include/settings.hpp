@@ -44,6 +44,8 @@ extern bool invertZoom;
 extern float cableOpacity;
 /** Straightness of cables in the range [0, 1]. Unitless and arbitrary. */
 extern float cableTension;
+extern float rackBrightness;
+extern float haloBrightness;
 /** Allows rack to hide and lock the cursor position when dragging knobs etc. */
 extern bool allowCursorLock;
 enum KnobMode {

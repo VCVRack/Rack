@@ -189,6 +189,8 @@ struct FileButton : MenuButton {
 		revertItem->disabled = (APP->patch->path == "");
 		menu->addChild(revertItem);
 
+		menu->addChild(new ui::MenuSeparator);
+
 		QuitItem* quitItem = new QuitItem;
 		quitItem->text = "Quit";
 		quitItem->rightText = RACK_MOD_CTRL_NAME "+Q";
@@ -248,7 +250,7 @@ struct EditButton : MenuButton {
 
 struct ZoomQuantity : Quantity {
 	void setValue(float value) override {
-		settings::zoom = value;
+		settings::zoom = math::clamp(value, getMinValue(), getMaxValue());
 	}
 	float getValue() override {
 		return settings::zoom;
@@ -275,7 +277,6 @@ struct ZoomQuantity : Quantity {
 		return "%";
 	}
 };
-
 struct ZoomSlider : ui::Slider {
 	ZoomSlider() {
 		quantity = new ZoomQuantity;
@@ -308,7 +309,6 @@ struct CableOpacityQuantity : Quantity {
 		return "%";
 	}
 };
-
 struct CableOpacitySlider : ui::Slider {
 	CableOpacitySlider() {
 		quantity = new CableOpacityQuantity;
@@ -335,12 +335,81 @@ struct CableTensionQuantity : Quantity {
 		return 2;
 	}
 };
-
 struct CableTensionSlider : ui::Slider {
 	CableTensionSlider() {
 		quantity = new CableTensionQuantity;
 	}
 	~CableTensionSlider() {
+		delete quantity;
+	}
+};
+
+struct RackBrightnessQuantity : Quantity {
+	void setValue(float value) override {
+		settings::rackBrightness = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return settings::rackBrightness;
+	}
+	float getDefaultValue() override {
+		return 1.0;
+	}
+	float getDisplayValue() override {
+		return getValue() * 100;
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(displayValue / 100);
+	}
+	std::string getUnit() override {
+		return "%";
+	}
+	std::string getLabel() override {
+		return "Room brightness";
+	}
+	int getDisplayPrecision() override {
+		return 3;
+	}
+};
+struct RackBrightnessSlider : ui::Slider {
+	RackBrightnessSlider() {
+		quantity = new RackBrightnessQuantity;
+	}
+	~RackBrightnessSlider() {
+		delete quantity;
+	}
+};
+
+struct HaloBrightnessQuantity : Quantity {
+	void setValue(float value) override {
+		settings::haloBrightness = math::clamp(value, getMinValue(), getMaxValue());
+	}
+	float getValue() override {
+		return settings::haloBrightness;
+	}
+	float getDefaultValue() override {
+		return 0.0;
+	}
+	float getDisplayValue() override {
+		return getValue() * 100;
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(displayValue / 100);
+	}
+	std::string getUnit() override {
+		return "%";
+	}
+	std::string getLabel() override {
+		return "Light bloom";
+	}
+	int getDisplayPrecision() override {
+		return 3;
+	}
+};
+struct HaloBrightnessSlider : ui::Slider {
+	HaloBrightnessSlider() {
+		quantity = new HaloBrightnessQuantity;
+	}
+	~HaloBrightnessSlider() {
 		delete quantity;
 	}
 };
@@ -469,6 +538,14 @@ struct ViewButton : MenuButton {
 		CableTensionSlider* cableTensionSlider = new CableTensionSlider;
 		cableTensionSlider->box.size.x = 200.0;
 		menu->addChild(cableTensionSlider);
+
+		RackBrightnessSlider* rackBrightnessSlider = new RackBrightnessSlider;
+		rackBrightnessSlider->box.size.x = 200.0;
+		menu->addChild(rackBrightnessSlider);
+
+		HaloBrightnessSlider* haloBrightnessSlider = new HaloBrightnessSlider;
+		haloBrightnessSlider->box.size.x = 200.0;
+		menu->addChild(haloBrightnessSlider);
 
 		FrameRateItem* frameRateItem = new FrameRateItem;
 		frameRateItem->text = "Frame rate";

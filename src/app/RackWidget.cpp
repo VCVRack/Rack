@@ -97,6 +97,10 @@ void RackWidget::step() {
 }
 
 void RackWidget::draw(const DrawArgs& args) {
+	// Darken all children by user setting
+	float b = std::pow(settings::rackBrightness, 1.f);
+	nvgGlobalTint(args.vg, nvgRGBAf(b, b, b, 1));
+
 	// Resize and reposition the RackRail to align on the grid.
 	math::Rect railBox;
 	railBox.pos = args.clipBox.pos.div(BUS_BOARD_GRID_SIZE).floor().mult(BUS_BOARD_GRID_SIZE);
