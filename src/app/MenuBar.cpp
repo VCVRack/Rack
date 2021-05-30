@@ -220,6 +220,52 @@ struct DisconnectCablesItem : ui::MenuItem {
 	}
 };
 
+struct AllowCursorLockItem : ui::MenuItem {
+	void onAction(const ActionEvent& e) override {
+		settings::allowCursorLock ^= true;
+	}
+};
+
+struct KnobModeValueItem : ui::MenuItem {
+	settings::KnobMode knobMode;
+	void onAction(const ActionEvent& e) override {
+		settings::knobMode = knobMode;
+	}
+};
+
+struct KnobModeItem : ui::MenuItem {
+	ui::Menu* createChildMenu() override {
+		ui::Menu* menu = new ui::Menu;
+
+		static const std::vector<std::pair<settings::KnobMode, std::string>> knobModes = {
+			{settings::KNOB_MODE_LINEAR, "Linear"},
+			{settings::KNOB_MODE_SCALED_LINEAR, "Scaled linear"},
+			{settings::KNOB_MODE_ROTARY_ABSOLUTE, "Absolute rotary"},
+			{settings::KNOB_MODE_ROTARY_RELATIVE, "Relative rotary"},
+		};
+		for (const auto& pair : knobModes) {
+			KnobModeValueItem* item = new KnobModeValueItem;
+			item->knobMode = pair.first;
+			item->text = pair.second;
+			item->rightText = CHECKMARK(settings::knobMode == pair.first);
+			menu->addChild(item);
+		}
+		return menu;
+	}
+};
+
+struct KnobScrollItem : ui::MenuItem {
+	void onAction(const ActionEvent& e) override {
+		settings::knobScroll ^= true;
+	}
+};
+
+struct LockModulesItem : ui::MenuItem {
+	void onAction(const ActionEvent& e) override {
+		settings::lockModules ^= true;
+	}
+};
+
 struct EditButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
@@ -241,6 +287,28 @@ struct EditButton : MenuButton {
 		DisconnectCablesItem* disconnectCablesItem = new DisconnectCablesItem;
 		disconnectCablesItem->text = "Clear cables";
 		menu->addChild(disconnectCablesItem);
+
+		menu->addChild(new ui::MenuSeparator);
+
+		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
+		allowCursorLockItem->text = "Lock cursor when dragging parameters";
+		allowCursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
+		menu->addChild(allowCursorLockItem);
+
+		KnobModeItem* knobModeItem = new KnobModeItem;
+		knobModeItem->text = "Knob mode";
+		knobModeItem->rightText = RIGHT_ARROW;
+		menu->addChild(knobModeItem);
+
+		KnobScrollItem* knobScrollItem = new KnobScrollItem;
+		knobScrollItem->text = "Scroll wheel knob control";
+		knobScrollItem->rightText = CHECKMARK(settings::knobScroll);
+		menu->addChild(knobScrollItem);
+
+		LockModulesItem* lockModulesItem = new LockModulesItem;
+		lockModulesItem->text = "Lock module positions";
+		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
+		menu->addChild(lockModulesItem);
 	}
 };
 
@@ -420,52 +488,6 @@ struct TooltipsItem : ui::MenuItem {
 	}
 };
 
-struct AllowCursorLockItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		settings::allowCursorLock ^= true;
-	}
-};
-
-struct KnobModeValueItem : ui::MenuItem {
-	settings::KnobMode knobMode;
-	void onAction(const ActionEvent& e) override {
-		settings::knobMode = knobMode;
-	}
-};
-
-struct KnobModeItem : ui::MenuItem {
-	ui::Menu* createChildMenu() override {
-		ui::Menu* menu = new ui::Menu;
-
-		static const std::vector<std::pair<settings::KnobMode, std::string>> knobModes = {
-			{settings::KNOB_MODE_LINEAR, "Linear"},
-			{settings::KNOB_MODE_SCALED_LINEAR, "Scaled linear"},
-			{settings::KNOB_MODE_ROTARY_ABSOLUTE, "Absolute rotary"},
-			{settings::KNOB_MODE_ROTARY_RELATIVE, "Relative rotary"},
-		};
-		for (const auto& pair : knobModes) {
-			KnobModeValueItem* item = new KnobModeValueItem;
-			item->knobMode = pair.first;
-			item->text = pair.second;
-			item->rightText = CHECKMARK(settings::knobMode == pair.first);
-			menu->addChild(item);
-		}
-		return menu;
-	}
-};
-
-struct KnobScrollItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		settings::knobScroll ^= true;
-	}
-};
-
-struct LockModulesItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		settings::lockModules ^= true;
-	}
-};
-
 struct FrameRateValueItem : ui::MenuItem {
 	int frameSwapInterval;
 	void onAction(const ActionEvent& e) override {
@@ -507,46 +529,6 @@ struct ViewButton : MenuButton {
 		tooltipsItem->rightText = CHECKMARK(settings::tooltips);
 		menu->addChild(tooltipsItem);
 
-		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
-		allowCursorLockItem->text = "Lock cursor when dragging parameters";
-		allowCursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
-		menu->addChild(allowCursorLockItem);
-
-		KnobModeItem* knobModeItem = new KnobModeItem;
-		knobModeItem->text = "Knob mode";
-		knobModeItem->rightText = RIGHT_ARROW;
-		menu->addChild(knobModeItem);
-
-		KnobScrollItem* knobScrollItem = new KnobScrollItem;
-		knobScrollItem->text = "Scroll wheel knob control";
-		knobScrollItem->rightText = CHECKMARK(settings::knobScroll);
-		menu->addChild(knobScrollItem);
-
-		LockModulesItem* lockModulesItem = new LockModulesItem;
-		lockModulesItem->text = "Lock module positions";
-		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
-		menu->addChild(lockModulesItem);
-
-		ZoomSlider* zoomSlider = new ZoomSlider;
-		zoomSlider->box.size.x = 200.0;
-		menu->addChild(zoomSlider);
-
-		CableOpacitySlider* cableOpacitySlider = new CableOpacitySlider;
-		cableOpacitySlider->box.size.x = 200.0;
-		menu->addChild(cableOpacitySlider);
-
-		CableTensionSlider* cableTensionSlider = new CableTensionSlider;
-		cableTensionSlider->box.size.x = 200.0;
-		menu->addChild(cableTensionSlider);
-
-		RackBrightnessSlider* rackBrightnessSlider = new RackBrightnessSlider;
-		rackBrightnessSlider->box.size.x = 200.0;
-		menu->addChild(rackBrightnessSlider);
-
-		HaloBrightnessSlider* haloBrightnessSlider = new HaloBrightnessSlider;
-		haloBrightnessSlider->box.size.x = 200.0;
-		menu->addChild(haloBrightnessSlider);
-
 		FrameRateItem* frameRateItem = new FrameRateItem;
 		frameRateItem->text = "Frame rate";
 		frameRateItem->rightText = RIGHT_ARROW;
@@ -558,6 +540,26 @@ struct ViewButton : MenuButton {
 		if (APP->window->isFullScreen())
 			fullscreenItem->rightText = CHECKMARK_STRING " " + fullscreenItem->rightText;
 		menu->addChild(fullscreenItem);
+
+		ZoomSlider* zoomSlider = new ZoomSlider;
+		zoomSlider->box.size.x = 250.0;
+		menu->addChild(zoomSlider);
+
+		CableOpacitySlider* cableOpacitySlider = new CableOpacitySlider;
+		cableOpacitySlider->box.size.x = 250.0;
+		menu->addChild(cableOpacitySlider);
+
+		CableTensionSlider* cableTensionSlider = new CableTensionSlider;
+		cableTensionSlider->box.size.x = 250.0;
+		menu->addChild(cableTensionSlider);
+
+		RackBrightnessSlider* rackBrightnessSlider = new RackBrightnessSlider;
+		rackBrightnessSlider->box.size.x = 250.0;
+		menu->addChild(rackBrightnessSlider);
+
+		HaloBrightnessSlider* haloBrightnessSlider = new HaloBrightnessSlider;
+		haloBrightnessSlider->box.size.x = 250.0;
+		menu->addChild(haloBrightnessSlider);
 	}
 };
 
@@ -1009,18 +1011,6 @@ struct HelpButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		if (library::isAppUpdateAvailable()) {
-			AppUpdateItem* appUpdateItem = new AppUpdateItem;
-			appUpdateItem->text = "Update " + APP_NAME;
-			appUpdateItem->rightText = APP_VERSION + " → " + library::appVersion;
-			menu->addChild(appUpdateItem);
-		}
-		else if (!settings::autoCheckUpdates && !settings::devMode) {
-			CheckAppUpdateItem* checkAppUpdateItem = new CheckAppUpdateItem;
-			checkAppUpdateItem->text = "Check for " + APP_NAME + " update";
-			menu->addChild(checkAppUpdateItem);
-		}
-
 		TipItem* tipItem = new TipItem;
 		tipItem->text = "Tips";
 		menu->addChild(tipItem);
@@ -1035,6 +1025,20 @@ struct HelpButton : MenuButton {
 		websiteItem->text = "VCVRack.com";
 		websiteItem->url = "https://vcvrack.com/";
 		menu->addChild(websiteItem);
+
+		menu->addChild(new ui::MenuSeparator);
+
+		if (library::isAppUpdateAvailable()) {
+			AppUpdateItem* appUpdateItem = new AppUpdateItem;
+			appUpdateItem->text = "Update " + APP_NAME;
+			appUpdateItem->rightText = APP_VERSION + " → " + library::appVersion;
+			menu->addChild(appUpdateItem);
+		}
+		else if (!settings::autoCheckUpdates && !settings::devMode) {
+			CheckAppUpdateItem* checkAppUpdateItem = new CheckAppUpdateItem;
+			checkAppUpdateItem->text = "Check for " + APP_NAME + " update";
+			menu->addChild(checkAppUpdateItem);
+		}
 
 		FolderItem* folderItem = new FolderItem;
 		folderItem->text = "Open user folder";
