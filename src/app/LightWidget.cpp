@@ -14,9 +14,7 @@ void LightWidget::draw(const DrawArgs& args) {
 
 	// Background
 	if (bgColor.a > 0.0) {
-		// TODO Set color in TGrayModuleLightWidget instead.
-		nvgFillColor(args.vg, color::mult(bgColor, 0.5));
-		// nvgFillColor(args.vg, bgColor);
+		nvgFillColor(args.vg, bgColor);
 		nvgFill(args.vg);
 	}
 
@@ -33,6 +31,7 @@ void LightWidget::draw(const DrawArgs& args) {
 	TransparentWidget::draw(args);
 
 	// Dynamic light and halo
+	// Override tint from rack brightness adjustment
 	nvgGlobalAlpha(args.vg, 1.0);
 	// Use the formula `lightColor * (1 - dest) + dest` for blending
 	nvgGlobalCompositeBlendFunc(args.vg, NVG_ONE_MINUS_DST_COLOR, NVG_ONE);
@@ -53,6 +52,10 @@ void LightWidget::drawLight(const DrawArgs& args) {
 }
 
 void LightWidget::drawHalo(const DrawArgs& args) {
+	// Don't draw halo if rendering in a framebuffer, e.g. screenshots or Module Browser
+	if (args.fb)
+		return;
+
 	const float halo = settings::haloBrightness;
 	if (halo == 0.f)
 		return;
