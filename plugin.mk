@@ -57,6 +57,8 @@ include $(RACK_DIR)/compile.mk
 clean:
 	rm -rfv build $(TARGET) dist
 
+ZSTD_COMPRESSION_LEVEL ?= 19
+
 dist: all
 	rm -rf dist
 	mkdir -p dist/$(SLUG)
@@ -77,7 +79,7 @@ else
 	cp -r --parents $(DISTRIBUTABLES) dist/$(SLUG)/
 endif
 	@# Create ZIP package
-	cd dist && tar -c $(SLUG) | zstd -19 -o $(SLUG)-"$(VERSION)"-$(ARCH).vcvplugin
+	cd dist && tar -c $(SLUG) | zstd -$(ZSTD_COMPRESSION_LEVEL) -o $(SLUG)-"$(VERSION)"-$(ARCH).vcvplugin
 
 install: dist
 	mkdir -p "$(RACK_USER_DIR)"/plugins-v2/
