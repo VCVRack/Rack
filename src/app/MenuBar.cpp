@@ -1057,14 +1057,25 @@ struct HelpButton : MenuButton {
 // MenuBar
 ////////////////////
 
+struct MeterLabel : widget::OpaqueWidget {
+	void draw(const DrawArgs& args) override {
+		double meterAverage = APP->engine->getMeterAverage();
+		double meterMax = APP->engine->getMeterMax();
+		std::string text = string::f("%.1f%% avg / %.1f%% max", meterAverage * 100, meterMax * 100);
+		bndMenuLabel(args.vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
+	}
+};
+
 
 struct MenuBar : widget::OpaqueWidget {
+	MeterLabel* meterLabel;
+
 	MenuBar() {
 		const float margin = 5;
 		box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
 
 		ui::SequentialLayout* layout = new ui::SequentialLayout;
-		layout->box.pos = math::Vec(margin, margin);
+		layout->margin = math::Vec(margin, margin);
 		layout->spacing = math::Vec(0, 0);
 		addChild(layout);
 
@@ -1095,6 +1106,11 @@ struct MenuBar : widget::OpaqueWidget {
 		MenuButton* alphaButton = new MenuButton;
 		alphaButton->text = "Pre-alpha build. Not for release.";
 		layout->addChild(alphaButton);
+
+		meterLabel = new MeterLabel;
+		meterLabel->box.pos.y = margin;
+		meterLabel->box.size.x = 160;
+		addChild(meterLabel);
 	}
 
 	void draw(const DrawArgs& args) override {
@@ -1102,6 +1118,11 @@ struct MenuBar : widget::OpaqueWidget {
 		bndBevel(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 
 		Widget::draw(args);
+	}
+
+	void step() override {
+		meterLabel->box.pos.x = box.size.x - meterLabel->box.size.x;
+		Widget::step();
 	}
 };
 

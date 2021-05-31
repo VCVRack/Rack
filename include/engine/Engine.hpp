@@ -85,6 +85,10 @@ struct Engine {
 	Calculated by `stepFrames / sampleRate`.
 	*/
 	double getBlockDuration();
+	/** Returns the average block processing time divided by block time in the last T seconds.
+	*/
+	double getMeterAverage();
+	double getMeterMax();
 
 	// Modules
 	size_t getNumModules();

@@ -201,6 +201,7 @@ struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
 	std::set<ParamHandle*> paramHandles;
+	Module* primaryModule = NULL;
 
 	// moduleId
 	std::map<int64_t, Module*> modulesCache;
@@ -216,7 +217,14 @@ struct Engine::Internal {
 	int64_t blockFrame = 0;
 	double blockTime = 0.0;
 	int blockFrames = 0;
-	Module* primaryModule = NULL;
+
+	// Meter
+	int meterCount = 0;
+	double meterTotal = 0.0;
+	double meterMax = 0.0;
+	double meterLastTime = -INFINITY;
+	double meterLastAverage = 0.0;
+	double meterLastMax = 0.0;
 
 	// Parameter smoothing
 	Module* smoothModule = NULL;
@@ -516,6 +524,9 @@ void Engine::clear_NoLock() {
 
 
 void Engine::stepBlock(int frames) {
+	// Start timer before locking
+	double startTime = system::getTime();
+
 	std::lock_guard<std::mutex> stepLock(internal->blockMutex);
 	ReadLock lock(internal->mutex);
 	// Configure thread
@@ -542,12 +553,25 @@ void Engine::stepBlock(int frames) {
 
 	yieldWorkers();
 
-	double endTime = system::getTime();
-	float duration = endTime - internal->blockTime;
-	float blockDuration = internal->blockFrames * internal->sampleTime;
-	// DEBUG("%d %f / %f = %f%%", internal->blockFrames, duration, blockDuration, duration / blockDuration * 100.f);
-
 	internal->block++;
+
+	// Stop timer
+	double endTime = system::getTime();
+	double meter = (endTime - startTime) / (frames * internal->sampleTime);
+	internal->meterTotal += meter;
+	internal->meterMax = std::fmax(internal->meterMax, meter);
+	internal->meterCount++;
+
+	// Update meter values
+	const double meterUpdateDuration = 1.0;
+	if (startTime - internal->meterLastTime >= meterUpdateDuration) {
+		internal->meterLastAverage = internal->meterTotal / internal->meterCount;
+		internal->meterLastMax = internal->meterMax;
+		internal->meterLastTime = startTime;
+		internal->meterCount = 0;
+		internal->meterTotal = 0.0;
+		internal->meterMax = 0.0;
+	}
 }
 
 
@@ -640,6 +664,16 @@ int Engine::getBlockFrames() {
 
 double Engine::getBlockDuration() {
 	return internal->blockFrames * internal->sampleTime;
+}
+
+
+double Engine::getMeterAverage() {
+	return internal->meterLastAverage;
+}
+
+
+double Engine::getMeterMax() {
+	return internal->meterLastMax;
 }
 
 
