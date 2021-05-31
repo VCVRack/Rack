@@ -529,18 +529,6 @@ struct ViewButton : MenuButton {
 		tooltipsItem->rightText = CHECKMARK(settings::tooltips);
 		menu->addChild(tooltipsItem);
 
-		FrameRateItem* frameRateItem = new FrameRateItem;
-		frameRateItem->text = "Frame rate";
-		frameRateItem->rightText = RIGHT_ARROW;
-		menu->addChild(frameRateItem);
-
-		FullscreenItem* fullscreenItem = new FullscreenItem;
-		fullscreenItem->text = "Fullscreen";
-		fullscreenItem->rightText = "F11";
-		if (APP->window->isFullScreen())
-			fullscreenItem->rightText = CHECKMARK_STRING " " + fullscreenItem->rightText;
-		menu->addChild(fullscreenItem);
-
 		ZoomSlider* zoomSlider = new ZoomSlider;
 		zoomSlider->box.size.x = 250.0;
 		menu->addChild(zoomSlider);
@@ -560,6 +548,18 @@ struct ViewButton : MenuButton {
 		HaloBrightnessSlider* haloBrightnessSlider = new HaloBrightnessSlider;
 		haloBrightnessSlider->box.size.x = 250.0;
 		menu->addChild(haloBrightnessSlider);
+
+		FrameRateItem* frameRateItem = new FrameRateItem;
+		frameRateItem->text = "Frame rate";
+		frameRateItem->rightText = RIGHT_ARROW;
+		menu->addChild(frameRateItem);
+
+		FullscreenItem* fullscreenItem = new FullscreenItem;
+		fullscreenItem->text = "Fullscreen";
+		fullscreenItem->rightText = "F11";
+		if (APP->window->isFullScreen())
+			fullscreenItem->rightText = CHECKMARK_STRING " " + fullscreenItem->rightText;
+		menu->addChild(fullscreenItem);
 	}
 };
 

@@ -6,7 +6,7 @@ namespace rack {
 namespace ui {
 
 
-#define BND_LABEL_FONT_SIZE 13
+#define BND_LABEL_FONT_SIZE 11
 
 
 void MenuItem::draw(const DrawArgs& args) {
