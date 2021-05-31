@@ -14,6 +14,7 @@
 #include <ui/TextField.hpp>
 #include <ui/PasswordField.hpp>
 #include <ui/ProgressBar.hpp>
+#include <ui/Label.hpp>
 #include <engine/Engine.hpp>
 #include <window.hpp>
 #include <asset.hpp>
@@ -1057,12 +1058,12 @@ struct HelpButton : MenuButton {
 // MenuBar
 ////////////////////
 
-struct MeterLabel : widget::OpaqueWidget {
-	void draw(const DrawArgs& args) override {
+struct MeterLabel : ui::Label {
+	void step() override {
 		double meterAverage = APP->engine->getMeterAverage();
 		double meterMax = APP->engine->getMeterMax();
-		std::string text = string::f("%.1f%% avg / %.1f%% max", meterAverage * 100, meterMax * 100);
-		bndMenuLabel(args.vg, 0.0, 0.0, box.size.x, box.size.y, -1, text.c_str());
+		text = string::f("%.1f%% avg / %.1f%% max", meterAverage * 100, meterMax * 100);
+		Label::step();
 	}
 };
 
@@ -1110,6 +1111,8 @@ struct MenuBar : widget::OpaqueWidget {
 		meterLabel = new MeterLabel;
 		meterLabel->box.pos.y = margin;
 		meterLabel->box.size.x = 160;
+		meterLabel->alignment = ui::Label::RIGHT_ALIGNMENT;
+		meterLabel->color.a = 0.5;
 		addChild(meterLabel);
 	}
 
@@ -1121,7 +1124,7 @@ struct MenuBar : widget::OpaqueWidget {
 	}
 
 	void step() override {
-		meterLabel->box.pos.x = box.size.x - meterLabel->box.size.x;
+		meterLabel->box.pos.x = box.size.x - meterLabel->box.size.x - 5;
 		Widget::step();
 	}
 };
