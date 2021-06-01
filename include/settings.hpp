@@ -38,6 +38,8 @@ extern math::Vec windowSize;
 extern math::Vec windowPos;
 /** Rack zoom level, log2. E.g. 100% = 0, 200% = 1, 50% = -1. */
 extern float zoom;
+static const float zoomMax = 2.f;
+static const float zoomMin = -2.f;
 /** Reverse the zoom scroll direction */
 extern bool invertZoom;
 /** Opacity of cables in the range [0, 1] */

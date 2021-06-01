@@ -28,8 +28,6 @@ void RackScrollWidget::reset() {
 
 
 void RackScrollWidget::step() {
-	// Clamp zoom
-	settings::zoom = math::clamp(settings::zoom, -2.f, 2.f);
 	// Compute zoom from exponential zoom
 	float zoom = std::pow(2.f, settings::zoom);
 	if (zoom != zoomWidget->zoom) {
@@ -137,6 +135,11 @@ void RackScrollWidget::onHoverScroll(const HoverScrollEvent& e) {
 		if (settings::invertZoom)
 			zoomDelta *= -1;
 		settings::zoom += zoomDelta;
+		// Limit min/max depending on the direction of zooming
+		if (zoomDelta > 0.f)
+			settings::zoom = std::fmin(settings::zoom, settings::zoomMax);
+		else
+			settings::zoom = std::fmax(settings::zoom, settings::zoomMin);
 		zoomPos = e.pos;
 		e.consume(this);
 	}
@@ -162,10 +165,12 @@ void RackScrollWidget::onButton(const ButtonEvent& e)  {
 	if (e.action == GLFW_PRESS) {
 		if (e.button == GLFW_MOUSE_BUTTON_4) {
 			settings::zoom -= 0.5f;
+			settings::zoom = std::fmax(settings::zoom, settings::zoomMin);
 			e.consume(this);
 		}
 		if (e.button == GLFW_MOUSE_BUTTON_5) {
 			settings::zoom += 0.5f;
+			settings::zoom = std::fmin(settings::zoom, settings::zoomMax);
 			e.consume(this);
 		}
 	}

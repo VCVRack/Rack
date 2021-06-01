@@ -325,10 +325,10 @@ struct ZoomQuantity : Quantity {
 		return settings::zoom;
 	}
 	float getMinValue() override {
-		return -2.0;
+		return settings::zoomMin;
 	}
 	float getMaxValue() override {
-		return 2.0;
+		return settings::zoomMax;
 	}
 	float getDefaultValue() override {
 		return 0.0;

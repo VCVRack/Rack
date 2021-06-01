@@ -152,6 +152,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			zoom = std::ceil(zoom - 0.01f) - 1;
 			zoom /= 2;
 			settings::zoom = zoom;
+			settings::zoom = std::fmax(settings::zoom, settings::zoomMin);
 			e.consume(this);
 		}
 		// Numpad has a "+" key, but the main keyboard section hides it under "="
@@ -161,6 +162,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			zoom = std::floor(zoom + 0.01f) + 1;
 			zoom /= 2;
 			settings::zoom = zoom;
+			settings::zoom = std::fmin(settings::zoom, settings::zoomMax);
 			e.consume(this);
 		}
 		if ((e.keyName == "0") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
