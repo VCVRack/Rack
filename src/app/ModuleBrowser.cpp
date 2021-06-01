@@ -198,6 +198,10 @@ struct ModelBox : widget::OpaqueWidget {
 		nvgFillPaint(args.vg, nvgBoxGradient(args.vg, 0, 0, box.size.x, box.size.y, c, r, shadowColor, transparentColor));
 		nvgFill(args.vg);
 
+		// To avoid blinding the user when rack brightness is low, draw framebuffer with the same brightness.
+		float b = settings::rackBrightness;
+		nvgGlobalTint(args.vg, nvgRGBAf(b, b, b, 1));
+
 		OpaqueWidget::draw(args);
 	}
 
