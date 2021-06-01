@@ -33,6 +33,7 @@ struct LedDisplayTextField : ui::TextField {
 	std::string fontPath;
 	math::Vec textOffset;
 	NVGcolor color;
+	NVGcolor bgColor;
 	LedDisplayTextField();
 	void draw(const DrawArgs& args) override;
 	int getTextPosition(math::Vec mousePos) override;
