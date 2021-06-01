@@ -153,5 +153,24 @@ void RackScrollWidget::onHover(const HoverEvent& e) {
 }
 
 
+void RackScrollWidget::onButton(const ButtonEvent& e)  {
+	ScrollWidget::onButton(e);
+	if (e.isConsumed())
+		return;
+
+	// Zoom in/out with extra mouse buttons
+	if (e.action == GLFW_PRESS) {
+		if (e.button == GLFW_MOUSE_BUTTON_4) {
+			settings::zoom -= 0.5f;
+			e.consume(this);
+		}
+		if (e.button == GLFW_MOUSE_BUTTON_5) {
+			settings::zoom += 0.5f;
+			e.consume(this);
+		}
+	}
+}
+
+
 } // namespace app
 } // namespace rack

@@ -23,6 +23,7 @@ struct RackScrollWidget : ui::ScrollWidget {
 	void onHoverKey(const HoverKeyEvent& e) override;
 	void onHoverScroll(const HoverScrollEvent& e) override;
 	void onHover(const HoverEvent& e) override;
+	void onButton(const ButtonEvent& e) override;
 };
 
 
