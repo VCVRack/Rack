@@ -38,9 +38,9 @@ void LedDisplaySeparator::draw(const DrawArgs& args) {
 LedDisplayChoice::LedDisplayChoice() {
 	box.size = mm2px(math::Vec(0, 28.0 / 3));
 	fontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
+	textOffset = math::Vec(10, 18);
 	color = nvgRGB(0xff, 0xd7, 0x14);
 	bgColor = nvgRGBAf(0, 0, 0, 0);
-	textOffset = math::Vec(10, 18);
 }
 
 
@@ -80,8 +80,9 @@ void LedDisplayChoice::onButton(const ButtonEvent& e) {
 
 LedDisplayTextField::LedDisplayTextField() {
 	fontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
-	color = nvgRGB(0xff, 0xd7, 0x14);
 	textOffset = math::Vec(5, 5);
+	color = nvgRGB(0xff, 0xd7, 0x14);
+	bgColor = nvgRGB(0x00, 0x00, 0x00);
 }
 
 
