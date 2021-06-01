@@ -86,7 +86,7 @@ typedef TSvgLight<> SvgLight;
 template <typename Base = app::ModuleLightWidget>
 struct TGrayModuleLightWidget : Base {
 	TGrayModuleLightWidget() {
-		this->bgColor = nvgRGBA(0x55, 0x55, 0x55, 0xff);
+		this->bgColor = nvgRGBA(0x33, 0x33, 0x33, 0xff);
 		this->borderColor = nvgRGBA(0, 0, 0, 53);
 	}
 };
