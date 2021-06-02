@@ -42,12 +42,14 @@ plugin::Model* createModel(const std::string& slug) {
 	return o;
 }
 
+
 template <class TWidget>
 TWidget* createWidget(math::Vec pos) {
 	TWidget* o = new TWidget;
 	o->box.pos = pos;
 	return o;
 }
+
 
 template <class TWidget>
 TWidget* createWidgetCentered(math::Vec pos) {
@@ -56,12 +58,14 @@ TWidget* createWidgetCentered(math::Vec pos) {
 	return o;
 }
 
+
 inline app::SvgPanel* createPanel(std::string svgPath) {
 	app::SvgPanel* panel = new app::SvgPanel;
 	std::shared_ptr<Svg> svg = Svg::load(svgPath);
 	panel->setBackground(svg);
 	return panel;
 }
+
 
 template <class TParamWidget>
 TParamWidget* createParam(math::Vec pos, engine::Module* module, int paramId) {
@@ -73,12 +77,14 @@ TParamWidget* createParam(math::Vec pos, engine::Module* module, int paramId) {
 	return o;
 }
 
+
 template <class TParamWidget>
 TParamWidget* createParamCentered(math::Vec pos, engine::Module* module, int paramId) {
 	TParamWidget* o = createParam<TParamWidget>(pos, module, paramId);
 	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
+
 
 template <class TPortWidget>
 TPortWidget* createInput(math::Vec pos, engine::Module* module, int inputId) {
@@ -90,12 +96,14 @@ TPortWidget* createInput(math::Vec pos, engine::Module* module, int inputId) {
 	return o;
 }
 
+
 template <class TPortWidget>
 TPortWidget* createInputCentered(math::Vec pos, engine::Module* module, int inputId) {
 	TPortWidget* o = createInput<TPortWidget>(pos, module, inputId);
 	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
+
 
 template <class TPortWidget>
 TPortWidget* createOutput(math::Vec pos, engine::Module* module, int outputId) {
@@ -107,12 +115,14 @@ TPortWidget* createOutput(math::Vec pos, engine::Module* module, int outputId) {
 	return o;
 }
 
+
 template <class TPortWidget>
 TPortWidget* createOutputCentered(math::Vec pos, engine::Module* module, int outputId) {
 	TPortWidget* o = createOutput<TPortWidget>(pos, module, outputId);
 	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
+
 
 template <class TModuleLightWidget>
 TModuleLightWidget* createLight(math::Vec pos, engine::Module* module, int firstLightId) {
@@ -123,12 +133,14 @@ TModuleLightWidget* createLight(math::Vec pos, engine::Module* module, int first
 	return o;
 }
 
+
 template <class TModuleLightWidget>
 TModuleLightWidget* createLightCentered(math::Vec pos, engine::Module* module, int firstLightId) {
 	TModuleLightWidget* o = createLight<TModuleLightWidget>(pos, module, firstLightId);
 	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
+
 
 /** Creates a param with a light and calls setFirstLightId() on it. */
 template <class TParamWidget>
@@ -138,12 +150,14 @@ TParamWidget* createLightParam(math::Vec pos, engine::Module* module, int paramI
 	return o;
 }
 
+
 template <class TParamWidget>
 TParamWidget* createLightParamCentered(math::Vec pos, engine::Module* module, int paramId, int firstLightId) {
 	TParamWidget* o = createLightParam<TParamWidget>(pos, module, paramId, firstLightId);
 	o->box.pos = o->box.pos.minus(o->box.size.div(2));
 	return o;
 }
+
 
 template <class TMenuLabel = ui::MenuLabel>
 TMenuLabel* createMenuLabel(std::string text) {
@@ -152,6 +166,7 @@ TMenuLabel* createMenuLabel(std::string text) {
 	return o;
 }
 
+
 template <class TMenuItem = ui::MenuItem>
 TMenuItem* createMenuItem(std::string text, std::string rightText = "") {
 	TMenuItem* o = new TMenuItem;
@@ -159,6 +174,7 @@ TMenuItem* createMenuItem(std::string text, std::string rightText = "") {
 	o->rightText = rightText;
 	return o;
 }
+
 
 template <class TMenu = ui::Menu>
 TMenu* createMenu() {
@@ -170,6 +186,39 @@ TMenu* createMenu() {
 
 	APP->scene->addChild(menuOverlay);
 	return o;
+}
+
+
+template <typename T = int>
+ui::MenuItem* createIndexMenuItem(T* ptr, std::string name, std::vector<std::string> labels) {
+	struct IndexItem : ui::MenuItem {
+		T* ptr;
+		T index;
+		void onAction(const event::Action& e) override {
+			*ptr = index;
+		}
+	};
+	struct Item : ui::MenuItem {
+		T* ptr;
+		std::vector<std::string> labels;
+		ui::Menu* createChildMenu() override {
+			ui::Menu* menu = new ui::Menu;
+			for (T i = 0; i < (T) labels.size(); i++) {
+				IndexItem* item = createMenuItem<IndexItem>(labels[i], CHECKMARK(*ptr == i));
+				item->ptr = ptr;
+				item->index = i;
+				menu->addChild(item);
+			}
+			return menu;
+		}
+	};
+
+	T index = *ptr;
+	std::string label = (0 <= index && index < (T) labels.size()) ? labels[index] : "";
+	Item* item = createMenuItem<Item>(name, label + "  " + RIGHT_ARROW);
+	item->ptr = ptr;
+	item->labels = labels;
+	return item;
 }
 
 
