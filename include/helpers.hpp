@@ -13,6 +13,8 @@
 #include <engine/ParamQuantity.hpp>
 #include <context.hpp>
 
+#include <functional>
+
 
 namespace rack {
 
@@ -189,23 +191,60 @@ TMenu* createMenu() {
 }
 
 
-template <typename T = int>
-ui::MenuItem* createIndexMenuItem(T* ptr, std::string name, std::vector<std::string> labels) {
-	struct IndexItem : ui::MenuItem {
-		T* ptr;
-		T index;
+/** Creates a MenuItem that controls a boolean value with a check mark.
+*/
+inline ui::MenuItem* createBoolMenuItem(std::string name, std::function<bool()> getter, std::function<void(bool)> setter) {
+	struct Item : ui::MenuItem {
+		std::function<void(size_t)> setter;
+		bool val;
+
 		void onAction(const event::Action& e) override {
-			*ptr = index;
+			setter(val);
 		}
 	};
+
+	bool currVal = getter();
+	Item* item = createMenuItem<Item>(name, CHECKMARK(currVal));
+	item->setter = setter;
+	item->val = !currVal;
+	return item;
+}
+
+
+/** Easy wrapper for createBoolMenuItem() to modify a bool pointer.
+*/
+template <typename T>
+ui::MenuItem* createBoolPtrMenuItem(std::string name, T* ptr) {
+	return createBoolMenuItem(name,
+		[=]() {return *ptr;},
+		[=](T val) {*ptr = val;}
+	);
+}
+
+
+/** Creates a MenuItem that when hovered, opens a submenu with several MenuItems indexed by an integer.
+*/
+inline ui::MenuItem* createIndexSubmenuItem(std::string name, std::vector<std::string> labels, std::function<size_t()> getter, std::function<void(size_t)> setter) {
+	struct IndexItem : ui::MenuItem {
+		std::function<void(size_t)> setter;
+		size_t index;
+
+		void onAction(const event::Action& e) override {
+			setter(index);
+		}
+	};
+
 	struct Item : ui::MenuItem {
-		T* ptr;
+		std::function<size_t()> getter;
+		std::function<void(size_t)> setter;
 		std::vector<std::string> labels;
+
 		ui::Menu* createChildMenu() override {
 			ui::Menu* menu = new ui::Menu;
-			for (T i = 0; i < (T) labels.size(); i++) {
-				IndexItem* item = createMenuItem<IndexItem>(labels[i], CHECKMARK(*ptr == i));
-				item->ptr = ptr;
+			size_t currIndex = getter();
+			for (size_t i = 0; i < labels.size(); i++) {
+				IndexItem* item = createMenuItem<IndexItem>(labels[i], CHECKMARK(currIndex == i));
+				item->setter = setter;
 				item->index = i;
 				menu->addChild(item);
 			}
@@ -213,12 +252,24 @@ ui::MenuItem* createIndexMenuItem(T* ptr, std::string name, std::vector<std::str
 		}
 	};
 
-	T index = *ptr;
-	std::string label = (0 <= index && index < (T) labels.size()) ? labels[index] : "";
+	size_t currIndex = getter();
+	std::string label = (currIndex < labels.size()) ? labels[currIndex] : "";
 	Item* item = createMenuItem<Item>(name, label + "  " + RIGHT_ARROW);
-	item->ptr = ptr;
+	item->getter = getter;
+	item->setter = setter;
 	item->labels = labels;
 	return item;
+}
+
+
+/** Easy wrapper for createIndexSubmenuItem() that controls an integer index at a pointer address.
+*/
+template <typename T>
+ui::MenuItem* createIndexPtrSubmenuItem(std::string name, std::vector<std::string> labels, T* ptr) {
+	return createIndexSubmenuItem(name, labels,
+		[=]() {return *ptr;},
+		[=](T index) {*ptr = index;}
+	);
 }
 
 
