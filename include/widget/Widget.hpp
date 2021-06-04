@@ -145,9 +145,9 @@ struct Widget : WeakBase {
 			if (!e.isPropagating())
 				break;
 			Widget* child = *it;
-			// Filter child by visibility
-			if (!child->visible)
-				continue;
+			// Don't filter child by visibility. Typically only position events need to be filtered by visibility.
+			// if (!child->visible)
+			// 	continue;
 
 			// Clone event for (currently) no reason
 			TEvent e2 = e;
