@@ -48,7 +48,7 @@ struct CV_MIDI : Module {
 
 	CV_MIDI() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configInput(PITCH_INPUT, "V/oct");
+		configInput(PITCH_INPUT, "Pitch (1V/oct)");
 		configInput(GATE_INPUT, "Gate");
 		configInput(VEL_INPUT, "Velocity");
 		configInput(AFT_INPUT, "Aftertouch");
@@ -57,9 +57,9 @@ struct CV_MIDI : Module {
 		configInput(CLK_INPUT, "Clock");
 		configInput(VOL_INPUT, "Volume");
 		configInput(PAN_INPUT, "Pan");
-		configInput(START_INPUT, "Start");
-		configInput(STOP_INPUT, "Stop");
-		configInput(CONTINUE_INPUT, "Continue");
+		configInput(START_INPUT, "Start trigger");
+		configInput(STOP_INPUT, "Stop trigger");
+		configInput(CONTINUE_INPUT, "Continue trigger");
 		onReset();
 	}
 

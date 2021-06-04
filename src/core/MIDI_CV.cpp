@@ -87,9 +87,9 @@ struct MIDI_CV : Module {
 		configOutput(RETRIGGER_OUTPUT, "Retrigger");
 		configOutput(CLOCK_OUTPUT, "Clock");
 		configOutput(CLOCK_DIV_OUTPUT, "Clock divider");
-		configOutput(START_OUTPUT, "Start");
-		configOutput(STOP_OUTPUT, "Stop");
-		configOutput(CONTINUE_OUTPUT, "Continue");
+		configOutput(START_OUTPUT, "Start trigger");
+		configOutput(STOP_OUTPUT, "Stop trigger");
+		configOutput(CONTINUE_OUTPUT, "Continue trigger");
 		heldNotes.reserve(128);
 		for (int c = 0; c < 16; c++) {
 			pwFilters[c].setTau(1 / 30.f);
