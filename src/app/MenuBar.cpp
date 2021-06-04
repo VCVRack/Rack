@@ -456,7 +456,7 @@ struct HaloBrightnessQuantity : Quantity {
 		return settings::haloBrightness;
 	}
 	float getDefaultValue() override {
-		return 0.0;
+		return 0.25;
 	}
 	float getDisplayValue() override {
 		return getValue() * 100;
