@@ -505,38 +505,19 @@ struct MIDI_CVWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		struct SmoothItem : MenuItem {
-			MIDI_CV* module;
-			void onAction(const ActionEvent& e) override {
-				module->smooth ^= true;
-			}
-		};
-		SmoothItem* smoothItem = new SmoothItem;
-		smoothItem->text = "Smooth pitch/mod wheel";
-		smoothItem->rightText = CHECKMARK(module->smooth);
-		smoothItem->module = module;
-		menu->addChild(smoothItem);
+		menu->addChild(createBoolPtrMenuItem("Smooth pitch/mod wheel", &module->smooth));
 
-		struct ClockDivisionValueItem : MenuItem {
-			MIDI_CV* module;
-			int clockDivision;
-			void onAction(const ActionEvent& e) override {
-				module->clockDivision = clockDivision;
-			}
-		};
+		static const std::vector<int> clockDivisions = {24 * 4, 24 * 2, 24, 24 / 2, 24 / 4, 24 / 8, 2, 1};
+		static const std::vector<std::string> clockDivisionLabels = {"Whole", "Half", "Quarter", "8th", "16th", "32nd", "12 PPQN", "24 PPQN"};
 		struct ClockDivisionItem : MenuItem {
 			MIDI_CV* module;
 			Menu* createChildMenu() override {
 				Menu* menu = new Menu;
-				std::vector<int> divisions = {24 * 4, 24 * 2, 24, 24 / 2, 24 / 4, 24 / 8, 2, 1};
-				std::vector<std::string> divisionNames = {"Whole", "Half", "Quarter", "8th", "16th", "32nd", "12 PPQN", "24 PPQN"};
-				for (size_t i = 0; i < divisions.size(); i++) {
-					ClockDivisionValueItem* item = new ClockDivisionValueItem;
-					item->text = divisionNames[i];
-					item->rightText = CHECKMARK(module->clockDivision == divisions[i]);
-					item->module = module;
-					item->clockDivision = divisions[i];
-					menu->addChild(item);
+				for (size_t i = 0; i < clockDivisions.size(); i++) {
+					menu->addChild(createCheckMenuItem(clockDivisionLabels[i],
+						[=]() {return module->clockDivision == clockDivisions[i];},
+						[=]() {module->clockDivision = clockDivisions[i];}
+					));
 				}
 				return menu;
 			}
@@ -547,82 +528,35 @@ struct MIDI_CVWidget : ModuleWidget {
 		clockDivisionItem->module = module;
 		menu->addChild(clockDivisionItem);
 
-		struct ChannelValueItem : MenuItem {
-			MIDI_CV* module;
-			int channels;
-			void onAction(const ActionEvent& e) override {
-				module->setChannels(channels);
-			}
-		};
 		struct ChannelItem : MenuItem {
 			MIDI_CV* module;
 			Menu* createChildMenu() override {
 				Menu* menu = new Menu;
-				for (int channels = 1; channels <= 16; channels++) {
-					ChannelValueItem* item = new ChannelValueItem;
-					if (channels == 1)
-						item->text = "Monophonic";
-					else
-						item->text = string::f("%d", channels);
-					item->rightText = CHECKMARK(module->channels == channels);
-					item->module = module;
-					item->channels = channels;
-					menu->addChild(item);
+				for (int c = 1; c <= 16; c++) {
+					menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c),
+						[=]() {return module->channels == c;},
+						[=]() {module->setChannels(c);}
+					));
 				}
 				return menu;
 			}
 		};
 		ChannelItem* channelItem = new ChannelItem;
 		channelItem->text = "Polyphony channels";
-		channelItem->rightText = string::f("%d", module->channels) + " " + RIGHT_ARROW;
+		channelItem->rightText = string::f("%d", module->channels) + "  " + RIGHT_ARROW;
 		channelItem->module = module;
 		menu->addChild(channelItem);
 
-		struct PolyModeValueItem : MenuItem {
-			MIDI_CV* module;
-			MIDI_CV::PolyMode polyMode;
-			void onAction(const ActionEvent& e) override {
-				module->setPolyMode(polyMode);
-			}
-		};
-		struct PolyModeItem : MenuItem {
-			MIDI_CV* module;
-			Menu* createChildMenu() override {
-				Menu* menu = new Menu;
-				std::vector<std::string> polyModeNames = {
-					"Rotate",
-					"Reuse",
-					"Reset",
-					"MPE",
-				};
-				for (int i = 0; i < MIDI_CV::NUM_POLY_MODES; i++) {
-					MIDI_CV::PolyMode polyMode = (MIDI_CV::PolyMode) i;
-					PolyModeValueItem* item = new PolyModeValueItem;
-					item->text = polyModeNames[i];
-					item->rightText = CHECKMARK(module->polyMode == polyMode);
-					item->module = module;
-					item->polyMode = polyMode;
-					menu->addChild(item);
-				}
-				return menu;
-			}
-		};
-		PolyModeItem* polyModeItem = new PolyModeItem;
-		polyModeItem->text = "Polyphony mode";
-		polyModeItem->rightText = RIGHT_ARROW;
-		polyModeItem->module = module;
-		menu->addChild(polyModeItem);
+		menu->addChild(createIndexPtrSubmenuItem("Polyphony mode", {
+			"Rotate",
+			"Reuse",
+			"Reset",
+			"MPE",
+		}, &module->polyMode));
 
-		struct PanicItem : MenuItem {
-			MIDI_CV* module;
-			void onAction(const ActionEvent& e) override {
-				module->panic();
-			}
-		};
-		PanicItem* panicItem = new PanicItem;
-		panicItem->text = "Panic";
-		panicItem->module = module;
-		menu->addChild(panicItem);
+		menu->addChild(createMenuItem("Panic", "",
+			[=]() {module->panic();}
+		));
 
 		// Example of using appendMidiMenu()
 		// menu->addChild(new MenuSeparator);

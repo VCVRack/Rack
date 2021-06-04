@@ -255,41 +255,11 @@ struct MIDI_CCWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		struct SmoothItem : MenuItem {
-			MIDI_CC* module;
-			void onAction(const ActionEvent& e) override {
-				module->smooth ^= true;
-			}
-		};
-		SmoothItem* smoothItem = new SmoothItem;
-		smoothItem->text = "Smooth CC";
-		smoothItem->rightText = CHECKMARK(module->smooth);
-		smoothItem->module = module;
-		menu->addChild(smoothItem);
+		menu->addChild(createBoolPtrMenuItem("Smooth CC", &module->smooth));
 
-		struct MpeModeItem : MenuItem {
-			MIDI_CC* module;
-			void onAction(const ActionEvent& e) override {
-				module->mpeMode ^= true;
-			}
-		};
-		MpeModeItem* mpeModeItem = new MpeModeItem;
-		mpeModeItem->text = "MPE mode";
-		mpeModeItem->rightText = CHECKMARK(module->mpeMode);
-		mpeModeItem->module = module;
-		menu->addChild(mpeModeItem);
+		menu->addChild(createBoolPtrMenuItem("MPE mode", &module->mpeMode));
 
-		struct LsbModeItem : MenuItem {
-			MIDI_CC* module;
-			void onAction(const ActionEvent& e) override {
-				module->lsbMode ^= true;
-			}
-		};
-		LsbModeItem* lsbItem = new LsbModeItem;
-		lsbItem->text = "CC 0-31 controls are 14-bit";
-		lsbItem->rightText = CHECKMARK(module->lsbMode);
-		lsbItem->module = module;
-		menu->addChild(lsbItem);
+		menu->addChild(createBoolPtrMenuItem("CC 0-31 controls are 14-bit", &module->lsbMode));
 	}
 };
 

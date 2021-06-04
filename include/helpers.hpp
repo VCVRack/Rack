@@ -300,7 +300,7 @@ template <typename T>
 ui::MenuItem* createIndexPtrSubmenuItem(std::string text, std::vector<std::string> labels, T* ptr) {
 	return createIndexSubmenuItem(text, labels,
 		[=]() {return *ptr;},
-		[=](T index) {*ptr = index;}
+		[=](size_t index) {*ptr = T(index);}
 	);
 }
 

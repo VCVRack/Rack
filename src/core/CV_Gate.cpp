@@ -162,22 +162,6 @@ struct CV_Gate : Module {
 };
 
 
-struct CV_GateVelocityItem : MenuItem {
-	CV_Gate* module;
-	void onAction(const ActionEvent& e) override {
-		module->velocityMode ^= true;
-	}
-};
-
-
-struct CV_GatePanicItem : MenuItem {
-	CV_Gate* module;
-	void onAction(const ActionEvent& e) override {
-		module->midiOutput.panic();
-	}
-};
-
-
 struct CV_GateWidget : ModuleWidget {
 	CV_GateWidget(CV_Gate* module) {
 		setModule(module);
@@ -217,14 +201,12 @@ struct CV_GateWidget : ModuleWidget {
 		CV_Gate* module = dynamic_cast<CV_Gate*>(this->module);
 
 		menu->addChild(new MenuSeparator);
-		CV_GateVelocityItem* velocityItem = createMenuItem<CV_GateVelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
-		velocityItem->module = module;
-		menu->addChild(velocityItem);
 
-		CV_GatePanicItem* panicItem = new CV_GatePanicItem;
-		panicItem->text = "Panic";
-		panicItem->module = module;
-		menu->addChild(panicItem);
+		menu->addChild(createBoolPtrMenuItem("Velocity mode", &module->velocityMode));
+
+		menu->addChild(createMenuItem("Panic", "",
+			[=]() {module->midiOutput.panic();}
+		));
 	}
 };
 

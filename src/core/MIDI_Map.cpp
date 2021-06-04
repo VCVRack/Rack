@@ -496,18 +496,7 @@ struct MIDI_MapWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		struct SmoothItem : MenuItem {
-			MIDI_Map* module;
-			void onAction(const ActionEvent& e) override {
-				module->smooth ^= true;
-			}
-		};
-
-		SmoothItem* smoothItem = new SmoothItem;
-		smoothItem->text = "Smooth CC";
-		smoothItem->rightText = CHECKMARK(module->smooth);
-		smoothItem->module = module;
-		menu->addChild(smoothItem);
+		menu->addChild(createBoolPtrMenuItem("Smooth CC", &module->smooth));
 	}
 };
 

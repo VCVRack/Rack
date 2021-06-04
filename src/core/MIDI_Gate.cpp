@@ -221,39 +221,15 @@ struct MIDI_GateWidget : ModuleWidget {
 	void appendContextMenu(Menu* menu) override {
 		MIDI_Gate* module = dynamic_cast<MIDI_Gate*>(this->module);
 
-		struct VelocityItem : MenuItem {
-			MIDI_Gate* module;
-			void onAction(const ActionEvent& e) override {
-				module->velocityMode ^= true;
-			}
-		};
 		menu->addChild(new MenuSeparator);
-		VelocityItem* velocityItem = createMenuItem<VelocityItem>("Velocity mode", CHECKMARK(module->velocityMode));
-		velocityItem->module = module;
-		menu->addChild(velocityItem);
 
-		struct MpeModeItem : MenuItem {
-			MIDI_Gate* module;
-			void onAction(const ActionEvent& e) override {
-				module->mpeMode ^= true;
-			}
-		};
-		MpeModeItem* mpeModeItem = new MpeModeItem;
-		mpeModeItem->text = "MPE mode";
-		mpeModeItem->rightText = CHECKMARK(module->mpeMode);
-		mpeModeItem->module = module;
-		menu->addChild(mpeModeItem);
+		menu->addChild(createBoolPtrMenuItem("Velocity mode", &module->velocityMode));
 
-		struct PanicItem : MenuItem {
-			MIDI_Gate* module;
-			void onAction(const ActionEvent& e) override {
-				module->panic();
-			}
-		};
-		PanicItem* panicItem = new PanicItem;
-		panicItem->text = "Panic";
-		panicItem->module = module;
-		menu->addChild(panicItem);
+		menu->addChild(createBoolPtrMenuItem("MPE mode", &module->mpeMode));
+
+		menu->addChild(createMenuItem("Panic", "",
+			[=]() {module->panic();}
+		));
 	}
 };
 

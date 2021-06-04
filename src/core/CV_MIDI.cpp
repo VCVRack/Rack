@@ -180,10 +180,9 @@ struct CV_MIDIWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		CV_MIDIPanicItem* panicItem = new CV_MIDIPanicItem;
-		panicItem->text = "Panic";
-		panicItem->module = module;
-		menu->addChild(panicItem);
+		menu->addChild(createMenuItem("Panic", "",
+			[=]() {module->midiOutput.panic();}
+		));
 	}
 };
 

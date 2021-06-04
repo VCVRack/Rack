@@ -560,31 +560,12 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		struct PrimaryModuleItem : MenuItem {
-			TAudioInterface* module;
-			void onAction(const ActionEvent& e) override {
-				module->setPrimary();
-			}
-		};
+		menu->addChild(createCheckMenuItem("Primary audio module",
+			[=]() {return module->isPrimary();},
+			[=]() {module->setPrimary();}
+		));
 
-		PrimaryModuleItem* primaryModuleItem = new PrimaryModuleItem;
-		primaryModuleItem->text = "Primary audio module";
-		primaryModuleItem->rightText = CHECKMARK(module->isPrimary());
-		primaryModuleItem->module = module;
-		menu->addChild(primaryModuleItem);
-
-		struct DCFilterItem : MenuItem {
-			TAudioInterface* module;
-			void onAction(const ActionEvent& e) override {
-				module->dcFilterEnabled ^= true;
-			}
-		};
-
-		DCFilterItem* dcFilterItem = new DCFilterItem;
-		dcFilterItem->text = "DC blocker";
-		dcFilterItem->rightText = CHECKMARK(module->dcFilterEnabled);
-		dcFilterItem->module = module;
-		menu->addChild(dcFilterItem);
+		menu->addChild(createBoolPtrMenuItem("DC blocker", &module->dcFilterEnabled));
 	}
 };
 
