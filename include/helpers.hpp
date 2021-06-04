@@ -161,6 +161,19 @@ TParamWidget* createLightParamCentered(math::Vec pos, engine::Module* module, in
 }
 
 
+template <class TMenu = ui::Menu>
+TMenu* createMenu() {
+	TMenu* o = new TMenu;
+	o->box.pos = APP->scene->mousePos;
+
+	ui::MenuOverlay* menuOverlay = new ui::MenuOverlay;
+	menuOverlay->addChild(o);
+
+	APP->scene->addChild(menuOverlay);
+	return o;
+}
+
+
 template <class TMenuLabel = ui::MenuLabel>
 TMenuLabel* createMenuLabel(std::string text) {
 	TMenuLabel* o = new TMenuLabel;
@@ -178,22 +191,41 @@ TMenuItem* createMenuItem(std::string text, std::string rightText = "") {
 }
 
 
-template <class TMenu = ui::Menu>
-TMenu* createMenu() {
-	TMenu* o = new TMenu;
-	o->box.pos = APP->scene->mousePos;
+template <class TMenuItem = ui::MenuItem>
+TMenuItem* createMenuItem(std::string text, std::string rightText, std::function<void()> action) {
+	struct Item : TMenuItem {
+		std::function<void()> action;
+		void onAction(const event::Action& e) override {
+			action();
+		}
+	};
 
-	ui::MenuOverlay* menuOverlay = new ui::MenuOverlay;
-	menuOverlay->addChild(o);
+	Item* item = createMenuItem<Item>(text, rightText);
+	item->action = action;
+	return item;
+}
 
-	APP->scene->addChild(menuOverlay);
-	return o;
+
+/** Creates a MenuItem with a check mark set by a lambda function.
+*/
+inline ui::MenuItem* createCheckMenuItem(std::string text, std::function<bool()> checked, std::function<void()> action) {
+	struct Item : ui::MenuItem {
+		std::function<void()> action;
+
+		void onAction(const event::Action& e) override {
+			action();
+		}
+	};
+
+	Item* item = createMenuItem<Item>(text, CHECKMARK(checked()));
+	item->action = action;
+	return item;
 }
 
 
 /** Creates a MenuItem that controls a boolean value with a check mark.
 */
-inline ui::MenuItem* createBoolMenuItem(std::string name, std::function<bool()> getter, std::function<void(bool)> setter) {
+inline ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> getter, std::function<void(bool)> setter) {
 	struct Item : ui::MenuItem {
 		std::function<void(size_t)> setter;
 		bool val;
@@ -204,7 +236,7 @@ inline ui::MenuItem* createBoolMenuItem(std::string name, std::function<bool()> 
 	};
 
 	bool currVal = getter();
-	Item* item = createMenuItem<Item>(name, CHECKMARK(currVal));
+	Item* item = createMenuItem<Item>(text, CHECKMARK(currVal));
 	item->setter = setter;
 	item->val = !currVal;
 	return item;
@@ -214,8 +246,8 @@ inline ui::MenuItem* createBoolMenuItem(std::string name, std::function<bool()> 
 /** Easy wrapper for createBoolMenuItem() to modify a bool pointer.
 */
 template <typename T>
-ui::MenuItem* createBoolPtrMenuItem(std::string name, T* ptr) {
-	return createBoolMenuItem(name,
+ui::MenuItem* createBoolPtrMenuItem(std::string text, T* ptr) {
+	return createBoolMenuItem(text,
 		[=]() {return *ptr;},
 		[=](T val) {*ptr = val;}
 	);
@@ -224,7 +256,7 @@ ui::MenuItem* createBoolPtrMenuItem(std::string name, T* ptr) {
 
 /** Creates a MenuItem that when hovered, opens a submenu with several MenuItems indexed by an integer.
 */
-inline ui::MenuItem* createIndexSubmenuItem(std::string name, std::vector<std::string> labels, std::function<size_t()> getter, std::function<void(size_t)> setter) {
+inline ui::MenuItem* createIndexSubmenuItem(std::string text, std::vector<std::string> labels, std::function<size_t()> getter, std::function<void(size_t)> setter) {
 	struct IndexItem : ui::MenuItem {
 		std::function<void(size_t)> setter;
 		size_t index;
@@ -254,7 +286,7 @@ inline ui::MenuItem* createIndexSubmenuItem(std::string name, std::vector<std::s
 
 	size_t currIndex = getter();
 	std::string label = (currIndex < labels.size()) ? labels[currIndex] : "";
-	Item* item = createMenuItem<Item>(name, label + "  " + RIGHT_ARROW);
+	Item* item = createMenuItem<Item>(text, label + "  " + RIGHT_ARROW);
 	item->getter = getter;
 	item->setter = setter;
 	item->labels = labels;
@@ -265,8 +297,8 @@ inline ui::MenuItem* createIndexSubmenuItem(std::string name, std::vector<std::s
 /** Easy wrapper for createIndexSubmenuItem() that controls an integer index at a pointer address.
 */
 template <typename T>
-ui::MenuItem* createIndexPtrSubmenuItem(std::string name, std::vector<std::string> labels, T* ptr) {
-	return createIndexSubmenuItem(name, labels,
+ui::MenuItem* createIndexPtrSubmenuItem(std::string text, std::vector<std::string> labels, T* ptr) {
+	return createIndexSubmenuItem(text, labels,
 		[=]() {return *ptr;},
 		[=](T index) {*ptr = index;}
 	);
