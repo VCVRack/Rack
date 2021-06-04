@@ -70,8 +70,6 @@ void ModuleLightWidget::createTooltip() {
 		return;
 	if (this->tooltip)
 		return;
-	if (!module)
-		return;
 	// If the LightInfo is null, don't show a tooltip
 	if (!getLightInfo())
 		return;
@@ -123,6 +121,11 @@ void ModuleLightWidget::step() {
 void ModuleLightWidget::onHover(const HoverEvent& e) {
 	// Adapted from OpaqueWidget::onHover()
 	Widget::onHover(e);
+
+	// If the LightInfo is null, don't consume Hover event
+	if (!getLightInfo())
+		return;
+
 	e.stopPropagating();
 	// Consume if not consumed by child
 	if (!e.isConsumed())

@@ -1,5 +1,6 @@
 #include <app/ParamWidget.hpp>
 #include <ui/MenuOverlay.hpp>
+#include <ui/MenuSeparator.hpp>
 #include <ui/TextField.hpp>
 #include <app/Scene.hpp>
 #include <context.hpp>
@@ -249,7 +250,8 @@ void ParamWidget::createContextMenu() {
 
 	if (switchQuantity) {
 		int index = (int) std::floor(pq->getValue());
-		for (int i = 0; i < (int) switchQuantity->labels.size(); i++) {
+		int numStates = switchQuantity->labels.size();
+		for (int i = 0; i < numStates; i++) {
 			std::string label = switchQuantity->labels[i];
 			ParamValueItem* paramValueItem = new ParamValueItem;
 			paramValueItem->text = label;
@@ -257,6 +259,9 @@ void ParamWidget::createContextMenu() {
 			paramValueItem->paramWidget = this;
 			paramValueItem->value = i;
 			menu->addChild(paramValueItem);
+		}
+		if (numStates > 0) {
+			menu->addChild(new ui::MenuSeparator);
 		}
 	}
 	else {
