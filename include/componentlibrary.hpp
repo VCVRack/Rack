@@ -237,39 +237,49 @@ struct PB61303Light : Base {
 ////////////////////
 
 struct RoundKnob : app::SvgKnob {
+	widget::SvgWidget* bg;
+
 	RoundKnob() {
 		minAngle = -0.83 * M_PI;
 		maxAngle = 0.83 * M_PI;
+
+		bg = new widget::SvgWidget;
+		fb->addChildBelow(bg, tw);
 	}
 };
 
 struct RoundBlackKnob : RoundKnob {
 	RoundBlackKnob() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundBlackKnob.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundBlackKnob-bg.svg")));
 	}
 };
 
 struct RoundSmallBlackKnob : RoundKnob {
 	RoundSmallBlackKnob() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundSmallBlackKnob.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundSmallBlackKnob-bg.svg")));
 	}
 };
 
 struct RoundLargeBlackKnob : RoundKnob {
 	RoundLargeBlackKnob() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundLargeBlackKnob.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundLargeBlackKnob-bg.svg")));
 	}
 };
 
 struct RoundBigBlackKnob : RoundKnob {
 	RoundBigBlackKnob() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundBigBlackKnob.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundBigBlackKnob-bg.svg")));
 	}
 };
 
 struct RoundHugeBlackKnob : RoundKnob {
 	RoundHugeBlackKnob() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundHugeBlackKnob.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/RoundHugeBlackKnob-bg.svg")));
 	}
 };
 
@@ -572,10 +582,17 @@ struct SynthTechAlco : app::SvgKnob {
 };
 
 struct Trimpot : app::SvgKnob {
+	widget::SvgWidget* bg;
+
 	Trimpot() {
 		minAngle = -0.75 * M_PI;
 		maxAngle = 0.75 * M_PI;
+
+		bg = new widget::SvgWidget;
+		fb->addChildBelow(bg, tw);
+
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/Trimpot.svg")));
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/Trimpot-bg.svg")));
 	}
 };
 

@@ -4,7 +4,12 @@
 	 id="svg111794" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
 	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="17.85552px"
 	 height="17.85938px" viewBox="0 0 17.85552 17.85938" enable-background="new 0 0 17.85552 17.85938" xml:space="preserve">
-<path opacity="0.99" fill="#EDEDED" enable-background="new    " d="M7.84916,2.02241h2.09046v4.45324
-	c0,0.29768-0.24131,0.53899-0.53899,0.53899H8.38815c-0.29768,0-0.53899-0.24131-0.53899-0.53899V2.02241z"/>
-<rect x="7.84916" y="0.83048" opacity="0.81" fill="#FFFFFF" width="2.09046" height="1.19193"/>
+<circle fill="#0A0A0A" cx="8.92778" cy="8.9278" r="8.92779"/>
+<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-2441.74438" y1="3969.85278" x2="-2425.5498" y2="3969.85278" gradientTransform="matrix(6.123234e-17 1 1 -6.123234e-17 -3960.92505 2442.57495)">
+	<stop  offset="0" style="stop-color:#FFFBFD"/>
+	<stop  offset="1" style="stop-color:#000000"/>
+</linearGradient>
+<circle fill="url(#SVGID_1_)" cx="8.92778" cy="8.9278" r="8.09732"/>
+<circle opacity="0.39" fill="#0A0A0A" enable-background="new    " cx="8.92778" cy="8.9278" r="8.09732"/>
+<circle opacity="0.69" fill="#1A1A1A" enable-background="new    " cx="8.92778" cy="8.9278" r="6.90537"/>
 </svg>

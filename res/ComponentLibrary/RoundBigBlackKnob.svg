@@ -1,71 +1,12 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="15.875mm"
-   height="15.875003mm"
-   viewBox="0 0 15.875 15.875003"
-   version="1.1"
-   id="svg52164"
-   inkscape:version="0.92.4 5da689c313, 2019-01-14"
-   sodipodi:docname="BlackKnob.svg">
-  <defs
-     id="defs52158" />
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="5.6"
-     inkscape:cx="29.110815"
-     inkscape:cy="14.88916"
-     inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:window-width="1600"
-     inkscape:window-height="879"
-     inkscape:window-x="0"
-     inkscape:window-y="21"
-     inkscape:window-maximized="1" />
-  <metadata
-     id="metadata52161">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-132.66964,-87.979167)">
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277778"
-       d="m 148.54464,95.916667 c 0,4.383543 -3.55395,7.937503 -7.9375,7.937503 -4.38354,0 -7.9375,-3.55396 -7.9375,-7.937503 0,-4.383539 3.55396,-7.9375 7.9375,-7.9375 4.38355,0 7.9375,3.553961 7.9375,7.9375"
-       id="path51525" />
-    <path
-       inkscape:connector-curvature="0"
-       style="fill:#fdfdfd;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.35277778"
-       d="m 140.87035,88.009485 c -0.0854,-0.0193 -0.17226,-0.0303 -0.26321,-0.0303 -0.0909,0 -0.17776,0.01101 -0.26321,0.0303 v 8.006401 h 0.52642 z m 0,0"
-       id="path51527" />
-  </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.0"
+	 id="svg52164" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="45px" height="45.00001px"
+	 viewBox="0 0 45 45.00001" enable-background="new 0 0 45 45.00001" xml:space="preserve">
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="0" fit-margin-left="0" fit-margin-right="0" fit-margin-top="0" id="base" inkscape:current-layer="layer1" inkscape:cx="29.110815" inkscape:cy="14.88916" inkscape:document-units="mm" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="879" inkscape:window-maximized="1" inkscape:window-width="1600" inkscape:window-x="0" inkscape:window-y="21" inkscape:zoom="5.6" pagecolor="#ffffff" showgrid="false">
+	</sodipodi:namedview>
+<path fill="#EDEDED" d="M23.38463,2.89254h-1.76925v19.08557c0,0.28613,0.23196,0.51809,0.51809,0.51809h0.73308
+	c0.28613,0,0.51809-0.23196,0.51809-0.51809C23.38464,21.97811,23.38464,2.89254,23.38463,2.89254z"/>
+<rect x="21.61537" y="1.98753" opacity="0.81" fill="#FFFFFF" enable-background="new    " width="1.76925" height="0.90492"/>
 </svg>
