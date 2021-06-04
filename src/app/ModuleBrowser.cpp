@@ -239,7 +239,7 @@ struct ModelBox : widget::OpaqueWidget {
 		}
 	}
 
-	void onEnter(const EnterEvent& e) override {
+	ui::Tooltip* createTooltip() {
 		std::string text;
 		text = model->plugin->brand;
 		text += " " + model->name;
@@ -257,7 +257,11 @@ struct ModelBox : widget::OpaqueWidget {
 		}
 		ui::Tooltip* tooltip = new ui::Tooltip;
 		tooltip->text = text;
-		setTooltip(tooltip);
+		return tooltip;
+	}
+
+	void onEnter(const EnterEvent& e) override {
+		setTooltip(createTooltip());
 	}
 
 	void onLeave(const LeaveEvent& e) override {
