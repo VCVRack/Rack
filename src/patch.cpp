@@ -88,6 +88,8 @@ static bool promptClear(std::string text) {
 
 void PatchManager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
+	// Dispatch SaveEvent to modules
+	APP->engine->prepareSave();
 	// Save patch.json
 	saveAutosave();
 	// Clean up autosave directory (e.g. removed modules)

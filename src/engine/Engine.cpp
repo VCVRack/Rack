@@ -852,6 +852,15 @@ void Engine::moduleFromJson(Module* module, json_t* rootJ) {
 }
 
 
+void Engine::prepareSave() {
+	ReadLock lock(internal->mutex);
+	for (Module* module : internal->modules) {
+		Module::SaveEvent e;
+		module->onSave(e);
+	}
+}
+
+
 size_t Engine::getNumCables() {
 	return internal->cables.size();
 }

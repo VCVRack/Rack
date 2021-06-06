@@ -321,7 +321,7 @@ struct Module {
 	}
 
 	struct RemoveEvent {};
-	/** Called before removing the module to the Engine.
+	/** Called before removing the module from the Engine.
 	*/
 	virtual void onRemove(const RemoveEvent& e) {
 		// Call deprecated event method by default
@@ -341,6 +341,7 @@ struct Module {
 	struct PortChangeEvent {
 		/** True if connecting, false if disconnecting. */
 		bool connecting;
+		/** Port::INPUT or Port::OUTPUT */
 		Port::Type type;
 		int portId;
 	};
@@ -379,6 +380,12 @@ struct Module {
 	The default implementation randomizes all parameters by default, so you must call `Module::onRandomize(e)` in your overridden method if you want to keep this behavior.
 	*/
 	virtual void onRandomize(const RandomizeEvent& e);
+
+	struct SaveEvent {};
+	/** Called when the user saves the patch to a file.
+	If your module uses patch asset storage, make sure all files are saved in this event.
+	*/
+	virtual void onSave(const SaveEvent& e) {}
 
 	/** DEPRECATED. Override `onAdd(e)` instead. */
 	virtual void onAdd() {}

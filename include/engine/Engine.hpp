@@ -142,6 +142,10 @@ struct Engine {
 	Write-locks.
 	*/
 	void moduleFromJson(Module* module, json_t* rootJ);
+	/** Dispatches Save event to all modules
+	Read-locks.
+	*/
+	void prepareSave();
 
 	// Cables
 	size_t getNumCables();
