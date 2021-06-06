@@ -1045,6 +1045,11 @@ struct HelpButton : MenuButton {
 		folderItem->text = "Open user folder";
 		folderItem->path = asset::user("");
 		menu->addChild(folderItem);
+
+		menu->addChild(new ui::MenuSeparator);
+
+		menu->addChild(createMenuLabel(APP_VARIANT));
+		menu->addChild(createMenuLabel(APP_VERSION));
 	}
 
 	void step() override {
