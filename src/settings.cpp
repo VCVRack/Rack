@@ -16,10 +16,9 @@ namespace settings {
 
 
 std::string settingsPath;
-
-
 bool devMode = false;
 bool headless = false;
+
 std::string token;
 math::Vec windowSize;
 math::Vec windowPos;

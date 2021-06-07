@@ -19,12 +19,10 @@ namespace rack {
 namespace settings {
 
 
-/** Path to settings.json */
-extern std::string settingsPath;
-
-
 // Runtime state, not serialized.
 
+/** Path to settings.json */
+extern std::string settingsPath;
 extern bool devMode;
 extern bool headless;
 
