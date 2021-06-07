@@ -19,15 +19,40 @@ namespace rack {
 namespace app {
 
 
-struct Scene::Internal {
-};
-
-
 struct FrameRateWidget : widget::TransparentWidget {
 	void draw(const DrawArgs& args) override {
 		std::string text = string::f("%.2lf Hz", 1.0 / APP->window->getLastFrameDuration());
 		bndLabel(args.vg, 0.0, 0.0, INFINITY, INFINITY, -1, text.c_str());
 	}
+};
+
+
+struct ResizeHandle : widget::OpaqueWidget {
+	math::Vec size;
+
+	void draw(const DrawArgs& args) override {
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, box.size.x, box.size.y);
+		nvgLineTo(args.vg, 0, box.size.y);
+		nvgLineTo(args.vg, box.size.x, 0);
+		nvgClosePath(args.vg);
+		nvgFillColor(args.vg, nvgRGBAf(1, 1, 1, 0.15));
+		nvgFill(args.vg);
+	}
+
+	void onDragStart(const DragStartEvent& e) override {
+		size = APP->window->getSize();
+	}
+
+	void onDragMove(const DragMoveEvent& e) override {
+		size = size.plus(e.mouseDelta);
+		APP->window->setSize(size.round());
+	}
+};
+
+
+struct Scene::Internal {
+	ResizeHandle* resizeHandle;
 };
 
 
@@ -54,6 +79,10 @@ Scene::Scene() {
 	// frameRateWidget->box.size = math::Vec(80.0, 30.0);
 	// frameRateWidget->hide();
 	// addChild(frameRateWidget);
+
+	internal->resizeHandle = new ResizeHandle;
+	internal->resizeHandle->box.size = math::Vec(15, 15);
+	addChild(internal->resizeHandle);
 }
 
 Scene::~Scene() {
@@ -72,6 +101,8 @@ void Scene::step() {
 	}
 
 	// frameRateWidget->box.pos.x = box.size.x - frameRateWidget->box.size.x;
+
+	internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
 
 	// Resize owned descendants
 	menuBar->box.size.x = box.size.x;

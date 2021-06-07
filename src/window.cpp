@@ -26,6 +26,9 @@
 namespace rack {
 
 
+static const math::Vec minWindowSize = math::Vec(640, 480);
+
+
 void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
 	handle = nvgCreateFont(vg, filename.c_str(), filename.c_str());
@@ -240,7 +243,7 @@ Window::Window() {
 	glfwGetWindowContentScale(win, &contentScale, NULL);
 	INFO("Window content scale: %f", contentScale);
 
-	glfwSetWindowSizeLimits(win, 640, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits(win, minWindowSize.x, minWindowSize.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	if (settings::windowSize.isZero()) {
 		glfwMaximizeWindow(win);
 	}
@@ -339,6 +342,19 @@ Window::~Window() {
 
 	glfwDestroyWindow(win);
 	delete internal;
+}
+
+
+math::Vec Window::getSize() {
+	int width, height;
+	glfwGetWindowSize(win, &width, &height);
+	return math::Vec(width, height);
+}
+
+
+void Window::setSize(math::Vec size) {
+	size = size.max(minWindowSize);
+	glfwSetWindowSize(win, size.x, size.y);
 }
 
 

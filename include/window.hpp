@@ -60,6 +60,8 @@ struct Window {
 
 	Window();
 	~Window();
+	math::Vec getSize();
+	void setSize(math::Vec size);
 	void run();
 	void step();
 	/** Takes a screenshot of the screen and saves it to a PNG file. */
