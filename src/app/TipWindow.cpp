@@ -47,7 +47,7 @@ static std::vector<TipInfo> tipInfos = {
 	{"Did you know that patch cables in Rack can carry up to 16 signals? You can use this feature to build polyphonic patches with modules having the “Polyphonic” tag. Cables carrying more than 1 signal appear thicker than normal cables. To try out polyphony, add the VCV MIDI-CV module to your patch, right-click its panel, and select your desired number of polyphonic channels.", "Learn more about polyphony in VCV Rack", "https://vcvrack.com/manual/Polyphony"}, // reviewed
 	{"Know C++ programming and want to create your own modules for Rack? Developing Rack modules is a great way to learn digital signal processing and quickly test your ideas with an easy-to-learn platform.\n\nDownload the Rack SDK and follow the official tutorial to get started.", "Plugin Development Tutorial", "https://vcvrack.com/manual/PluginDevelopmentTutorial"}, // reviewed
 	{"Wondering how to use a particular module? Right-click its panel and choose “Info > User manual”.\n\nYou can also open the module's Info menu to view the module's tags, website, VCV Library entry, and changelog.", "", ""}, // reviewed
-	{"Did you know that ModularGrid is interconnected with the VCV Library? If a Eurorack version of a Rack module is available, right-click its panel and choose “Info > ModularGrid”, or click the “ModularGrid” link on its VCV Library page.\nOn ModularGrid.net, search for the “Available for VCV Rack” link if a hardware module has a virtual Rack version.", "Example: Grayscale Permutation on ModularGrid", "https://www.modulargrid.net/e/grayscale-permutation-18hp"}, // reviewed
+	{"Did you know that ModularGrid is integrated with the VCV Library? If a Eurorack version of a Rack module is available, right-click its panel and choose “Info > ModularGrid”, or click the “ModularGrid” link on its VCV Library page.\nOn ModularGrid.net, search for the “Available for VCV Rack” link if a hardware module has a virtual Rack version.", "Example: Grayscale Permutation on ModularGrid", "https://www.modulargrid.net/e/grayscale-permutation-18hp"}, // reviewed
 	// {"", "", ""},
 };
 
@@ -114,7 +114,7 @@ struct TipWindow : widget::OpaqueWidget {
 		};
 		PreviousButton* prevButton = new PreviousButton;
 		prevButton->box.size.x = buttonWidth;
-		prevButton->text = "◀ Previous";
+		prevButton->text = "◀  Previous";
 		prevButton->tipWindow = this;
 		buttonLayout->addChild(prevButton);
 
@@ -126,7 +126,7 @@ struct TipWindow : widget::OpaqueWidget {
 		};
 		NextButton* nextButton = new NextButton;
 		nextButton->box.size.x = buttonWidth;
-		nextButton->text = "▶ Next";
+		nextButton->text = "▶  Next";
 		nextButton->tipWindow = this;
 		buttonLayout->addChild(nextButton);
 
@@ -138,7 +138,7 @@ struct TipWindow : widget::OpaqueWidget {
 		};
 		CloseButton* closeButton = new CloseButton;
 		closeButton->box.size.x = buttonWidth;
-		closeButton->text = "✖ Close";
+		closeButton->text = "✖  Close";
 		closeButton->tipWindow = this;
 		buttonLayout->addChild(closeButton);
 
