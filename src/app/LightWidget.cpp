@@ -60,8 +60,12 @@ void LightWidget::drawHalo(const DrawArgs& args) {
 	if (halo == 0.f)
 		return;
 
+	// If light is off, rendering the halo gives no effect.
+	if (color.r == 0.f && color.g == 0.f && color.b == 0.f)
+		return;
+
 	float radius = std::min(box.size.x, box.size.y) / 2.0;
-	float oradius = std::min(radius * 5.f, 30.f);
+	float oradius = radius + std::min(radius * 4.f, 15.f);
 
 	nvgBeginPath(args.vg);
 	nvgRect(args.vg, radius - oradius, radius - oradius, 2 * oradius, 2 * oradius);
