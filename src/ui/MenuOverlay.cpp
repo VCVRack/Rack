@@ -5,12 +5,18 @@ namespace rack {
 namespace ui {
 
 
+MenuOverlay::MenuOverlay() {
+	bgColor = nvgRGBA(0, 0, 0, 0);
+}
+
+
 void MenuOverlay::draw(const DrawArgs& args) {
-	// Translucent background
-	// nvgBeginPath(args.vg);
-	// nvgRect(args.vg, 0, 0, VEC_ARGS(box.size));
-	// nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.33));
-	// nvgFill(args.vg);
+	if (bgColor.a > 0.f) {
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0, 0, VEC_ARGS(box.size));
+		nvgFillColor(args.vg, bgColor);
+		nvgFill(args.vg);
+	}
 
 	OpaqueWidget::draw(args);
 }

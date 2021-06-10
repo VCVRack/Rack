@@ -915,6 +915,7 @@ inline void ZoomItem::onAction(const ActionEvent& e) {
 
 widget::Widget* moduleBrowserCreate() {
 	moduleBrowser::BrowserOverlay* overlay = new moduleBrowser::BrowserOverlay;
+	overlay->bgColor = nvgRGBAf(0, 0, 0, 0.33);
 
 	moduleBrowser::ModuleBrowser* browser = new moduleBrowser::ModuleBrowser;
 	overlay->addChild(browser);

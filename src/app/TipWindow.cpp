@@ -174,6 +174,7 @@ struct TipWindow : widget::OpaqueWidget {
 
 widget::Widget* tipWindowCreate() {
 	ui::MenuOverlay* overlay = new ui::MenuOverlay;
+	overlay->bgColor = nvgRGBAf(0, 0, 0, 0.33);
 
 	TipWindow* tipWindow = new TipWindow;
 	overlay->addChild(tipWindow);
