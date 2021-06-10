@@ -82,6 +82,7 @@ Scene::Scene() {
 
 	internal->resizeHandle = new ResizeHandle;
 	internal->resizeHandle->box.size = math::Vec(15, 15);
+	internal->resizeHandle->hide();
 	addChild(internal->resizeHandle);
 }
 
