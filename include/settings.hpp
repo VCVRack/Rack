@@ -30,6 +30,8 @@ extern bool headless;
 
 /** vcvrack.com user token */
 extern std::string token;
+/** Whether the window is maximized */
+extern bool windowMaximized;
 /** Size of window in pixels */
 extern math::Vec windowSize;
 /** Position in window in pixels */

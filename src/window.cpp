@@ -91,15 +91,32 @@ struct Window::Internal {
 };
 
 
-static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
-	Window* window = (Window*) glfwGetWindowUserPointer(win);
-	window->updatePosSizeSettings();
+static void windowPosCallback(GLFWwindow* win, int x, int y) {
+	// Window* window = (Window*) glfwGetWindowUserPointer(win);
+	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
+		return;
+	if (glfwGetWindowMonitor(win))
+		return;
+	settings::windowPos = math::Vec(x, y);
+	// DEBUG("windowPosCallback %d %d", x, y);
 }
 
 
 static void windowSizeCallback(GLFWwindow* win, int width, int height) {
-	Window* window = (Window*) glfwGetWindowUserPointer(win);
-	window->updatePosSizeSettings();
+	// Window* window = (Window*) glfwGetWindowUserPointer(win);
+	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
+		return;
+	if (glfwGetWindowMonitor(win))
+		return;
+	settings::windowSize = math::Vec(width, height);
+	// DEBUG("windowSizeCallback %d %d", width, height);
+}
+
+
+static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
+	// Window* window = (Window*) glfwGetWindowUserPointer(win);
+	settings::windowMaximized = maximized;
+	// DEBUG("windowMaximizeCallback %d", maximized);
 }
 
 
@@ -251,14 +268,12 @@ Window::Window() {
 	INFO("Window content scale: %f", contentScale);
 
 	glfwSetWindowSizeLimits(win, minWindowSize.x, minWindowSize.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
-	if (settings::windowSize.isZero()) {
-		glfwMaximizeWindow(win);
+	glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
+	if (settings::windowPos.isFinite()) {
+		glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
 	}
-	else {
-		glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
-		if (settings::windowPos.isFinite()) {
-			glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
-		}
+	if (settings::windowMaximized) {
+		glfwMaximizeWindow(win);
 	}
 	glfwShowWindow(win);
 
@@ -271,8 +286,9 @@ Window::Window() {
 	internal->monitorRefreshRate = monitorMode->refreshRate;
 
 	// Set window callbacks
-	glfwSetWindowMaximizeCallback(win, windowMaximizeCallback);
+	glfwSetWindowPosCallback(win, windowPosCallback);
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
+	glfwSetWindowMaximizeCallback(win, windowMaximizeCallback);
 	glfwSetMouseButtonCallback(win, mouseButtonCallback);
 	// Call this ourselves, but on every frame instead of only when the mouse moves
 	// glfwSetCursorPosCallback(win, cursorPosCallback);
@@ -342,13 +358,6 @@ Window::~Window() {
 }
 
 
-math::Vec Window::getPosition() {
-	int x, y;
-	glfwGetWindowPos(win, &x, &y);
-	return math::Vec(x, y);
-}
-
-
 math::Vec Window::getSize() {
 	int width, height;
 	glfwGetWindowSize(win, &width, &height);
@@ -359,18 +368,6 @@ math::Vec Window::getSize() {
 void Window::setSize(math::Vec size) {
 	size = size.max(minWindowSize);
 	glfwSetWindowSize(win, size.x, size.y);
-}
-
-
-void Window::updatePosSizeSettings() {
-	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED)) {
-		settings::windowSize = math::Vec();
-		settings::windowPos = math::Vec();
-	}
-	else {
-		settings::windowSize = getSize();
-		settings::windowPos = getPosition();
-	}
 }
 
 

@@ -20,6 +20,7 @@ bool devMode = false;
 bool headless = false;
 
 std::string token;
+bool windowMaximized = false;
 math::Vec windowSize = math::Vec(1024, 768);
 math::Vec windowPos = math::Vec(NAN, NAN);
 float zoom = 0.25;
@@ -89,6 +90,8 @@ json_t* toJson() {
 	json_t* rootJ = json_object();
 
 	json_object_set_new(rootJ, "token", json_string(token.c_str()));
+
+	json_object_set_new(rootJ, "windowMaximized", json_boolean(windowMaximized));
 
 	json_t* windowSizeJ = json_pack("[f, f]", windowSize.x, windowSize.y);
 	json_object_set_new(rootJ, "windowSize", windowSizeJ);
@@ -193,6 +196,10 @@ void fromJson(json_t* rootJ) {
 	json_t* tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
 		token = json_string_value(tokenJ);
+
+	json_t* windowMaximizedJ = json_object_get(rootJ, "windowMaximized");
+	if (windowMaximizedJ)
+		windowMaximized = json_boolean_value(windowMaximizedJ);
 
 	json_t* windowSizeJ = json_object_get(rootJ, "windowSize");
 	if (windowSizeJ) {
