@@ -20,8 +20,8 @@ bool devMode = false;
 bool headless = false;
 
 std::string token;
-math::Vec windowSize;
-math::Vec windowPos;
+math::Vec windowSize = math::Vec(1024, 768);
+math::Vec windowPos = math::Vec(NAN, NAN);
 float zoom = 0.25;
 bool invertZoom = false;
 float cableOpacity = 0.5;

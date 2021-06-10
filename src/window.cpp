@@ -91,8 +91,15 @@ struct Window::Internal {
 };
 
 
+static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
+	Window* window = (Window*) glfwGetWindowUserPointer(win);
+	window->updatePosSizeSettings();
+}
+
+
 static void windowSizeCallback(GLFWwindow* win, int width, int height) {
-	// Do nothing. Window size is reset each frame anyway.
+	Window* window = (Window*) glfwGetWindowUserPointer(win);
+	window->updatePosSizeSettings();
 }
 
 
@@ -233,7 +240,7 @@ Window::Window() {
 #endif
 
 	// Create window
-	win = glfwCreateWindow(800, 600, "", NULL, NULL);
+	win = glfwCreateWindow(1024, 768, "", NULL, NULL);
 	if (!win) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not open GLFW window. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
@@ -248,8 +255,10 @@ Window::Window() {
 		glfwMaximizeWindow(win);
 	}
 	else {
-		glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
 		glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
+		if (settings::windowPos.isFinite()) {
+			glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
+		}
 	}
 	glfwShowWindow(win);
 
@@ -262,6 +271,7 @@ Window::Window() {
 	internal->monitorRefreshRate = monitorMode->refreshRate;
 
 	// Set window callbacks
+	glfwSetWindowMaximizeCallback(win, windowMaximizeCallback);
 	glfwSetWindowSizeCallback(win, windowSizeCallback);
 	glfwSetMouseButtonCallback(win, mouseButtonCallback);
 	// Call this ourselves, but on every frame instead of only when the mouse moves
@@ -314,19 +324,6 @@ Window::Window() {
 
 
 Window::~Window() {
-	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED)) {
-		settings::windowSize = math::Vec();
-		settings::windowPos = math::Vec();
-	}
-	else {
-		int winWidth, winHeight;
-		glfwGetWindowSize(win, &winWidth, &winHeight);
-		int winX, winY;
-		glfwGetWindowPos(win, &winX, &winY);
-		settings::windowSize = math::Vec(winWidth, winHeight);
-		settings::windowPos = math::Vec(winX, winY);
-	}
-
 	if (APP->scene) {
 		widget::Widget::ContextDestroyEvent e;
 		APP->scene->onContextDestroy(e);
@@ -345,6 +342,13 @@ Window::~Window() {
 }
 
 
+math::Vec Window::getPosition() {
+	int x, y;
+	glfwGetWindowPos(win, &x, &y);
+	return math::Vec(x, y);
+}
+
+
 math::Vec Window::getSize() {
 	int width, height;
 	glfwGetWindowSize(win, &width, &height);
@@ -355,6 +359,18 @@ math::Vec Window::getSize() {
 void Window::setSize(math::Vec size) {
 	size = size.max(minWindowSize);
 	glfwSetWindowSize(win, size.x, size.y);
+}
+
+
+void Window::updatePosSizeSettings() {
+	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED)) {
+		settings::windowSize = math::Vec();
+		settings::windowPos = math::Vec();
+	}
+	else {
+		settings::windowSize = getSize();
+		settings::windowPos = getPosition();
+	}
 }
 
 
