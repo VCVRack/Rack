@@ -7,6 +7,8 @@ namespace rack {
 namespace ui {
 
 
+/** We assume horizontal orientation in this file, but we can achieve vertical orientation just by swapping the axes.
+*/
 #define X(v) (orientation == HORIZONTAL_ORIENTATION ? (v).x : (v).y)
 #define Y(v) (orientation == HORIZONTAL_ORIENTATION ? (v).y : (v).x)
 
@@ -14,16 +16,13 @@ namespace ui {
 void SequentialLayout::step() {
 	Widget::step();
 
-	math::Rect bound;
-	bound.pos = margin;
-	bound.size = box.size.minus(margin.mult(2));
+	float boundWidth = X(box.size) - 2 * X(margin);
 
 	// Sort widgets into rows (or columns if vertical)
 	std::vector<widget::Widget*> row;
-	math::Vec cursor = bound.pos;
+	math::Vec cursor = margin;
 	auto flushRow = [&]() {
 		// For center and right alignment, compute offset from the left margin
-		float offset = 0.f;
 		if (alignment != LEFT_ALIGNMENT) {
 			float rowWidth = 0.f;
 			for (widget::Widget* child : row) {
@@ -32,16 +31,15 @@ void SequentialLayout::step() {
 			rowWidth -= X(spacing);
 
 			if (alignment == CENTER_ALIGNMENT)
-				offset = (X(bound.size) - rowWidth) / 2;
+				X(cursor) += (boundWidth - rowWidth) / 2;
 			else if (alignment == RIGHT_ALIGNMENT)
-				offset = X(bound.size) - rowWidth;
+				X(cursor) += boundWidth - rowWidth;
 		}
 
 		// Set positions of widgets
 		float maxHeight = 0.f;
 		for (widget::Widget* child : row) {
 			child->box.pos = cursor;
-			X(child->box.pos) += offset;
 			X(cursor) += X(child->box.size) + X(spacing);
 
 			if (Y(child->box.size) > maxHeight)
@@ -50,20 +48,21 @@ void SequentialLayout::step() {
 		row.clear();
 
 		// Reset cursor to next line
-		X(cursor) = X(bound.pos);
+		X(cursor) = X(margin);
 		Y(cursor) += maxHeight + Y(spacing);
 	};
 
 	// Iterate through children until row is full
 	float rowWidth = 0.0;
 	for (widget::Widget* child : children) {
+		// Skip invisible children
 		if (!child->isVisible()) {
 			child->box.pos = math::Vec();
 			continue;
 		}
 
 		// Should we wrap the widget now?
-		if (!row.empty() && rowWidth + X(child->box.size) > X(bound.size)) {
+		if (!row.empty() && rowWidth + X(child->box.size) > boundWidth) {
 			flushRow();
 			rowWidth = 0.0;
 		}
@@ -76,6 +75,8 @@ void SequentialLayout::step() {
 	if (!row.empty()) {
 		flushRow();
 	}
+
+	Y(box.size) = Y(cursor) - Y(spacing) + Y(margin);
 }
 
 

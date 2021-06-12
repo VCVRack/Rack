@@ -108,7 +108,7 @@ json_t* CableWidget::toJson() {
 void CableWidget::fromJson(json_t* rootJ) {
 	json_t* colorJ = json_object_get(rootJ, "color");
 	if (colorJ) {
-		// In <=v0.6.0, patches used JSON objects. Just ignore them if so and use the existing cable color.
+		// In <v0.6.0, cables used JSON objects instead of hex strings. Just ignore them if so and use the existing cable color.
 		if (json_is_string(colorJ))
 			color = color::fromHexString(json_string_value(colorJ));
 	}

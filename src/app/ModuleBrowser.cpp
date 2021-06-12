@@ -9,7 +9,6 @@
 #include <ui/MenuOverlay.hpp>
 #include <ui/ScrollWidget.hpp>
 #include <ui/SequentialLayout.hpp>
-#include <ui/MarginLayout.hpp>
 #include <ui/Label.hpp>
 #include <ui/Slider.hpp>
 #include <ui/TextField.hpp>
@@ -440,7 +439,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	ClearButton* clearButton;
 
 	ui::ScrollWidget* modelScroll;
-	ui::MarginLayout* modelMargin;
+	widget::Widget* modelMargin;
 	ui::SequentialLayout* modelContainer;
 
 	std::string search;
@@ -450,12 +449,12 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	std::map<plugin::Model*, float> prefilteredModelScores;
 
 	ModuleBrowser() {
-		float margin = 10;
+		const float margin = 10;
 
 		// Header
 		headerLayout = new ui::SequentialLayout;
 		headerLayout->box.pos = math::Vec(0, 0);
-		headerLayout->box.size.y = BND_WIDGET_HEIGHT + 2 * margin;
+		headerLayout->box.size.y = 0;
 		headerLayout->margin = math::Vec(margin, margin);
 		headerLayout->spacing = math::Vec(margin, margin);
 		addChild(headerLayout);
@@ -482,9 +481,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		clearButton->browser = this;
 		headerLayout->addChild(clearButton);
 
-		widget::Widget* spacer1 = new widget::Widget;
-		spacer1->box.size.x = 20;
-		headerLayout->addChild(spacer1);
+		// widget::Widget* spacer1 = new widget::Widget;
+		// spacer1->box.size.x = 20;
+		// spacer1->box.size.y = 0;
+		// headerLayout->addChild(spacer1);
 
 		SortButton* sortButton = new SortButton;
 		sortButton->box.size.x = 150;
@@ -507,11 +507,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		modelScroll->box.pos.y = BND_WIDGET_HEIGHT;
 		addChild(modelScroll);
 
-		modelMargin = new ui::MarginLayout;
-		modelMargin->margin = math::Vec(margin, 0);
+		modelMargin = new widget::Widget;
 		modelScroll->container->addChild(modelMargin);
 
 		modelContainer = new ui::SequentialLayout;
+		modelContainer->margin = math::Vec(margin, 0);
 		modelContainer->spacing = math::Vec(margin, margin);
 		modelMargin->addChild(modelContainer);
 
@@ -558,10 +558,12 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 		headerLayout->box.size.x = box.size.x;
 
+		const float margin = 10;
 		modelScroll->box.pos = headerLayout->box.getBottomLeft();
 		modelScroll->box.size = box.size.minus(modelScroll->box.pos);
 		modelMargin->box.size.x = modelScroll->box.size.x;
-		modelMargin->box.size.y = modelContainer->getChildrenBoundingBox().size.y + 2 * modelMargin->margin.y;
+		modelMargin->box.size.y = modelContainer->box.size.y + margin;
+		modelContainer->box.size.x = modelMargin->box.size.x - margin;
 
 		OpaqueWidget::step();
 	}
