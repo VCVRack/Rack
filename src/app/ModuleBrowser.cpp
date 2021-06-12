@@ -437,6 +437,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	BrandButton* brandButton;
 	TagButton* tagButton;
 	ClearButton* clearButton;
+	ui::Label* countLabel;
 
 	ui::ScrollWidget* modelScroll;
 	widget::Widget* modelMargin;
@@ -481,10 +482,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		clearButton->browser = this;
 		headerLayout->addChild(clearButton);
 
-		// widget::Widget* spacer1 = new widget::Widget;
-		// spacer1->box.size.x = 20;
-		// spacer1->box.size.y = 0;
-		// headerLayout->addChild(spacer1);
+		countLabel = new ui::Label;
+		countLabel->box.size.x = 100;
+		countLabel->color.a = 0.5;
+		headerLayout->addChild(countLabel);
+
 
 		SortButton* sortButton = new SortButton;
 		sortButton->box.size.x = 150;
@@ -692,12 +694,20 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			for (Widget* w : modelContainer->children) {
 				ModelBox* m = reinterpret_cast<ModelBox*>(w);
 				assert(m);
-				if (m->visible) {
+				if (m->isVisible()) {
 					if (prefilteredModelScores.find(m->model) == prefilteredModelScores.end())
-						m->visible = false;
+						m->hide();
 				}
 			}
 		}
+
+		// Count visible modules
+		int count = 0;
+		for (Widget* w : modelContainer->children) {
+			if (w->isVisible())
+				count++;
+		}
+		countLabel->text = string::f("%d modules", count);
 	}
 
 	void clear() {
