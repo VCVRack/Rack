@@ -45,8 +45,8 @@ static bool modelDbInitialized = false;
 static void modelDbInit() {
 	if (modelDbInitialized)
 		return;
-	modelDb.setWeights({1.f, 1.f, 0.25f, 1.f, 0.5f, 0.5f});
-	modelDb.setThreshold(0.5f);
+	modelDb.setWeights({1.f, 1.f, 0.1f, 1.f, 0.5f, 0.5f});
+	modelDb.setThreshold(0.25f);
 
 	// Iterate plugins
 	for (plugin::Plugin* plugin : plugin::plugins) {
@@ -61,7 +61,7 @@ static void modelDbInit() {
 					tagStr += ", ";
 				}
 			}
-			std::vector<std::string> fields {
+			std::vector<std::string> fields = {
 				model->plugin->brand,
 				model->plugin->name,
 				model->plugin->description,
@@ -69,6 +69,7 @@ static void modelDbInit() {
 				model->description,
 				tagStr,
 			};
+			// DEBUG("%s; %s; %s; %s; %s; %s", fields[0].c_str(), fields[1].c_str(), fields[2].c_str(), fields[3].c_str(), fields[4].c_str(), fields[5].c_str());
 			modelDb.addEntry(model, fields);
 		}
 	}
@@ -684,11 +685,11 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			// DEBUG("=============");
 			for (auto& result : results) {
 				prefilteredModelScores[result.key] = result.score;
-				// DEBUG("%s %s\t\t%f", result._key->plugin->slug.c_str(), result._key->slug.c_str(), result._score);
+				// DEBUG("%s %s\t\t%f", result.key->plugin->slug.c_str(), result.key->slug.c_str(), result.score);
 			}
 			// Sort by score
 			sortModels([&](ModelBox* m) {
-				return get(prefilteredModelScores, m->model, 0.f);
+				return -get(prefilteredModelScores, m->model, 0.f);
 			});
 			// Filter by whether the score is above the threshold
 			for (Widget* w : modelContainer->children) {
