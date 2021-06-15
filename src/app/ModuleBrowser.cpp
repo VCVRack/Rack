@@ -42,7 +42,7 @@ static fuzzysearch::Database<plugin::Model*> modelDb;
 static bool modelDbInitialized = false;
 
 
-static void modelDbInit() {
+static void fuzzySearchInit() {
 	if (modelDbInitialized)
 		return;
 	modelDb.setWeights({1.f, 1.f, 0.1f, 1.f, 0.5f, 0.5f});
@@ -447,7 +447,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	std::string brand;
 	std::set<int> tagIds = {};
 
+	// Caches and temporary state
 	std::map<plugin::Model*, float> prefilteredModelScores;
+	std::map<plugin::Model*, int> modelOrders;
 
 	ModuleBrowser() {
 		const float margin = 10;
@@ -523,12 +525,14 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 	void resetModelBoxes() {
 		modelContainer->clearChildren();
+		modelOrders.clear();
 		// Iterate plugins
 		// for (int i = 0; i < 100; i++)
 		for (plugin::Plugin* plugin : plugin::plugins) {
 			// Get module slugs from module whitelist
 			const auto& pluginIt = settings::moduleWhitelist.find(plugin->slug);
 			// Iterate models in plugin
+			int modelIndex = 0;
 			for (plugin::Model* model : plugin->models) {
 				// Don't show module if plugin whitelist exists but the module is not in it.
 				if (pluginIt != settings::moduleWhitelist.end()) {
@@ -541,6 +545,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 				ModelBox* modelBox = new ModelBox;
 				modelBox->setModel(model);
 				modelContainer->addChild(modelBox);
+
+				modelOrders[model] = modelIndex;
+				modelIndex++;
 			}
 		}
 	}
@@ -633,36 +640,42 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 			// Sort ModelBoxes
 			if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_UPDATED) {
-				sortModels([](ModelBox* m) {
+				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
-					return std::make_tuple(-p->modifiedTimestamp, p->brand, m->model->name);
+					int modelOrder = get(modelOrders, m->model, 0);
+					return std::make_tuple(-p->modifiedTimestamp, p->brand, p->name, modelOrder);
 				});
 			}
 			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_LAST_USED) {
-				sortModels([](ModelBox* m) {
+				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
 					const settings::ModuleUsage* mu = settings::getModuleUsage(p->slug, m->model->slug);
 					double lastTime = mu ? mu->lastTime : -INFINITY;
-					return std::make_tuple(-lastTime, -p->modifiedTimestamp, p->brand);
+					int modelOrder = get(modelOrders, m->model, 0);
+					return std::make_tuple(-lastTime, -p->modifiedTimestamp, p->brand, p->name, modelOrder);
 				});
 			}
 			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_MOST_USED) {
-				sortModels([](ModelBox* m) {
+				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
 					const settings::ModuleUsage* mu = settings::getModuleUsage(p->slug, m->model->slug);
 					int count = mu ? mu->count : 0;
 					double lastTime = mu ? mu->lastTime : -INFINITY;
-					return std::make_tuple(-count, -lastTime, -p->modifiedTimestamp, p->brand);
+					int modelOrder = get(modelOrders, m->model, 0);
+					return std::make_tuple(-count, -lastTime, -p->modifiedTimestamp, p->brand, p->name, modelOrder);
 				});
 			}
 			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_BRAND) {
-				sortModels([](ModelBox* m) {
-					return std::make_tuple(m->model->plugin->brand, m->model->name);
+				sortModels([this](ModelBox* m) {
+					plugin::Plugin* p = m->model->plugin;
+					int modelOrder = get(modelOrders, m->model, 0);
+					return std::make_tuple(p->brand, p->name, modelOrder);
 				});
 			}
 			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_NAME) {
 				sortModels([](ModelBox* m) {
-					return std::make_tuple(m->model->name, m->model->plugin->brand);
+					plugin::Plugin* p = m->model->plugin;
+					return std::make_tuple(m->model->name, p->brand);
 				});
 			}
 			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_RANDOM) {
@@ -678,7 +691,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		}
 		else {
 			// Lazily initialize search database
-			modelDbInit();
+			fuzzySearchInit();
 			// Score results against search query
 			auto results = modelDb.search(search);
 			// DEBUG("=============");
