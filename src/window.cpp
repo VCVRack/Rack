@@ -92,7 +92,6 @@ struct Window::Internal {
 
 
 static void windowPosCallback(GLFWwindow* win, int x, int y) {
-	// Window* window = (Window*) glfwGetWindowUserPointer(win);
 	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
 		return;
 	if (glfwGetWindowMonitor(win))
@@ -103,7 +102,6 @@ static void windowPosCallback(GLFWwindow* win, int x, int y) {
 
 
 static void windowSizeCallback(GLFWwindow* win, int width, int height) {
-	// Window* window = (Window*) glfwGetWindowUserPointer(win);
 	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
 		return;
 	if (glfwGetWindowMonitor(win))
@@ -114,14 +112,13 @@ static void windowSizeCallback(GLFWwindow* win, int width, int height) {
 
 
 static void windowMaximizeCallback(GLFWwindow* win, int maximized) {
-	// Window* window = (Window*) glfwGetWindowUserPointer(win);
 	settings::windowMaximized = maximized;
 	// DEBUG("windowMaximizeCallback %d", maximized);
 }
 
 
 static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mods) {
-	Window* window = (Window*) glfwGetWindowUserPointer(win);
+	contextSet((Context*) glfwGetWindowUserPointer(win));
 #if defined ARCH_MAC
 	// Remap Ctrl-left click to right click on Mac
 	if (button == GLFW_MOUSE_BUTTON_LEFT && (mods & RACK_MOD_MASK) == GLFW_MOD_CONTROL) {
@@ -135,18 +132,18 @@ static void mouseButtonCallback(GLFWwindow* win, int button, int action, int mod
 	}
 #endif
 
-	APP->event->handleButton(window->internal->lastMousePos, button, action, mods);
+	APP->event->handleButton(APP->window->internal->lastMousePos, button, action, mods);
 }
 
 
 static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
-	Window* window = (Window*) glfwGetWindowUserPointer(win);
-	math::Vec mousePos = math::Vec(xpos, ypos).div(window->pixelRatio / window->windowRatio).round();
-	math::Vec mouseDelta = mousePos.minus(window->internal->lastMousePos);
+	contextSet((Context*) glfwGetWindowUserPointer(win));
+	math::Vec mousePos = math::Vec(xpos, ypos).div(APP->window->pixelRatio / APP->window->windowRatio).round();
+	math::Vec mouseDelta = mousePos.minus(APP->window->internal->lastMousePos);
 
 	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
-	if (window->internal->ignoreNextMouseDelta) {
-		window->internal->ignoreNextMouseDelta = false;
+	if (APP->window->internal->ignoreNextMouseDelta) {
+		APP->window->internal->ignoreNextMouseDelta = false;
 		mouseDelta = math::Vec();
 	}
 
@@ -158,15 +155,15 @@ static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
 	if (cursorMode == GLFW_CURSOR_HIDDEN) {
 		// CGSetLocalEventsSuppressionInterval(0.0);
-		glfwSetCursorPos(win, window->internal->lastMousePos.x, window->internal->lastMousePos.y);
+		glfwSetCursorPos(win, APP->window->internal->lastMousePos.x, APP->window->internal->lastMousePos.y);
 		CGAssociateMouseAndMouseCursorPosition(true);
-		mousePos = window->internal->lastMousePos;
+		mousePos = APP->window->internal->lastMousePos;
 	}
 	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
 	glfwSetCursor(win, NULL);
 #endif
 
-	window->internal->lastMousePos = mousePos;
+	APP->window->internal->lastMousePos = mousePos;
 
 	APP->event->handleHover(mousePos, mouseDelta);
 
@@ -179,6 +176,7 @@ static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 
 
 static void cursorEnterCallback(GLFWwindow* win, int entered) {
+	contextSet((Context*) glfwGetWindowUserPointer(win));
 	if (!entered) {
 		APP->event->handleLeave();
 	}
@@ -186,7 +184,7 @@ static void cursorEnterCallback(GLFWwindow* win, int entered) {
 
 
 static void scrollCallback(GLFWwindow* win, double x, double y) {
-	Window* window = (Window*) glfwGetWindowUserPointer(win);
+	contextSet((Context*) glfwGetWindowUserPointer(win));
 	math::Vec scrollDelta = math::Vec(x, y);
 #if defined ARCH_MAC
 	scrollDelta = scrollDelta.mult(10.0);
@@ -194,20 +192,20 @@ static void scrollCallback(GLFWwindow* win, double x, double y) {
 	scrollDelta = scrollDelta.mult(50.0);
 #endif
 
-	APP->event->handleScroll(window->internal->lastMousePos, scrollDelta);
+	APP->event->handleScroll(APP->window->internal->lastMousePos, scrollDelta);
 }
 
 
 static void charCallback(GLFWwindow* win, unsigned int codepoint) {
-	Window* window = (Window*) glfwGetWindowUserPointer(win);
-	if (APP->event->handleText(window->internal->lastMousePos, codepoint))
+	contextSet((Context*) glfwGetWindowUserPointer(win));
+	if (APP->event->handleText(APP->window->internal->lastMousePos, codepoint))
 		return;
 }
 
 
 static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int mods) {
-	Window* window = (Window*) glfwGetWindowUserPointer(win);
-	if (APP->event->handleKey(window->internal->lastMousePos, key, scancode, action, mods))
+	contextSet((Context*) glfwGetWindowUserPointer(win));
+	if (APP->event->handleKey(APP->window->internal->lastMousePos, key, scancode, action, mods))
 		return;
 
 	// Keyboard/mouse MIDI driver
@@ -221,12 +219,12 @@ static void keyCallback(GLFWwindow* win, int key, int scancode, int action, int 
 
 
 static void dropCallback(GLFWwindow* win, int count, const char** paths) {
-	Window* window = (Window*) glfwGetWindowUserPointer(win);
+	contextSet((Context*) glfwGetWindowUserPointer(win));
 	std::vector<std::string> pathsVec;
 	for (int i = 0; i < count; i++) {
 		pathsVec.push_back(paths[i]);
 	}
-	APP->event->handleDrop(window->internal->lastMousePos, pathsVec);
+	APP->event->handleDrop(APP->window->internal->lastMousePos, pathsVec);
 }
 
 
@@ -277,7 +275,7 @@ Window::Window() {
 	}
 	glfwShowWindow(win);
 
-	glfwSetWindowUserPointer(win, this);
+	glfwSetWindowUserPointer(win, contextGet());
 	glfwSetInputMode(win, GLFW_LOCK_KEY_MODS, 1);
 
 	glfwMakeContextCurrent(win);
