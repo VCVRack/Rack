@@ -85,11 +85,11 @@ struct ModuleInfoItem : ui::MenuItem {
 		}
 
 		// tags
-		if (!model->tags.empty()) {
+		if (!model->tagIds.empty()) {
 			ui::MenuLabel* tagsLabel = new ui::MenuLabel;
 			tagsLabel->text = "Tags:";
 			menu->addChild(tagsLabel);
-			for (int tagId : model->tags) {
+			for (int tagId : model->tagIds) {
 				ui::MenuLabel* tagLabel = new ui::MenuLabel;
 				tagLabel->text = "• " + tag::getTag(tagId);
 				menu->addChild(tagLabel);

@@ -148,18 +148,18 @@ static Plugin* loadPlugin(std::string path) {
 		plugin->fromJson(rootJ);
 
 		// Reject plugin if slug already exists
-		Plugin* oldPlugin = getPlugin(plugin->slug);
-		if (oldPlugin)
+		Plugin* existingPlugin = getPlugin(plugin->slug);
+		if (existingPlugin)
 			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
-
-		plugins.push_back(plugin);
-		INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), plugin->path.c_str());
 	}
 	catch (Exception& e) {
 		WARN("Could not load plugin %s: %s", path.c_str(), e.what());
 		delete plugin;
-		plugin = NULL;
+		return NULL;
 	}
+
+	plugins.push_back(plugin);
+	INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), plugin->path.c_str());
 	return plugin;
 }
 

@@ -52,6 +52,21 @@ struct CaseInsensitiveCompare {
 	bool operator()(const std::string& a, const std::string& b) const;
 };
 
+/** Joins an container (vector, list, etc) of std::strings with an optional separator string.
+*/
+template <typename TContainer>
+std::string join(const TContainer& container, std::string seperator = "") {
+	std::string s;
+	bool first = true;
+	for (const auto& c : container) {
+		if (!first)
+			s += seperator;
+		first = false;
+		s += c;
+	}
+	return s;
+}
+
 
 #if defined ARCH_WIN
 /** Performs a Unicode string conversion from UTF-16 to UTF-8.

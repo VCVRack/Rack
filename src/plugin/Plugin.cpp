@@ -4,6 +4,8 @@
 #include <string.hpp>
 #include <app/common.hpp>
 
+#include <algorithm>
+
 
 namespace rack {
 namespace plugin {
@@ -24,12 +26,12 @@ void Plugin::addModel(Model* model) {
 }
 
 Model* Plugin::getModel(const std::string& slug) {
-	for (Model* model : models) {
-		if (model->slug == slug) {
-			return model;
-		}
-	}
-	return NULL;
+	auto it = std::find_if(models.begin(), models.end(), [&](Model* m) {
+		return m->slug == slug;
+	});
+	if (it == models.end())
+		return NULL;
+	return *it;
 }
 
 void Plugin::fromJson(json_t* rootJ) {
@@ -106,6 +108,9 @@ void Plugin::fromJson(json_t* rootJ) {
 	if (changelogUrlJ)
 		changelogUrl = json_string_value(changelogUrlJ);
 
+	// Reordered models vector
+	std::list<Model*> newModels;
+
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (modulesJ && json_array_size(modulesJ) > 0) {
 		size_t moduleId;
@@ -131,10 +136,16 @@ void Plugin::fromJson(json_t* rootJ) {
 			}
 
 			// Get model
-			Model* model = getModel(modelSlug);
-			if (!model) {
-				throw Exception("Manifest contains module %s but it is not defined in the plugin", modelSlug.c_str());
+			auto it = std::find_if(models.begin(), models.end(), [&](Model* m) {
+				return m->slug == modelSlug;
+			});
+			if (it == models.end()) {
+				throw Exception("Manifest contains module %s but it is not defined in plugin", modelSlug.c_str());
 			}
+
+			Model* model = *it;
+			models.erase(it);
+			newModels.push_back(model);
 
 			model->fromJson(moduleJ);
 		}
@@ -142,6 +153,17 @@ void Plugin::fromJson(json_t* rootJ) {
 	else {
 		WARN("No modules in plugin manifest %s", slug.c_str());
 	}
+
+	if (!models.empty()) {
+		std::vector<std::string> slugs;
+		for (Model* model : models) {
+			slugs.push_back(model->slug);
+			delete model;
+		}
+		throw Exception("Plugin defines module %s but it is not defined in manifest", string::join(slugs, ", ").c_str());
+	}
+
+	models = newModels;
 
 	// Remove models without names
 	// This is a hacky way of matching JSON models with C++ models.

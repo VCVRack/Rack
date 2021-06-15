@@ -1,9 +1,10 @@
 #pragma once
+#include <common.hpp>
+#include <plugin/Plugin.hpp>
 
 #include <jansson.h>
 
-#include <common.hpp>
-#include <plugin/Plugin.hpp>
+#include <list>
 
 
 namespace rack {
@@ -34,7 +35,7 @@ struct Model {
 	/** List of tag IDs representing the function(s) of the module.
 	Tag IDs are not part of the ABI and may change at any time.
 	*/
-	std::vector<int> tags;
+	std::list<int> tagIds;
 	/** A one-line summary of the module's purpose */
 	std::string description;
 	/** The manual of the module. HTML, PDF, or GitHub readme/wiki are fine.

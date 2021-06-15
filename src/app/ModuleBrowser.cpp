@@ -54,7 +54,7 @@ static void modelDbInit() {
 		for (plugin::Model* model : plugin->models) {
 			// Get search fields for model
 			std::string tagStr;
-			for (int tagId : model->tags) {
+			for (int tagId : model->tagIds) {
 				// Add all aliases of a tag
 				for (const std::string& tagAlias : tag::tagAliases[tagId]) {
 					tagStr += tagAlias;
@@ -249,12 +249,11 @@ struct ModelBox : widget::OpaqueWidget {
 		}
 		// Tags
 		text += "\n\nTags: ";
-		for (size_t i = 0; i < model->tags.size(); i++) {
-			if (i > 0)
-				text += ", ";
-			int tagId = model->tags[i];
-			text += tag::getTag(tagId);
+		std::vector<std::string> tags;
+		for (int tagId : model->tagIds) {
+			tags.push_back(tag::getTag(tagId));
 		}
+		text += string::join(tags, ", ");
 		ui::Tooltip* tooltip = new ui::Tooltip;
 		tooltip->text = text;
 		return tooltip;
@@ -585,8 +584,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 
 		// Filter tag
 		for (int tagId : tagIds) {
-			auto it = std::find(model->tags.begin(), model->tags.end(), tagId);
-			if (it == model->tags.end())
+			auto it = std::find(model->tagIds.begin(), model->tagIds.end(), tagId);
+			if (it == model->tagIds.end())
 				return false;
 		}
 

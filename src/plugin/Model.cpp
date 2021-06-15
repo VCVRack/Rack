@@ -26,7 +26,7 @@ void Model::fromJson(json_t* rootJ) {
 		description = json_string_value(descriptionJ);
 
 	// Tags
-	tags.clear();
+	tagIds.clear();
 	json_t* tagsJ = json_object_get(rootJ, "tags");
 	if (tagsJ) {
 		size_t i;
@@ -36,12 +36,12 @@ void Model::fromJson(json_t* rootJ) {
 			int tagId = tag::findId(tag);
 
 			// Omit duplicates
-			auto it = std::find(tags.begin(), tags.end(), tagId);
-			if (it != tags.end())
+			auto it = std::find(tagIds.begin(), tagIds.end(), tagId);
+			if (it != tagIds.end())
 				continue;
 
 			if (tagId >= 0)
-				tags.push_back(tagId);
+				tagIds.push_back(tagId);
 		}
 	}
 
