@@ -225,7 +225,7 @@ inline ui::MenuItem* createCheckMenuItem(std::string text, std::function<bool()>
 
 /** Creates a MenuItem that controls a boolean value with a check mark.
 */
-inline ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> getter, std::function<void(bool)> setter) {
+inline ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> getter, std::function<void(bool state)> setter) {
 	struct Item : ui::MenuItem {
 		std::function<void(size_t)> setter;
 		bool val;
@@ -254,9 +254,28 @@ ui::MenuItem* createBoolPtrMenuItem(std::string text, T* ptr) {
 }
 
 
+/** Creates a MenuItem that opens a submenu.
+*/
+inline ui::MenuItem* createSubmenuItem(std::string text, std::function<void(ui::Menu* menu)> createMenu) {
+	struct Item : ui::MenuItem {
+		std::function<void(ui::Menu* menu)> createMenu;
+
+		ui::Menu* createChildMenu() override {
+			ui::Menu* menu = new ui::Menu;
+			createMenu(menu);
+			return menu;
+		}
+	};
+
+	Item* item = createMenuItem<Item>(text, RIGHT_ARROW);
+	item->createMenu = createMenu;
+	return item;
+}
+
+
 /** Creates a MenuItem that when hovered, opens a submenu with several MenuItems indexed by an integer.
 */
-inline ui::MenuItem* createIndexSubmenuItem(std::string text, std::vector<std::string> labels, std::function<size_t()> getter, std::function<void(size_t)> setter) {
+inline ui::MenuItem* createIndexSubmenuItem(std::string text, std::vector<std::string> labels, std::function<size_t()> getter, std::function<void(size_t val)> setter) {
 	struct IndexItem : ui::MenuItem {
 		std::function<void(size_t)> setter;
 		size_t index;
