@@ -42,6 +42,8 @@ void Switch::onDoubleClick(const DoubleClickEvent& e) {
 }
 
 void Switch::onDragStart(const DragStartEvent& e) {
+	ParamWidget::onDragStart(e);
+
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
