@@ -265,7 +265,7 @@ static void Engine_updateExpander(Engine* that, Module* module, bool side) {
 	}
 
 	if (expander.module != oldExpanderModule) {
-		// Trigger ExpanderChangeEvent event
+		// Dispatch ExpanderChangeEvent
 		Module::ExpanderChangeEvent e;
 		e.side = side;
 		module->onExpanderChange(e);
@@ -579,7 +579,7 @@ void Engine::setPrimaryModule(Module* module) {
 	WriteLock lock(internal->mutex);
 
 	if (internal->primaryModule) {
-		// Trigger UnsetPrimaryEvent
+		// Dispatch UnsetPrimaryEvent
 		Module::UnsetPrimaryEvent e;
 		internal->primaryModule->onUnsetPrimary(e);
 	}
@@ -587,7 +587,7 @@ void Engine::setPrimaryModule(Module* module) {
 	internal->primaryModule = module;
 
 	if (internal->primaryModule) {
-		// Trigger SetPrimaryEvent
+		// Dispatch SetPrimaryEvent
 		Module::SetPrimaryEvent e;
 		internal->primaryModule->onSetPrimary(e);
 	}
@@ -611,7 +611,7 @@ void Engine::setSampleRate(float sampleRate) {
 
 	internal->sampleRate = sampleRate;
 	internal->sampleTime = 1.f / sampleRate;
-	// Trigger SampleRateChangeEvent
+	// Dispatch SampleRateChangeEvent
 	Module::SampleRateChangeEvent e;
 	e.sampleRate = internal->sampleRate;
 	e.sampleTime = internal->sampleTime;
@@ -733,7 +733,7 @@ void Engine::addModule(Module* module) {
 	// Add module
 	internal->modules.push_back(module);
 	internal->modulesCache[module->id] = module;
-	// Trigger Add event
+	// Dispatch AddEvent
 	Module::AddEvent eAdd;
 	module->onAdd(eAdd);
 	// Update ParamHandles' module pointers
@@ -780,7 +780,7 @@ void Engine::removeModule_NoLock(Module* module) {
 			m->rightExpander.module = NULL;
 		}
 	}
-	// Trigger Remove event
+	// Dispatch RemoveEvent
 	Module::RemoveEvent eRemove;
 	module->onRemove(eRemove);
 	// Unset primary module
@@ -841,12 +841,13 @@ void Engine::bypassModule(Module* module, bool bypassed) {
 	}
 	// Set bypassed state
 	module->setBypassed(bypassed);
-	// Trigger event
 	if (bypassed) {
+		// Dispatch BypassEvent
 		Module::BypassEvent eBypass;
 		module->onBypass(eBypass);
 	}
 	else {
+		// Dispatch UnBypassEvent
 		Module::UnBypassEvent eUnBypass;
 		module->onUnBypass(eUnBypass);
 	}
@@ -929,7 +930,7 @@ void Engine::addCable(Cable* cable) {
 	internal->cables.push_back(cable);
 	internal->cablesCache[cable->id] = cable;
 	Engine_updateConnected(this);
-	// Trigger input port event
+	// Dispatch input port event
 	{
 		Module::PortChangeEvent e;
 		e.connecting = true;
@@ -937,7 +938,7 @@ void Engine::addCable(Cable* cable) {
 		e.portId = cable->inputId;
 		cable->inputModule->onPortChange(e);
 	}
-	// Trigger output port event if its state went from disconnected to connected.
+	// Dispatch output port event if its state went from disconnected to connected.
 	if (!outputWasConnected) {
 		Module::PortChangeEvent e;
 		e.connecting = true;
@@ -970,7 +971,7 @@ void Engine::removeCable_NoLock(Cable* cable) {
 		if (cable2->outputModule == cable->outputModule && cable2->outputId == cable->outputId)
 			outputIsConnected = true;
 	}
-	// Trigger input port event
+	// Dispatch input port event
 	{
 		Module::PortChangeEvent e;
 		e.connecting = false;
@@ -978,7 +979,7 @@ void Engine::removeCable_NoLock(Cable* cable) {
 		e.portId = cable->inputId;
 		cable->inputModule->onPortChange(e);
 	}
-	// Trigger output port event if its state went from connected to disconnected.
+	// Dispatch output port event if its state went from connected to disconnected.
 	if (!outputIsConnected) {
 		Module::PortChangeEvent e;
 		e.connecting = false;

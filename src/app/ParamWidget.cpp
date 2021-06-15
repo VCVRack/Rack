@@ -177,7 +177,7 @@ void ParamWidget::step() {
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
 		float value = pq->getSmoothValue();
-		// Trigger change event when the ParamQuantity value changes
+		// Dispatch change event when the ParamQuantity value changes
 		if (value != lastValue) {
 			ChangeEvent eChange;
 			onChange(eChange);

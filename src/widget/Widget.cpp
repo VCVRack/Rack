@@ -35,7 +35,7 @@ void Widget::setPosition(math::Vec pos) {
 	if (pos.equals(box.pos))
 		return;
 	box.pos = pos;
-	// Trigger Reposition event
+	// Dispatch Reposition event
 	RepositionEvent eReposition;
 	onReposition(eReposition);
 }
@@ -50,7 +50,7 @@ void Widget::setSize(math::Vec size) {
 	if (size.equals(box.size))
 		return;
 	box.size = size;
-	// Trigger Resize event
+	// Dispatch Resize event
 	ResizeEvent eResize;
 	onResize(eResize);
 }
@@ -71,12 +71,12 @@ void Widget::setVisible(bool visible) {
 		return;
 	this->visible = visible;
 	if (visible) {
-		// Trigger Show event
+		// Dispatch Show event
 		ShowEvent eShow;
 		onShow(eShow);
 	}
 	else {
-		// Trigger Hide event
+		// Dispatch Hide event
 		HideEvent eHide;
 		onHide(eHide);
 	}
@@ -159,7 +159,7 @@ void Widget::addChild(Widget* child) {
 	// Add child
 	child->parent = this;
 	children.push_back(child);
-	// Trigger Add event
+	// Dispatch Add event
 	AddEvent eAdd;
 	child->onAdd(eAdd);
 }
@@ -171,7 +171,7 @@ void Widget::addChildBottom(Widget* child) {
 	// Add child
 	child->parent = this;
 	children.push_front(child);
-	// Trigger Add event
+	// Dispatch Add event
 	AddEvent eAdd;
 	child->onAdd(eAdd);
 }
@@ -185,7 +185,7 @@ void Widget::addChildBelow(Widget* child, Widget* sibling) {
 	// Add child
 	child->parent = this;
 	children.insert(it, child);
-	// Trigger Add event
+	// Dispatch Add event
 	AddEvent eAdd;
 	child->onAdd(eAdd);
 }
@@ -200,7 +200,7 @@ void Widget::addChildAbove(Widget* child, Widget* sibling) {
 	child->parent = this;
 	it++;
 	children.insert(it, child);
-	// Trigger Add event
+	// Dispatch Add event
 	AddEvent eAdd;
 	child->onAdd(eAdd);
 }
@@ -210,7 +210,7 @@ void Widget::removeChild(Widget* child) {
 	assert(child);
 	// Make sure `this` is the child's parent
 	assert(child->parent == this);
-	// Trigger Remove event
+	// Dispatch Remove event
 	RemoveEvent eRemove;
 	child->onRemove(eRemove);
 	// Prepare to remove widget from the event state
@@ -226,7 +226,7 @@ void Widget::removeChild(Widget* child) {
 
 void Widget::clearChildren() {
 	for (Widget* child : children) {
-		// Trigger Remove event
+		// Dispatch Remove event
 		RemoveEvent eRemove;
 		child->onRemove(eRemove);
 		APP->event->finalizeWidget(child);
@@ -242,7 +242,7 @@ void Widget::step() {
 		Widget* child = *it;
 		// Delete children if a delete is requested
 		if (child->requestedDelete) {
-			// Trigger Remove event
+			// Dispatch Remove event
 			RemoveEvent eRemove;
 			child->onRemove(eRemove);
 			APP->event->finalizeWidget(child);

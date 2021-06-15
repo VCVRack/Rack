@@ -13,14 +13,14 @@ void EventState::setHovered(widget::Widget* w) {
 		return;
 
 	if (hoveredWidget) {
-		// Trigger LeaveEvent
+		// Dispatch LeaveEvent
 		Widget::LeaveEvent eLeave;
 		hoveredWidget->onLeave(eLeave);
 		hoveredWidget = NULL;
 	}
 
 	if (w) {
-		// Trigger EnterEvent
+		// Dispatch EnterEvent
 		EventContext cEnter;
 		cEnter.target = w;
 		Widget::EnterEvent eEnter;
@@ -35,7 +35,7 @@ void EventState::setDragged(widget::Widget* w, int button) {
 		return;
 
 	if (draggedWidget) {
-		// Trigger DragEndEvent
+		// Dispatch DragEndEvent
 		Widget::DragEndEvent eDragEnd;
 		eDragEnd.button = dragButton;
 		draggedWidget->onDragEnd(eDragEnd);
@@ -45,7 +45,7 @@ void EventState::setDragged(widget::Widget* w, int button) {
 	dragButton = button;
 
 	if (w) {
-		// Trigger DragStartEvent
+		// Dispatch DragStartEvent
 		EventContext cDragStart;
 		cDragStart.target = w;
 		Widget::DragStartEvent eDragStart;
@@ -61,7 +61,7 @@ void EventState::setDragHovered(widget::Widget* w) {
 		return;
 
 	if (dragHoveredWidget) {
-		// Trigger DragLeaveEvent
+		// Dispatch DragLeaveEvent
 		Widget::DragLeaveEvent eDragLeave;
 		eDragLeave.button = dragButton;
 		eDragLeave.origin = draggedWidget;
@@ -70,7 +70,7 @@ void EventState::setDragHovered(widget::Widget* w) {
 	}
 
 	if (w) {
-		// Trigger DragEnterEvent
+		// Dispatch DragEnterEvent
 		EventContext cDragEnter;
 		cDragEnter.target = w;
 		Widget::DragEnterEvent eDragEnter;
@@ -87,14 +87,14 @@ void EventState::setSelected(widget::Widget* w) {
 		return;
 
 	if (selectedWidget) {
-		// Trigger DeselectEvent
+		// Dispatch DeselectEvent
 		Widget::DeselectEvent eDeselect;
 		selectedWidget->onDeselect(eDeselect);
 		selectedWidget = NULL;
 	}
 
 	if (w) {
-		// Trigger SelectEvent
+		// Dispatch SelectEvent
 		EventContext cSelect;
 		cSelect.target = w;
 		Widget::SelectEvent eSelect;
@@ -122,7 +122,7 @@ bool EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 
 	widget::Widget* clickedWidget = NULL;
 	if (!cursorLocked) {
-		// Trigger ButtonEvent
+		// Dispatch ButtonEvent
 		EventContext cButton;
 		Widget::ButtonEvent eButton;
 		eButton.context = &cButton;
@@ -142,7 +142,7 @@ bool EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 		setDragHovered(NULL);
 
 		if (clickedWidget && draggedWidget) {
-			// Trigger DragDropEvent
+			// Dispatch DragDropEvent
 			Widget::DragDropEvent eDragDrop;
 			eDragDrop.button = dragButton;
 			eDragDrop.origin = draggedWidget;
@@ -163,7 +163,7 @@ bool EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 			if (clickedWidget
 			    && clickTime - lastClickTime <= doubleClickDuration
 			    && lastClickedWidget == clickedWidget) {
-				// Trigger DoubleClickEvent
+				// Dispatch DoubleClickEvent
 				Widget::DoubleClickEvent eDoubleClick;
 				clickedWidget->onDoubleClick(eDoubleClick);
 				// Reset double click
@@ -195,7 +195,7 @@ bool EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	if (draggedWidget) {
 		bool dragHovered = false;
 		if (!cursorLocked) {
-			// Trigger DragHoverEvent
+			// Dispatch DragHoverEvent
 			EventContext cDragHover;
 			Widget::DragHoverEvent eDragHover;
 			eDragHover.context = &cDragHover;
@@ -211,7 +211,7 @@ bool EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 				dragHovered = true;
 		}
 
-		// Trigger DragMoveEvent
+		// Dispatch DragMoveEvent
 		Widget::DragMoveEvent eDragMove;
 		eDragMove.button = dragButton;
 		eDragMove.mouseDelta = mouseDelta;
@@ -221,7 +221,7 @@ bool EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 	}
 
 	if (!cursorLocked) {
-		// Trigger HoverEvent
+		// Dispatch HoverEvent
 		EventContext cHover;
 		Widget::HoverEvent eHover;
 		eHover.context = &cHover;
@@ -245,7 +245,7 @@ bool EventState::handleLeave() {
 }
 
 bool EventState::handleScroll(math::Vec pos, math::Vec scrollDelta) {
-	// Trigger HoverScrollEvent
+	// Dispatch HoverScrollEvent
 	EventContext cHoverScroll;
 	Widget::HoverScrollEvent eHoverScroll;
 	eHoverScroll.context = &cHoverScroll;
@@ -257,7 +257,7 @@ bool EventState::handleScroll(math::Vec pos, math::Vec scrollDelta) {
 }
 
 bool EventState::handleDrop(math::Vec pos, const std::vector<std::string>& paths) {
-	// Trigger PathDropEvent
+	// Dispatch PathDropEvent
 	EventContext cPathDrop;
 	Widget::PathDropEvent ePathDrop(paths);
 	ePathDrop.context = &cPathDrop;
@@ -269,7 +269,7 @@ bool EventState::handleDrop(math::Vec pos, const std::vector<std::string>& paths
 
 bool EventState::handleText(math::Vec pos, int codepoint) {
 	if (selectedWidget) {
-		// Trigger SelectTextEvent
+		// Dispatch SelectTextEvent
 		EventContext cSelectText;
 		Widget::SelectTextEvent eSelectText;
 		eSelectText.context = &cSelectText;
@@ -279,7 +279,7 @@ bool EventState::handleText(math::Vec pos, int codepoint) {
 			return true;
 	}
 
-	// Trigger HoverText
+	// Dispatch HoverText
 	EventContext cHoverText;
 	Widget::HoverTextEvent eHoverText;
 	eHoverText.context = &cHoverText;
@@ -302,7 +302,7 @@ bool EventState::handleKey(math::Vec pos, int key, int scancode, int action, int
 	}
 
 	if (selectedWidget) {
-		// Trigger SelectKeyEvent
+		// Dispatch SelectKeyEvent
 		EventContext cSelectKey;
 		Widget::SelectKeyEvent eSelectKey;
 		eSelectKey.context = &cSelectKey;
@@ -318,7 +318,7 @@ bool EventState::handleKey(math::Vec pos, int key, int scancode, int action, int
 			return true;
 	}
 
-	// Trigger HoverKeyEvent
+	// Dispatch HoverKeyEvent
 	EventContext cHoverKey;
 	Widget::HoverKeyEvent eHoverKey;
 	eHoverKey.context = &cHoverKey;
@@ -335,7 +335,7 @@ bool EventState::handleKey(math::Vec pos, int key, int scancode, int action, int
 }
 
 bool EventState::handleDirty() {
-	// Trigger DirtyEvent
+	// Dispatch DirtyEvent
 	EventContext cDirty;
 	Widget::DirtyEvent eDirty;
 	eDirty.context = &cDirty;
