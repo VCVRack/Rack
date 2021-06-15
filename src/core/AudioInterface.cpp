@@ -371,9 +371,6 @@ struct AudioInterface : Module {
 		json_t* rootJ = json_object();
 		json_object_set_new(rootJ, "audio", port.toJson());
 
-		if (isPrimary())
-			json_object_set_new(rootJ, "primary", json_boolean(true));
-
 		json_object_set_new(rootJ, "dcFilter", json_boolean(dcFilterEnabled));
 
 		return rootJ;
@@ -383,11 +380,6 @@ struct AudioInterface : Module {
 		json_t* audioJ = json_object_get(rootJ, "audio");
 		if (audioJ)
 			port.fromJson(audioJ);
-
-		// For not, don't deserialize primary module state.
-		// json_t* primaryJ = json_object_get(rootJ, "primary");
-		// if (primaryJ)
-		// 	setPrimary();
 
 		json_t* dcFilterJ = json_object_get(rootJ, "dcFilter");
 		if (dcFilterJ)

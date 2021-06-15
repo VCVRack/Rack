@@ -1137,6 +1137,11 @@ json_t* Engine::toJson() {
 	}
 	json_object_set_new(rootJ, "cables", cablesJ);
 
+	// primaryModule
+	if (internal->primaryModule) {
+		json_object_set_new(rootJ, "primaryModuleId", json_integer(internal->primaryModule->id));
+	}
+
 	return rootJ;
 }
 
@@ -1218,6 +1223,13 @@ void Engine::fromJson(json_t* rootJ) {
 			// Don't log exceptions because missing modules create unnecessary complaining when cables try to connect to them.
 			continue;
 		}
+	}
+
+	// primaryModule
+	json_t* primaryModuleIdJ = json_object_get(rootJ, "primaryModuleId");
+	if (primaryModuleIdJ) {
+		Module* primaryModule = getModule(json_integer_value(primaryModuleIdJ));
+		setPrimaryModule(primaryModule);
 	}
 }
 
