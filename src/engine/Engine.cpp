@@ -577,7 +577,20 @@ void Engine::stepBlock(int frames) {
 
 void Engine::setPrimaryModule(Module* module) {
 	WriteLock lock(internal->mutex);
+
+	if (internal->primaryModule) {
+		// Trigger UnsetPrimaryEvent
+		Module::UnsetPrimaryEvent e;
+		internal->primaryModule->onUnsetPrimary(e);
+	}
+
 	internal->primaryModule = module;
+
+	if (internal->primaryModule) {
+		// Trigger SetPrimaryEvent
+		Module::SetPrimaryEvent e;
+		internal->primaryModule->onSetPrimary(e);
+	}
 }
 
 
