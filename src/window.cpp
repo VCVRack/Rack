@@ -388,7 +388,10 @@ void Window::step() {
 	bndSetFont(uiFont->handle);
 
 	// Poll events
+	// Save and restore context because event handler set their own context based on which window they originate from.
+	Context* context = contextGet();
 	glfwPollEvents();
+	contextSet(context);
 
 	// In case glfwPollEvents() sets another OpenGL context
 	glfwMakeContextCurrent(win);
