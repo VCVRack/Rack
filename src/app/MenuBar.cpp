@@ -1109,7 +1109,8 @@ struct MenuBar : widget::OpaqueWidget {
 		helpButton->text = "Help";
 		layout->addChild(helpButton);
 
-		ui::MenuLabel* alphaLabel = new ui::MenuLabel;
+		ui::Label* alphaLabel = new ui::Label;
+		alphaLabel->color.a = 0.5;
 		alphaLabel->text = "Pre-alpha build. Not for release.";
 		layout->addChild(alphaLabel);
 
