@@ -12,8 +12,8 @@ struct Module;
 
 struct PortInfo {
 	Module* module = NULL;
-	Port::Type type;
-	int portId;
+	Port::Type type = Port::INPUT;
+	int portId = -1;
 
 	/** The name of the port, using sentence capitalization.
 	e.g. "Sine", "Pitch input", "Mode CV".

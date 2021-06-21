@@ -14,9 +14,9 @@ struct Cable {
 	*/
 	int64_t id = -1;
 	Module* inputModule = NULL;
-	int inputId;
+	int inputId = -1;
 	Module* outputModule = NULL;
-	int outputId;
+	int outputId = -1;
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);

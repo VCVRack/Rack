@@ -13,7 +13,7 @@ namespace app {
 /** Manages an engine::Param on a ModuleWidget. */
 struct ParamWidget : widget::OpaqueWidget {
 	engine::Module* module = NULL;
-	int paramId;
+	int paramId = -1;
 
 	ui::Tooltip* tooltip = NULL;
 	/** For triggering the Change event. `*/

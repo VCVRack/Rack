@@ -14,8 +14,8 @@ namespace app {
 /** Manages an engine::Port on a ModuleWidget. */
 struct PortWidget : widget::OpaqueWidget {
 	engine::Module* module = NULL;
-	engine::Port::Type type;
-	int portId;
+	engine::Port::Type type = engine::Port::INPUT;
+	int portId = -1;
 
 	ui::Tooltip* tooltip = NULL;
 

@@ -11,7 +11,7 @@ struct Module;
 
 struct LightInfo {
 	Module* module = NULL;
-	int lightId;
+	int lightId = -1;
 
 	/** The name of the light, using sentence capitalization.
 	e.g. "Level", "Pitch light", "Mode CV".

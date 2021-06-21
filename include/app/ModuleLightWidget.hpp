@@ -14,7 +14,7 @@ Will access firstLightId, firstLightId + 1, etc. for each added color
 */
 struct ModuleLightWidget : MultiLightWidget {
 	engine::Module* module = NULL;
-	int firstLightId;
+	int firstLightId = -1;
 
 	ui::Tooltip* tooltip = NULL;
 

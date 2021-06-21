@@ -12,7 +12,7 @@ namespace engine {
 
 engine::Param* ParamQuantity::getParam() {
 	assert(module);
-	assert(paramId < (int) module->params.size());
+	assert(0 <= paramId && paramId < (int) module->params.size());
 	return &module->params[paramId];
 }
 
