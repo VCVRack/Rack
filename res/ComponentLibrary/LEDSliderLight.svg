@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 25.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   version="1.0"
+   id="svg164153"
+   x="0px"
+   y="0px"
+   width="4.3202701"
+   height="6.00001"
+   viewBox="0 0 4.3202698 6.0000101"
+   enable-background="new 0 0 4.3204 11.74218"
+   xml:space="preserve"
+   sodipodi:docname="LEDSliderLight.svg"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+   id="defs19" />
+<sodipodi:namedview
+   bordercolor="#666666"
+   borderopacity="1.0"
+   fit-margin-bottom="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-top="0"
+   id="base"
+   inkscape:current-layer="svg164153"
+   inkscape:cx="-0.89043389"
+   inkscape:cy="7.2578763"
+   inkscape:document-units="mm"
+   inkscape:pageopacity="0.0"
+   inkscape:pageshadow="2"
+   inkscape:window-height="882"
+   inkscape:window-maximized="0"
+   inkscape:window-width="1600"
+   inkscape:window-x="0"
+   inkscape:window-y="18"
+   inkscape:zoom="29.760772"
+   pagecolor="#ffffff"
+   showgrid="false"
+   inkscape:pagecheckerboard="0">
+	</sodipodi:namedview>
+<rect
+   x="0.46793997"
+   y="0.43858004"
+   opacity="0.4"
+   fill="#ffffff"
+   enable-background="new    "
+   width="3.3843901"
+   height="0.46342"
+   id="rect3" />
+<rect
+   x="0.46793997"
+   y="5.0980101"
+   opacity="0.4"
+   fill="#ffffff"
+   enable-background="new    "
+   width="3.3843901"
+   height="0.46342"
+   id="rect5" />
+<rect
+   x="3.85233"
+   y="2.0027161e-05"
+   opacity="0.11"
+   enable-background="new    "
+   width="0.46794"
+   height="5.99999"
+   id="rect7" />
+<rect
+   x="0"
+   y="0"
+   opacity="0.11"
+   enable-background="new    "
+   width="0.46794"
+   height="5.99999"
+   id="rect9" />
+<linearGradient
+   id="SVGID_1_"
+   gradientUnits="userSpaceOnUse"
+   x1="-983.01074"
+   y1="1002.4846"
+   x2="-983.01074"
+   y2="999.99487"
+   gradientTransform="matrix(-1,0,0,1,-980.8506,-998.20348)">
+	<stop
+   offset="0"
+   style="stop-color:#FDFDFF"
+   id="stop11" />
+	<stop
+   offset="1"
+   style="stop-color:#FCFEFF;stop-opacity:0"
+   id="stop13" />
+</linearGradient>
+<ellipse
+   opacity="0.38"
+   fill="url(#SVGID_1_)"
+   enable-background="new    "
+   cx="2.16013"
+   cy="3.0362601"
+   rx="0.85495001"
+   ry="1.24484"
+   id="ellipse16"
+   style="fill:url(#SVGID_1_)" />
+</svg>
