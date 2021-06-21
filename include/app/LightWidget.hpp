@@ -13,6 +13,7 @@ struct LightWidget : widget::TransparentWidget {
 	NVGcolor borderColor = nvgRGBA(0, 0, 0, 0);
 
 	void draw(const DrawArgs& args) override;
+	virtual void drawBackground(const DrawArgs& args);
 	virtual void drawLight(const DrawArgs& args);
 	virtual void drawHalo(const DrawArgs& args);
 };

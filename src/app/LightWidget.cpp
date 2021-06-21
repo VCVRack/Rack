@@ -8,6 +8,22 @@ namespace app {
 
 
 void LightWidget::draw(const DrawArgs& args) {
+	drawBackground(args);
+
+	// Child widgets
+	Widget::draw(args);
+
+	// Dynamic light and halo
+	// Override tint from rack brightness adjustment
+	nvgGlobalAlpha(args.vg, 1.0);
+	// Use the formula `lightColor * (1 - dest) + dest` for blending
+	nvgGlobalCompositeBlendFunc(args.vg, NVG_ONE_MINUS_DST_COLOR, NVG_ONE);
+	drawLight(args);
+	drawHalo(args);
+}
+
+
+void LightWidget::drawBackground(const DrawArgs& args) {
 	float radius = std::min(box.size.x, box.size.y) / 2.0;
 	nvgBeginPath(args.vg);
 	nvgCircle(args.vg, radius, radius, radius);
@@ -24,20 +40,8 @@ void LightWidget::draw(const DrawArgs& args) {
 		nvgStrokeColor(args.vg, borderColor);
 		nvgStroke(args.vg);
 	}
-
-	// Child widgets
-	// TODO Upload new graphics instead of use this hack.
-	// nvgGlobalAlpha(args.vg, 0.5);
-	TransparentWidget::draw(args);
-
-	// Dynamic light and halo
-	// Override tint from rack brightness adjustment
-	nvgGlobalAlpha(args.vg, 1.0);
-	// Use the formula `lightColor * (1 - dest) + dest` for blending
-	nvgGlobalCompositeBlendFunc(args.vg, NVG_ONE_MINUS_DST_COLOR, NVG_ONE);
-	drawLight(args);
-	drawHalo(args);
 }
+
 
 void LightWidget::drawLight(const DrawArgs& args) {
 	// Foreground
@@ -50,6 +54,7 @@ void LightWidget::drawLight(const DrawArgs& args) {
 		nvgFill(args.vg);
 	}
 }
+
 
 void LightWidget::drawHalo(const DrawArgs& args) {
 	// Don't draw halo if rendering in a framebuffer, e.g. screenshots or Module Browser

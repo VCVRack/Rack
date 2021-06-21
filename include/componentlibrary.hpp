@@ -53,7 +53,7 @@ Many of these classes use CRTP (https://en.wikipedia.org/wiki/Curiously_recurrin
 
 To use a red light with its default base class for example, use `RedLight` or `TRedLight<>`. (They are synonymous.)
 
-Use the `Base` template argument if you want a different base class.
+Use the `TBase` template argument if you want a different base class.
 E.g. `RectangleLight<RedLight>`
 
 Although this paradigm might seem confusing at first, it ends up being extremely simple in your plugin code and perfect for "decorating" your classes with appearance traits and behavioral properties.
@@ -62,8 +62,8 @@ For example, need a slider with a green LED? Just use
 	createLightParamCentered<LEDLightSlider<GreenLight>>(...)
 */
 
-template <typename Base = app::ModuleLightWidget>
-struct TSvgLight : Base {
+template <typename TBase = app::ModuleLightWidget>
+struct TSvgLight : TBase {
 	widget::FramebufferWidget* fb;
 	widget::SvgWidget* sw;
 
@@ -83,8 +83,8 @@ struct TSvgLight : Base {
 };
 typedef TSvgLight<> SvgLight;
 
-template <typename Base = app::ModuleLightWidget>
-struct TGrayModuleLightWidget : Base {
+template <typename TBase = app::ModuleLightWidget>
+struct TGrayModuleLightWidget : TBase {
 	TGrayModuleLightWidget() {
 		this->bgColor = nvgRGBA(0x33, 0x33, 0x33, 0xff);
 		this->borderColor = nvgRGBA(0, 0, 0, 53);
@@ -92,40 +92,40 @@ struct TGrayModuleLightWidget : Base {
 };
 typedef TGrayModuleLightWidget<> GrayModuleLightWidget;
 
-template <typename Base = GrayModuleLightWidget>
-struct TRedLight : Base {
+template <typename TBase = GrayModuleLightWidget>
+struct TRedLight : TBase {
 	TRedLight() {
 		this->addBaseColor(SCHEME_RED);
 	}
 };
 typedef TRedLight<> RedLight;
 
-template <typename Base = GrayModuleLightWidget>
-struct TGreenLight : Base {
+template <typename TBase = GrayModuleLightWidget>
+struct TGreenLight : TBase {
 	TGreenLight() {
 		this->addBaseColor(SCHEME_GREEN);
 	}
 };
 typedef TGreenLight<> GreenLight;
 
-template <typename Base = GrayModuleLightWidget>
-struct TYellowLight : Base {
+template <typename TBase = GrayModuleLightWidget>
+struct TYellowLight : TBase {
 	TYellowLight() {
 		this->addBaseColor(SCHEME_YELLOW);
 	}
 };
 typedef TYellowLight<> YellowLight;
 
-template <typename Base = GrayModuleLightWidget>
-struct TBlueLight : Base {
+template <typename TBase = GrayModuleLightWidget>
+struct TBlueLight : TBase {
 	TBlueLight() {
 		this->addBaseColor(SCHEME_BLUE);
 	}
 };
 typedef TBlueLight<> BlueLight;
 
-template <typename Base = GrayModuleLightWidget>
-struct TWhiteLight : Base {
+template <typename TBase = GrayModuleLightWidget>
+struct TWhiteLight : TBase {
 	TWhiteLight() {
 		this->addBaseColor(SCHEME_WHITE);
 	}
@@ -133,8 +133,8 @@ struct TWhiteLight : Base {
 typedef TWhiteLight<> WhiteLight;
 
 /** Reads two adjacent lightIds, so `lightId` and `lightId + 1` must be defined */
-template <typename Base = GrayModuleLightWidget>
-struct TGreenRedLight : Base {
+template <typename TBase = GrayModuleLightWidget>
+struct TGreenRedLight : TBase {
 	TGreenRedLight() {
 		this->addBaseColor(SCHEME_GREEN);
 		this->addBaseColor(SCHEME_RED);
@@ -142,8 +142,8 @@ struct TGreenRedLight : Base {
 };
 typedef TGreenRedLight<> GreenRedLight;
 
-template <typename Base = GrayModuleLightWidget>
-struct TRedGreenBlueLight : Base {
+template <typename TBase = GrayModuleLightWidget>
+struct TRedGreenBlueLight : TBase {
 	TRedGreenBlueLight() {
 		this->addBaseColor(SCHEME_RED);
 		this->addBaseColor(SCHEME_GREEN);
@@ -153,52 +153,48 @@ struct TRedGreenBlueLight : Base {
 typedef TRedGreenBlueLight<> RedGreenBlueLight;
 
 /** Based on the size of 5mm LEDs */
-template <typename Base>
-struct LargeLight : TSvgLight<Base> {
+template <typename TBase>
+struct LargeLight : TSvgLight<TBase> {
 	LargeLight() {
 		this->setSvg(Svg::load(asset::system("res/ComponentLibrary/LargeLight.svg")));
 	}
 };
 
 /** Based on the size of 3mm LEDs */
-template <typename Base>
-struct MediumLight : TSvgLight<Base> {
+template <typename TBase>
+struct MediumLight : TSvgLight<TBase> {
 	MediumLight() {
 		this->setSvg(Svg::load(asset::system("res/ComponentLibrary/MediumLight.svg")));
 	}
 };
 
 /** Based on the size of 2mm LEDs */
-template <typename Base>
-struct SmallLight : TSvgLight<Base> {
+template <typename TBase>
+struct SmallLight : TSvgLight<TBase> {
 	SmallLight() {
 		this->setSvg(Svg::load(asset::system("res/ComponentLibrary/SmallLight.svg")));
 	}
 };
 
 /** Based on the size of 1mm LEDs */
-template <typename Base>
-struct TinyLight : TSvgLight<Base> {
+template <typename TBase>
+struct TinyLight : TSvgLight<TBase> {
 	TinyLight() {
 		this->setSvg(Svg::load(asset::system("res/ComponentLibrary/TinyLight.svg")));
 	}
 };
 
-template <typename Base>
-struct RectangleLight : Base {
-	void drawLight(const widget::Widget::DrawArgs& args) override {
+template <typename TBase>
+struct RectangleLight : TBase {
+	void drawBackground(const widget::Widget::DrawArgs& args) override {
+		// Derived from LightWidget::drawBackground()
+
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
 
 		// Background
 		if (this->bgColor.a > 0.0) {
 			nvgFillColor(args.vg, this->bgColor);
-			nvgFill(args.vg);
-		}
-
-		// Foreground
-		if (this->color.a > 0.0) {
-			nvgFillColor(args.vg, this->color);
 			nvgFill(args.vg);
 		}
 
@@ -209,11 +205,24 @@ struct RectangleLight : Base {
 			nvgStroke(args.vg);
 		}
 	}
+
+	void drawLight(const widget::Widget::DrawArgs& args) override {
+		// Derived from LightWidget::drawLight()
+
+		// Foreground
+		if (this->color.a > 0.0) {
+			nvgBeginPath(args.vg);
+			nvgRect(args.vg, 0, 0, this->box.size.x, this->box.size.y);
+
+			nvgFillColor(args.vg, this->color);
+			nvgFill(args.vg);
+		}
+	}
 };
 
 /** A light for displaying on top of PB61303. Must add a color by subclassing or templating. */
-template <typename Base>
-struct LEDBezelLight : Base {
+template <typename TBase>
+struct LEDBezelLight : TBase {
 	LEDBezelLight() {
 		this->borderColor = color::BLACK_TRANSPARENT;
 		this->bgColor = color::BLACK_TRANSPARENT;
@@ -224,8 +233,8 @@ struct LEDBezelLight : Base {
 /** A light to displayed over PB61303. Must add a color by subclassing or templating.
 Don't add this as a child of the PB61303 itself. Instead, just place it over it as a sibling in the scene graph, offset by mm2px(math::Vec(0.5, 0.5)).
 */
-template <typename Base>
-struct PB61303Light : Base {
+template <typename TBase>
+struct PB61303Light : TBase {
 	PB61303Light() {
 		this->bgColor = color::BLACK_TRANSPARENT;
 		this->box.size = mm2px(math::Vec(9.0, 9.0));
@@ -633,43 +642,52 @@ struct BefacoSlidePot : app::SvgSlider {
 
 struct LEDSlider : app::SvgSlider {
 	LEDSlider() {
-		maxHandlePos = mm2px(math::Vec(0.738, 0.738).plus(math::Vec(2, 0)));
-		minHandlePos = mm2px(math::Vec(0.738, 22.078).plus(math::Vec(2, 0)));
+		// TODO Fix positions
+		setHandlePos(
+			mm2px(math::Vec(0.738, 22.078).plus(math::Vec(2, 0))),
+			mm2px(math::Vec(0.738, 0.738).plus(math::Vec(2, 0)))
+		);
 		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSlider.svg")));
+		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHandle.svg")));
 	}
 };
 
-/** API is unstable for LEDSlider. Will add a LightWidget later. */
+// TODO Modernize
 struct LEDSliderGreen : LEDSlider {
 	LEDSliderGreen() {
 		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderGreenHandle.svg")));
 	}
 };
 
+// TODO Modernize
 struct LEDSliderRed : LEDSlider {
 	LEDSliderRed() {
 		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderRedHandle.svg")));
 	}
 };
 
+// TODO Modernize
 struct LEDSliderYellow : LEDSlider {
 	LEDSliderYellow() {
 		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderYellowHandle.svg")));
 	}
 };
 
+// TODO Modernize
 struct LEDSliderBlue : LEDSlider {
 	LEDSliderBlue() {
 		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderBlueHandle.svg")));
 	}
 };
 
+// TODO Modernize
 struct LEDSliderWhite : LEDSlider {
 	LEDSliderWhite() {
 		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderWhiteHandle.svg")));
 	}
 };
 
+// TODO Modernize
 struct LEDSliderHorizontal : app::SvgSlider {
 	LEDSliderHorizontal() {
 		horizontal = true;
@@ -679,32 +697,37 @@ struct LEDSliderHorizontal : app::SvgSlider {
 	}
 };
 
-template <typename Base, typename TLightBase = RedLight>
-struct LightSlider : Base {
+template <typename TBase, typename TLightBase = RedLight>
+struct LightSlider : TBase {
 	app::ModuleLightWidget* light;
 
 	LightSlider() {
-		light = new RectangleLight<TLightBase>;
+		light = new TLightBase;
 		this->addChild(light);
 	}
 
 	void step() override {
-		Base::step();
+		TBase::step();
 		// Move center of light to center of handle
 		light->box.pos = this->handle->box.pos
-				 .plus(this->handle->box.size.div(2))
-				 .minus(light->box.size.div(2));
+			.plus(this->handle->box.size.div(2))
+			.minus(light->box.size.div(2));
+	}
+};
+
+template <typename TBase>
+struct LEDSliderLight : RectangleLight<TSvgLight<TBase>> {
+	LEDSliderLight() {
+		this->setSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderLight.svg")));
 	}
 };
 
 template <typename TLightBase = RedLight>
-struct LEDLightSlider : LightSlider<LEDSlider, TLightBase> {
-	LEDLightSlider() {
-		this->setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHandle.svg")));
-		this->light->box.size = mm2px(math::Vec(1.524, 3.276));
-	}
+struct LEDLightSlider : LightSlider<LEDSlider, LEDSliderLight<TLightBase>> {
+	LEDLightSlider() {}
 };
 
+// TODO Modernize
 template <typename TLightBase = RedLight>
 struct LEDLightSliderHorizontal : LightSlider<LEDSliderHorizontal, TLightBase> {
 	LEDLightSliderHorizontal() {

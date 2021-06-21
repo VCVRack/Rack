@@ -54,12 +54,16 @@ ModuleLightWidget::~ModuleLightWidget() {
 engine::Light* ModuleLightWidget::getLight(int colorId) {
 	if (!module)
 		return NULL;
+	if (firstLightId < 0)
+		return NULL;
 	return &module->lights[firstLightId + colorId];
 }
 
 
 engine::LightInfo* ModuleLightWidget::getLightInfo() {
 	if (!module)
+		return NULL;
+	if (firstLightId < 0)
 		return NULL;
 	return module->lightInfos[firstLightId];
 }
@@ -92,8 +96,8 @@ void ModuleLightWidget::destroyTooltip() {
 void ModuleLightWidget::step() {
 	std::vector<float> brightnesses(baseColors.size());
 
-	if (module) {
-		assert(module->lights.size() >= firstLightId + baseColors.size());
+	if (module && firstLightId >= 0) {
+		assert((int) module->lights.size() >= firstLightId + (int) baseColors.size());
 
 		for (size_t i = 0; i < baseColors.size(); i++) {
 			float b = module->lights[firstLightId + i].getBrightness();
