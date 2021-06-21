@@ -185,9 +185,11 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	math::Vec offsetI = offset.floor();
 	internal->offsetF = offset.minus(offsetI);
 
-	if (dirtyOnSubpixelChange && !(math::isNear(internal->offsetF.x, internal->fbOffsetF.x, 0.01f) && math::isNear(internal->offsetF.y, internal->fbOffsetF.y, 0.01f))) {
-		// If drawing to a new subpixel location, rerender in the next frame.
-		// DEBUG("%p dirty subpixel", this);
+	// If drawing to a new subpixel location, rerender in the next frame.
+	// Anything less than 0.1 pixels isn't noticeable.
+	math::Vec offsetFDelta = internal->offsetF.minus(internal->fbOffsetF);
+	if (dirtyOnSubpixelChange && offsetFDelta.square() >= std::pow(0.1f, 2)) {
+		// DEBUG("%p dirty subpixel (%f, %f) (%f, %f)", this, VEC_ARGS(internal->offsetF), VEC_ARGS(internal->fbOffsetF));
 		setDirty();
 	}
 	if (!internal->scale.equals(internal->fbScale)) {
@@ -247,6 +249,7 @@ void FramebufferWidget::drawFramebuffer() {
 	nvgTranslate(vg, internal->fbOffsetF.x, internal->fbOffsetF.y);
 	nvgScale(vg, internal->fbScale.x, internal->fbScale.y);
 
+	// Draw children
 	DrawArgs args;
 	args.vg = vg;
 	args.clipBox = box.zeroPos();

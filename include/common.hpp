@@ -30,7 +30,7 @@ E.g.
 #endif
 
 /** Attribute for private functions and symbols not intended to be used by plugins.
-By default this does nothing, but when #including rack.hpp, it prints a compile-time warning.
+When #including rack.hpp, using an INTERNAL function prints a compile-time warning and will not link.
 */
 #if defined ARCH_WIN
 	#define INTERNAL
