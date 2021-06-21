@@ -1,81 +1,44 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="17.999601"
-   height="18"
-   viewBox="0 0 4.7623944 4.7624998"
-   version="1.1"
-   id="svg7595"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
-   sodipodi:docname="LEDButton.svg">
-  <defs
-     id="defs7589">
-    <clipPath
-       id="clip444">
-      <path
-         d="m 1201.582,338.19922 h 18 v 18 h -18 z m 0,0"
-         id="path24586"
-         inkscape:connector-curvature="0" />
-    </clipPath>
-  </defs>
-  <sodipodi:namedview
-     id="base"
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1.0"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="7.9195959"
-     inkscape:cx="-43.394453"
-     inkscape:cy="0.82092183"
-     inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
-     showgrid="false"
-     fit-margin-top="0"
-     fit-margin-left="0"
-     fit-margin-right="0"
-     fit-margin-bottom="0"
-     inkscape:window-width="2560"
-     inkscape:window-height="1422"
-     inkscape:window-x="0"
-     inkscape:window-y="18"
-     inkscape:window-maximized="0"
-     units="px" />
-  <metadata
-     id="metadata7592">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1"
-     transform="translate(-46.755712,-67.833036)">
-    <g
-       transform="matrix(0.26458333,0,0,0.26458333,-271.16296,-21.64884)"
-       clip-path="url(#clip444)"
-       id="g31387"
-       style="clip-rule:nonzero">
-      <path
-         style="fill:#2b2b2b;fill-opacity:1;fill-rule:nonzero;stroke:none"
-         d="m 1202.125,344.12109 c -1.6953,4.66797 0.7148,9.83594 5.3789,11.53516 4.6719,1.69531 9.8359,-0.71094 11.5352,-5.37891 1.6992,-4.67187 -0.7071,-9.83203 -5.3789,-11.53515 -4.668,-1.69532 -9.8282,0.70703 -11.5352,5.3789"
-         id="path31385"
-         inkscape:connector-curvature="0" />
-    </g>
-  </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 25.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.0"
+	 id="svg7595" sodipodi:docname="LEDButton.svg" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="17.9996px" height="18px"
+	 viewBox="0 0 17.9996 18" enable-background="new 0 0 17.9996 18" xml:space="preserve">
+<sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="0" fit-margin-left="0" fit-margin-right="0" fit-margin-top="0" id="base" inkscape:current-layer="layer1" inkscape:cx="-43.394453" inkscape:cy="0.82092183" inkscape:document-units="mm" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="1422" inkscape:window-maximized="0" inkscape:window-width="2560" inkscape:window-x="0" inkscape:window-y="18" inkscape:zoom="7.9195959" pagecolor="#ffffff" showgrid="false" units="px">
+	</sodipodi:namedview>
+<g id="layer1" transform="translate(-46.755712,-67.833036)" inkscape:groupmode="layer" inkscape:label="Layer 1">
+	<g>
+		<defs>
+			<rect id="SVGID_1_" x="46.75532" y="67.83302" width="18" height="18"/>
+		</defs>
+		<clipPath id="SVGID_2_">
+			<use xlink:href="#SVGID_1_"  overflow="visible"/>
+		</clipPath>
+	</g>
+</g>
+<g id="g5959-5_67_" transform="translate(301.93513,1189.951)">
+	<path id="path5961-3_67_" inkscape:connector-curvature="0" d="M-283.93512-1180.95044c0,4.97021-4.03055,8.99939-9.00067,8.99939
+		c-4.96945,0-8.99933-4.02917-8.99933-8.99939c0-4.97217,4.02988-9.00061,8.99933-9.00061
+		C-287.96567-1189.95105-283.93512-1185.92261-283.93512-1180.95044"/>
+</g>
+<g id="g5959-5_66_" transform="translate(301.93513,1189.951)">
+	
+		<linearGradient id="path5961-3_1_" gradientUnits="userSpaceOnUse" x1="-590.61273" y1="-2201.38525" x2="-574.11816" y2="-2201.38525" gradientTransform="matrix(-3.267949e-07 1 -1 -3.267949e-07 -2494.32056 -598.5863)">
+		<stop  offset="0" style="stop-color:#807C7E"/>
+		<stop  offset="1" style="stop-color:#0A0A0A"/>
+	</linearGradient>
+	<path id="path5961-3_66_" inkscape:connector-curvature="0" fill="url(#path5961-3_1_)" d="M-301.1824-1180.95166
+		c0-4.55444,3.69345-8.2467,8.24789-8.2467c4.55383,0,8.24667,3.69226,8.24667,8.2467c0,4.55627-3.69284,8.24792-8.24667,8.24792
+		C-297.48895-1172.70374-301.1824-1176.39539-301.1824-1180.95166"/>
+</g>
+<g id="g5959-5_65_" transform="translate(301.93513,1189.951)">
+	
+		<linearGradient id="path5961-3_2_" gradientUnits="userSpaceOnUse" x1="844.57037" y1="-5065.53271" x2="859.31799" y2="-5065.53271" gradientTransform="matrix(6.123234e-17 1 -1 6.123234e-17 -5358.46777 -2032.89526)">
+		<stop  offset="0.00559" style="stop-color:#4A4747"/>
+		<stop  offset="1" style="stop-color:#1F1F1F"/>
+	</linearGradient>
+	<path id="path5961-3_65_" inkscape:connector-curvature="0" fill="url(#path5961-3_2_)" d="M-292.93457-1188.32483
+		c4.07211,0,7.37326,3.30225,7.37326,7.37427c0,4.07153-3.30115,7.37329-7.37326,7.37329
+		c-4.07376,0-7.37436-3.30176-7.37436-7.37329C-300.30893-1185.02258-297.00833-1188.32483-292.93457-1188.32483"/>
+</g>
 </svg>
