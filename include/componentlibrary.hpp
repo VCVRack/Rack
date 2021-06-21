@@ -215,8 +215,9 @@ struct RectangleLight : Base {
 template <typename Base>
 struct LEDBezelLight : Base {
 	LEDBezelLight() {
+		this->borderColor = color::BLACK_TRANSPARENT;
 		this->bgColor = color::BLACK_TRANSPARENT;
-		this->box.size = mm2px(math::Vec(6.0, 6.0));
+		this->box.size = math::Vec(17.545, 17.545);
 	}
 };
 
@@ -687,11 +688,6 @@ struct LightSlider : Base {
 		this->addChild(light);
 	}
 
-	void setFirstLightId(int firstLightId) {
-		light->module = this->module;
-		light->firstLightId = firstLightId;
-	}
-
 	void step() override {
 		Base::step();
 		// Move center of light to center of handle
@@ -837,11 +833,6 @@ struct LEDLightBezel : LEDBezel {
 		// Move center of light to center of box
 		light->box.pos = box.size.div(2).minus(light->box.size.div(2));
 		addChild(light);
-	}
-
-	void setFirstLightId(int firstLightId) {
-		light->module = this->module;
-		light->firstLightId = firstLightId;
 	}
 };
 

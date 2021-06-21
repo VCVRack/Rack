@@ -144,11 +144,14 @@ TModuleLightWidget* createLightCentered(math::Vec pos, engine::Module* module, i
 }
 
 
-/** Creates a param with a light and calls setFirstLightId() on it. */
+/** Creates a param with a light and calls setFirstLightId() on it.
+Requires ParamWidget to have a `light` member.
+*/
 template <class TParamWidget>
 TParamWidget* createLightParam(math::Vec pos, engine::Module* module, int paramId, int firstLightId) {
 	TParamWidget* o = createParam<TParamWidget>(pos, module, paramId);
-	o->setFirstLightId(firstLightId);
+	o->light->module = module;
+	o->light->firstLightId = firstLightId;
 	return o;
 }
 
