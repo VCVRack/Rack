@@ -1,6 +1,6 @@
 [submodule "dep/nanovg"]
 	path = dep/nanovg
-	url = https://github.com/memononen/nanovg.git
+	url = https://github.com/VCVRack/nanovg.git
 	ignore = untracked
 [submodule "dep/nanosvg"]
 	path = dep/nanosvg
