@@ -89,38 +89,37 @@ void ScrollWidget::step() {
 
 
 void ScrollWidget::onButton(const ButtonEvent& e) {
-	OpaqueWidget::onButton(e);
+	math::Rect offsetBound = getContainerOffsetBound();
+	// Handle Alt-click before children, since most widgets consume Alt-click without needing to.
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.mods == GLFW_MOD_ALT) {
+		// Check if scrollable
+		if (offsetBound.size.x > 0.f || offsetBound.size.y > 0.f) {
+			e.consume(this);
+			return;
+		}
+	}
+
+	Widget::onButton(e);
 	if (e.isConsumed())
 		return;
 
 	// Check if scrollable
-	math::Rect offsetBound = getContainerOffsetBound();
-	if (offsetBound.size.x <= 0.f && offsetBound.size.y <= 0.f)
-		return;
-
-	if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
-		e.consume(this);
+	if (offsetBound.size.x > 0.f || offsetBound.size.y > 0.f) {
+		if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
+			e.consume(this);
+		}
 	}
 }
 
 
 void ScrollWidget::onDragStart(const DragStartEvent& e) {
-	// Check if scrollable
-	math::Rect offsetBound = getContainerOffsetBound();
-	if (offsetBound.size.x <= 0.f && offsetBound.size.y <= 0.f)
-		return;
-
-	if (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
-		e.consume(this);
-	}
+	e.consume(this);
 }
 
 
 void ScrollWidget::onDragMove(const DragMoveEvent& e) {
-	if (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
-		math::Vec offsetDelta = e.mouseDelta.div(getAbsoluteZoom());
-		offset = offset.minus(offsetDelta);
-	}
+	math::Vec offsetDelta = e.mouseDelta.div(getAbsoluteZoom());
+	offset = offset.minus(offsetDelta);
 }
 
 
