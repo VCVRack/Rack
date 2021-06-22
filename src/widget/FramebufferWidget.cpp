@@ -188,7 +188,7 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	// If drawing to a new subpixel location, rerender in the next frame.
 	// Anything less than 0.1 pixels isn't noticeable.
 	math::Vec offsetFDelta = internal->offsetF.minus(internal->fbOffsetF);
-	if (dirtyOnSubpixelChange && offsetFDelta.square() >= std::pow(0.1f, 2)) {
+	if (offsetFDelta.square() >= std::pow(0.1f, 2) && dirtyOnSubpixelChange && APP->window->fbDirtyOnSubpixelChange()) {
 		// DEBUG("%p dirty subpixel (%f, %f) (%f, %f)", this, VEC_ARGS(internal->offsetF), VEC_ARGS(internal->fbOffsetF));
 		setDirty();
 	}

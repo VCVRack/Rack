@@ -681,6 +681,9 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 
 void ModuleWidget::onDragStart(const DragStartEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		// HACK Disable FramebufferWidget redrawing subpixels while dragging
+		APP->window->fbDirtyOnSubpixelChange() = false;
+
 		// Clear dragRack so dragging in not enabled until mouse is moved a bit.
 		internal->dragRackPos = math::Vec(NAN, NAN);
 
@@ -691,6 +694,8 @@ void ModuleWidget::onDragStart(const DragStartEvent& e) {
 
 void ModuleWidget::onDragEnd(const DragEndEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		APP->window->fbDirtyOnSubpixelChange() = true;
+
 		// The next time the module is dragged, it should always move immediately
 		internal->dragEnabled = true;
 

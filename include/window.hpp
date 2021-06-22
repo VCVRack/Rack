@@ -92,6 +92,8 @@ struct Window {
 	DEPRECATED std::shared_ptr<Svg> loadSvg(const std::string& filename) {
 		return Svg::load(filename);
 	}
+
+	INTERNAL bool& fbDirtyOnSubpixelChange();
 };
 
 

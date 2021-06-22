@@ -88,6 +88,8 @@ struct Window::Internal {
 
 	std::map<std::string, std::shared_ptr<Font>> fontCache;
 	std::map<std::string, std::shared_ptr<Image>> imageCache;
+
+	bool fbDirtyOnSubpixelChange = true;
 };
 
 
@@ -676,6 +678,11 @@ std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
 	}
 	internal->imageCache[filename] = image;
 	return image;
+}
+
+
+bool& Window::fbDirtyOnSubpixelChange() {
+	return internal->fbDirtyOnSubpixelChange;
 }
 
 
