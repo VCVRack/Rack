@@ -90,25 +90,21 @@ void ScrollWidget::step() {
 
 void ScrollWidget::onButton(const ButtonEvent& e) {
 	math::Rect offsetBound = getContainerOffsetBound();
-	// Handle Alt-click before children, since most widgets consume Alt-click without needing to.
-	if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.mods == GLFW_MOD_ALT) {
-		// Check if scrollable
-		if (offsetBound.size.x > 0.f || offsetBound.size.y > 0.f) {
+	// Check if scrollable
+	if (offsetBound.size.x > 0.f || offsetBound.size.y > 0.f) {
+		// Handle Alt-click before children, since most widgets consume Alt-click without needing to.
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.mods == GLFW_MOD_ALT) {
+			e.consume(this);
+			return;
+		}
+		// Might as well handle middle click before children as well.
+		if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
 			e.consume(this);
 			return;
 		}
 	}
 
 	Widget::onButton(e);
-	if (e.isConsumed())
-		return;
-
-	// Check if scrollable
-	if (offsetBound.size.x > 0.f || offsetBound.size.y > 0.f) {
-		if (e.button == GLFW_MOUSE_BUTTON_MIDDLE) {
-			e.consume(this);
-		}
-	}
 }
 
 
