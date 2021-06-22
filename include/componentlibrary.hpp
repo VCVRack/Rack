@@ -642,13 +642,12 @@ struct BefacoSlidePot : app::SvgSlider {
 
 struct LEDSlider : app::SvgSlider {
 	LEDSlider() {
-		// TODO Fix positions
-		setHandlePos(
-			mm2px(math::Vec(0.738, 22.078).plus(math::Vec(2, 0))),
-			mm2px(math::Vec(0.738, 0.738).plus(math::Vec(2, 0)))
-		);
 		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSlider.svg")));
 		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHandle.svg")));
+		setHandlePosCentered(
+			math::Vec(19.84260/2, 76.53517 - 11.74218/2),
+			math::Vec(19.84260/2, 0.0 + 11.74218/2)
+		);
 	}
 };
 
