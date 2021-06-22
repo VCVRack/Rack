@@ -653,41 +653,6 @@ struct LEDSlider : app::SvgSlider {
 };
 
 // TODO Modernize
-struct LEDSliderGreen : LEDSlider {
-	LEDSliderGreen() {
-		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderGreenHandle.svg")));
-	}
-};
-
-// TODO Modernize
-struct LEDSliderRed : LEDSlider {
-	LEDSliderRed() {
-		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderRedHandle.svg")));
-	}
-};
-
-// TODO Modernize
-struct LEDSliderYellow : LEDSlider {
-	LEDSliderYellow() {
-		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderYellowHandle.svg")));
-	}
-};
-
-// TODO Modernize
-struct LEDSliderBlue : LEDSlider {
-	LEDSliderBlue() {
-		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderBlueHandle.svg")));
-	}
-};
-
-// TODO Modernize
-struct LEDSliderWhite : LEDSlider {
-	LEDSliderWhite() {
-		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderWhiteHandle.svg")));
-	}
-};
-
-// TODO Modernize
 struct LEDSliderHorizontal : app::SvgSlider {
 	LEDSliderHorizontal() {
 		horizontal = true;
@@ -726,6 +691,13 @@ template <typename TLightBase = RedLight>
 struct LEDLightSlider : LightSlider<LEDSlider, LEDSliderLight<TLightBase>> {
 	LEDLightSlider() {}
 };
+
+/** Deprecated. Use LEDSliderLight with your preferred LightWidget. */
+struct LEDSliderGreen : LEDLightSlider<GreenLight> {};
+struct LEDSliderRed : LEDLightSlider<RedLight> {};
+struct LEDSliderYellow : LEDLightSlider<YellowLight> {};
+struct LEDSliderBlue : LEDLightSlider<BlueLight> {};
+struct LEDSliderWhite : LEDLightSlider<WhiteLight> {};
 
 // TODO Modernize
 template <typename TLightBase = RedLight>
