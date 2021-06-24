@@ -262,12 +262,9 @@ typename C::mapped_type get(const C& m, const typename C::key_type& key, const t
 extern const std::string APP_NAME;
 extern const std::string APP_VARIANT;
 extern const std::string APP_VERSION;
+extern const std::string APP_VERSION_MAJOR;
 extern const std::string APP_ARCH;
-
-extern const std::string ABI_VERSION;
-
 extern const std::string API_URL;
-extern const std::string API_VERSION;
 
 
 } // namespace rack

@@ -217,7 +217,7 @@ void init() {
 		pluginsPath = asset::user("plugins");
 	}
 	else {
-		pluginsPath = asset::user("plugins-v" + ABI_VERSION);
+		pluginsPath = asset::user("plugins-v" + APP_VERSION_MAJOR);
 	}
 
 	// Get user plugins directory

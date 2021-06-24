@@ -28,8 +28,8 @@ PatchManager::PatchManager() {
 		templatePath = asset::user("template.vcv");
 	}
 	else {
-		autosavePath = asset::user("autosave-v" + ABI_VERSION);
-		templatePath = asset::user("template-v" + ABI_VERSION + ".vcv");
+		autosavePath = asset::user("autosave-v" + APP_VERSION_MAJOR);
+		templatePath = asset::user("template-v" + APP_VERSION_MAJOR + ".vcv");
 	}
 	factoryTemplatePath = asset::system("template.vcv");
 }

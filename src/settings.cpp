@@ -70,7 +70,7 @@ void init() {
 		settingsPath = asset::user("settings.json");
 	}
 	else {
-		settingsPath = asset::user("settings-v" + ABI_VERSION + ".json");
+		settingsPath = asset::user("settings-v" + APP_VERSION_MAJOR + ".json");
 	}
 }
 

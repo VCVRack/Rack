@@ -176,7 +176,7 @@ void checkUpdates() {
 	// Get library manifests
 	std::string manifestsUrl = API_URL + "/library/manifests";
 	json_t* manifestsReq = json_object();
-	json_object_set(manifestsReq, "version", json_string(API_VERSION.c_str()));
+	json_object_set(manifestsReq, "version", json_string(APP_VERSION_MAJOR.c_str()));
 	json_t* manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, manifestsReq);
 	json_decref(manifestsReq);
 	if (!manifestsResJ) {
@@ -216,22 +216,23 @@ void checkUpdates() {
 		// Get version
 		json_t* versionJ = json_object_get(manifestJ, "version");
 		if (!versionJ) {
-			WARN("Plugin %s has no version in manifest", slug.c_str());
+			// WARN("Plugin %s has no version in manifest", slug.c_str());
 			continue;
 		}
 		update.version = json_string_value(versionJ);
+		// Reject plugins with ABI mismatch
+		if (!string::startsWith(update.version, APP_VERSION_MAJOR + ".")) {
+			continue;
+		}
 
 		// Check if update is needed
 		plugin::Plugin* p = plugin::getPlugin(slug);
 		if (p && p->version == update.version)
 			continue;
 
-		// Require that "status" is "available"
-		json_t* statusJ = json_object_get(manifestJ, "status");
-		if (!statusJ)
-			continue;
-		std::string status = json_string_value(statusJ);
-		if (status != "available")
+		// Require that plugin is available
+		json_t* availableJ = json_object_get(manifestJ, "available");
+		if (!json_boolean_value(availableJ))
 			continue;
 
 		// Get changelog URL

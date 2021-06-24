@@ -18,6 +18,7 @@ namespace rack {
 const std::string APP_NAME = "VCV Rack";
 const std::string APP_VARIANT = "Community Edition";
 const std::string APP_VERSION = TOSTRING(VERSION);
+const std::string APP_VERSION_MAJOR = "2";
 #if defined ARCH_WIN
 	const std::string APP_ARCH = "win";
 #elif ARCH_MAC
@@ -26,10 +27,7 @@ const std::string APP_VERSION = TOSTRING(VERSION);
 	const std::string APP_ARCH = "lin";
 #endif
 
-const std::string ABI_VERSION = "2";
-
 const std::string API_URL = "https://api.vcvrack.com";
-const std::string API_VERSION = "2";
 
 
 Exception::Exception(const char* format, ...) {

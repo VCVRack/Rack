@@ -27,7 +27,7 @@ void init();
 /** Requests a JSON API URL over HTTP(S), using the data as the query (GET) or the body (POST, etc)
 Caller must json_decref() if return value is non-NULL.
 */
-json_t* requestJson(Method method, const std::string& url, json_t* dataJ, const CookieMap& cookies = {});
+json_t* requestJson(Method method, const std::string& url, json_t* dataJ = NULL, const CookieMap& cookies = {});
 /** Returns true if downloaded successfully */
 bool requestDownload(const std::string& url, const std::string& filename, float* progress, const CookieMap& cookies = {});
 /** URL-encodes `s` */
