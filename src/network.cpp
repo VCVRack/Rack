@@ -127,7 +127,7 @@ json_t* requestJson(Method method, const std::string& url, json_t* dataJ, const 
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &resText);
 
 	// Perform request
-	INFO("Requesting JSON: %s %s", methodNames[method].c_str(), urlS.c_str());
+	INFO("Requesting JSON %s %s", methodNames[method].c_str(), urlS.c_str());
 	CURLcode res = curl_easy_perform(curl);
 
 	// Cleanup
@@ -137,7 +137,7 @@ json_t* requestJson(Method method, const std::string& url, json_t* dataJ, const 
 	curl_slist_free_all(headers);
 
 	if (res != CURLE_OK) {
-		WARN("libcurl error: %s", curl_easy_strerror(res));
+		WARN("Could not request %s: %s", urlS.c_str(), curl_easy_strerror(res));
 		return NULL;
 	}
 
@@ -181,16 +181,19 @@ bool requestDownload(const std::string& url, const std::string& filename, float*
 		curl_easy_setopt(curl, CURLOPT_COOKIE, getCookieString(cookies).c_str());
 	}
 
-	INFO("Requesting download: %s", url.c_str());
+	INFO("Requesting download %s", url.c_str());
 	CURLcode res = curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 
 	std::fclose(file);
 
-	if (res != CURLE_OK)
+	if (res != CURLE_OK) {
 		system::remove(filename);
+		WARN("Could not download %s: %s", url.c_str(), curl_easy_strerror(res));
+		return false;
+	}
 
-	return res == CURLE_OK;
+	return true;
 }
 
 
