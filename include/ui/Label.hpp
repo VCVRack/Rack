@@ -16,6 +16,7 @@ struct Label : widget::Widget {
 
 	std::string text;
 	float fontSize;
+	float lineHeight;
 	NVGcolor color;
 	Alignment alignment = LEFT_ALIGNMENT;
 

@@ -8,6 +8,7 @@ namespace ui {
 Label::Label() {
 	box.size.y = BND_WIDGET_HEIGHT;
 	fontSize = 13;
+	lineHeight = 1.2;
 	color = bndGetTheme()->regularTheme.textColor;
 }
 
@@ -28,6 +29,7 @@ void Label::draw(const DrawArgs& args) {
 		} break;
 	}
 
+	nvgTextLineHeight(args.vg, lineHeight);
 	bndIconLabelValue(args.vg, x, 0.0, box.size.x, box.size.y, -1, color, BND_LEFT, fontSize, text.c_str(), NULL);
 }
 

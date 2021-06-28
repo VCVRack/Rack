@@ -385,8 +385,9 @@ void Window::step() {
 	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
 	internal->lastFrameTime = frameTime;
 
-	// Make event handlers and step() have a clean nanovg context
+	// Make event handlers and step() have a clean NanoVG context
 	nvgReset(vg);
+
 	bndSetFont(uiFont->handle);
 
 	// Poll events
