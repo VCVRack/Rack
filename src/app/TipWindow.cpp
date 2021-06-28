@@ -43,7 +43,7 @@ static std::vector<TipInfo> tipInfos = {
 	{"You can search over 2400 modules on the VCV Library website.\n\nRegister for a VCV account, log into Rack using the Library menu, and browse the VCV Library to add or purchase modules. Keep all plugins up to date by clicking “Library > Update all”.", "VCV Library", "https://library.vcvrack.com/"}, // reviewed
 	{"Some developers of free plugins accept donations for their work. Right-click a module panel and select “Info > Donate”.\n\nYou can support VCV Rack by purchasing VCV plugins.", "VCV Library", "https://library.vcvrack.com/"}, // reviewed
 	{"You can learn more about VCV Rack by browsing the official Rack manual.", "VCV Rack manual", "https://vcvrack.com/manual/"},
-	{"Follow VCV Rack on Twitter for new modules, product announcements, and development news.", "Twitter @vcvrack", "https://twitter.com/vcvrack"}, // reviewed
+	{"Follow VCV Rack on Twitter for new module announcements, development news, and featured patches.", "Twitter @vcvrack", "https://twitter.com/vcvrack"}, // reviewed
 	{"Did you know that patch cables in Rack can carry up to 16 signals? You can use this feature to build polyphonic patches with modules having the “Polyphonic” tag. Cables carrying more than 1 signal appear thicker than normal cables. To try out polyphony, add the VCV MIDI-CV module to your patch, right-click its panel, and select your desired number of polyphonic channels.", "Learn more about polyphony in VCV Rack", "https://vcvrack.com/manual/Polyphony"}, // reviewed
 	{"Know C++ programming and want to create your own modules for Rack? Developing Rack modules is a great way to learn digital signal processing and quickly test your ideas with an easy-to-learn platform.\n\nDownload the Rack SDK and follow the official tutorial to get started.", "Plugin Development Tutorial", "https://vcvrack.com/manual/PluginDevelopmentTutorial"}, // reviewed
 	{"Wondering how to use a particular module? Right-click its panel and choose “Info > User manual”.\n\nYou can also open the module's Info menu to view the module's tags, website, VCV Library entry, and changelog.", "", ""}, // reviewed
@@ -58,7 +58,7 @@ struct TipWindow : widget::OpaqueWidget {
 
 	TipWindow() {
 		float margin = 10;
-		float buttonWidth = 80;
+		float buttonWidth = 90;
 		box.size.x = buttonWidth*5 + margin*6;
 
 		ui::Label* header = new ui::Label;
