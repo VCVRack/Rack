@@ -17,6 +17,19 @@ SvgButton::SvgButton() {
 	fb->addChild(sw);
 }
 
+
+void SvgButton::onButton(const ButtonEvent& e) {
+	OpaqueWidget::onButton(e);
+
+	// Accept left and right-click dragging.
+	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
+		ActionEvent eAction;
+		onAction(eAction);
+		e.consume(this);
+	}
+}
+
+
 void SvgButton::addFrame(std::shared_ptr<Svg> svg) {
 	frames.push_back(svg);
 	// If this is our first frame, automatically set SVG and size
@@ -30,6 +43,7 @@ void SvgButton::addFrame(std::shared_ptr<Svg> svg) {
 	}
 }
 
+
 void SvgButton::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
@@ -40,12 +54,14 @@ void SvgButton::onDragStart(const DragStartEvent& e) {
 	}
 }
 
+
 void SvgButton::onDragEnd(const DragEndEvent& e) {
 	if (frames.size() >= 1) {
 		sw->setSvg(frames[0]);
 		fb->dirty = true;
 	}
 }
+
 
 void SvgButton::onDragDrop(const DragDropEvent& e) {
 	if (e.origin == this) {

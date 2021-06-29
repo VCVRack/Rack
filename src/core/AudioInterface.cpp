@@ -544,6 +544,15 @@ struct AudioInterfaceWidget : ModuleWidget {
 			// Adjust deviceChoice position
 			audioWidget->deviceChoice->textOffset = Vec(6, 14);
 			addChild(audioWidget);
+
+			// AudioButton example
+			// AudioButton* audioButton_ADAT = createWidget<AudioButton_ADAT>(Vec(0, 0));
+			// audioButton_ADAT->setAudioPort(module ? &module->port : NULL);
+			// addChild(audioButton_ADAT);
+
+			// AudioButton* audioButton_USB_B = createWidget<AudioButton_USB_B>(Vec(0, 40));
+			// audioButton_USB_B->setAudioPort(module ? &module->port : NULL);
+			// addChild(audioButton_USB_B);
 		}
 	}
 
