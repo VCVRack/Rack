@@ -74,7 +74,13 @@ struct PlugLight : MultiLightWidget {
 };
 
 
+struct PortWidget::Internal {
+	ui::Tooltip* tooltip = NULL;
+};
+
+
 PortWidget::PortWidget() {
+	internal = new Internal;
 	plugLight = new PlugLight;
 }
 
@@ -86,6 +92,7 @@ PortWidget::~PortWidget() {
 	// HACK
 	if (module)
 		APP->scene->rack->clearCablesOnPort(this);
+	delete internal;
 }
 
 engine::Port* PortWidget::getPort() {
@@ -109,22 +116,22 @@ engine::PortInfo* PortWidget::getPortInfo() {
 void PortWidget::createTooltip() {
 	if (!settings::tooltips)
 		return;
-	if (this->tooltip)
+	if (internal->tooltip)
 		return;
 	if (!module)
 		return;
 	PortTooltip* tooltip = new PortTooltip;
 	tooltip->portWidget = this;
 	APP->scene->addChild(tooltip);
-	this->tooltip = tooltip;
+	internal->tooltip = tooltip;
 }
 
 void PortWidget::destroyTooltip() {
-	if (!tooltip)
+	if (!internal->tooltip)
 		return;
-	APP->scene->removeChild(tooltip);
-	delete tooltip;
-	tooltip = NULL;
+	APP->scene->removeChild(internal->tooltip);
+	delete internal->tooltip;
+	internal->tooltip = NULL;
 }
 
 void PortWidget::step() {

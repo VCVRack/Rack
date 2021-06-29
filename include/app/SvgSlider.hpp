@@ -22,9 +22,9 @@ struct SvgSlider : app::SliderKnob {
 	SvgSlider();
 	void setBackgroundSvg(std::shared_ptr<Svg> svg);
 	void setHandleSvg(std::shared_ptr<Svg> svg);
-	void onChange(const ChangeEvent& e) override;
 	void setHandlePos(math::Vec minHandlePos, math::Vec maxHandlePos);
 	void setHandlePosCentered(math::Vec minHandlePosCentered, math::Vec maxHandlePosCentered);
+	void onChange(const ChangeEvent& e) override;
 
 	DEPRECATED void setBackgroundSVG(std::shared_ptr<Svg> svg) {
 		setBackgroundSvg(svg);

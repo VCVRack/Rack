@@ -152,28 +152,44 @@ engine::ParamQuantity* ParamWidget::getParamQuantity() {
 	return module->paramQuantities[paramId];
 }
 
-ParamWidget::ParamWidget() {}
-ParamWidget::~ParamWidget() {}
+
+struct ParamWidget::Internal {
+	ui::Tooltip* tooltip = NULL;
+	/** For triggering the Change event. `*/
+	float lastValue = NAN;
+};
+
+
+ParamWidget::ParamWidget() {
+	internal = new Internal;
+}
+
+
+ParamWidget::~ParamWidget() {
+	delete internal;
+}
+
 
 void ParamWidget::createTooltip() {
 	if (!settings::tooltips)
 		return;
-	if (this->tooltip)
+	if (internal->tooltip)
 		return;
 	if (!module)
 		return;
 	ParamTooltip* tooltip = new ParamTooltip;
 	tooltip->paramWidget = this;
 	APP->scene->addChild(tooltip);
-	this->tooltip = tooltip;
+	internal->tooltip = tooltip;
 }
 
+
 void ParamWidget::destroyTooltip() {
-	if (!tooltip)
+	if (!internal->tooltip)
 		return;
-	APP->scene->removeChild(tooltip);
-	delete tooltip;
-	tooltip = NULL;
+	APP->scene->removeChild(internal->tooltip);
+	delete internal->tooltip;
+	internal->tooltip = NULL;
 }
 
 void ParamWidget::step() {
@@ -181,15 +197,16 @@ void ParamWidget::step() {
 	if (pq) {
 		float value = pq->getSmoothValue();
 		// Dispatch change event when the ParamQuantity value changes
-		if (value != lastValue) {
+		if (value != internal->lastValue) {
 			ChangeEvent eChange;
 			onChange(eChange);
-			lastValue = value;
+			internal->lastValue = value;
 		}
 	}
 
 	Widget::step();
 }
+
 
 void ParamWidget::draw(const DrawArgs& args) {
 	Widget::draw(args);
@@ -210,6 +227,7 @@ void ParamWidget::draw(const DrawArgs& args) {
 	}
 }
 
+
 void ParamWidget::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 
@@ -229,17 +247,21 @@ void ParamWidget::onButton(const ButtonEvent& e) {
 	}
 }
 
+
 void ParamWidget::onDoubleClick(const DoubleClickEvent& e) {
 	resetAction();
 }
+
 
 void ParamWidget::onEnter(const EnterEvent& e) {
 	createTooltip();
 }
 
+
 void ParamWidget::onLeave(const LeaveEvent& e) {
 	destroyTooltip();
 }
+
 
 void ParamWidget::createContextMenu() {
 	ui::Menu* menu = createMenu();
@@ -299,6 +321,7 @@ void ParamWidget::createContextMenu() {
 
 	appendContextMenu(menu);
 }
+
 
 void ParamWidget::resetAction() {
 	engine::ParamQuantity* pq = getParamQuantity();
