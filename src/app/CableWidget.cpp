@@ -12,6 +12,7 @@
 namespace rack {
 namespace app {
 
+
 CableWidget::CableWidget() {
 	color = color::BLACK_TRANSPARENT;
 }

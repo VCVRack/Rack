@@ -8,6 +8,9 @@ namespace rack {
 
 
 struct PatchManager {
+	struct Internal;
+	Internal* internal;
+
 	/** The currently loaded patch file path */
 	std::string path;
 	/** Path to autosave folder */

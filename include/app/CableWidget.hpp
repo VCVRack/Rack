@@ -12,6 +12,9 @@ namespace app {
 
 
 struct CableWidget : widget::OpaqueWidget {
+	struct Internal;
+	Internal* internal;
+
 	/** Owned. */
 	engine::Cable* cable = NULL;
 	NVGcolor color;

@@ -12,6 +12,9 @@ namespace app {
 
 /** Manages an engine::Param on a ModuleWidget. */
 struct ParamWidget : widget::OpaqueWidget {
+	struct Internal;
+	Internal* internal;
+
 	engine::Module* module = NULL;
 	int paramId = -1;
 
@@ -19,6 +22,8 @@ struct ParamWidget : widget::OpaqueWidget {
 	/** For triggering the Change event. `*/
 	float lastValue = NAN;
 
+	ParamWidget();
+	~ParamWidget();
 	/** Configures ParamQuantity properties based on the type of ParamWidget.
 	This seems a bit hacky, but it's easier than requiring plugin developers to set `ParamQuantity::randomizeEnabled`, etc.
 	*/

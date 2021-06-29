@@ -152,6 +152,9 @@ engine::ParamQuantity* ParamWidget::getParamQuantity() {
 	return module->paramQuantities[paramId];
 }
 
+ParamWidget::ParamWidget() {}
+ParamWidget::~ParamWidget() {}
+
 void ParamWidget::createTooltip() {
 	if (!settings::tooltips)
 		return;

@@ -17,6 +17,9 @@ namespace app {
 
 /** Container for ModuleWidget and CableWidget. */
 struct RackWidget : widget::OpaqueWidget {
+	struct Internal;
+	Internal* internal;
+
 	widget::Widget* moduleContainer;
 	widget::Widget* cableContainer;
 	CableWidget* incompleteCable = NULL;
