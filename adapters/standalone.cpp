@@ -113,7 +113,7 @@ int main(int argc, char* argv[]) {
 	logger::init();
 	random::init();
 
-	// Test stuff
+	// Test code
 	// exit(0);
 
 	// We can now install a signal handler and log the output
