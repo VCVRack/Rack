@@ -17,7 +17,7 @@ From https://prng.di.unimi.it/
 Example:
 
 	std::random_device rd;
-	random::Xoroshiro128Plus rng(rd());
+	random::Xoroshiro128Plus rng(rd(), rd());
 	uint64_t r = rng();
 	uint32_t r = rng.u32();
 
@@ -31,22 +31,20 @@ struct Xoroshiro128Plus {
 	uint64_t state[2];
 
 	Xoroshiro128Plus(uint64_t s0 = 1, uint64_t s1 = 0) {
-		seed(s0, s1);
-	}
-	void seed(uint64_t s0 = 1, uint64_t s1 = 0) {
 		state[0] = s0;
 		state[1] = s1;
+		// A bad seed will give a bad first result, so shift the state
 		operator()();
 	}
 
-	static uint64_t rotl(const uint64_t x, int k) {
+	static uint64_t rotl(uint64_t x, int k) {
 		return (x << k) | (x >> (64 - k));
 	}
 
 	uint64_t operator()() {
-		const uint64_t s0 = state[0];
+		uint64_t s0 = state[0];
 		uint64_t s1 = state[1];
-		const uint64_t result = s0 + s1;
+		uint64_t result = s0 + s1;
 
 		s1 ^= s0;
 		state[0] = rotl(s0, 55) ^ s1 ^ (s1 << 14);
@@ -90,7 +88,7 @@ extern thread_local Xoroshiro128Plus rng;
 
 
 /** Initializes the thread-local RNG state.
-Must call per-thread, otherwise the RNG will always return 0.
+Must call when creating a thread, otherwise random state is undefined (might always return 0).
 */
 void init();
 /** Returns a uniform random uint64_t from 0 to UINT64_MAX */
