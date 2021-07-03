@@ -100,7 +100,7 @@ void PatchManager::save(std::string path) {
 
 	double startTime = system::getTime();
 	// Set compression level to 1 so that a 500MB/s SSD is almost bottlenecked
-	system::archiveFolder(path, autosavePath, 1);
+	system::archiveDir(path, autosavePath, 1);
 	double endTime = system::getTime();
 	INFO("Archived patch in %lf seconds", (endTime - startTime));
 }
@@ -131,11 +131,11 @@ void PatchManager::saveAsDialog() {
 	std::string filename;
 	if (this->path == "") {
 		dir = asset::user("patches");
-		system::createDirectories(dir);
+		system::createDirs(dir);
 		filename = "Untitled.vcv";
 	}
 	else {
-		dir = system::getDirectory(this->path);
+		dir = system::getDir(this->path);
 		filename = system::getFilename(this->path);
 	}
 
@@ -196,7 +196,7 @@ void PatchManager::saveAutosave() {
 	DEFER({json_decref(rootJ);});
 
 	// Write to temporary path and then rename it to the correct path
-	system::createDirectories(autosavePath);
+	system::createDirs(autosavePath);
 	std::string tmpPath = patchPath + ".tmp";
 	FILE* file = std::fopen(tmpPath.c_str(), "w");
 	if (!file) {
@@ -212,9 +212,9 @@ void PatchManager::saveAutosave() {
 
 
 void PatchManager::cleanAutosave() {
-	// Remove files and folders in the `autosave/modules` folder that doesn't match a module in the rack.
+	// Remove files and directories in the `autosave/modules` directory that doesn't match a module in the rack.
 	std::string modulesDir = system::join(autosavePath, "modules");
-	if (system::isDirectory(modulesDir)) {
+	if (system::isDir(modulesDir)) {
 		for (const std::string& entry : system::getEntries(modulesDir)) {
 			try {
 				int64_t moduleId = std::stol(system::getFilename(entry));
@@ -249,7 +249,7 @@ void PatchManager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
 	system::removeRecursively(autosavePath);
-	system::createDirectories(autosavePath);
+	system::createDirs(autosavePath);
 
 	if (isPatchLegacyV1(path)) {
 		// Copy the .vcv file directly to "patch.json".
@@ -258,7 +258,7 @@ void PatchManager::load(std::string path) {
 	else {
 		// Extract the .vcv file as a .tar.zst archive.
 		double startTime = system::getTime();
-		system::unarchiveToFolder(path, autosavePath);
+		system::unarchiveToDir(path, autosavePath);
 		double endTime = system::getTime();
 		INFO("Unarchived patch in %lf seconds", (endTime - startTime));
 	}
@@ -349,10 +349,10 @@ void PatchManager::loadDialog() {
 	std::string dir;
 	if (this->path == "") {
 		dir = asset::user("patches");
-		system::createDirectory(dir);
+		system::createDir(dir);
 	}
 	else {
-		dir = system::getDirectory(this->path);
+		dir = system::getDir(this->path);
 	}
 
 	osdialog_filters* filters = osdialog_filters_parse(PATCH_FILTERS);

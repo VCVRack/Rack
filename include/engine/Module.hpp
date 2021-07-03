@@ -218,8 +218,11 @@ struct Module {
 		bypassRoutes.push_back(br);
 	}
 
-	/** Creates and returns the module's patch storage folder path.
-	Since the folder is created when this is called, do not call it frequently or in an audio/engine thread such as process().
+	/** Creates and returns the module's patch storage directory path.
+	Since the directory is created when this is called, do not call it frequently or in an audio/engine thread such as process().
+
+	The Module must be added to Engine before this can be called, so it cannot be called in your Module constructor.
+	Override onAdd() instead.
 	*/
 	std::string createPatchStorageDir();
 	std::string getPatchStorageDir();

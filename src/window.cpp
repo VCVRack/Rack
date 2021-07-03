@@ -507,10 +507,10 @@ void Window::screenshot(const std::string& screenshotPath) {
 
 void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 	// Iterate plugins and create directories
-	system::createDirectories(screenshotsDir);
+	system::createDirs(screenshotsDir);
 	for (plugin::Plugin* p : plugin::plugins) {
 		std::string dir = system::join(screenshotsDir, p->slug);
-		system::createDirectory(dir);
+		system::createDir(dir);
 		for (plugin::Model* model : p->models) {
 			std::string filename = system::join(dir, model->slug + ".png");
 

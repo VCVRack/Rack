@@ -29,16 +29,20 @@ static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
 struct ModuleUrlItem : ui::MenuItem {
 	std::string url;
 	void onAction(const ActionEvent& e) override {
-		std::thread t(system::openBrowser, url);
+		std::thread t([=]() {
+			system::openBrowser(url);
+		});
 		t.detach();
 	}
 };
 
 
-struct ModuleFolderItem : ui::MenuItem {
+struct ModuleDirItem : ui::MenuItem {
 	std::string path;
 	void onAction(const ActionEvent& e) override {
-		std::thread t(system::openFolder, path);
+		std::thread t([=]() {
+			system::openDir(path);
+		});
 		t.detach();
 	}
 };
@@ -147,7 +151,7 @@ struct ModuleInfoItem : ui::MenuItem {
 
 		// plugin folder
 		if (model->plugin->path != "") {
-			ModuleFolderItem* pathItem = new ModuleFolderItem;
+			ModuleDirItem* pathItem = new ModuleDirItem;
 			pathItem->text = "Open plugin folder";
 			pathItem->path = model->plugin->path;
 			menu->addChild(pathItem);
@@ -284,14 +288,14 @@ struct ModulePresetDirItem : ui::MenuItem {
 static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
 	bool hasPresets = false;
 	// Note: This is not cached, so opening this menu each time might have a bit of latency.
-	if (system::isDirectory(presetDir)) {
+	if (system::isDir(presetDir)) {
 		for (const std::string& path : system::getEntries(presetDir)) {
 			std::string name = system::getStem(path);
 			// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
 			std::regex r("^\\d*_");
 			name = std::regex_replace(name, r, "");
 
-			if (system::isDirectory(path)) {
+			if (system::isDir(path)) {
 				hasPresets = true;
 
 				ModulePresetDirItem* dirItem = new ModulePresetDirItem;
@@ -843,13 +847,13 @@ void ModuleWidget::loadTemplate() {
 
 void ModuleWidget::loadDialog() {
 	std::string presetDir = model->getUserPresetDir();
-	system::createDirectories(presetDir);
+	system::createDirs(presetDir);
 
 	// Delete directories if empty
 	DEFER({
 		try {
 			system::remove(presetDir);
-			system::remove(system::getDirectory(presetDir));
+			system::remove(system::getDir(presetDir));
 		}
 		catch (Exception& e) {
 			// Ignore exceptions if directory cannot be removed.
@@ -894,7 +898,7 @@ void ModuleWidget::save(std::string filename) {
 
 void ModuleWidget::saveTemplate() {
 	std::string presetDir = model->getUserPresetDir();
-	system::createDirectories(presetDir);
+	system::createDirs(presetDir);
 	std::string templatePath = system::join(presetDir, "template.vcvm");
 	save(templatePath);
 }
@@ -929,13 +933,13 @@ void ModuleWidget::clearTemplateDialog() {
 
 void ModuleWidget::saveDialog() {
 	std::string presetDir = model->getUserPresetDir();
-	system::createDirectories(presetDir);
+	system::createDirs(presetDir);
 
 	// Delete directories if empty
 	DEFER({
 		try {
 			system::remove(presetDir);
-			system::remove(system::getDirectory(presetDir));
+			system::remove(system::getDir(presetDir));
 		}
 		catch (Exception& e) {
 			// Ignore exceptions if directory cannot be removed.

@@ -13,7 +13,7 @@ struct PatchManager {
 
 	/** The currently loaded patch file path */
 	std::string path;
-	/** Path to autosave folder */
+	/** Path to autosave dir */
 	std::string autosavePath;
 	/** Path to user template patch */
 	std::string templatePath;

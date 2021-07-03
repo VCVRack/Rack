@@ -26,10 +26,10 @@ std::string system(std::string filename = "");
 /** Returns the path of a user asset. Can read and write files to this location. */
 std::string user(std::string filename = "");
 
-/** Returns the path of a asset in the plugin's folder.
+/** Returns the path of a asset in the plugin's dir.
 Plugin assets should be read-only by plugins.
 Examples:
-	asset::plugin(pluginInstance, "samples/00.wav") // "/path/to/Rack/user/folder/plugins/MyPlugin/samples/00.wav"
+	asset::plugin(pluginInstance, "samples/00.wav") // "/path/to/Rack/user/dir/plugins/MyPlugin/samples/00.wav"
 */
 std::string plugin(plugin::Plugin* plugin, std::string filename = "");
 

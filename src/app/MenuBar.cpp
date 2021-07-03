@@ -70,11 +70,11 @@ struct UrlItem : ui::MenuItem {
 	}
 };
 
-struct FolderItem : ui::MenuItem {
+struct DirItem : ui::MenuItem {
 	std::string path;
 	void onAction(const ActionEvent& e) override {
 		std::thread t([=] {
-			system::openFolder(path);
+			system::openDir(path);
 		});
 		t.detach();
 	}
@@ -1041,14 +1041,15 @@ struct HelpButton : MenuButton {
 			menu->addChild(checkAppUpdateItem);
 		}
 
-		FolderItem* folderItem = new FolderItem;
-		folderItem->text = "Open user folder";
-		folderItem->path = asset::user("");
-		menu->addChild(folderItem);
+		DirItem* dirItem = new DirItem;
+		dirItem->text = "Open user folder";
+		dirItem->path = asset::user("");
+		menu->addChild(dirItem);
 
 		menu->addChild(new ui::MenuSeparator);
 
 		menu->addChild(createMenuLabel(APP_VARIANT));
+
 		menu->addChild(createMenuLabel(APP_VERSION));
 	}
 

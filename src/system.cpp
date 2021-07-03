@@ -100,7 +100,7 @@ bool isFile(const std::string& path) {
 }
 
 
-bool isDirectory(const std::string& path) {
+bool isDir(const std::string& path) {
 	try {
 		return fs::is_directory(fs::u8path(path));
 	}
@@ -140,7 +140,7 @@ void copy(const std::string& srcPath, const std::string& destPath) {
 }
 
 
-bool createDirectory(const std::string& path) {
+bool createDir(const std::string& path) {
 	try {
 		return fs::create_directory(fs::u8path(path));
 	}
@@ -150,7 +150,7 @@ bool createDirectory(const std::string& path) {
 }
 
 
-bool createDirectories(const std::string& path) {
+bool createDirs(const std::string& path) {
 	try {
 		return fs::create_directories(fs::u8path(path));
 	}
@@ -180,7 +180,7 @@ int removeRecursively(const std::string& path) {
 }
 
 
-std::string getWorkingDirectory() {
+std::string getWorkingDir() {
 	try {
 		return fs::current_path().generic_u8string();
 	}
@@ -190,7 +190,7 @@ std::string getWorkingDirectory() {
 }
 
 
-void setWorkingDirectory(const std::string& path) {
+void setWorkingDir(const std::string& path) {
 	try {
 		fs::current_path(fs::u8path(path));
 	}
@@ -230,7 +230,7 @@ std::string getCanonical(const std::string& path) {
 }
 
 
-std::string getDirectory(const std::string& path) {
+std::string getDir(const std::string& path) {
 	try {
 		return fs::u8path(path).parent_path().generic_u8string();
 	}
@@ -300,7 +300,7 @@ static la_ssize_t archiveWriteVectorCallback(struct archive* a, void* client_dat
 }
 
 
-static void archiveFolder(const std::string& archivePath, std::vector<uint8_t>* archiveData, const std::string& folderPath, int compressionLevel) {
+static void archiveDir(const std::string& archivePath, std::vector<uint8_t>* archiveData, const std::string& dirPath, int compressionLevel) {
 	// Based on minitar.c create() in libarchive examples
 	int r;
 
@@ -330,19 +330,19 @@ static void archiveFolder(const std::string& archivePath, std::vector<uint8_t>* 
 	}
 	DEFER({archive_write_close(a);});
 
-	// Open folder for reading
+	// Open dir for reading
 	struct archive* disk = archive_read_disk_new();
 	DEFER({archive_read_free(disk);});
 #if defined ARCH_WIN
-	r = archive_read_disk_open_w(disk, string::UTF8toUTF16(folderPath).c_str());
+	r = archive_read_disk_open_w(disk, string::UTF8toUTF16(dirPath).c_str());
 #else
-	r = archive_read_disk_open(disk, folderPath.c_str());
+	r = archive_read_disk_open(disk, dirPath.c_str());
 #endif
 	if (r < ARCHIVE_OK)
-		throw Exception("Archiver could not open folder %s for reading: %s", folderPath.c_str(), archive_error_string(a));
+		throw Exception("Archiver could not open dir %s for reading: %s", dirPath.c_str(), archive_error_string(a));
 	DEFER({archive_read_close(a);});
 
-	// Iterate folder
+	// Iterate dir
 	for (;;) {
 		struct archive_entry* entry = archive_entry_new();
 		DEFER({archive_entry_free(entry);});
@@ -363,7 +363,7 @@ static void archiveFolder(const std::string& archivePath, std::vector<uint8_t>* 
 #else
 		entryPath = archive_entry_pathname(entry);
 #endif
-		entryPath = getRelativePath(entryPath, folderPath);
+		entryPath = getRelativePath(entryPath, dirPath);
 #if defined ARCH_WIN
 		// FIXME This doesn't seem to set UTF-8 paths on Windows.
 		archive_entry_copy_pathname_w(entry, string::UTF8toUTF16(entryPath).c_str());
@@ -392,13 +392,13 @@ static void archiveFolder(const std::string& archivePath, std::vector<uint8_t>* 
 	}
 }
 
-void archiveFolder(const std::string& archivePath, const std::string& folderPath, int compressionLevel) {
-	archiveFolder(archivePath, NULL, folderPath, compressionLevel);
+void archiveDir(const std::string& archivePath, const std::string& dirPath, int compressionLevel) {
+	archiveDir(archivePath, NULL, dirPath, compressionLevel);
 }
 
-std::vector<uint8_t> archiveFolder(const std::string& folderPath, int compressionLevel) {
+std::vector<uint8_t> archiveDir(const std::string& dirPath, int compressionLevel) {
 	std::vector<uint8_t> archiveData;
-	archiveFolder("", &archiveData, folderPath, compressionLevel);
+	archiveDir("", &archiveData, dirPath, compressionLevel);
 	return archiveData;
 }
 
@@ -420,7 +420,7 @@ static la_ssize_t archiveReadVectorCallback(struct archive *a, void* client_data
 	return len;
 }
 
-static void unarchiveToFolder(const std::string& archivePath, const std::vector<uint8_t>* archiveData, const std::string& folderPath) {
+static void unarchiveToDir(const std::string& archivePath, const std::vector<uint8_t>* archiveData, const std::string& dirPath) {
 	// Based on minitar.c extract() in libarchive examples
 	int r;
 
@@ -450,7 +450,7 @@ static void unarchiveToFolder(const std::string& archivePath, const std::vector<
 	}
 	DEFER({archive_read_close(a);});
 
-	// Open folder for writing
+	// Open dir for writing
 	struct archive* disk = archive_write_disk_new();
 	DEFER({archive_write_free(disk);});
 	int flags = ARCHIVE_EXTRACT_TIME;
@@ -467,11 +467,11 @@ static void unarchiveToFolder(const std::string& archivePath, const std::vector<
 		if (r < ARCHIVE_OK)
 			throw Exception("Unarchiver could not read entry from archive: %s", archive_error_string(a));
 
-		// Convert relative pathname to absolute based on folderPath
+		// Convert relative pathname to absolute based on dirPath
 		std::string entryPath = archive_entry_pathname(entry);
 		if (!fs::u8path(entryPath).is_relative())
 			throw Exception("Unarchiver does not support absolute tar paths: %s", entryPath.c_str());
-		entryPath = (fs::u8path(folderPath) / fs::u8path(entryPath)).generic_u8string();
+		entryPath = (fs::u8path(dirPath) / fs::u8path(entryPath)).generic_u8string();
 #if defined ARCH_WIN
 		archive_entry_copy_pathname_w(entry, string::UTF8toUTF16(entryPath).c_str());
 #else
@@ -481,7 +481,7 @@ static void unarchiveToFolder(const std::string& archivePath, const std::vector<
 		// Write entry to disk
 		r = archive_write_header(disk, entry);
 		if (r < ARCHIVE_OK)
-			throw Exception("Unarchiver could not write file to folder: %s", archive_error_string(disk));
+			throw Exception("Unarchiver could not write file to dir: %s", archive_error_string(disk));
 
 		// Copy data to file
 		for (;;) {
@@ -508,12 +508,12 @@ static void unarchiveToFolder(const std::string& archivePath, const std::vector<
 	}
 }
 
-void unarchiveToFolder(const std::string& archivePath, const std::string& folderPath) {
-	unarchiveToFolder(archivePath, NULL, folderPath);
+void unarchiveToDir(const std::string& archivePath, const std::string& dirPath) {
+	unarchiveToDir(archivePath, NULL, dirPath);
 }
 
-void unarchiveToFolder(const std::vector<uint8_t>& archiveData, const std::string& folderPath) {
-	unarchiveToFolder("", &archiveData, folderPath);
+void unarchiveToDir(const std::vector<uint8_t>& archiveData, const std::string& dirPath) {
+	unarchiveToDir("", &archiveData, dirPath);
 }
 
 
@@ -687,7 +687,7 @@ void openBrowser(const std::string& url) {
 }
 
 
-void openFolder(const std::string& path) {
+void openDir(const std::string& path) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open \"" + path + "\"";
 	(void) std::system(command.c_str());

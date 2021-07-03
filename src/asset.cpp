@@ -34,7 +34,7 @@ static void initSystemDir() {
 		return;
 
 	if (settings::devMode) {
-		systemDir = system::getWorkingDirectory();
+		systemDir = system::getWorkingDir();
 		return;
 	}
 
@@ -65,13 +65,13 @@ static void initSystemDir() {
 	wchar_t moduleBufW[MAX_PATH] = L"";
 	DWORD length = GetModuleFileNameW(NULL, moduleBufW, LENGTHOF(moduleBufW));
 	assert(length > 0);
-	// Get folder of executable
+	// Get directory of executable
 	PathRemoveFileSpecW(moduleBufW);
 	systemDir = string::UTF16toUTF8(moduleBufW);
 #endif
 #if defined ARCH_LIN
 	// Use the current working directory as the default path on Linux.
-	systemDir = system::getWorkingDirectory();
+	systemDir = system::getWorkingDir();
 #endif
 }
 
@@ -86,7 +86,7 @@ static void initUserDir() {
 	}
 
 #if defined ARCH_WIN
-	// Get "My Documents" folder
+	// Get "My Documents" path
 	wchar_t documentsBufW[MAX_PATH] = L".";
 	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufW);
 	assert(result == S_OK);
@@ -114,7 +114,7 @@ void init() {
 	initSystemDir();
 	initUserDir();
 
-	system::createDirectory(userDir);
+	system::createDir(userDir);
 }
 
 

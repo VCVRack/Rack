@@ -84,7 +84,7 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 
 std::string Module::createPatchStorageDir() {
 	std::string path = getPatchStorageDir();
-	system::createDirectories(path);
+	system::createDirs(path);
 	return path;
 }
 

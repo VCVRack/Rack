@@ -53,10 +53,10 @@ static void* loadLibrary(std::string libraryPath) {
 	}
 #else
 	// As of Rack v2.0, plugins are linked with `-rpath=.` so change current directory so it can find libRack.
-	std::string cwd = system::getWorkingDirectory();
-	system::setWorkingDirectory(asset::systemDir);
+	std::string cwd = system::getWorkingDir();
+	system::setWorkingDir(asset::systemDir);
 	// Change it back when we're finished
-	DEFER({system::setWorkingDirectory(cwd);});
+	DEFER({system::setWorkingDir(cwd);});
 	// Load library with dlopen
 	void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	if (!handle)
@@ -166,7 +166,7 @@ static Plugin* loadPlugin(std::string path) {
 
 static void loadPlugins(std::string path) {
 	for (std::string pluginPath : system::getEntries(path)) {
-		if (!system::isDirectory(pluginPath))
+		if (!system::isDir(pluginPath))
 			continue;
 		if (!loadPlugin(pluginPath)) {
 			// Ignore bad plugins. They are reported in the log.
@@ -187,7 +187,7 @@ static void extractPackages(std::string path) {
 		// Extract package
 		INFO("Extracting package %s", packagePath.c_str());
 		try {
-			system::unarchiveToFolder(packagePath, path);
+			system::unarchiveToDir(packagePath, path);
 		}
 		catch (Exception& e) {
 			WARN("Plugin package %s failed to extract: %s", packagePath.c_str(), e.what());
@@ -221,7 +221,7 @@ void init() {
 	}
 
 	// Get user plugins directory
-	system::createDirectory(pluginsPath);
+	system::createDir(pluginsPath);
 
 	// Extract packages and load plugins
 	extractPackages(pluginsPath);
@@ -232,7 +232,7 @@ void init() {
 	std::string fundamentalDir = system::join(pluginsPath, "Fundamental");
 	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
 		INFO("Extracting bundled Fundamental package");
-		system::unarchiveToFolder(fundamentalSrc.c_str(), pluginsPath.c_str());
+		system::unarchiveToDir(fundamentalSrc.c_str(), pluginsPath.c_str());
 		loadPlugin(fundamentalDir);
 	}
 }
