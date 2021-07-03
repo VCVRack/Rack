@@ -1,5 +1,6 @@
 #pragma once
 #include <list>
+#include <vector>
 
 #include <common.hpp>
 
@@ -112,12 +113,14 @@ An equivalent shell command is
 	ZSTD_CLEVEL=1 tar -cf archivePath --zstd -C folderPath .
 */
 void archiveFolder(const std::string& archivePath, const std::string& folderPath, int compressionLevel = 1);
+std::vector<uint8_t> archiveFolder(const std::string& folderPath, int compressionLevel = 1);
 /** Extracts an archive into a folder.
 An equivalent shell command is
 
 	tar -xf archivePath --zstd -C folderPath
 */
 void unarchiveToFolder(const std::string& archivePath, const std::string& folderPath);
+void unarchiveToFolder(const std::vector<uint8_t>& archiveData, const std::string& folderPath);
 
 
 // Threading

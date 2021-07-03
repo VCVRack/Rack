@@ -291,7 +291,16 @@ static std::string getRelativePath(std::string path, std::string base) {
 }
 
 
-void archiveFolder(const std::string& archivePath, const std::string& folderPath, int compressionLevel) {
+static la_ssize_t archiveWriteVectorCallback(struct archive* a, void* client_data, const void* buffer, size_t length) {
+	assert(client_data);
+	std::vector<uint8_t>& data = *((std::vector<uint8_t>*) client_data);
+	uint8_t* buf = (uint8_t*) buffer;
+	data.insert(data.end(), buf, buf + length);
+	return length;
+}
+
+
+static void archiveFolder(const std::string& archivePath, std::vector<uint8_t>* archiveData, const std::string& folderPath, int compressionLevel) {
 	// Based on minitar.c create() in libarchive examples
 	int r;
 
@@ -305,13 +314,20 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 	if (r < ARCHIVE_OK)
 		throw Exception("Archiver could not set filter option: %s", archive_error_string(a));
 
+	if (archiveData) {
+		// Open vector
+		archive_write_open(a, (void*) archiveData, NULL, archiveWriteVectorCallback, NULL);
+	}
+	else {
+		// Open file
 #if defined ARCH_WIN
-	r = archive_write_open_filename_w(a, string::UTF8toUTF16(archivePath).c_str());
+		r = archive_write_open_filename_w(a, string::UTF8toUTF16(archivePath).c_str());
 #else
-	r = archive_write_open_filename(a, archivePath.c_str());
+		r = archive_write_open_filename(a, archivePath.c_str());
 #endif
 	if (r < ARCHIVE_OK)
 		throw Exception("Archiver could not open archive %s for writing: %s", archivePath.c_str(), archive_error_string(a));
+	}
 	DEFER({archive_write_close(a);});
 
 	// Open folder for reading
@@ -376,8 +392,35 @@ void archiveFolder(const std::string& archivePath, const std::string& folderPath
 	}
 }
 
+void archiveFolder(const std::string& archivePath, const std::string& folderPath, int compressionLevel) {
+	archiveFolder(archivePath, NULL, folderPath, compressionLevel);
+}
 
-void unarchiveToFolder(const std::string& archivePath, const std::string& folderPath) {
+std::vector<uint8_t> archiveFolder(const std::string& folderPath, int compressionLevel) {
+	std::vector<uint8_t> archiveData;
+	archiveFolder("", &archiveData, folderPath, compressionLevel);
+	return archiveData;
+}
+
+
+struct ArchiveReadVectorData {
+	const std::vector<uint8_t>* data = NULL;
+	size_t pos = 0;
+};
+
+static la_ssize_t archiveReadVectorCallback(struct archive *a, void* client_data, const void** buffer) {
+	assert(client_data);
+	ArchiveReadVectorData* arvd = (ArchiveReadVectorData*) client_data;
+	assert(arvd->data);
+	const std::vector<uint8_t>& data = *arvd->data;
+	*buffer = &data[arvd->pos];
+	// Read up to some block size of bytes
+	size_t len = std::min(data.size() - arvd->pos, size_t(1 << 16));
+	arvd->pos += len;
+	return len;
+}
+
+static void unarchiveToFolder(const std::string& archivePath, const std::vector<uint8_t>* archiveData, const std::string& folderPath) {
 	// Based on minitar.c extract() in libarchive examples
 	int r;
 
@@ -388,13 +431,23 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 	// archive_read_support_filter_all(a);
 	archive_read_support_format_tar(a);
 	// archive_read_support_format_all(a);
+
+	ArchiveReadVectorData arvd;
+	if (archiveData) {
+		// Open vector
+		arvd.data = archiveData;
+		archive_read_open(a, &arvd, NULL, archiveReadVectorCallback, NULL);
+	}
+	else {
+		// Open file
 #if defined ARCH_WIN
-	r = archive_read_open_filename_w(a, string::UTF8toUTF16(archivePath).c_str(), 1 << 16);
+		r = archive_read_open_filename_w(a, string::UTF8toUTF16(archivePath).c_str(), 1 << 16);
 #else
-	r = archive_read_open_filename(a, archivePath.c_str(), 1 << 14);
+		r = archive_read_open_filename(a, archivePath.c_str(), 1 << 16);
 #endif
-	if (r < ARCHIVE_OK)
-		throw Exception("Unarchiver could not open archive %s: %s", archivePath.c_str(), archive_error_string(a));
+		if (r < ARCHIVE_OK)
+			throw Exception("Unarchiver could not open archive %s: %s", archivePath.c_str(), archive_error_string(a));
+	}
 	DEFER({archive_read_close(a);});
 
 	// Open folder for writing
@@ -453,6 +506,14 @@ void unarchiveToFolder(const std::string& archivePath, const std::string& folder
 		if (r < ARCHIVE_OK)
 			throw Exception("Unarchiver could not close file: %s", archive_error_string(disk));
 	}
+}
+
+void unarchiveToFolder(const std::string& archivePath, const std::string& folderPath) {
+	unarchiveToFolder(archivePath, NULL, folderPath);
+}
+
+void unarchiveToFolder(const std::vector<uint8_t>& archiveData, const std::string& folderPath) {
+	unarchiveToFolder("", &archiveData, folderPath);
 }
 
 
