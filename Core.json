@@ -18,6 +18,7 @@
       "slug": "AudioInterface2",
       "name": "Audio-2",
       "description": "Sends audio and CV to/from an audio device",
+      "manualUrl": "https://vcvrack.com/manual/Core#Audio",
       "tags": [
         "External"
       ]
@@ -26,6 +27,7 @@
       "slug": "AudioInterface",
       "name": "Audio-8",
       "description": "Sends audio and CV to/from an audio device",
+      "manualUrl": "https://vcvrack.com/manual/Core#Audio",
       "tags": [
         "External"
       ]
@@ -34,6 +36,7 @@
       "slug": "AudioInterface16",
       "name": "Audio-16",
       "description": "Sends audio and CV to/from an audio device",
+      "manualUrl": "https://vcvrack.com/manual/Core#Audio",
       "tags": [
         "External"
       ]
@@ -42,6 +45,7 @@
       "slug": "MIDIToCVInterface",
       "name": "MIDI-CV",
       "description": "Converts MIDI from an external device to CV and gates",
+      "manualUrl": "https://vcvrack.com/manual/Core#MIDI-CV",
       "tags": [
         "External",
         "MIDI",
@@ -52,6 +56,7 @@
       "slug": "MIDICCToCVInterface",
       "name": "MIDI-CC",
       "description": "Converts MIDI CC from an external device to CV",
+      "manualUrl": "https://vcvrack.com/manual/Core#MIDI-CC",
       "tags": [
         "External",
         "MIDI"
@@ -61,6 +66,7 @@
       "slug": "MIDITriggerToCVInterface",
       "name": "MIDI-Gate",
       "description": "Converts MIDI notes from an external device to gates",
+      "manualUrl": "https://vcvrack.com/manual/Core#MIDI-Gate",
       "tags": [
         "External",
         "MIDI"
@@ -70,6 +76,7 @@
       "slug": "MIDI-Map",
       "name": "MIDI-Map",
       "description": "Controls parameters (knobs, sliders, switches) directly with MIDI CC",
+      "manualUrl": "https://vcvrack.com/manual/Core#MIDI-Map",
       "tags": [
         "External",
         "MIDI"
@@ -79,6 +86,7 @@
       "slug": "CV-MIDI",
       "name": "CV-MIDI",
       "description": "Converts CV to MIDI and sends to an external device",
+      "manualUrl": "https://vcvrack.com/manual/Core#CV-MIDI",
       "tags": [
         "External",
         "MIDI",
@@ -89,6 +97,7 @@
       "slug": "CV-CC",
       "name": "CV-CC",
       "description": "Converts CV to MIDI CC and sends to an external device",
+      "manualUrl": "https://vcvrack.com/manual/Core#CV-CC",
       "tags": [
         "External",
         "MIDI"
@@ -98,6 +107,7 @@
       "slug": "CV-Gate",
       "name": "CV-Gate",
       "description": "Converts gates to MIDI notes and sends to an external device",
+      "manualUrl": "https://vcvrack.com/manual/Core#CV-Gate",
       "tags": [
         "External",
         "MIDI"
@@ -107,6 +117,7 @@
       "slug": "Blank",
       "name": "Blank",
       "description": "A resizable blank panel",
+      "manualUrl": "https://vcvrack.com/manual/Core#Blank",
       "tags": [
         "Blank"
       ]
@@ -115,6 +126,7 @@
       "slug": "Notes",
       "name": "Notes",
       "description": "Write text for patch notes or artist attribution",
+      "manualUrl": "https://vcvrack.com/manual/Core#Notes",
       "tags": [
         "Blank"
       ]
