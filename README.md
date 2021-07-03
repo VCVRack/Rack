@@ -15,7 +15,7 @@
 - [Grayscale](https://grayscale.info/): Module design, branding
 - [Pyer](https://www.pyer.be/): Component graphics
 - [Richie Hindle](http://entrian.com/audio/): OS/DAW-dependent bug fixes
-- [cschol](https://github.com/cschol): VCV Library reviews and builds
+- Christoph Scholtes: VCV Library reviews and builds
 - Rack plugin developers: Authorship shown on each plugin's [VCV Library](https://library.vcvrack.com/) page
 - Rack users like you: Bug reports and feature requests
 
