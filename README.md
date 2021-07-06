@@ -40,3 +40,10 @@
 - [RtAudio](https://www.music.mcgill.ca/~gary/rtaudio/)
 - [Fuzzy Search Database](https://bitbucket.org/j_norberg/fuzzysearchdatabase) (written by Nils Jonas Norberg for VCV Rack's module browser)
 - [TinyExpr](https://codeplea.com/tinyexpr) (for math evaluation in parameter context menu)
+
+## Contributions
+
+VCV cannot accept free contributions to Rack itself, but we encourage you to
+- Send us feature requests and bug reports.
+- Create a plugin that extends Rack's functionality. Most of Rack's functionality is exposed in its public plugin API.
+- Send your resume to VCV or apply for funding for your contribution.
