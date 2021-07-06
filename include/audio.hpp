@@ -34,6 +34,10 @@ struct Driver {
 	virtual std::vector<int> getDeviceIds() {
 		return {};
 	}
+	/** Returns the default device to use when the driver is selected, or -1 for none. */
+	virtual int getDefaultDeviceId() {
+		return -1;
+	}
 	/** Returns the name of a device without obtaining it. */
 	virtual std::string getDeviceName(int deviceId) {
 		return "";
@@ -194,7 +198,9 @@ struct Port {
 
 void init();
 void destroy();
-/** Registers a new audio driver. Takes pointer ownership. */
+/** Registers a new audio driver. Takes pointer ownership.
+Driver ID is stored in patches and must be unique. -1 is reserved.
+*/
 void addDriver(int driverId, Driver* driver);
 std::vector<int> getDriverIds();
 Driver* getDriver(int driverId);

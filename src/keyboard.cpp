@@ -230,6 +230,11 @@ struct Driver : midi::Driver {
 		return deviceIds;
 	}
 
+	int getDefaultInputDeviceId() override {
+		// QWERTY keyboard device
+		return 0;
+	}
+
 	midi::InputDevice* getInputDevice(int deviceId) {
 		if (deviceId == MOUSE_DEVICE_ID)
 			return &mouseDevice;

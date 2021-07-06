@@ -70,17 +70,12 @@ Port::Port() {
 }
 
 Port::~Port() {
-	setDriverId(-1);
+	setDeviceId(-1);
 }
 
 void Port::reset() {
-	// Get default driver
-	int firstDriverId = -1;
-	std::vector<int> driverIds = getDriverIds();
-	if (!driverIds.empty())
-		firstDriverId = driverIds[0];
-
-	setDriverId(firstDriverId);
+	// Set default driver
+	setDriverId(-1);
 }
 
 Driver* Port::getDriver() {
@@ -92,8 +87,6 @@ int Port::getDriverId() {
 }
 
 void Port::setDriverId(int driverId) {
-	if (driverId == this->driverId)
-		return;
 	// Unset device and driver
 	setDeviceId(-1);
 	driver = NULL;
@@ -104,11 +97,20 @@ void Port::setDriverId(int driverId) {
 	if (driver) {
 		this->driverId = driverId;
 	}
-	else {
+	else if (!drivers.empty()) {
 		// Set first driver as default
 		driver = drivers[0].second;
 		this->driverId = drivers[0].first;
 	}
+	else {
+		// No fallback drivers
+		return;
+	}
+
+	// Set default device if exists
+	int defaultDeviceId = driver->getDefaultDeviceId();
+	if (defaultDeviceId >= 0)
+		setDeviceId(defaultDeviceId);
 }
 
 std::string Port::getDriverName() {
@@ -165,8 +167,10 @@ void Port::setDeviceId(int deviceId) {
 	if (deviceId >= 0) {
 		try {
 			device = driver->subscribe(deviceId, this);
-			this->deviceId = deviceId;
-			onStartStream();
+			if (device) {
+				this->deviceId = deviceId;
+				onStartStream();
+			}
 		}
 		catch (Exception& e) {
 			WARN("Audio port could not subscribe to device: %s", e.what());
@@ -375,6 +379,7 @@ void destroy() {
 
 void addDriver(int driverId, Driver* driver) {
 	assert(driver);
+	assert(driverId != -1);
 	drivers.push_back(std::make_pair(driverId, driver));
 }
 
@@ -387,6 +392,8 @@ std::vector<int> getDriverIds() {
 }
 
 Driver* getDriver(int driverId) {
+	if (driverId == -1)
+		return NULL;
 	// Search for driver by ID
 	for (auto& pair : drivers) {
 		if (pair.first == driverId)

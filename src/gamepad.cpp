@@ -100,19 +100,24 @@ struct Driver : midi::Driver {
 		return deviceIds;
 	}
 
+	int getDefaultInputDeviceId() override {
+		return 0;
+	}
+
 	std::string getInputDeviceName(int deviceId) override {
 		if (!(0 <= deviceId && deviceId < 16))
 			return "";
 
 		const char* name = glfwGetJoystickName(deviceId);
-		if (name) {
-			return name;
-		}
-		return string::f(" %d (unavailable)", deviceId + 1);
+		if (!name)
+			return string::f("#%d (unavailable)", deviceId + 1);
+		return name;
 	}
 
 	midi::InputDevice* subscribeInput(int deviceId, midi::Input* input) override {
 		if (!(0 <= deviceId && deviceId < 16))
+			return NULL;
+		if (!glfwJoystickPresent(deviceId))
 			return NULL;
 
 		devices[deviceId].subscribe(input);

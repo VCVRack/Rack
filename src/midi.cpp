@@ -112,11 +112,20 @@ void Port::setDriverId(int driverId) {
 	if (driver) {
 		this->driverId = driverId;
 	}
-	else {
+	else if (!drivers.empty()) {
 		// Set first driver as default
 		driver = drivers[0].second;
 		this->driverId = drivers[0].first;
 	}
+	else {
+		// No fallback drivers
+		return;
+	}
+
+	// Set default device if exists
+	int defaultDeviceId = getDefaultDeviceId();
+	if (defaultDeviceId >= 0)
+		setDeviceId(defaultDeviceId);
 }
 
 Device* Port::getDevice() {
@@ -191,7 +200,7 @@ Input::Input() {
 }
 
 Input::~Input() {
-	setDriverId(-1);
+	setDeviceId(-1);
 }
 
 void Input::reset() {
@@ -211,6 +220,12 @@ std::vector<int> Input::getDeviceIds() {
 	}
 }
 
+int Input::getDefaultDeviceId() {
+	if (!driver)
+		return -1;
+	return driver->getDefaultInputDeviceId();
+}
+
 void Input::setDeviceId(int deviceId) {
 	// Destroy device
 	if (driver && this->deviceId >= 0) {
@@ -228,7 +243,9 @@ void Input::setDeviceId(int deviceId) {
 	if (driver && deviceId >= 0) {
 		try {
 			device = inputDevice = driver->subscribeInput(deviceId, this);
-			this->deviceId = deviceId;
+			if (device) {
+				this->deviceId = deviceId;
+			}
 		}
 		catch (Exception& e) {
 			WARN("MIDI port could not subscribe to input: %s", e.what());
@@ -272,7 +289,7 @@ Output::Output() {
 }
 
 Output::~Output() {
-	setDriverId(-1);
+	setDeviceId(-1);
 }
 
 void Output::reset() {
@@ -309,12 +326,20 @@ void Output::setDeviceId(int deviceId) {
 	if (driver && deviceId >= 0) {
 		try {
 			device = outputDevice = driver->subscribeOutput(deviceId, this);
-			this->deviceId = deviceId;
+			if (device) {
+				this->deviceId = deviceId;
+			}
 		}
 		catch (Exception& e) {
 			WARN("MIDI port could not subscribe to output: %s", e.what());
 		}
 	}
+}
+
+int Output::getDefaultDeviceId() {
+	if (!driver)
+		return -1;
+	return driver->getDefaultOutputDeviceId();
 }
 
 std::string Output::getDeviceName(int deviceId) {

@@ -104,6 +104,10 @@ struct Driver {
 	virtual std::vector<int> getInputDeviceIds() {
 		return {};
 	}
+	/** Returns the default device to use when the driver is selected, or -1 for none. */
+	virtual int getDefaultInputDeviceId() {
+		return -1;
+	}
 	/** Returns the name of an input device without obtaining it. */
 	virtual std::string getInputDeviceName(int deviceId) {
 		return "";
@@ -123,6 +127,9 @@ struct Driver {
 
 	virtual std::vector<int> getOutputDeviceIds() {
 		return {};
+	}
+	virtual int getDefaultOutputDeviceId() {
+		return -1;
 	}
 	virtual std::string getOutputDeviceName(int deviceId) {
 		return "";
@@ -207,6 +214,7 @@ struct Port {
 
 	Device* getDevice();
 	virtual std::vector<int> getDeviceIds() = 0;
+	virtual int getDefaultDeviceId() = 0;
 	int getDeviceId();
 	virtual void setDeviceId(int deviceId) = 0;
 	virtual std::string getDeviceName(int deviceId) = 0;
@@ -230,6 +238,7 @@ struct Input : Port {
 	void reset();
 
 	std::vector<int> getDeviceIds() override;
+	int getDefaultDeviceId() override;
 	void setDeviceId(int deviceId) override;
 	std::string getDeviceName(int deviceId) override;
 
@@ -255,6 +264,7 @@ struct Output : Port {
 	void reset();
 
 	std::vector<int> getDeviceIds() override;
+	int getDefaultDeviceId() override;
 	void setDeviceId(int deviceId) override;
 	std::string getDeviceName(int deviceId) override;
 
