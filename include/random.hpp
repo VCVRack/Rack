@@ -52,10 +52,10 @@ struct Xoroshiro128Plus {
 
 		return result;
 	}
-	constexpr uint64_t min() {
+	constexpr uint64_t min() const {
 		return 0;
 	}
-	constexpr uint64_t max() {
+	constexpr uint64_t max() const {
 		return UINT64_MAX;
 	}
 
