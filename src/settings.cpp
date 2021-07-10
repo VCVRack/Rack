@@ -23,7 +23,7 @@ std::string token;
 bool windowMaximized = false;
 math::Vec windowSize = math::Vec(1024, 768);
 math::Vec windowPos = math::Vec(NAN, NAN);
-float zoom = 0.25;
+float zoom = 0.0;
 bool invertZoom = false;
 float cableOpacity = 0.5;
 float cableTension = 0.5;
