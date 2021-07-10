@@ -11,6 +11,7 @@ namespace app {
 RackRail::RackRail() {
 	busBoardSvg = Svg::load(asset::system("res/ComponentLibrary/RackBusboard.svg"));
 	railsSvg = Svg::load(asset::system("res/ComponentLibrary/RackRails.svg"));
+	// DEBUG("%d %d %d", railsSvg->getNumShapes(), railsSvg->getNumPaths(), railsSvg->getNumPoints());
 }
 
 
@@ -40,7 +41,7 @@ void RackRail::draw(const DrawArgs& args) {
 		for (float x = 0; x < box.size.x; x += busBoardWidth) {
 			nvgSave(args.vg);
 			nvgTranslate(args.vg, x, busBoardY);
-			svgDraw(args.vg, busBoardSvg->handle);
+			busBoardSvg->draw(args.vg);
 			nvgRestore(args.vg);
 		}
 
@@ -56,7 +57,7 @@ void RackRail::draw(const DrawArgs& args) {
 		for (float x = 0; x < box.size.x; x += RACK_GRID_WIDTH) {
 			nvgSave(args.vg);
 			nvgTranslate(args.vg, x, y );
-			svgDraw(args.vg, railsSvg->handle);
+			railsSvg->draw(args.vg);
 			nvgRestore(args.vg);
 		}
 	}

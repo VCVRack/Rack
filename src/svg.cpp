@@ -41,6 +41,42 @@ void Svg::draw(NVGcontext* vg) {
 }
 
 
+int Svg::getNumShapes() {
+	if (!handle)
+		return 0;
+	int count = 0;
+	for (NSVGshape* shape = handle->shapes; shape; shape = shape->next) {
+		count++;
+	}
+	return count;
+}
+
+
+int Svg::getNumPaths() {
+	if (!handle)
+		return 0;
+	int count = 0;
+	for (NSVGshape* shape = handle->shapes; shape; shape = shape->next) {
+		for (NSVGpath* path = shape->paths; path; path = path->next) {
+			count++;
+		}
+	}
+	return count;
+}
+
+
+int Svg::getNumPoints() {
+	if (!handle)
+		return 0;
+	int count = 0;
+	for (NSVGshape* shape = handle->shapes; shape; shape = shape->next) {
+		for (NSVGpath* path = shape->paths; path; path = path->next) {
+			count += (path->npts / 3);
+		}
+	}
+	return count;
+}
+
 
 static std::map<std::string, std::shared_ptr<Svg>> svgCache;
 

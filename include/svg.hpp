@@ -44,6 +44,9 @@ struct Svg {
 	/** Loads SVG data from a string. */
 	void loadString(const std::string& str);
 	void draw(NVGcontext* vg);
+	int getNumShapes();
+	int getNumPaths();
+	int getNumPoints();
 
 	/** Loads Svg from a cache. */
 	static std::shared_ptr<Svg> load(const std::string& filename);
