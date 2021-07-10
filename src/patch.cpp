@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <fstream>
 
 #include <osdialog.h>
 
@@ -12,8 +13,6 @@
 #include <app/RackWidget.hpp>
 #include <history.hpp>
 #include <settings.hpp>
-
-#include <fstream>
 
 
 namespace rack {
