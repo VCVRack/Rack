@@ -76,20 +76,21 @@ struct PlugLight : MultiLightWidget {
 
 struct PortWidget::Internal {
 	ui::Tooltip* tooltip = NULL;
+	PlugLight* plugLight;
 };
 
 
 PortWidget::PortWidget() {
 	internal = new Internal;
-	plugLight = new PlugLight;
+	internal->plugLight = new PlugLight;
 }
 
 PortWidget::~PortWidget() {
 	// HACK: In case onDragDrop() is called but not onLeave() afterwards...
 	destroyTooltip();
-	// plugLight is not a child and is thus owned by the PortWidget, so we need to delete it here
-	delete plugLight;
-	// HACK
+	// plugLight is not a child but owned by the PortWidget, so we need to delete it here
+	delete internal->plugLight;
+	// The port shouldn't have any cables when destroyed, but just to make sure.
 	if (module)
 		APP->scene->rack->clearCablesOnPort(this);
 	delete internal;
@@ -111,6 +112,10 @@ engine::PortInfo* PortWidget::getPortInfo() {
 		return module->inputInfos[portId];
 	else
 		return module->outputInfos[portId];
+}
+
+LightWidget* PortWidget::getPlugLight() {
+	return internal->plugLight;
 }
 
 void PortWidget::createTooltip() {
@@ -145,7 +150,7 @@ void PortWidget::step() {
 		else
 			values[i] = module->inputs[portId].plugLights[i].getBrightness();
 	}
-	plugLight->setBrightnesses(values);
+	internal->plugLight->setBrightnesses(values);
 
 	Widget::step();
 }

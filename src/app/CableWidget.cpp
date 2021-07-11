@@ -226,7 +226,7 @@ void CableWidget::drawPlugs(const DrawArgs& args) {
 			// Draw plug light
 			nvgSave(args.vg);
 			nvgTranslate(args.vg, outputPos.x - 4, outputPos.y - 4);
-			outputPort->plugLight->draw(args);
+			outputPort->getPlugLight()->draw(args);
 			nvgRestore(args.vg);
 		}
 	}
@@ -236,7 +236,7 @@ void CableWidget::drawPlugs(const DrawArgs& args) {
 		if (isComplete()) {
 			nvgSave(args.vg);
 			nvgTranslate(args.vg, inputPos.x - 4, inputPos.y - 4);
-			inputPort->plugLight->draw(args);
+			inputPort->getPlugLight()->draw(args);
 			nvgRestore(args.vg);
 		}
 	}

@@ -20,12 +20,11 @@ struct PortWidget : widget::OpaqueWidget {
 	engine::Port::Type type = engine::Port::INPUT;
 	int portId = -1;
 
-	MultiLightWidget* plugLight;
-
 	PortWidget();
 	~PortWidget();
 	engine::Port* getPort();
 	engine::PortInfo* getPortInfo();
+	LightWidget* getPlugLight();
 	void createTooltip();
 	void destroyTooltip();
 
