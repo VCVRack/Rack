@@ -353,7 +353,7 @@ struct {identifier} : Module {{"""
 
 	# Params
 	source += """
-	enum ParamIds {"""
+	enum ParamId {"""
 	for c in components['params']:
 		source += f"""
 		{c['name']}_PARAM,"""
@@ -363,7 +363,7 @@ struct {identifier} : Module {{"""
 
 	# Inputs
 	source += """
-	enum InputIds {"""
+	enum InputId {"""
 	for c in components['inputs']:
 		source += f"""
 		{c['name']}_INPUT,"""
@@ -373,7 +373,7 @@ struct {identifier} : Module {{"""
 
 	# Outputs
 	source += """
-	enum OutputIds {"""
+	enum OutputId {"""
 	for c in components['outputs']:
 		source += f"""
 		{c['name']}_OUTPUT,"""
@@ -383,7 +383,7 @@ struct {identifier} : Module {{"""
 
 	# Lights
 	source += """
-	enum LightIds {"""
+	enum LightId {"""
 	for c in components['lights']:
 		source += f"""
 		{c['name']}_LIGHT,"""
