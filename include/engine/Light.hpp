@@ -22,7 +22,7 @@ struct Light {
 	}
 
 	/** Emulates light decay with slow fall but immediate rise. */
-	void setSmoothBrightness(float brightness, float deltaTime) {
+	void setBrightnessSmooth(float brightness, float deltaTime) {
 		if (brightness < value) {
 			// Fade out light
 			const float lambda = 30.f;
@@ -33,9 +33,13 @@ struct Light {
 			value = brightness;
 		}
 	}
+	/** Alias for setBrightnessSmooth() */
+	void setSmoothBrightness(float brightness, float deltaTime) {
+		setBrightnessSmooth(brightness, deltaTime);
+	}
 
-	/** Use `setSmoothBrightness(brightness, sampleTime * frames)` instead. */
-	DEPRECATED void setBrightnessSmooth(float brightness, float frames = 1.f) {
+	/** Use `setBrightnessSmooth(brightness, sampleTime * frames)` instead. */
+	DEPRECATED void setBrightnessSmooth(float brightness, int frames = 1) {
 		setSmoothBrightness(brightness, frames / 44100.f);
 	}
 };
