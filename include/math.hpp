@@ -181,7 +181,7 @@ inline void complexMult(float ar, float ai, float br, float bi, float* cr, float
 
 struct Rect;
 
-/** 2-dimensional vector of floats, representing a point in 2D space.
+/** 2-dimensional vector of floats, representing a point on the plane for graphics.
 */
 struct Vec {
 	float x = 0.f;
@@ -288,7 +288,9 @@ struct Vec {
 };
 
 
-/** 2-dimensional rectangle of floats.
+/** 2-dimensional rectangle for graphics.
+Mathematically, Rects include points on its left/top edge but *not* its right/bottom edge.
+The infinite Rect (equal to the entire plane) is defined using pos=-inf and size=inf.
 */
 struct Rect {
 	Vec pos;
@@ -296,33 +298,36 @@ struct Rect {
 
 	Rect() {}
 	Rect(Vec pos, Vec size) : pos(pos), size(size) {}
-	Rect(float posX, float posY, float sizeX, float sizeY) : pos(math::Vec(posX, posY)), size(math::Vec(sizeX, sizeY)) {}
+	Rect(float posX, float posY, float sizeX, float sizeY) : pos(Vec(posX, posY)), size(Vec(sizeX, sizeY)) {}
 	/** Constructs a Rect from the upper-left position `a` and lower-right pos `b`. */
 	static Rect fromMinMax(Vec a, Vec b) {
 		return Rect(a, b.minus(a));
 	}
+	/** Returns the infinite Rect. */
 	static Rect inf() {
 		return Rect(Vec(-INFINITY, -INFINITY), Vec(INFINITY, INFINITY));
 	}
 
-	/** Returns whether this Rect contains an entire point, inclusive. */
+	/** Returns whether this Rect contains a point, inclusive on the left/top, exclusive on the right/bottom.
+	Correctly handles infinite Rects.
+	*/
 	bool contains(Vec v) const {
-		// Handle the case where pos=-inf and size=inf
-		// i.e. don't ever use `pos + size` which is NAN
-		return (pos.x <= v.x) && (v.x - size.x <= pos.x)
-		    && (pos.y <= v.y) && (v.y - size.y <= pos.y);
+		return (pos.x <= v.x) && (size.x == INFINITY || v.x < pos.x + size.x)
+		    && (pos.y <= v.y) && (size.y == INFINITY || v.y < pos.y + size.y);
 	}
-	/** Returns whether this Rect contains an entire Rect. */
+	/** Returns whether this Rect contains (is a superset of) a Rect.
+	Correctly handles infinite Rects.
+	*/
 	bool contains(Rect r) const {
-		// Handle the case where pos=-inf and size=inf for either Rect
 		return (pos.x <= r.pos.x) && (r.pos.x - size.x <= pos.x - r.size.x)
 		    && (pos.y <= r.pos.y) && (r.pos.y - size.y <= pos.y - r.size.y);
 	}
-	/** Returns whether this Rect overlaps with another Rect. */
+	/** Returns whether this Rect overlaps with another Rect.
+	Correctly handles infinite Rects.
+	*/
 	bool intersects(Rect r) const {
-		// Handle the case where pos=-inf and size=inf for either Rect
-		return (r.pos.x - size.x <= pos.x) && (pos.x - r.size.x <= r.pos.x)
-		    && (r.pos.y - size.y <= pos.y) && (pos.y - r.size.y <= r.pos.y);
+		return (r.size.x == INFINITY || pos.x < r.pos.x + r.size.x) && (size.x == INFINITY || r.pos.x < pos.x + size.x)
+		    && (r.size.y == INFINITY || pos.y < r.pos.y + r.size.y) && (size.y == INFINITY || r.pos.y < pos.y + size.y);
 	}
 	bool equals(Rect r) const {
 		return pos.equals(r.pos) && size.equals(r.size);

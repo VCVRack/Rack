@@ -437,8 +437,6 @@ void RackWidget::removeModule(ModuleWidget* m) {
 bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 	// Check intersection with other modules
 	math::Rect mwBox = math::Rect(pos, mw->box.size);
-	// Since `Rect::intersects()` is inclusive, subtract an infinitesimal from the size.
-	mwBox.size = mwBox.size.minus(math::Vec(0.01, 0.01));
 	for (widget::Widget* w2 : moduleContainer->children) {
 		// Don't intersect with self
 		if (mw == w2)
@@ -448,7 +446,6 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 			continue;
 		// Check intersection
 		math::Rect w2Box = w2->box;
-		w2Box.size = w2Box.size.minus(math::Vec(0.01, 0.01));
 		if (mwBox.intersects(w2Box))
 			return false;
 	}
