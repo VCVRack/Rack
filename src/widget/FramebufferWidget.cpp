@@ -38,8 +38,11 @@ FramebufferWidget::FramebufferWidget() {
 
 
 FramebufferWidget::~FramebufferWidget() {
-	if (internal->fb)
+	if (internal->fb) {
+		// If the framebuffer exists, the Window should exist.
+		assert(APP->window);
 		nvgluDeleteFramebuffer(internal->fb);
+	}
 	delete internal;
 }
 
