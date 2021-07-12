@@ -301,21 +301,28 @@ struct Rect {
 	static Rect fromMinMax(Vec a, Vec b) {
 		return Rect(a, b.minus(a));
 	}
+	static Rect inf() {
+		return Rect(Vec(-INFINITY, -INFINITY), Vec(INFINITY, INFINITY));
+	}
 
-	/** Returns whether this Rect contains an entire point, inclusive on the top/left, non-inclusive on the bottom/right. */
+	/** Returns whether this Rect contains an entire point, inclusive. */
 	bool contains(Vec v) const {
-		return pos.x <= v.x && v.x < pos.x + size.x
-		       && pos.y <= v.y && v.y < pos.y + size.y;
+		// Handle the case where pos=-inf and size=inf
+		// i.e. don't ever use `pos + size` which is NAN
+		return (pos.x <= v.x) && (v.x - size.x <= pos.x)
+		    && (pos.y <= v.y) && (v.y - size.y <= pos.y);
 	}
 	/** Returns whether this Rect contains an entire Rect. */
 	bool contains(Rect r) const {
-		return pos.x <= r.pos.x && r.pos.x + r.size.x <= pos.x + size.x
-		       && pos.y <= r.pos.y && r.pos.y + r.size.y <= pos.y + size.y;
+		// Handle the case where pos=-inf and size=inf for either Rect
+		return (pos.x <= r.pos.x) && (r.pos.x - size.x <= pos.x - r.size.x)
+		    && (pos.y <= r.pos.y) && (r.pos.y - size.y <= pos.y - r.size.y);
 	}
 	/** Returns whether this Rect overlaps with another Rect. */
 	bool intersects(Rect r) const {
-		return (pos.x + size.x > r.pos.x && r.pos.x + r.size.x > pos.x)
-		       && (pos.y + size.y > r.pos.y && r.pos.y + r.size.y > pos.y);
+		// Handle the case where pos=-inf and size=inf for either Rect
+		return (r.pos.x - size.x <= pos.x) && (pos.x - r.size.x <= r.pos.x)
+		    && (r.pos.y - size.y <= pos.y) && (pos.y - r.size.y <= r.pos.y);
 	}
 	bool equals(Rect r) const {
 		return pos.equals(r.pos) && size.equals(r.size);
