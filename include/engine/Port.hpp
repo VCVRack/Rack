@@ -103,6 +103,23 @@ struct Port {
 		return sum;
 	}
 
+	/** Returns the root-mean-square of all voltages. */
+	float getVoltageRMS() {
+		if (channels == 0) {
+			return 0.f;
+		}
+		else if (channels == 1) {
+			return std::fabs(voltages[0]);
+		}
+		else {
+			float sum = 0.f;
+			for (int c = 0; c < channels; c++) {
+				sum += std::pow(voltages[c], 2);
+			}
+			return std::sqrt(sum);
+		}
+	}
+
 	template <typename T>
 	T getVoltageSimd(int firstChannel) {
 		return T::load(&voltages[firstChannel]);
