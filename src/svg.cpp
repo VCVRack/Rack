@@ -18,6 +18,9 @@ Svg::~Svg() {
 
 
 void Svg::loadFile(const std::string& filename) {
+	if (handle)
+		nsvgDelete(handle);
+
 	handle = nsvgParseFromFile(filename.c_str(), "px", SVG_DPI);
 	if (!handle)
 		throw Exception("Failed to load SVG %s", filename.c_str());
@@ -26,6 +29,9 @@ void Svg::loadFile(const std::string& filename) {
 
 
 void Svg::loadString(const std::string& str) {
+	if (handle)
+		nsvgDelete(handle);
+
 	// nsvgParse modifies the input string
 	std::string strCopy = str;
 	handle = nsvgParse(&strCopy[0], "px", SVG_DPI);
@@ -36,8 +42,10 @@ void Svg::loadString(const std::string& str) {
 }
 
 
-void Svg::draw(NVGcontext* vg) {
-	svgDraw(vg, handle);
+math::Vec Svg::getSize() {
+	if (!handle)
+		return math::Vec();
+	return math::Vec(handle->width, handle->height);
 }
 
 
@@ -75,6 +83,13 @@ int Svg::getNumPoints() {
 		}
 	}
 	return count;
+}
+
+
+void Svg::draw(NVGcontext* vg) {
+	if (!handle)
+		return;
+	svgDraw(vg, handle);
 }
 
 

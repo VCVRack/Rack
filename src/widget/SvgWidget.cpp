@@ -7,8 +7,8 @@ namespace widget {
 
 
 void SvgWidget::wrap() {
-	if (svg && svg->handle) {
-		box.size = math::Vec(svg->handle->width, svg->handle->height);
+	if (svg) {
+		box.size = svg->getSize();
 	}
 	else {
 		box.size = math::Vec();
@@ -22,8 +22,6 @@ void SvgWidget::setSvg(std::shared_ptr<Svg> svg) {
 
 void SvgWidget::draw(const DrawArgs& args) {
 	if (!svg)
-		return;
-	if (!svg->handle)
 		return;
 
 	svgDraw(args.vg, svg->handle);

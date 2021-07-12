@@ -24,21 +24,20 @@ void RackRail::draw(const DrawArgs& args) {
 
 	// Rails
 	for (float y = 0; y < box.size.y; y += RACK_GRID_HEIGHT) {
-		const float busBoardWidth = busBoardSvg->handle->width;
-		const float busBoardHeight = busBoardSvg->handle->height;
-		const float busBoardY = y + (RACK_GRID_HEIGHT - busBoardHeight) / 2;
+		const math::Vec busBoardSize = busBoardSvg->getSize();
+		const float busBoardY = y + (RACK_GRID_HEIGHT - busBoardSize.y) / 2;
 		const NVGcolor shadowColor = nvgRGBA(0, 0, 0, 0x20);
 
 		// Bus board shadow
 		nvgBeginPath(args.vg);
-		const float busBoardShadowY = busBoardY + busBoardHeight;
+		const float busBoardShadowY = busBoardY + busBoardSize.y;
 		const float busBoardShadowHeight = 10;
 		nvgRect(args.vg, 0, busBoardShadowY, box.size.x, busBoardShadowHeight);
 		nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0, busBoardShadowY, 0, busBoardShadowY + busBoardShadowHeight, shadowColor, color::BLACK_TRANSPARENT));
 		nvgFill(args.vg);
 
 		// Bus board
-		for (float x = 0; x < box.size.x; x += busBoardWidth) {
+		for (float x = 0; x < box.size.x; x += busBoardSize.x) {
 			nvgSave(args.vg);
 			nvgTranslate(args.vg, x, busBoardY);
 			busBoardSvg->draw(args.vg);
