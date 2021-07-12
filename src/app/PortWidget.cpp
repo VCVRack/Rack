@@ -63,36 +63,33 @@ struct PortTooltip : ui::Tooltip {
 };
 
 
-struct PlugLight : MultiLightWidget {
-	PlugLight() {
-		addBaseColor(componentlibrary::SCHEME_GREEN);
-		addBaseColor(componentlibrary::SCHEME_RED);
-		addBaseColor(componentlibrary::SCHEME_BLUE);
-		box.size = math::Vec(8, 8);
-		bgColor = componentlibrary::SCHEME_BLACK_TRANSPARENT;
-	}
-};
-
-
 struct PortWidget::Internal {
 	ui::Tooltip* tooltip = NULL;
-	PlugLight* plugLight;
+	app::MultiLightWidget* plugLight;
 };
 
 
 PortWidget::PortWidget() {
 	internal = new Internal;
+
+	using namespace componentlibrary;
+	struct PlugLight : TRedGreenBlueLight<TGrayModuleLightWidget<MediumLight<app::MultiLightWidget>>> {
+		PlugLight() {
+			// fb->bypassed = true;
+			fb->oversample = 1.0;
+		}
+	};
 	internal->plugLight = new PlugLight;
 }
 
 PortWidget::~PortWidget() {
+	// The port shouldn't have any cables when destroyed, but just to make sure.
+	if (module)
+		APP->scene->rack->clearCablesOnPort(this);
 	// HACK: In case onDragDrop() is called but not onLeave() afterwards...
 	destroyTooltip();
 	// plugLight is not a child but owned by the PortWidget, so we need to delete it here
 	delete internal->plugLight;
-	// The port shouldn't have any cables when destroyed, but just to make sure.
-	if (module)
-		APP->scene->rack->clearCablesOnPort(this);
 	delete internal;
 }
 
@@ -151,6 +148,7 @@ void PortWidget::step() {
 			values[i] = module->inputs[portId].plugLights[i].getBrightness();
 	}
 	internal->plugLight->setBrightnesses(values);
+	internal->plugLight->step();
 
 	Widget::step();
 }
@@ -334,6 +332,11 @@ void PortWidget::onDragLeave(const DragLeaveEvent& e) {
 		else
 			cw->hoveredInputPort = NULL;
 	}
+}
+
+void PortWidget::onContextDestroy(const ContextDestroyEvent& e) {
+	internal->plugLight->onContextDestroy(e);
+	Widget::onContextDestroy(e);
 }
 
 

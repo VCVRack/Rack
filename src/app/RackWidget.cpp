@@ -60,7 +60,11 @@ struct CableContainer : widget::TransparentWidget {
 		for (widget::Widget* w : children) {
 			CableWidget* cw = dynamic_cast<CableWidget*>(w);
 			assert(cw);
-			cw->drawPlugs(args);
+
+			DrawArgs childArgs = args;
+			// TODO Make clip box equal actual viewport
+			childArgs.clipBox = math::Rect::inf();
+			cw->drawPlugs(childArgs);
 		}
 
 		Widget::draw(args);
@@ -433,6 +437,7 @@ void RackWidget::removeModule(ModuleWidget* m) {
 bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 	// Check intersection with other modules
 	math::Rect mwBox = math::Rect(pos, mw->box.size);
+	mwBox.size.x -= 0.01;
 	for (widget::Widget* w2 : moduleContainer->children) {
 		// Don't intersect with self
 		if (mw == w2)
@@ -441,7 +446,9 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 		if (!w2->visible)
 			continue;
 		// Check intersection
-		if (mwBox.intersects(w2->box))
+		math::Rect w2Box = w2->box;
+		w2Box.size.x -= 0.01;
+		if (mwBox.intersects(w2Box))
 			return false;
 	}
 

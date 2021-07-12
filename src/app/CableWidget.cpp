@@ -4,6 +4,7 @@
 #include <window.hpp>
 #include <context.hpp>
 #include <patch.hpp>
+#include <asset.hpp>
 #include <settings.hpp>
 #include <engine/Engine.hpp>
 #include <engine/Port.hpp>
@@ -13,12 +14,20 @@ namespace rack {
 namespace app {
 
 
+struct CableWidget::Internal {
+	std::shared_ptr<Svg> plugPortSvg;
+};
+
+
 CableWidget::CableWidget() {
+	internal = new Internal;
 	color = color::BLACK_TRANSPARENT;
+	internal->plugPortSvg = Svg::load(asset::system("res/ComponentLibrary/PlugPort.svg"));
 }
 
 CableWidget::~CableWidget() {
 	setCable(NULL);
+	delete internal;
 }
 
 void CableWidget::setNextCableColor() {
@@ -115,36 +124,43 @@ void CableWidget::fromJson(json_t* rootJ) {
 	}
 }
 
-static void drawPlug(NVGcontext* vg, math::Vec pos, NVGcolor color) {
+static void CableWidget_drawPlug(CableWidget* that, const widget::Widget::DrawArgs& args, math::Vec pos, NVGcolor color, bool top) {
+	if (!top)
+		return;
+
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
+	nvgSave(args.vg);
+	nvgTranslate(args.vg, pos.x, pos.y);
 
 	// Plug solid
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos.x, pos.y, 9);
-	nvgFillColor(vg, color);
-	nvgFill(vg);
+	nvgBeginPath(args.vg);
+	nvgCircle(args.vg, 0.0, 0.0, 9);
+	nvgFillColor(args.vg, color);
+	nvgFill(args.vg);
 
 	// Border
-	nvgStrokeWidth(vg, 1.0);
-	nvgStrokeColor(vg, colorOutline);
-	nvgStroke(vg);
+	nvgStrokeWidth(args.vg, 1.0);
+	nvgStrokeColor(args.vg, colorOutline);
+	nvgStroke(args.vg);
 
-	// Hole
-	nvgBeginPath(vg);
-	nvgCircle(vg, pos.x, pos.y, 5);
-	nvgFillColor(vg, nvgRGBf(0.0, 0.0, 0.0));
-	nvgFill(vg);
+	// Port
+	std::shared_ptr<Svg> plugPortSvg = that->internal->plugPortSvg;
+	math::Vec plugPortSize = plugPortSvg->getSize();
+	nvgTranslate(args.vg, VEC_ARGS(plugPortSize.div(2).neg()));
+	plugPortSvg->draw(args.vg);
+
+	nvgRestore(args.vg);
 }
 
-static void drawCable(NVGcontext* vg, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
+static void CableWidget_drawCable(CableWidget* that, const widget::Widget::DrawArgs& args, math::Vec pos1, math::Vec pos2, NVGcolor color, float thickness, float tension, float opacity) {
 	NVGcolor colorShadow = nvgRGBAf(0, 0, 0, 0.10);
 	NVGcolor colorOutline = nvgLerpRGBA(color, nvgRGBf(0.0, 0.0, 0.0), 0.5);
 
 	// Cable
 	if (opacity > 0.0) {
-		nvgSave(vg);
+		nvgSave(args.vg);
 		// This power scaling looks more linear than actual linear scaling
-		nvgGlobalAlpha(vg, std::pow(opacity, 1.5));
+		nvgGlobalAlpha(args.vg, std::pow(opacity, 1.5));
 
 		float dist = pos1.minus(pos2).norm();
 		math::Vec slump;
@@ -155,31 +171,31 @@ static void drawCable(NVGcontext* vg, math::Vec pos1, math::Vec pos2, NVGcolor c
 		pos1 = pos1.plus(pos3.minus(pos1).normalize().mult(9));
 		pos2 = pos2.plus(pos3.minus(pos2).normalize().mult(9));
 
-		nvgLineJoin(vg, NVG_ROUND);
+		nvgLineJoin(args.vg, NVG_ROUND);
 
 		// Shadow
 		math::Vec pos4 = pos3.plus(slump.mult(0.08));
-		nvgBeginPath(vg);
-		nvgMoveTo(vg, pos1.x, pos1.y);
-		nvgQuadTo(vg, pos4.x, pos4.y, pos2.x, pos2.y);
-		nvgStrokeColor(vg, colorShadow);
-		nvgStrokeWidth(vg, thickness);
-		nvgStroke(vg);
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, pos1.x, pos1.y);
+		nvgQuadTo(args.vg, pos4.x, pos4.y, pos2.x, pos2.y);
+		nvgStrokeColor(args.vg, colorShadow);
+		nvgStrokeWidth(args.vg, thickness);
+		nvgStroke(args.vg);
 
 		// Cable outline
-		nvgBeginPath(vg);
-		nvgMoveTo(vg, pos1.x, pos1.y);
-		nvgQuadTo(vg, pos3.x, pos3.y, pos2.x, pos2.y);
-		nvgStrokeColor(vg, colorOutline);
-		nvgStrokeWidth(vg, thickness);
-		nvgStroke(vg);
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, pos1.x, pos1.y);
+		nvgQuadTo(args.vg, pos3.x, pos3.y, pos2.x, pos2.y);
+		nvgStrokeColor(args.vg, colorOutline);
+		nvgStrokeWidth(args.vg, thickness);
+		nvgStroke(args.vg);
 
 		// Cable solid
-		nvgStrokeColor(vg, color);
-		nvgStrokeWidth(vg, thickness - 2);
-		nvgStroke(vg);
+		nvgStrokeColor(args.vg, color);
+		nvgStrokeWidth(args.vg, thickness - 2);
+		nvgStroke(args.vg);
 
-		nvgRestore(vg);
+		nvgRestore(args.vg);
 	}
 }
 
@@ -212,33 +228,36 @@ void CableWidget::draw(const DrawArgs& args) {
 
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
-	drawCable(args.vg, outputPos, inputPos, color, thickness, tension, opacity);
+	CableWidget_drawCable(this, args, outputPos, inputPos, color, thickness, tension, opacity);
 }
 
 void CableWidget::drawPlugs(const DrawArgs& args) {
+	// Draw output plug
 	math::Vec outputPos = getOutputPos();
-	math::Vec inputPos = getInputPos();
-
-	// Draw plug if the cable is on top, or if the cable is incomplete
-	if (!isComplete() || APP->scene->rack->getTopCable(outputPort) == this) {
-		drawPlug(args.vg, outputPos, color);
-		if (isComplete()) {
-			// Draw plug light
-			nvgSave(args.vg);
-			nvgTranslate(args.vg, outputPos.x - 4, outputPos.y - 4);
-			outputPort->getPlugLight()->draw(args);
-			nvgRestore(args.vg);
-		}
+	bool outputTop = !isComplete() || APP->scene->rack->getTopCable(outputPort) == this;
+	CableWidget_drawPlug(this, args, outputPos, color, outputTop);
+	if (outputTop && isComplete()) {
+		// Draw output plug light
+		nvgSave(args.vg);
+		LightWidget* plugLight = outputPort->getPlugLight();
+		math::Vec plugPos = outputPos.minus(plugLight->getSize().div(2));
+		nvgTranslate(args.vg, VEC_ARGS(plugPos));
+		plugLight->draw(args);
+		nvgRestore(args.vg);
 	}
 
-	if (!isComplete() || APP->scene->rack->getTopCable(inputPort) == this) {
-		drawPlug(args.vg, inputPos, color);
-		if (isComplete()) {
-			nvgSave(args.vg);
-			nvgTranslate(args.vg, inputPos.x - 4, inputPos.y - 4);
-			inputPort->getPlugLight()->draw(args);
-			nvgRestore(args.vg);
-		}
+	// Draw input plug
+	math::Vec inputPos = getInputPos();
+	bool inputTop = !isComplete() || APP->scene->rack->getTopCable(inputPort) == this;
+	CableWidget_drawPlug(this, args, inputPos, color, inputTop);
+	if (inputTop && isComplete()) {
+		// Draw input plug light
+		nvgSave(args.vg);
+		LightWidget* plugLight = inputPort->getPlugLight();
+		math::Vec plugPos = inputPos.minus(plugLight->getSize().div(2));
+		nvgTranslate(args.vg, VEC_ARGS(plugPos));
+		plugLight->draw(args);
+		nvgRestore(args.vg);
 	}
 }
 

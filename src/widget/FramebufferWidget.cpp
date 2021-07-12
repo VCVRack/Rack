@@ -105,6 +105,7 @@ void FramebufferWidget::step() {
 		// Create a framebuffer
 		if (internal->fbSize.isFinite() && !internal->fbSize.isZero()) {
 			internal->fb = nvgluCreateFramebuffer(vg, internal->fbSize.x, internal->fbSize.y, 0);
+			// DEBUG("Created framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
 		}
 	}
 	if (!internal->fb) {

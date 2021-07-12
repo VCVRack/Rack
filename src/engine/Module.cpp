@@ -315,16 +315,12 @@ static void Port_step(Port* that, float deltaTime) {
 	}
 	else if (that->channels == 1) {
 		float v = that->getVoltage() / 10.f;
-		that->plugLights[0].setSmoothBrightness(v, deltaTime);
-		that->plugLights[1].setSmoothBrightness(-v, deltaTime);
+		that->plugLights[0].setSmoothBrightness(-v, deltaTime);
+		that->plugLights[1].setSmoothBrightness(v, deltaTime);
 		that->plugLights[2].setBrightness(0.f);
 	}
 	else {
-		float v2 = 0.f;
-		for (int c = 0; c < that->channels; c++) {
-			v2 += std::pow(that->getVoltage(c), 2);
-		}
-		float v = std::sqrt(v2) / 10.f;
+		float v = that->getVoltageRMS() / 10.f;
 		that->plugLights[0].setBrightness(0.f);
 		that->plugLights[1].setBrightness(0.f);
 		that->plugLights[2].setSmoothBrightness(v, deltaTime);

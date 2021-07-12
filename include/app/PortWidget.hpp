@@ -39,6 +39,7 @@ struct PortWidget : widget::OpaqueWidget {
 	void onDragDrop(const DragDropEvent& e) override;
 	void onDragEnter(const DragEnterEvent& e) override;
 	void onDragLeave(const DragLeaveEvent& e) override;
+	void onContextDestroy(const ContextDestroyEvent& e) override;
 };
 
 

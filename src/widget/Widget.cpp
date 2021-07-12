@@ -268,15 +268,16 @@ void Widget::draw(const DrawArgs& args) {
 		if (!args.clipBox.intersects(child->box))
 			continue;
 
-		DrawArgs childCtx = args;
+		DrawArgs childArgs = args;
 		// Intersect child clip box with self
-		childCtx.clipBox = childCtx.clipBox.intersect(child->box);
-		childCtx.clipBox.pos = childCtx.clipBox.pos.minus(child->box.pos);
+		childArgs.clipBox = childArgs.clipBox.intersect(child->box);
+		// Offset clip box by child pos
+		childArgs.clipBox.pos = childArgs.clipBox.pos.minus(child->box.pos);
 
 		nvgSave(args.vg);
 		nvgTranslate(args.vg, child->box.pos.x, child->box.pos.y);
 
-		child->draw(childCtx);
+		child->draw(childArgs);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
