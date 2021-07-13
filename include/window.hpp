@@ -50,6 +50,7 @@ struct Window {
 
 	GLFWwindow* win = NULL;
 	NVGcontext* vg = NULL;
+	NVGcontext* fbVg = NULL;
 	/** The scaling ratio */
 	float pixelRatio = 1.f;
 	/* The ratio between the framebuffer size and the window size reported by the OS.

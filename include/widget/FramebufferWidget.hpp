@@ -31,7 +31,6 @@ struct FramebufferWidget : Widget {
 	int getImageHandle();
 	NVGLUframebuffer* getFramebuffer();
 	math::Vec getFramebufferSize();
-	void setScale(math::Vec scale);
 	void onContextCreate(const ContextCreateEvent& e) override;
 	void onContextDestroy(const ContextDestroyEvent& e) override;
 };
