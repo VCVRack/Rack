@@ -336,14 +336,17 @@ struct Rect {
 		return pos.x;
 	}
 	float getRight() const {
-		return pos.x + size.x;
+		return (size.x == INFINITY) ? INFINITY : (pos.x + size.x);
 	}
 	float getTop() const {
 		return pos.y;
 	}
 	float getBottom() const {
-		return pos.y + size.y;
+		return (size.y == INFINITY) ? INFINITY : (pos.y + size.y);
 	}
+	/** Returns the center point of the rectangle.
+	Returns a NaN coordinate if pos=-inf and size=inf.
+	*/
 	Vec getCenter() const {
 		return pos.plus(size.mult(0.5f));
 	}
@@ -351,13 +354,13 @@ struct Rect {
 		return pos;
 	}
 	Vec getTopRight() const {
-		return pos.plus(Vec(size.x, 0.f));
+		return Vec(getRight(), getTop());
 	}
 	Vec getBottomLeft() const {
-		return pos.plus(Vec(0.f, size.y));
+		return Vec(getLeft(), getBottom());
 	}
 	Vec getBottomRight() const {
-		return pos.plus(size);
+		return Vec(getRight(), getBottom());
 	}
 	/** Clamps the edges of the rectangle to fit within a bound. */
 	Rect clamp(Rect bound) const {
@@ -435,6 +438,12 @@ inline Vec Vec::clampSafe(Rect bound) const {
 
 
 // Operator overloads for Vec
+inline Vec operator+(const Vec& a) {
+	return a;
+}
+inline Vec operator-(const Vec& a) {
+	return a.neg();
+}
 inline Vec operator+(const Vec& a, const Vec& b) {
 	return a.plus(b);
 }
@@ -478,6 +487,15 @@ inline bool operator==(const Vec& a, const Vec& b) {
 	return a.equals(b);
 }
 inline bool operator!=(const Vec& a, const Vec& b) {
+	return !a.equals(b);
+}
+
+
+// Operator overloads for Rect
+inline bool operator==(const Rect& a, const Rect& b) {
+	return a.equals(b);
+}
+inline bool operator!=(const Rect& a, const Rect& b) {
 	return !a.equals(b);
 }
 
