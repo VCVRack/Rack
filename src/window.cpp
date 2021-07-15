@@ -10,7 +10,7 @@
 #include <stb_image_write.h>
 #include <osdialog.h>
 
-#include <window.hpp>
+#include <Window.hpp>
 #include <asset.hpp>
 #include <widget/Widget.hpp>
 #include <app/Scene.hpp>

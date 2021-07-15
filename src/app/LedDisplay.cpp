@@ -1,6 +1,6 @@
 #include <app/LedDisplay.hpp>
 #include <asset.hpp>
-#include <window.hpp>
+#include <Window.hpp>
 #include <context.hpp>
 
 

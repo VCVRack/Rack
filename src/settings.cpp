@@ -1,7 +1,7 @@
 #include <jansson.h>
 
 #include <settings.hpp>
-#include <window.hpp>
+#include <Window.hpp>
 #include <plugin.hpp>
 #include <app/Scene.hpp>
 #include <app/ModuleBrowser.hpp>

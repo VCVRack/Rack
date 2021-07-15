@@ -9,7 +9,7 @@
 #include <random.hpp>
 #include <network.hpp>
 #include <asset.hpp>
-#include <window.hpp>
+#include <Window.hpp>
 #include <context.hpp>
 #include <midi.hpp>
 #include <settings.hpp>

@@ -13,7 +13,7 @@
 #include <app/Scene.hpp>
 #include <plugin.hpp>
 #include <context.hpp>
-#include <window.hpp>
+#include <Window.hpp>
 #include <patch.hpp>
 #include <history.hpp>
 #include <ui/common.hpp>

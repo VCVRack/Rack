@@ -1,7 +1,7 @@
 #include <gamepad.hpp>
 #include <midi.hpp>
 #include <string.hpp>
-#include <window.hpp>
+#include <Window.hpp>
 
 
 namespace rack {

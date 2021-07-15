@@ -1,6 +1,6 @@
 #include <app/PortWidget.hpp>
 #include <app/Scene.hpp>
-#include <window.hpp>
+#include <Window.hpp>
 #include <context.hpp>
 #include <history.hpp>
 #include <engine/Engine.hpp>

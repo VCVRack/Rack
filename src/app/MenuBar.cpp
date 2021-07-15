@@ -16,7 +16,7 @@
 #include <ui/ProgressBar.hpp>
 #include <ui/Label.hpp>
 #include <engine/Engine.hpp>
-#include <window.hpp>
+#include <Window.hpp>
 #include <asset.hpp>
 #include <context.hpp>
 #include <settings.hpp>

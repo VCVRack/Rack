@@ -1,7 +1,7 @@
 #include <app/CableWidget.hpp>
 #include <app/Scene.hpp>
 #include <app/RackWidget.hpp>
-#include <window.hpp>
+#include <Window.hpp>
 #include <context.hpp>
 #include <patch.hpp>
 #include <asset.hpp>
