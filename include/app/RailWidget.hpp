@@ -7,12 +7,12 @@ namespace rack {
 namespace app {
 
 
-struct RackRail : widget::TransparentWidget {
-	std::shared_ptr<Svg> busBoardSvg;
-	std::shared_ptr<Svg> railsSvg;
+struct RailWidget : widget::TransparentWidget {
+	std::shared_ptr<Svg> svg;
 
-	RackRail();
+	RailWidget();
 	void draw(const DrawArgs& args) override;
+	math::Vec getTileSize();
 };
 
 

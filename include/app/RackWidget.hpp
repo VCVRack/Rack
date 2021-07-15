@@ -23,7 +23,6 @@ struct RackWidget : widget::OpaqueWidget {
 	widget::Widget* moduleContainer;
 	widget::Widget* cableContainer;
 	CableWidget* incompleteCable = NULL;
-	widget::FramebufferWidget* railFb;
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
 	ParamWidget* touchedParam = NULL;

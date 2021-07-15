@@ -6,7 +6,7 @@
 
 #include <app/RackWidget.hpp>
 #include <widget/TransparentWidget.hpp>
-#include <app/RackRail.hpp>
+#include <app/RailWidget.hpp>
 #include <app/Scene.hpp>
 #include <app/ModuleBrowser.hpp>
 #include <settings.hpp>
@@ -72,18 +72,24 @@ struct CableContainer : widget::TransparentWidget {
 };
 
 
+struct RackWidget::Internal {
+	widget::FramebufferWidget* railFb;
+	app::RailWidget* rail;
+};
+
+
 RackWidget::RackWidget() {
-	// railFb = new widget::FramebufferWidget;
-	// railFb->box.size = math::Vec();
-	// railFb->oversample = 1.0;
-	// // Don't redraw when the world offset of the rail FramebufferWidget changes its fractional value.
-	// railFb->dirtyOnSubpixelChange = false;
-	// {
-	// 	RackRail* rail = new RackRail;
-	// 	rail->box.size = math::Vec();
-	// 	railFb->addChild(rail);
-	// }
-	// addChild(railFb);
+	internal = new Internal;
+
+	internal->railFb = new widget::FramebufferWidget;
+	internal->railFb->box.size = math::Vec();
+	internal->railFb->oversample = 1.0;
+	// Don't redraw when the world offset of the rail FramebufferWidget changes its fractional value.
+	internal->railFb->dirtyOnSubpixelChange = false;
+	addChild(internal->railFb);
+
+	internal->rail = new RailWidget;
+	internal->railFb->addChild(internal->rail);
 
 	moduleContainer = new ModuleContainer;
 	addChild(moduleContainer);
@@ -94,6 +100,7 @@ RackWidget::RackWidget() {
 
 RackWidget::~RackWidget() {
 	clear();
+	delete internal;
 }
 
 void RackWidget::step() {
@@ -106,16 +113,15 @@ void RackWidget::draw(const DrawArgs& args) {
 	nvgGlobalTint(args.vg, nvgRGBAf(b, b, b, 1));
 
 	// Resize and reposition the RackRail to align on the grid.
-	// math::Rect railBox;
-	// railBox.pos = args.clipBox.pos.div(BUS_BOARD_GRID_SIZE).floor().mult(BUS_BOARD_GRID_SIZE);
-	// railBox.size = args.clipBox.size.div(BUS_BOARD_GRID_SIZE).ceil().plus(math::Vec(1, 1)).mult(BUS_BOARD_GRID_SIZE);
-	// if (!railFb->box.size.equals(railBox.size)) {
-	// 	railFb->dirty = true;
-	// }
-	// railFb->box = railBox;
-
-	// RackRail* rail = railFb->getFirstDescendantOfType<RackRail>();
-	// rail->box.size = railFb->box.size;
+	math::Vec railSize = internal->rail->getTileSize();
+	math::Rect railBox;
+	railBox.pos = args.clipBox.pos.div(railSize).floor().mult(railSize);
+	railBox.size = args.clipBox.size.div(railSize).ceil().plus(math::Vec(1, 1)).mult(railSize);
+	if (!internal->railFb->box.size.equals(railBox.size)) {
+		internal->railFb->setDirty();
+	}
+	internal->railFb->box = railBox;
+	internal->rail->box.size = internal->railFb->box.size;
 
 	Widget::draw(args);
 }

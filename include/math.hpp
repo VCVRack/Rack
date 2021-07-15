@@ -236,6 +236,9 @@ struct Vec {
 	float square() const {
 		return x * x + y * y;
 	}
+	float area() const {
+		return x * y;
+	}
 	/** Rotates counterclockwise in radians. */
 	Vec rotate(float angle) {
 		float sin = std::sin(angle);
