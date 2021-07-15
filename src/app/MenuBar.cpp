@@ -1068,6 +1068,7 @@ struct MeterLabel : ui::Label {
 	void step() override {
 		double meterAverage = APP->engine->getMeterAverage();
 		double meterMax = APP->engine->getMeterMax();
+		// double frameRate = 1.0 / APP->window->getLastFrameDuration();
 		text = string::f("%.1f%% avg / %.1f%% max", meterAverage * 100, meterMax * 100);
 		Label::step();
 	}
@@ -1117,7 +1118,7 @@ struct MenuBar : widget::OpaqueWidget {
 
 		meterLabel = new MeterLabel;
 		meterLabel->box.pos.y = margin;
-		meterLabel->box.size.x = 160;
+		meterLabel->box.size.x = 300;
 		meterLabel->alignment = ui::Label::RIGHT_ALIGNMENT;
 		meterLabel->color.a = 0.5;
 		addChild(meterLabel);

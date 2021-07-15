@@ -19,14 +19,6 @@ namespace rack {
 namespace app {
 
 
-struct FrameRateWidget : widget::TransparentWidget {
-	void draw(const DrawArgs& args) override {
-		std::string text = string::f("%.2lf Hz", 1.0 / APP->window->getLastFrameDuration());
-		bndLabel(args.vg, 0.0, 0.0, INFINITY, INFINITY, -1, text.c_str());
-	}
-};
-
-
 struct ResizeHandle : widget::OpaqueWidget {
 	math::Vec size;
 
@@ -75,11 +67,6 @@ Scene::Scene() {
 		addChild(tipWindowCreate());
 	}
 
-	// frameRateWidget = new FrameRateWidget;
-	// frameRateWidget->box.size = math::Vec(80.0, 30.0);
-	// frameRateWidget->hide();
-	// addChild(frameRateWidget);
-
 	internal->resizeHandle = new ResizeHandle;
 	internal->resizeHandle->box.size = math::Vec(15, 15);
 	internal->resizeHandle->hide();
@@ -100,8 +87,6 @@ void Scene::step() {
 		menuBar->show();
 		rackScroll->box.pos.y = menuBar->box.size.y;
 	}
-
-	// frameRateWidget->box.pos.x = box.size.x - frameRateWidget->box.size.x;
 
 	internal->resizeHandle->box.pos = box.size.minus(internal->resizeHandle->box.size);
 
