@@ -73,17 +73,17 @@ struct CableContainer : widget::TransparentWidget {
 
 
 RackWidget::RackWidget() {
-	railFb = new widget::FramebufferWidget;
-	railFb->box.size = math::Vec();
-	railFb->oversample = 1.0;
-	// Don't redraw when the world offset of the rail FramebufferWidget changes its fractional value.
-	railFb->dirtyOnSubpixelChange = false;
-	{
-		RackRail* rail = new RackRail;
-		rail->box.size = math::Vec();
-		railFb->addChild(rail);
-	}
-	addChild(railFb);
+	// railFb = new widget::FramebufferWidget;
+	// railFb->box.size = math::Vec();
+	// railFb->oversample = 1.0;
+	// // Don't redraw when the world offset of the rail FramebufferWidget changes its fractional value.
+	// railFb->dirtyOnSubpixelChange = false;
+	// {
+	// 	RackRail* rail = new RackRail;
+	// 	rail->box.size = math::Vec();
+	// 	railFb->addChild(rail);
+	// }
+	// addChild(railFb);
 
 	moduleContainer = new ModuleContainer;
 	addChild(moduleContainer);
@@ -106,16 +106,16 @@ void RackWidget::draw(const DrawArgs& args) {
 	nvgGlobalTint(args.vg, nvgRGBAf(b, b, b, 1));
 
 	// Resize and reposition the RackRail to align on the grid.
-	math::Rect railBox;
-	railBox.pos = args.clipBox.pos.div(BUS_BOARD_GRID_SIZE).floor().mult(BUS_BOARD_GRID_SIZE);
-	railBox.size = args.clipBox.size.div(BUS_BOARD_GRID_SIZE).ceil().plus(math::Vec(1, 1)).mult(BUS_BOARD_GRID_SIZE);
-	if (!railFb->box.size.equals(railBox.size)) {
-		railFb->dirty = true;
-	}
-	railFb->box = railBox;
+	// math::Rect railBox;
+	// railBox.pos = args.clipBox.pos.div(BUS_BOARD_GRID_SIZE).floor().mult(BUS_BOARD_GRID_SIZE);
+	// railBox.size = args.clipBox.size.div(BUS_BOARD_GRID_SIZE).ceil().plus(math::Vec(1, 1)).mult(BUS_BOARD_GRID_SIZE);
+	// if (!railFb->box.size.equals(railBox.size)) {
+	// 	railFb->dirty = true;
+	// }
+	// railFb->box = railBox;
 
-	RackRail* rail = railFb->getFirstDescendantOfType<RackRail>();
-	rail->box.size = railFb->box.size;
+	// RackRail* rail = railFb->getFirstDescendantOfType<RackRail>();
+	// rail->box.size = railFb->box.size;
 
 	Widget::draw(args);
 }

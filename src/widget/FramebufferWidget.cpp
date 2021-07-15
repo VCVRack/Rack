@@ -95,10 +95,6 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 		if (APP->window->getFrameTimeOverdue() > 0.0)
 			return;
 
-		// Check that scale has been set by `draw()` yet.
-		if (scale.isZero())
-			return;
-
 		// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
 		dirty = false;
 		NVGcontext* vg = APP->window->vg;
@@ -134,8 +130,8 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 			}
 			// Create a framebuffer
 			if (internal->fbSize.isFinite() && !internal->fbSize.isZero()) {
+				// DEBUG("Creating framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
 				internal->fb = nvgluCreateFramebuffer(vg, internal->fbSize.x, internal->fbSize.y, 0);
-				// DEBUG("Created framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
 			}
 		}
 		if (!internal->fb) {
@@ -143,7 +139,7 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 			return;
 		}
 
-		DEBUG("Drawing to framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
+		// DEBUG("Drawing to framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
 
 		// Render to framebuffer
 		if (oversample == 1.0) {
@@ -156,6 +152,7 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 			NVGLUframebuffer* fb = internal->fb;
 			// If oversampling, create another framebuffer and copy it to actual size.
 			math::Vec oversampledFbSize = internal->fbSize.mult(oversample).ceil();
+			// DEBUG("Creating %0.fx oversampled framebuffer of size (%f, %f)", oversample, VEC_ARGS(internal->fbSize));
 			NVGLUframebuffer* oversampledFb = nvgluCreateFramebuffer(fbVg, oversampledFbSize.x, oversampledFbSize.y, 0);
 
 			if (!oversampledFb) {
@@ -170,9 +167,8 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 			internal->fb = fb;
 			nvgluBindFramebuffer(NULL);
 
-			// Use NanoVG for resizing framebuffers
+			// Use NanoVG for copying oversampled framebuffer to normal framebuffer
 			nvgluBindFramebuffer(internal->fb);
-
 			nvgBeginFrame(fbVg, internal->fbBox.size.x, internal->fbBox.size.y, 1.0);
 
 			// Draw oversampled framebuffer
@@ -205,11 +201,7 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	nvgSave(args.vg);
 	nvgResetTransform(args.vg);
 
-	math::Vec scaleRatio = math::Vec(1, 1);
-	if (!internal->fbScale.isZero() && !scale.equals(internal->fbScale)) {
-		// Continue to draw with the last framebuffer, but stretch it to rescale.
-		scaleRatio = scale.div(internal->fbScale);
-	}
+	math::Vec scaleRatio = scale.div(internal->fbScale);
 	// DEBUG("%f %f %f %f", scaleRatio.x, scaleRatio.y, offsetF.x, offsetF.y);
 
 	// DEBUG("%f %f %f %f, %f %f", RECT_ARGS(internal->fbBox), VEC_ARGS(internal->fbSize));

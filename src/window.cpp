@@ -81,8 +81,8 @@ struct Window::Internal {
 	bool ignoreNextMouseDelta = false;
 	int frameSwapInterval = -1;
 	double monitorRefreshRate = 0.0;
+	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
-	double lastFrameTime = 0.0;
 
 	math::Vec lastMousePos;
 
@@ -387,10 +387,10 @@ void Window::run() {
 
 
 void Window::step() {
-	double frameTime = glfwGetTime();
-	internal->lastFrameDuration = frameTime - internal->lastFrameTime;
+	double lastFrameTime = internal->frameTime;
+	internal->frameTime = system::getTime();
+	internal->lastFrameDuration = internal->frameTime - lastFrameTime;
 	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
-	internal->lastFrameTime = frameTime;
 
 	// Make event handlers and step() have a clean NanoVG context
 	nvgReset(vg);
@@ -540,7 +540,7 @@ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 			zw->addChild(mw);
 
 			// HACK: Set the frame time so FramebufferWidgets are never overdue and therefore guaranteed to draw
-			internal->lastFrameTime = INFINITY;
+			internal->frameTime = INFINITY;
 
 			// Draw to framebuffer
 			fbw->step();
@@ -636,8 +636,8 @@ double Window::getMonitorRefreshRate() {
 }
 
 
-double Window::getLastFrameTime() {
-	return internal->lastFrameTime;
+double Window::getFrameTime() {
+	return internal->frameTime;
 }
 
 
@@ -648,7 +648,7 @@ double Window::getLastFrameDuration() {
 
 double Window::getFrameTimeOverdue() {
 	double desiredFrameDuration = internal->frameSwapInterval / internal->monitorRefreshRate;
-	double frameDuration = glfwGetTime() - internal->lastFrameTime;
+	double frameDuration = system::getTime() - internal->frameTime;
 	return frameDuration - desiredFrameDuration;
 }
 

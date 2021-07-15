@@ -111,7 +111,7 @@ void Scene::step() {
 
 	// Autosave periodically
 	if (settings::autosaveInterval > 0.0) {
-		double time = glfwGetTime();
+		double time = system::getTime();
 		if (time - lastAutosaveTime >= settings::autosaveInterval) {
 			lastAutosaveTime = time;
 			APP->patch->saveAutosave();

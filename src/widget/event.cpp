@@ -2,6 +2,7 @@
 #include <widget/Widget.hpp>
 #include <context.hpp>
 #include <window.hpp>
+#include <system.hpp>
 
 
 namespace rack {
@@ -159,7 +160,7 @@ bool EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 
 		if (action == GLFW_PRESS) {
 			const double doubleClickDuration = 0.3;
-			double clickTime = glfwGetTime();
+			double clickTime = system::getTime();
 			if (clickedWidget
 			    && clickTime - lastClickTime <= doubleClickDuration
 			    && lastClickedWidget == clickedWidget) {

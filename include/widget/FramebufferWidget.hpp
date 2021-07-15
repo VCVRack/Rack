@@ -6,9 +6,8 @@ namespace rack {
 namespace widget {
 
 
-/** Caches a widget's draw() result to a framebuffer so it is called less frequently.
-When `dirty` is true, its children will be re-rendered on the next call to step().
-Events are not passed to the underlying scene.
+/** Caches its children's draw() result to a framebuffer image.
+When dirty, its children will be re-rendered on the next call to step().
 */
 struct FramebufferWidget : Widget {
 	struct Internal;

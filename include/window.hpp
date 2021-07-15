@@ -82,7 +82,7 @@ struct Window {
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();
 	double getMonitorRefreshRate();
-	double getLastFrameTime();
+	double getFrameTime();
 	double getLastFrameDuration();
 	double getFrameTimeOverdue();
 
