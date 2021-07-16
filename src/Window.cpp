@@ -306,9 +306,10 @@ Window::Window() {
 		exit(1);
 	}
 
+	const GLubyte* vendor = glGetString(GL_VENDOR);
 	const GLubyte* renderer = glGetString(GL_RENDERER);
 	const GLubyte* version = glGetString(GL_VERSION);
-	INFO("Renderer: %s", renderer);
+	INFO("Renderer: %s %s", vendor, renderer);
 	INFO("OpenGL: %s", version);
 
 	// GLEW generates GL error because it calls glGetString(GL_EXTENSIONS), we'll consume it here.
