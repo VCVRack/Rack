@@ -26,6 +26,7 @@ struct FramebufferWidget : Widget {
 	int getImageHandle();
 	NVGLUframebuffer* getFramebuffer();
 	math::Vec getFramebufferSize();
+	void deleteFramebuffer();
 
 	void step() override;
 	/** Draws the framebuffer to the NanoVG scene, re-rendering it if necessary.

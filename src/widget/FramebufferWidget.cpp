@@ -7,6 +7,9 @@ namespace rack {
 namespace widget {
 
 
+static int FramebufferWidget_totalPixels = 0;
+
+
 struct FramebufferWidget::Internal {
 	NVGLUframebuffer* fb = NULL;
 
@@ -29,11 +32,7 @@ FramebufferWidget::FramebufferWidget() {
 
 
 FramebufferWidget::~FramebufferWidget() {
-	if (internal->fb) {
-		// If the framebuffer exists, the Window should exist.
-		assert(APP->window);
-		nvgluDeleteFramebuffer(internal->fb);
-	}
+	deleteFramebuffer();
 	delete internal;
 }
 
@@ -57,6 +56,20 @@ NVGLUframebuffer* FramebufferWidget::getFramebuffer() {
 
 math::Vec FramebufferWidget::getFramebufferSize() {
 	return internal->fbSize;
+}
+
+
+void FramebufferWidget::deleteFramebuffer() {
+	if (!internal->fb)
+		return;
+
+	// If the framebuffer exists, the Window should exist.
+	assert(APP->window);
+
+	nvgluDeleteFramebuffer(internal->fb);
+	internal->fb = NULL;
+
+	FramebufferWidget_totalPixels -= internal->fbSize.area();
 }
 
 
@@ -168,17 +181,18 @@ void FramebufferWidget::render(math::Vec scale, math::Vec offsetF) {
 
 	// Create framebuffer if a new size is needed
 	if (!internal->fb || !newFbSize.equals(internal->fbSize)) {
-		internal->fbSize = newFbSize;
 		// Delete old framebuffer
-		if (internal->fb) {
-			nvgluDeleteFramebuffer(internal->fb);
-			internal->fb = NULL;
-		}
+		deleteFramebuffer();
+
 		// Create a framebuffer
-		if (internal->fbSize.isFinite() && !internal->fbSize.isZero()) {
-			// DEBUG("Creating framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
-			internal->fb = nvgluCreateFramebuffer(vg, internal->fbSize.x, internal->fbSize.y, 0);
+		if (newFbSize.isFinite() && !newFbSize.isZero()) {
+			// DEBUG("Creating framebuffer of size (%f, %f)", VEC_ARGS(newFbSize));
+			internal->fb = nvgluCreateFramebuffer(vg, newFbSize.x, newFbSize.y, 0);
+			FramebufferWidget_totalPixels += newFbSize.area();
 		}
+
+		// DEBUG("Framebuffer total pixels: %.1f Mpx", FramebufferWidget_totalPixels / 1e6);
+		internal->fbSize = newFbSize;
 	}
 	if (!internal->fb) {
 		WARN("Framebuffer of size (%f, %f) could not be created for FramebufferWidget %p.", VEC_ARGS(internal->fbSize), this);
@@ -282,10 +296,7 @@ void FramebufferWidget::onContextCreate(const ContextCreateEvent& e) {
 
 
 void FramebufferWidget::onContextDestroy(const ContextDestroyEvent& e) {
-	if (internal->fb) {
-		nvgluDeleteFramebuffer(internal->fb);
-		internal->fb = NULL;
-	}
+	deleteFramebuffer();
 	setDirty();
 	Widget::onContextDestroy(e);
 }
