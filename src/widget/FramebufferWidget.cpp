@@ -43,9 +43,20 @@ void FramebufferWidget::setDirty(bool dirty) {
 }
 
 
-void FramebufferWidget::onDirty(const DirtyEvent& e) {
-	setDirty();
-	Widget::onDirty(e);
+int FramebufferWidget::getImageHandle() {
+	if (!internal->fb)
+		return -1;
+	return internal->fb->image;
+}
+
+
+NVGLUframebuffer* FramebufferWidget::getFramebuffer() {
+	return internal->fb;
+}
+
+
+math::Vec FramebufferWidget::getFramebufferSize() {
+	return internal->fbSize;
 }
 
 
@@ -79,7 +90,7 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	// If drawing to a new subpixel location, rerender in the next frame.
 	// Anything less than 0.1 pixels isn't noticeable.
 	math::Vec offsetFDelta = offsetF.minus(internal->fbOffsetF);
-	if (offsetFDelta.square() >= std::pow(0.1f, 2) && dirtyOnSubpixelChange && APP->window->fbDirtyOnSubpixelChange()) {
+	if (dirtyOnSubpixelChange && APP->window->fbDirtyOnSubpixelChange() && offsetFDelta.square() >= std::pow(0.1f, 2)) {
 		// DEBUG("%p dirty subpixel (%f, %f) (%f, %f)", this, VEC_ARGS(offsetF), VEC_ARGS(internal->fbOffsetF));
 		setDirty();
 	}
@@ -89,109 +100,9 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 		setDirty();
 	}
 
-	// Draw to framebuffer if dirty
-	auto redraw = [&]() {
-		// It's more important to not lag the frame than to draw the framebuffer
-		if (APP->window->getFrameTimeOverdue() > 0.0)
-			return;
-
-		// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
-		dirty = false;
-		NVGcontext* vg = APP->window->vg;
-		NVGcontext* fbVg = APP->window->fbVg;
-
-		internal->fbScale = scale;
-		internal->fbOffsetF = offsetF;
-
-		math::Rect localBox;
-		if (children.empty()) {
-			localBox = box.zeroPos();
-		}
-		else {
-			localBox = getVisibleChildrenBoundingBox();
-		}
-
-		// DEBUG("rendering FramebufferWidget localBox (%g %g %g %g) fbOffset (%g %g) fbScale (%g %g)", RECT_ARGS(localBox), VEC_ARGS(internal->fbOffsetF), VEC_ARGS(internal->fbScale));
-		// Transform to world coordinates, then expand to nearest integer coordinates
-		math::Vec min = localBox.getTopLeft().mult(internal->fbScale).plus(internal->fbOffsetF).floor();
-		math::Vec max = localBox.getBottomRight().mult(internal->fbScale).plus(internal->fbOffsetF).ceil();
-		internal->fbBox = math::Rect::fromMinMax(min, max);
-		// DEBUG("%g %g %g %g", RECT_ARGS(internal->fbBox));
-
-		math::Vec newFbSize = internal->fbBox.size.mult(APP->window->pixelRatio).ceil();
-
-		// Create framebuffer if a new size is needed
-		if (!internal->fb || !newFbSize.equals(internal->fbSize)) {
-			internal->fbSize = newFbSize;
-			// Delete old framebuffer
-			if (internal->fb) {
-				nvgluDeleteFramebuffer(internal->fb);
-				internal->fb = NULL;
-			}
-			// Create a framebuffer
-			if (internal->fbSize.isFinite() && !internal->fbSize.isZero()) {
-				// DEBUG("Creating framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
-				internal->fb = nvgluCreateFramebuffer(vg, internal->fbSize.x, internal->fbSize.y, 0);
-			}
-		}
-		if (!internal->fb) {
-			WARN("Framebuffer of size (%f, %f) could not be created for FramebufferWidget %p.", VEC_ARGS(internal->fbSize), this);
-			return;
-		}
-
-		// DEBUG("Drawing to framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
-
-		// Render to framebuffer
-		if (oversample == 1.0) {
-			// If not oversampling, render directly to framebuffer.
-			nvgluBindFramebuffer(internal->fb);
-			drawFramebuffer();
-			nvgluBindFramebuffer(NULL);
-		}
-		else {
-			NVGLUframebuffer* fb = internal->fb;
-			// If oversampling, create another framebuffer and copy it to actual size.
-			math::Vec oversampledFbSize = internal->fbSize.mult(oversample).ceil();
-			// DEBUG("Creating %0.fx oversampled framebuffer of size (%f, %f)", oversample, VEC_ARGS(internal->fbSize));
-			NVGLUframebuffer* oversampledFb = nvgluCreateFramebuffer(fbVg, oversampledFbSize.x, oversampledFbSize.y, 0);
-
-			if (!oversampledFb) {
-				WARN("Oversampled framebuffer of size (%f, %f) could not be created for FramebufferWidget %p.", VEC_ARGS(oversampledFbSize), this);
-				return;
-			}
-
-			// Render to oversampled framebuffer.
-			nvgluBindFramebuffer(oversampledFb);
-			internal->fb = oversampledFb;
-			drawFramebuffer();
-			internal->fb = fb;
-			nvgluBindFramebuffer(NULL);
-
-			// Use NanoVG for copying oversampled framebuffer to normal framebuffer
-			nvgluBindFramebuffer(internal->fb);
-			nvgBeginFrame(fbVg, internal->fbBox.size.x, internal->fbBox.size.y, 1.0);
-
-			// Draw oversampled framebuffer
-			nvgBeginPath(fbVg);
-			nvgRect(fbVg, 0.0, 0.0, internal->fbSize.x, internal->fbSize.y);
-			NVGpaint paint = nvgImagePattern(fbVg, 0.0, 0.0,
-				internal->fbSize.x, internal->fbSize.y,
-				0.0, oversampledFb->image, 1.0);
-			nvgFillPaint(fbVg, paint);
-			nvgFill(fbVg);
-
-			glViewport(0.0, 0.0, internal->fbSize.x, internal->fbSize.y);
-			glClearColor(0.0, 0.0, 0.0, 0.0);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-			nvgEndFrame(fbVg);
-			nvgReset(fbVg);
-
-			nvgluBindFramebuffer(NULL);
-			nvgluDeleteFramebuffer(oversampledFb);
-		}
-	};
-	if (dirty) {
-		redraw();
+	// It's more important to not lag the frame than to draw the framebuffer
+	if (dirty && APP->window->getFrameTimeOverdue() < 0.0) {
+		render(scale, offsetF);
 	}
 
 	if (!internal->fb)
@@ -229,6 +140,104 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 }
 
 
+void FramebufferWidget::render(math::Vec scale, math::Vec offsetF) {
+	// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
+	dirty = false;
+	NVGcontext* vg = APP->window->vg;
+	NVGcontext* fbVg = APP->window->fbVg;
+
+	internal->fbScale = scale;
+	internal->fbOffsetF = offsetF;
+
+	math::Rect localBox;
+	if (children.empty()) {
+		localBox = box.zeroPos();
+	}
+	else {
+		localBox = getVisibleChildrenBoundingBox();
+	}
+
+	// DEBUG("rendering FramebufferWidget localBox (%g %g %g %g) fbOffset (%g %g) fbScale (%g %g)", RECT_ARGS(localBox), VEC_ARGS(internal->fbOffsetF), VEC_ARGS(internal->fbScale));
+	// Transform to world coordinates, then expand to nearest integer coordinates
+	math::Vec min = localBox.getTopLeft().mult(internal->fbScale).plus(internal->fbOffsetF).floor();
+	math::Vec max = localBox.getBottomRight().mult(internal->fbScale).plus(internal->fbOffsetF).ceil();
+	internal->fbBox = math::Rect::fromMinMax(min, max);
+	// DEBUG("%g %g %g %g", RECT_ARGS(internal->fbBox));
+
+	math::Vec newFbSize = internal->fbBox.size.mult(APP->window->pixelRatio).ceil();
+
+	// Create framebuffer if a new size is needed
+	if (!internal->fb || !newFbSize.equals(internal->fbSize)) {
+		internal->fbSize = newFbSize;
+		// Delete old framebuffer
+		if (internal->fb) {
+			nvgluDeleteFramebuffer(internal->fb);
+			internal->fb = NULL;
+		}
+		// Create a framebuffer
+		if (internal->fbSize.isFinite() && !internal->fbSize.isZero()) {
+			// DEBUG("Creating framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
+			internal->fb = nvgluCreateFramebuffer(vg, internal->fbSize.x, internal->fbSize.y, 0);
+		}
+	}
+	if (!internal->fb) {
+		WARN("Framebuffer of size (%f, %f) could not be created for FramebufferWidget %p.", VEC_ARGS(internal->fbSize), this);
+		return;
+	}
+
+	// DEBUG("Drawing to framebuffer of size (%f, %f)", VEC_ARGS(internal->fbSize));
+
+	// Render to framebuffer
+	if (oversample == 1.0) {
+		// If not oversampling, render directly to framebuffer.
+		nvgluBindFramebuffer(internal->fb);
+		drawFramebuffer();
+		nvgluBindFramebuffer(NULL);
+	}
+	else {
+		NVGLUframebuffer* fb = internal->fb;
+		// If oversampling, create another framebuffer and copy it to actual size.
+		math::Vec oversampledFbSize = internal->fbSize.mult(oversample).ceil();
+		// DEBUG("Creating %0.fx oversampled framebuffer of size (%f, %f)", oversample, VEC_ARGS(internal->fbSize));
+		NVGLUframebuffer* oversampledFb = nvgluCreateFramebuffer(fbVg, oversampledFbSize.x, oversampledFbSize.y, 0);
+
+		if (!oversampledFb) {
+			WARN("Oversampled framebuffer of size (%f, %f) could not be created for FramebufferWidget %p.", VEC_ARGS(oversampledFbSize), this);
+			return;
+		}
+
+		// Render to oversampled framebuffer.
+		nvgluBindFramebuffer(oversampledFb);
+		internal->fb = oversampledFb;
+		drawFramebuffer();
+		internal->fb = fb;
+		nvgluBindFramebuffer(NULL);
+
+		// Use NanoVG for copying oversampled framebuffer to normal framebuffer
+		nvgluBindFramebuffer(internal->fb);
+		nvgBeginFrame(fbVg, internal->fbBox.size.x, internal->fbBox.size.y, 1.0);
+
+		// Draw oversampled framebuffer
+		nvgBeginPath(fbVg);
+		nvgRect(fbVg, 0.0, 0.0, internal->fbSize.x, internal->fbSize.y);
+		NVGpaint paint = nvgImagePattern(fbVg, 0.0, 0.0,
+			internal->fbSize.x, internal->fbSize.y,
+			0.0, oversampledFb->image, 1.0);
+		nvgFillPaint(fbVg, paint);
+		nvgFill(fbVg);
+
+		glViewport(0.0, 0.0, internal->fbSize.x, internal->fbSize.y);
+		glClearColor(0.0, 0.0, 0.0, 0.0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		nvgEndFrame(fbVg);
+		nvgReset(fbVg);
+
+		nvgluBindFramebuffer(NULL);
+		nvgluDeleteFramebuffer(oversampledFb);
+	}
+};
+
+
 void FramebufferWidget::drawFramebuffer() {
 	NVGcontext* vg = APP->window->fbVg;
 	nvgSave(vg);
@@ -260,20 +269,9 @@ void FramebufferWidget::drawFramebuffer() {
 }
 
 
-int FramebufferWidget::getImageHandle() {
-	if (!internal->fb)
-		return -1;
-	return internal->fb->image;
-}
-
-
-NVGLUframebuffer* FramebufferWidget::getFramebuffer() {
-	return internal->fb;
-}
-
-
-math::Vec FramebufferWidget::getFramebufferSize() {
-	return internal->fbSize;
+void FramebufferWidget::onDirty(const DirtyEvent& e) {
+	setDirty();
+	Widget::onDirty(e);
 }
 
 

@@ -135,6 +135,9 @@ struct Widget : WeakBase {
 	/** Override draw(const DrawArgs &args) instead */
 	DEPRECATED virtual void draw(NVGcontext* vg) {}
 
+	/** Draws a particular child. */
+	void drawChild(Widget* child, const DrawArgs& args);
+
 	// Events
 
 	/** Recurses an event to all visible Widgets */

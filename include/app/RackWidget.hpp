@@ -4,6 +4,7 @@
 #include <app/common.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <widget/FramebufferWidget.hpp>
+#include <app/RailWidget.hpp>
 #include <app/ModuleWidget.hpp>
 #include <app/CableWidget.hpp>
 #include <app/PortWidget.hpp>
@@ -20,6 +21,7 @@ struct RackWidget : widget::OpaqueWidget {
 	struct Internal;
 	Internal* internal;
 
+	RailWidget* rail;
 	widget::Widget* moduleContainer;
 	widget::Widget* cableContainer;
 	CableWidget* incompleteCable = NULL;

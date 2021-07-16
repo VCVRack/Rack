@@ -23,13 +23,23 @@ struct FramebufferWidget : Widget {
 	FramebufferWidget();
 	~FramebufferWidget();
 	void setDirty(bool dirty = true);
-	void onDirty(const DirtyEvent& e) override;
-	void step() override;
-	void draw(const DrawArgs& args) override;
-	virtual void drawFramebuffer();
 	int getImageHandle();
 	NVGLUframebuffer* getFramebuffer();
 	math::Vec getFramebufferSize();
+
+	void step() override;
+	/** Draws the framebuffer to the NanoVG scene, re-rendering it if necessary.
+	*/
+	void draw(const DrawArgs& args) override;
+	/** Re-renders the framebuffer, re-creating it if necessary.
+	Handles oversampling (if >1) by rendering to a temporary (larger) framebuffer and then downscaling it to the main persistent framebuffer.
+	*/
+	void render(math::Vec scale, math::Vec offsetF);
+	/** Initializes the current GL context and draws children to it.
+	*/
+	virtual void drawFramebuffer();
+
+	void onDirty(const DirtyEvent& e) override;
 	void onContextCreate(const ContextCreateEvent& e) override;
 	void onContextDestroy(const ContextDestroyEvent& e) override;
 };

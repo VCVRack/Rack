@@ -8,11 +8,12 @@ namespace app {
 
 
 struct RailWidget : widget::TransparentWidget {
-	std::shared_ptr<Svg> svg;
+	struct Internal;
+	Internal* internal;
 
 	RailWidget();
+	~RailWidget();
 	void draw(const DrawArgs& args) override;
-	math::Vec getTileSize();
 };
 
 

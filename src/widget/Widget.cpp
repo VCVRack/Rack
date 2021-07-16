@@ -262,31 +262,36 @@ void Widget::draw(const DrawArgs& args) {
 	// Iterate children
 	for (Widget* child : children) {
 		// Don't draw if invisible
-		if (!child->visible)
+		if (!child->isVisible())
 			continue;
 		// Don't draw if child is outside clip box
 		if (!args.clipBox.intersects(child->box))
 			continue;
 
-		DrawArgs childArgs = args;
-		// Intersect child clip box with self
-		childArgs.clipBox = childArgs.clipBox.intersect(child->box);
-		// Offset clip box by child pos
-		childArgs.clipBox.pos = childArgs.clipBox.pos.minus(child->box.pos);
+		drawChild(child, args);
+	}
+}
 
-		nvgSave(args.vg);
-		nvgTranslate(args.vg, child->box.pos.x, child->box.pos.y);
 
-		child->draw(childArgs);
+void Widget::drawChild(Widget* child, const DrawArgs& args) {
+	DrawArgs childArgs = args;
+	// Intersect child clip box with self
+	childArgs.clipBox = childArgs.clipBox.intersect(child->box);
+	// Offset clip box by child pos
+	childArgs.clipBox.pos = childArgs.clipBox.pos.minus(child->box.pos);
+
+	nvgSave(args.vg);
+	nvgTranslate(args.vg, child->box.pos.x, child->box.pos.y);
+
+	child->draw(childArgs);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-		// Call deprecated draw function, which does nothing by default
-		child->draw(args.vg);
+	// Call deprecated draw function, which does nothing by default
+	child->draw(args.vg);
 #pragma GCC diagnostic pop
 
-		nvgRestore(args.vg);
-	}
+	nvgRestore(args.vg);
 }
 
 
