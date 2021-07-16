@@ -1065,11 +1065,24 @@ struct HelpButton : MenuButton {
 ////////////////////
 
 struct MeterLabel : ui::Label {
+	int frameIndex = 0;
+	double frameDurationTotal = 0.0;
+	double frameDurationAvg = 0.0;
+
 	void step() override {
+		// Compute frame rate
+		double frameDuration = APP->window->getLastFrameDuration();
+		frameDurationTotal += frameDuration;
+		frameIndex++;
+		if (frameDurationTotal >= 1.0) {
+			frameDurationAvg = frameDurationTotal / frameIndex;
+			frameDurationTotal = 0.0;
+			frameIndex = 0;
+		}
+
 		double meterAverage = APP->engine->getMeterAverage();
 		double meterMax = APP->engine->getMeterMax();
-		// double frameRate = 1.0 / APP->window->getLastFrameDuration();
-		text = string::f("%.1f%% avg / %.1f%% max", meterAverage * 100, meterMax * 100);
+		text = string::f("%.1f fps / %.1f%% avg / %.1f%% max", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100);
 		Label::step();
 	}
 };
