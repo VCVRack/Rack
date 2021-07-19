@@ -9,7 +9,18 @@ namespace rack {
 namespace app {
 
 
+struct RackScrollWidget::Internal {
+	/** The pivot point for zooming */
+	math::Vec zoomPos;
+	/** For viewport expanding */
+	float oldZoom = 0.f;
+	math::Vec oldOffset;
+};
+
+
 RackScrollWidget::RackScrollWidget() {
+	internal = new Internal;
+
 	zoomWidget = new widget::ZoomWidget;
 	container->addChild(zoomWidget);
 
@@ -18,6 +29,11 @@ RackScrollWidget::RackScrollWidget() {
 	zoomWidget->addChild(rackWidget);
 
 	reset();
+}
+
+
+RackScrollWidget::~RackScrollWidget() {
+	delete internal;
 }
 
 
@@ -32,12 +48,12 @@ void RackScrollWidget::step() {
 	float zoom = std::pow(2.f, settings::zoom);
 	if (zoom != zoomWidget->zoom) {
 		// Set offset based on zoomPos
-		offset = offset.plus(zoomPos).div(zoomWidget->zoom).mult(zoom).minus(zoomPos);
+		offset = offset.plus(internal->zoomPos).div(zoomWidget->zoom).mult(zoom).minus(internal->zoomPos);
 		// Set zoom
 		zoomWidget->setZoom(zoom);
 	}
 
-	zoomPos = box.size.div(2);
+	internal->zoomPos = box.size.div(2);
 
 	// Compute module bounding box
 	math::Rect moduleBox = rackWidget->moduleContainer->getChildrenBoundingBox();
@@ -51,10 +67,12 @@ void RackScrollWidget::step() {
 	scrollBox = scrollBox.grow(box.size.mult(0.6666));
 
 	// Expand to the current viewport box so that moving modules (and thus changing the module bounding box) doesn't clamp the scroll offset.
-	math::Rect viewportBox;
-	viewportBox.pos = oldOffset;
-	viewportBox.size = box.size;
-	scrollBox = scrollBox.expand(viewportBox);
+	if (zoom == internal->oldZoom) {
+		math::Rect viewportBox;
+		viewportBox.pos = internal->oldOffset;
+		viewportBox.size = box.size;
+		scrollBox = scrollBox.expand(viewportBox);
+	}
 
 	// Reposition widgets
 	zoomWidget->box = scrollBox;
@@ -80,7 +98,8 @@ void RackScrollWidget::step() {
 	hideScrollbars = APP->window->isFullScreen();
 
 	ScrollWidget::step();
-	oldOffset = offset;
+	internal->oldOffset = offset;
+	internal->oldZoom = zoom;
 }
 
 
@@ -140,7 +159,7 @@ void RackScrollWidget::onHoverScroll(const HoverScrollEvent& e) {
 			settings::zoom = std::fmin(settings::zoom, settings::zoomMax);
 		else
 			settings::zoom = std::fmax(settings::zoom, settings::zoomMin);
-		zoomPos = e.pos;
+		internal->zoomPos = e.pos;
 		e.consume(this);
 	}
 }
@@ -156,7 +175,7 @@ void RackScrollWidget::onHover(const HoverEvent& e) {
 }
 
 
-void RackScrollWidget::onButton(const ButtonEvent& e)  {
+void RackScrollWidget::onButton(const ButtonEvent& e) {
 	ScrollWidget::onButton(e);
 	if (e.isConsumed())
 		return;

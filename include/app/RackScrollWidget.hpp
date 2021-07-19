@@ -10,13 +10,14 @@ namespace app {
 
 
 struct RackScrollWidget : ui::ScrollWidget {
+	struct Internal;
+	Internal* internal;
+
 	widget::ZoomWidget* zoomWidget;
 	RackWidget* rackWidget;
-	/** The pivot point for zooming */
-	math::Vec zoomPos;
-	math::Vec oldOffset;
 
 	RackScrollWidget();
+	~RackScrollWidget();
 	void reset();
 	void step() override;
 	void draw(const DrawArgs& args) override;
