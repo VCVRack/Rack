@@ -1,1 +1,0 @@
-See [VCV Community Rules](https://vcvrack.com/rules).
