@@ -93,7 +93,7 @@ void ScrollWidget::onButton(const ButtonEvent& e) {
 	// Check if scrollable
 	if (offsetBound.size.x > 0.f || offsetBound.size.y > 0.f) {
 		// Handle Alt-click before children, since most widgets consume Alt-click without needing to.
-		if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.mods == GLFW_MOD_ALT) {
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == GLFW_MOD_ALT) {
 			e.consume(this);
 			return;
 		}
