@@ -74,7 +74,7 @@ struct DirItem : ui::MenuItem {
 	std::string path;
 	void onAction(const ActionEvent& e) override {
 		std::thread t([=] {
-			system::openDir(path);
+			system::openDirectory(path);
 		});
 		t.detach();
 	}

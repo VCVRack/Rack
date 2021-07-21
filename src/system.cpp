@@ -100,7 +100,7 @@ bool isFile(const std::string& path) {
 }
 
 
-bool isDir(const std::string& path) {
+bool isDirectory(const std::string& path) {
 	try {
 		return fs::is_directory(fs::u8path(path));
 	}
@@ -140,7 +140,7 @@ void copy(const std::string& srcPath, const std::string& destPath) {
 }
 
 
-bool createDir(const std::string& path) {
+bool createDirectory(const std::string& path) {
 	try {
 		return fs::create_directory(fs::u8path(path));
 	}
@@ -150,7 +150,7 @@ bool createDir(const std::string& path) {
 }
 
 
-bool createDirs(const std::string& path) {
+bool createDirectories(const std::string& path) {
 	try {
 		return fs::create_directories(fs::u8path(path));
 	}
@@ -180,7 +180,7 @@ int removeRecursively(const std::string& path) {
 }
 
 
-std::string getWorkingDir() {
+std::string getWorkingDirectory() {
 	try {
 		return fs::current_path().generic_u8string();
 	}
@@ -190,7 +190,7 @@ std::string getWorkingDir() {
 }
 
 
-void setWorkingDir(const std::string& path) {
+void setWorkingDirectory(const std::string& path) {
 	try {
 		fs::current_path(fs::u8path(path));
 	}
@@ -200,7 +200,7 @@ void setWorkingDir(const std::string& path) {
 }
 
 
-std::string getTempDir() {
+std::string getTempDirectory() {
 	try {
 		return fs::temp_directory_path().generic_u8string();
 	}
@@ -230,7 +230,7 @@ std::string getCanonical(const std::string& path) {
 }
 
 
-std::string getDir(const std::string& path) {
+std::string getDirectory(const std::string& path) {
 	try {
 		return fs::u8path(path).parent_path().generic_u8string();
 	}
@@ -300,7 +300,7 @@ static la_ssize_t archiveWriteVectorCallback(struct archive* a, void* client_dat
 }
 
 
-static void archiveDir(const std::string& archivePath, std::vector<uint8_t>* archiveData, const std::string& dirPath, int compressionLevel) {
+static void archiveDirectory(const std::string& archivePath, std::vector<uint8_t>* archiveData, const std::string& dirPath, int compressionLevel) {
 	// Based on minitar.c create() in libarchive examples
 	int r;
 
@@ -394,13 +394,13 @@ static void archiveDir(const std::string& archivePath, std::vector<uint8_t>* arc
 	}
 }
 
-void archiveDir(const std::string& archivePath, const std::string& dirPath, int compressionLevel) {
-	archiveDir(archivePath, NULL, dirPath, compressionLevel);
+void archiveDirectory(const std::string& archivePath, const std::string& dirPath, int compressionLevel) {
+	archiveDirectory(archivePath, NULL, dirPath, compressionLevel);
 }
 
-std::vector<uint8_t> archiveDir(const std::string& dirPath, int compressionLevel) {
+std::vector<uint8_t> archiveDirectory(const std::string& dirPath, int compressionLevel) {
 	std::vector<uint8_t> archiveData;
-	archiveDir("", &archiveData, dirPath, compressionLevel);
+	archiveDirectory("", &archiveData, dirPath, compressionLevel);
 	return archiveData;
 }
 
@@ -422,7 +422,7 @@ static la_ssize_t archiveReadVectorCallback(struct archive *a, void* client_data
 	return len;
 }
 
-static void unarchiveToDir(const std::string& archivePath, const std::vector<uint8_t>* archiveData, const std::string& dirPath) {
+static void unarchiveToDirectory(const std::string& archivePath, const std::vector<uint8_t>* archiveData, const std::string& dirPath) {
 	// Based on minitar.c extract() in libarchive examples
 	int r;
 
@@ -510,12 +510,12 @@ static void unarchiveToDir(const std::string& archivePath, const std::vector<uin
 	}
 }
 
-void unarchiveToDir(const std::string& archivePath, const std::string& dirPath) {
-	unarchiveToDir(archivePath, NULL, dirPath);
+void unarchiveToDirectory(const std::string& archivePath, const std::string& dirPath) {
+	unarchiveToDirectory(archivePath, NULL, dirPath);
 }
 
-void unarchiveToDir(const std::vector<uint8_t>& archiveData, const std::string& dirPath) {
-	unarchiveToDir("", &archiveData, dirPath);
+void unarchiveToDirectory(const std::vector<uint8_t>& archiveData, const std::string& dirPath) {
+	unarchiveToDirectory("", &archiveData, dirPath);
 }
 
 
@@ -689,7 +689,7 @@ void openBrowser(const std::string& url) {
 }
 
 
-void openDir(const std::string& path) {
+void openDirectory(const std::string& path) {
 #if defined ARCH_LIN
 	std::string command = "xdg-open \"" + path + "\"";
 	(void) std::system(command.c_str());

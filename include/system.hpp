@@ -32,7 +32,7 @@ bool exists(const std::string& path);
 /** Returns whether the given path is a file. */
 bool isFile(const std::string& path);
 /** Returns whether the given path is a directory. */
-bool isDir(const std::string& path);
+bool isDirectory(const std::string& path);
 uint64_t getFileSize(const std::string& path);
 /** Moves a file or directory.
 Does not overwrite the destination. If this behavior is needed, use remove() or removeRecursively() before moving.
@@ -43,10 +43,10 @@ void copy(const std::string& srcPath, const std::string& destPath);
 /** Creates a directory.
 The parent directory must exist.
 */
-bool createDir(const std::string& path);
+bool createDirectory(const std::string& path);
 /** Creates all directories up to the path.
 */
-bool createDirs(const std::string& path);
+bool createDirectories(const std::string& path);
 /** Deletes a file or empty directory.
 Returns whether the deletion was successful.
 */
@@ -55,9 +55,9 @@ bool remove(const std::string& path);
 Returns the number of files and directories that were deleted.
 */
 int removeRecursively(const std::string& path);
-std::string getWorkingDir();
-void setWorkingDir(const std::string& path);
-std::string getTempDir();
+std::string getWorkingDirectory();
+void setWorkingDirectory(const std::string& path);
+std::string getTempDirectory();
 /** Returns the absolute path beginning with "/". */
 std::string getAbsolute(const std::string& path);
 /** Returns the canonical (unique) path, following symlinks and "." and ".." fake directories.
@@ -68,11 +68,11 @@ Examples:
 std::string getCanonical(const std::string& path);
 /** Extracts the parent directory of the path.
 Examples:
-	getDir("/var/tmp/example.txt") // "/var/tmp"
-	getDir("/") // ""
-	getDir("/var/tmp/.") // "/var/tmp"
+	getDirectory("/var/tmp/example.txt") // "/var/tmp"
+	getDirectory("/") // ""
+	getDirectory("/var/tmp/.") // "/var/tmp"
 */
-std::string getDir(const std::string& path);
+std::string getDirectory(const std::string& path);
 /** Extracts the filename of the path.
 Examples:
 	getFilename("/foo/bar.txt") // "bar.txt"
@@ -112,15 +112,15 @@ An equivalent shell command is
 
 	ZSTD_CLEVEL=1 tar -cf archivePath --zstd -C dirPath .
 */
-void archiveDir(const std::string& archivePath, const std::string& dirPath, int compressionLevel = 1);
-std::vector<uint8_t> archiveDir(const std::string& dirPath, int compressionLevel = 1);
+void archiveDirectory(const std::string& archivePath, const std::string& dirPath, int compressionLevel = 1);
+std::vector<uint8_t> archiveDirectory(const std::string& dirPath, int compressionLevel = 1);
 /** Extracts an archive into a directory.
 An equivalent shell command is
 
 	tar -xf archivePath --zstd -C dirPath
 */
-void unarchiveToDir(const std::string& archivePath, const std::string& dirPath);
-void unarchiveToDir(const std::vector<uint8_t>& archiveData, const std::string& dirPath);
+void unarchiveToDirectory(const std::string& archivePath, const std::string& dirPath);
+void unarchiveToDirectory(const std::vector<uint8_t>& archiveData, const std::string& dirPath);
 
 
 // Threading
@@ -151,7 +151,7 @@ May block, so open in a new thread.
 */
 void openBrowser(const std::string& url);
 /** Opens Windows Explorer, Finder, etc at a directory location. */
-void openDir(const std::string& path);
+void openDirectory(const std::string& path);
 /** Runs an executable without blocking.
 The launched process will continue running if the current process is closed.
 */

@@ -224,8 +224,8 @@ struct Module {
 	The Module must be added to Engine before this can be called, so it cannot be called in your Module constructor.
 	Override onAdd() instead.
 	*/
-	std::string createPatchStorageDir();
-	std::string getPatchStorageDir();
+	std::string createPatchStorageDirectory();
+	std::string getPatchStorageDirectory();
 
 	struct ProcessArgs {
 		/** The current sample rate in Hz. */

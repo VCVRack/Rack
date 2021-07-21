@@ -41,7 +41,7 @@ struct ModuleDirItem : ui::MenuItem {
 	std::string path;
 	void onAction(const ActionEvent& e) override {
 		std::thread t([=]() {
-			system::openDir(path);
+			system::openDirectory(path);
 		});
 		t.detach();
 	}
@@ -288,14 +288,14 @@ struct ModulePresetDirItem : ui::MenuItem {
 static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
 	bool hasPresets = false;
 	// Note: This is not cached, so opening this menu each time might have a bit of latency.
-	if (system::isDir(presetDir)) {
+	if (system::isDirectory(presetDir)) {
 		for (const std::string& path : system::getEntries(presetDir)) {
 			std::string name = system::getStem(path);
 			// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
 			std::regex r("^\\d*_");
 			name = std::regex_replace(name, r, "");
 
-			if (system::isDir(path)) {
+			if (system::isDirectory(path)) {
 				hasPresets = true;
 
 				ModulePresetDirItem* dirItem = new ModulePresetDirItem;
@@ -365,12 +365,12 @@ struct ModulePresetItem : ui::MenuItem {
 		// Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("User presets"));
-		appendPresetItems(menu, moduleWidget, moduleWidget->model->getUserPresetDir());
+		appendPresetItems(menu, moduleWidget, moduleWidget->model->getUserPresetDirectory());
 
 		// Scan `<plugin dir>/presets/<module slug>` for presets.
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("Factory presets"));
-		appendPresetItems(menu, moduleWidget, moduleWidget->model->getFactoryPresetDir());
+		appendPresetItems(menu, moduleWidget, moduleWidget->model->getFactoryPresetDirectory());
 
 		return menu;
 	}
@@ -836,7 +836,7 @@ void ModuleWidget::loadAction(std::string filename) {
 }
 
 void ModuleWidget::loadTemplate() {
-	std::string templatePath = system::join(model->getUserPresetDir(), "template.vcvm");
+	std::string templatePath = system::join(model->getUserPresetDirectory(), "template.vcvm");
 	try {
 		load(templatePath);
 	}
@@ -846,14 +846,14 @@ void ModuleWidget::loadTemplate() {
 }
 
 void ModuleWidget::loadDialog() {
-	std::string presetDir = model->getUserPresetDir();
-	system::createDirs(presetDir);
+	std::string presetDir = model->getUserPresetDirectory();
+	system::createDirectories(presetDir);
 
 	// Delete directories if empty
 	DEFER({
 		try {
 			system::remove(presetDir);
-			system::remove(system::getDir(presetDir));
+			system::remove(system::getDirectory(presetDir));
 		}
 		catch (Exception& e) {
 			// Ignore exceptions if directory cannot be removed.
@@ -897,8 +897,8 @@ void ModuleWidget::save(std::string filename) {
 }
 
 void ModuleWidget::saveTemplate() {
-	std::string presetDir = model->getUserPresetDir();
-	system::createDirs(presetDir);
+	std::string presetDir = model->getUserPresetDirectory();
+	system::createDirectories(presetDir);
 	std::string templatePath = system::join(presetDir, "template.vcvm");
 	save(templatePath);
 }
@@ -913,13 +913,13 @@ void ModuleWidget::saveTemplateDialog() {
 }
 
 bool ModuleWidget::hasTemplate() {
-	std::string presetDir = model->getUserPresetDir();
+	std::string presetDir = model->getUserPresetDirectory();
 	std::string templatePath = system::join(presetDir, "template.vcvm");
 	return system::exists(templatePath);;
 }
 
 void ModuleWidget::clearTemplate() {
-	std::string presetDir = model->getUserPresetDir();
+	std::string presetDir = model->getUserPresetDirectory();
 	std::string templatePath = system::join(presetDir, "template.vcvm");
 	system::remove(templatePath);
 }
@@ -932,14 +932,14 @@ void ModuleWidget::clearTemplateDialog() {
 }
 
 void ModuleWidget::saveDialog() {
-	std::string presetDir = model->getUserPresetDir();
-	system::createDirs(presetDir);
+	std::string presetDir = model->getUserPresetDirectory();
+	system::createDirectories(presetDir);
 
 	// Delete directories if empty
 	DEFER({
 		try {
 			system::remove(presetDir);
-			system::remove(system::getDir(presetDir));
+			system::remove(system::getDirectory(presetDir));
 		}
 		catch (Exception& e) {
 			// Ignore exceptions if directory cannot be removed.

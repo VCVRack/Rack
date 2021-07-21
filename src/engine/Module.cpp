@@ -82,14 +82,14 @@ void Module::config(int numParams, int numInputs, int numOutputs, int numLights)
 }
 
 
-std::string Module::createPatchStorageDir() {
-	std::string path = getPatchStorageDir();
-	system::createDirs(path);
+std::string Module::createPatchStorageDirectory() {
+	std::string path = getPatchStorageDirectory();
+	system::createDirectories(path);
 	return path;
 }
 
 
-std::string Module::getPatchStorageDir() {
+std::string Module::getPatchStorageDirectory() {
 	return system::join(APP->patch->autosavePath, "modules", std::to_string(id));
 }
 

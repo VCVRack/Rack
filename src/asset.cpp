@@ -34,7 +34,7 @@ static void initSystemDir() {
 		return;
 
 	if (settings::devMode) {
-		systemDir = system::getWorkingDir();
+		systemDir = system::getWorkingDirectory();
 		return;
 	}
 
@@ -71,7 +71,7 @@ static void initSystemDir() {
 #endif
 #if defined ARCH_LIN
 	// Use the current working directory as the default path on Linux.
-	systemDir = system::getWorkingDir();
+	systemDir = system::getWorkingDirectory();
 #endif
 }
 
@@ -114,7 +114,7 @@ void init() {
 	initSystemDir();
 	initUserDir();
 
-	system::createDir(userDir);
+	system::createDirectory(userDir);
 }
 
 

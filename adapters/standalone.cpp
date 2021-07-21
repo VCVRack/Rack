@@ -157,7 +157,7 @@ int main(int argc, char* argv[]) {
 
 	// Check existence of the system res/ directory
 	std::string resDir = asset::system("res");
-	if (!system::isDir(resDir)) {
+	if (!system::isDirectory(resDir)) {
 		std::string message = string::f("Rack's resource directory \"%s\" does not exist. Make sure Rack is correctly installed and launched.", resDir.c_str());
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, message.c_str());
 		exit(1);
