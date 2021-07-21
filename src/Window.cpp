@@ -547,19 +547,12 @@ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 			widget::FramebufferWidget* fbw = new widget::FramebufferWidget;
 			fbw->oversample = 2;
 
-			widget::ZoomWidget* zw = new widget::ZoomWidget;
-			zw->setZoom(zoom);
-			fbw->addChild(zw);
-
 			app::ModuleWidget* mw = model->createModuleWidget(NULL);
-			zw->box.size = mw->box.size.mult(zoom);
-			zw->addChild(mw);
-
-			// HACK: Set the frame time so FramebufferWidgets are never overdue and therefore guaranteed to draw
-			internal->frameTime = INFINITY;
+			fbw->addChild(mw);
+			fbw->box.size = mw->box.size;
 
 			// Draw to framebuffer
-			fbw->step();
+			fbw->render(math::Vec(zoom, zoom), math::Vec(0, 0));
 
 			// Read pixels
 			nvgluBindFramebuffer(fbw->getFramebuffer());
