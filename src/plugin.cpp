@@ -228,12 +228,14 @@ void init() {
 	loadPlugins(pluginsPath);
 
 	// If Fundamental wasn't loaded, copy the bundled Fundamental package and load it
-	std::string fundamentalSrc = asset::system("Fundamental.vcvplugin");
-	std::string fundamentalDir = system::join(pluginsPath, "Fundamental");
-	if (!settings::devMode && !getPlugin("Fundamental") && system::isFile(fundamentalSrc)) {
-		INFO("Extracting bundled Fundamental package");
-		system::unarchiveToDirectory(fundamentalSrc.c_str(), pluginsPath.c_str());
-		loadPlugin(fundamentalDir);
+	if (!settings::devMode && !getPlugin("Fundamental")) {
+		std::string fundamentalSrc = asset::system("Fundamental.vcvplugin");
+		std::string fundamentalDir = system::join(pluginsPath, "Fundamental");
+		if (system::isFile(fundamentalSrc)) {
+			INFO("Extracting bundled Fundamental package");
+			system::unarchiveToDirectory(fundamentalSrc.c_str(), pluginsPath.c_str());
+			loadPlugin(fundamentalDir);
+		}
 	}
 }
 

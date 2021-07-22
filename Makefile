@@ -139,9 +139,9 @@ endif
 
 
 DIST_RES := LICENSE* CHANGELOG.md res cacert.pem Core.json template.vcv
-DIST_NAME := VCV-Rack-$(VERSION)-$(ARCH)
+DIST_NAME := Rack.$(VERSION).$(ARCH)
 DIST_SDK_DIR := Rack-SDK
-DIST_SDK := Rack-SDK-$(VERSION).zip
+DIST_SDK := Rack-SDK.$(VERSION).zip
 ifdef ARCH_MAC
 	DIST_DIR := VCV Rack.app
 else
