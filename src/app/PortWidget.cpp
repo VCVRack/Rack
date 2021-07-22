@@ -32,11 +32,12 @@ struct PortTooltip : ui::Tooltip {
 			// Voltage, number of channels
 			int channels = port->getChannels();
 			for (int i = 0; i < channels; i++) {
+				float v = port->getVoltage(i);
 				// Add newline or comma
 				text += "\n";
 				if (channels > 1)
 					text += string::f("%d: ", i + 1);
-				text += string::f("% .3fV", port->getVoltage(i));
+				text += string::f("% .3fV", math::normalizeZero(v));
 			}
 			// Connected to
 			std::list<CableWidget*> cables = APP->scene->rack->getCablesOnPort(portWidget);
