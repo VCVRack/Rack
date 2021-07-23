@@ -118,7 +118,12 @@ inline float clampSafe(float x, float a = 0.f, float b = 1.f) {
 }
 
 /** Converts -0.f to 0.f. Leaves all other values unchanged. */
+#if defined __clang__
+// Clang doesn't support disabling individual optimizations, just everything.
+__attribute__((optnone))
+#else
 __attribute__((optimize("signed-zeros")))
+#endif
 inline float normalizeZero(float x) {
 	return x + 0.f;
 }
