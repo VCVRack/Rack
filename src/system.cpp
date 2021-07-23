@@ -75,7 +75,7 @@ std::list<std::string> getEntries(const std::string& dirPath, int depth) {
 		return entries;
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return {};
 	}
 }
 
@@ -85,7 +85,7 @@ bool exists(const std::string& path) {
 		return fs::exists(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
@@ -95,7 +95,7 @@ bool isFile(const std::string& path) {
 		return fs::is_regular_file(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
@@ -105,7 +105,7 @@ bool isDirectory(const std::string& path) {
 		return fs::is_directory(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
@@ -115,27 +115,29 @@ uint64_t getFileSize(const std::string& path) {
 		return fs::file_size(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return 0;
 	}
 }
 
 
-void rename(const std::string& srcPath, const std::string& destPath) {
+bool rename(const std::string& srcPath, const std::string& destPath) {
 	try {
 		fs::rename(fs::u8path(srcPath), fs::u8path(destPath));
+		return true;
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
 
-void copy(const std::string& srcPath, const std::string& destPath) {
+bool copy(const std::string& srcPath, const std::string& destPath) {
 	try {
 		fs::copy(fs::u8path(srcPath), fs::u8path(destPath), fs::copy_options::recursive);
+		return true;
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
@@ -145,7 +147,7 @@ bool createDirectory(const std::string& path) {
 		return fs::create_directory(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
@@ -155,7 +157,7 @@ bool createDirectories(const std::string& path) {
 		return fs::create_directories(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
@@ -165,7 +167,7 @@ bool remove(const std::string& path) {
 		return fs::remove(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
@@ -175,7 +177,7 @@ int removeRecursively(const std::string& path) {
 		return fs::remove_all(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return false;
 	}
 }
 
@@ -185,7 +187,7 @@ std::string getWorkingDirectory() {
 		return fs::current_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return "";
 	}
 }
 
@@ -195,7 +197,7 @@ void setWorkingDirectory(const std::string& path) {
 		fs::current_path(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		// Do nothing
 	}
 }
 
@@ -205,7 +207,7 @@ std::string getTempDirectory() {
 		return fs::temp_directory_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return "";
 	}
 }
 
@@ -215,7 +217,7 @@ std::string getAbsolute(const std::string& path) {
 		return fs::absolute(fs::u8path(path)).generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return "";
 	}
 }
 
@@ -225,7 +227,7 @@ std::string getCanonical(const std::string& path) {
 		return fs::canonical(fs::u8path(path)).generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return "";
 	}
 }
 
@@ -235,7 +237,7 @@ std::string getDirectory(const std::string& path) {
 		return fs::u8path(path).parent_path().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return "";
 	}
 }
 
@@ -245,7 +247,7 @@ std::string getFilename(const std::string& path) {
 		return fs::u8path(path).filename().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return "";
 	}
 }
 
@@ -255,7 +257,7 @@ std::string getStem(const std::string& path) {
 		return fs::u8path(path).stem().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return "";
 	}
 }
 
@@ -265,7 +267,7 @@ std::string getExtension(const std::string& path) {
 		return fs::u8path(path).extension().generic_u8string();
 	}
 	catch (fs::filesystem_error& e) {
-		throw Exception("%s", e.what());
+		return "";
 	}
 }
 
@@ -527,8 +529,10 @@ int getLogicalCoreCount() {
 void setThreadName(const std::string& name) {
 #if defined ARCH_LIN
 	pthread_setname_np(pthread_self(), name.c_str());
+#elif defined ARCH_MAC
+	// Not supported (yet) on Mac
 #elif defined ARCH_WIN
-	// Unsupported on Windows
+	// Not supported on Windows
 #endif
 }
 

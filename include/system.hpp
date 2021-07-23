@@ -36,15 +36,20 @@ bool isDirectory(const std::string& path);
 uint64_t getFileSize(const std::string& path);
 /** Moves a file or directory.
 Does not overwrite the destination. If this behavior is needed, use remove() or removeRecursively() before moving.
+Returns whether the rename was successful.
 */
-void rename(const std::string& srcPath, const std::string& destPath);
-/** Copies a file or directory recursively. */
-void copy(const std::string& srcPath, const std::string& destPath);
+bool rename(const std::string& srcPath, const std::string& destPath);
+/** Copies a file or directory recursively.
+Returns whether the copy was successful.
+*/
+bool copy(const std::string& srcPath, const std::string& destPath);
 /** Creates a directory.
 The parent directory must exist.
+Returns whether the creation was successful.
 */
 bool createDirectory(const std::string& path);
 /** Creates all directories up to the path.
+Returns whether the creation was successful.
 */
 bool createDirectories(const std::string& path);
 /** Deletes a file or empty directory.
