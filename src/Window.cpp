@@ -483,6 +483,17 @@ void Window::step() {
 	}
 
 	glfwSwapBuffers(win);
+
+	// On some platforms, glfwSwapBuffers() doesn't wait on monitor refresh, so we have to sleep as a fallback.
+	if (internal->frameSwapInterval > 0) {
+		double frameDurationExpected = internal->frameSwapInterval / internal->monitorRefreshRate * 0.90;
+		double swapBuffersTime = system::getTime();
+		double frameDurationRemaining = frameDurationExpected - (swapBuffersTime - frameTime);
+		if (frameDurationRemaining > 0.0) {
+			std::this_thread::sleep_for(std::chrono::duration<double>(frameDurationRemaining));
+		}
+	}
+
 	t5 = system::getTime();
 
 	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
