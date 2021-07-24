@@ -194,6 +194,15 @@ TMenuItem* createMenuItem(std::string text, std::string rightText = "") {
 }
 
 
+/** Creates a MenuItem with an action that calls a lambda function.
+Example:
+
+	menu->addChild(createMenuItem("Load sample", "kick.wav",
+		[=]() {
+			module->loadSample();
+		}
+	));
+*/
 template <class TMenuItem = ui::MenuItem>
 TMenuItem* createMenuItem(std::string text, std::string rightText, std::function<void()> action) {
 	struct Item : TMenuItem {
@@ -210,6 +219,16 @@ TMenuItem* createMenuItem(std::string text, std::string rightText, std::function
 
 
 /** Creates a MenuItem with a check mark set by a lambda function.
+Example:
+
+	menu->addChild(createCheckMenuItem("Loop",
+		[=]() {
+			return module->isLoop();
+		},
+		[=]() {
+			module->toggleLoop();
+		}
+	));
 */
 inline ui::MenuItem* createCheckMenuItem(std::string text, std::function<bool()> checked, std::function<void()> action) {
 	struct Item : ui::MenuItem {
@@ -227,6 +246,16 @@ inline ui::MenuItem* createCheckMenuItem(std::string text, std::function<bool()>
 
 
 /** Creates a MenuItem that controls a boolean value with a check mark.
+Example:
+
+	menu->addChild(createBoolMenuItem("Loop",
+		[=]() {
+			return module->isLoop();
+		},
+		[=](bool loop) {
+			module->setLoop(loop);
+		}
+	));
 */
 inline ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> getter, std::function<void(bool state)> setter) {
 	struct Item : ui::MenuItem {
@@ -247,6 +276,9 @@ inline ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> 
 
 
 /** Easy wrapper for createBoolMenuItem() to modify a bool pointer.
+Example:
+
+	menu->addChild(createBoolPtrMenuItem("Loop", &module->loop));
 */
 template <typename T>
 ui::MenuItem* createBoolPtrMenuItem(std::string text, T* ptr) {
@@ -258,6 +290,14 @@ ui::MenuItem* createBoolPtrMenuItem(std::string text, T* ptr) {
 
 
 /** Creates a MenuItem that opens a submenu.
+Example:
+
+	menu->addChild(createSubmenuItem("Edit",
+		[=](Menu* menu) {
+			menu->addChild(createMenuItem("Copy", "", [=]() {copy();}));
+			menu->addChild(createMenuItem("Paste", "", [=]() {paste();}));
+		}
+	));
 */
 inline ui::MenuItem* createSubmenuItem(std::string text, std::function<void(ui::Menu* menu)> createMenu) {
 	struct Item : ui::MenuItem {
@@ -277,6 +317,17 @@ inline ui::MenuItem* createSubmenuItem(std::string text, std::function<void(ui::
 
 
 /** Creates a MenuItem that when hovered, opens a submenu with several MenuItems indexed by an integer.
+Example:
+
+	menu->addChild(createIndexSubmenuItem("Mode",
+		{"Hi-fi", "Mid-fi", "Lo-fi"},
+		[=]() {
+			return module->getMode();
+		},
+		[=](int mode) {
+			module->setMode(mode);
+		}
+	));
 */
 inline ui::MenuItem* createIndexSubmenuItem(std::string text, std::vector<std::string> labels, std::function<size_t()> getter, std::function<void(size_t val)> setter) {
 	struct IndexItem : ui::MenuItem {
@@ -317,6 +368,12 @@ inline ui::MenuItem* createIndexSubmenuItem(std::string text, std::vector<std::s
 
 
 /** Easy wrapper for createIndexSubmenuItem() that controls an integer index at a pointer address.
+Example:
+
+	menu->addChild(createIndexPtrSubmenuItem("Mode",
+		{"Hi-fi", "Mid-fi", "Lo-fi"},
+		&module->mode
+	));
 */
 template <typename T>
 ui::MenuItem* createIndexPtrSubmenuItem(std::string text, std::vector<std::string> labels, T* ptr) {
