@@ -205,6 +205,36 @@ bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string&
 }
 
 
+std::vector<std::string> split(const std::string& s, const std::string& separator) {
+	// Special case of empty string
+	if (s == "")
+		return {};
+
+	std::vector<std::string> v;
+	// Special case of empty separator
+	if (separator == "") {
+		for (char c : s) {
+			std::string token(1, c);
+			v.push_back(token);
+		}
+		return v;
+	}
+
+	size_t sepLen = separator.size();
+	size_t start = 0;
+	size_t end;
+	while ((end = s.find(separator, start)) != std::string::npos) {
+		std::string token = s.substr(start, end - start);
+		v.push_back(token);
+		// Don't include delimiter
+		start = end + sepLen;
+	}
+
+	v.push_back(s.substr(start));
+	return v;
+}
+
+
 #if defined ARCH_WIN
 std::string UTF16toUTF8(const std::wstring& w) {
 	if (w.empty())

@@ -67,6 +67,17 @@ std::string join(const TContainer& container, std::string seperator = "") {
 	return s;
 }
 
+/** Splits a string into a vector of tokens.
+Tokens do not include the separator string.
+Examples:
+	split("a+b+c", "+") // {"a", "b", "c"}
+	split("abc", "+") // {"abc"}
+	split("a++c", "+") // {"a", "", "c"}
+	split("", "+") // {}
+	split("abc", "") // {"a", "b", "c"}
+*/
+std::vector<std::string> split(const std::string& s, const std::string& seperator);
+
 
 #if defined ARCH_WIN
 /** Performs a Unicode string conversion from UTF-16 to UTF-8.
