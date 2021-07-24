@@ -111,18 +111,35 @@ Examples:
 */
 std::string getExtension(const std::string& path);
 
+// File read/write
+
+/** Reads an entire file into a memory buffer.
+Throws on error.
+*/
+std::vector<uint8_t> readFile(const std::string& path);
+
+/** Writes a memory buffer to a file, overwriting if already exists.
+Throws on error.
+*/
+void writeFile(const std::string& path, const std::vector<uint8_t>& data);
+
 /** Compresses the contents of a directory (recursively) to an archive.
 Uses the Unix Standard TAR + Zstandard format (.tar.zst).
 An equivalent shell command is
 
 	ZSTD_CLEVEL=1 tar -cf archivePath --zstd -C dirPath .
+
+Throws on error.
 */
 void archiveDirectory(const std::string& archivePath, const std::string& dirPath, int compressionLevel = 1);
 std::vector<uint8_t> archiveDirectory(const std::string& dirPath, int compressionLevel = 1);
+
 /** Extracts an archive into a directory.
 An equivalent shell command is
 
 	tar -xf archivePath --zstd -C dirPath
+
+Throws on error.
 */
 void unarchiveToDirectory(const std::string& archivePath, const std::string& dirPath);
 void unarchiveToDirectory(const std::vector<uint8_t>& archiveData, const std::string& dirPath);

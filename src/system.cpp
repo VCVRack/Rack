@@ -272,6 +272,38 @@ std::string getExtension(const std::string& path) {
 }
 
 
+std::vector<uint8_t> readFile(const std::string& path) {
+	std::vector<uint8_t> data;
+	FILE* f = std::fopen(path.c_str(), "rb");
+	if (!f)
+		throw Exception("Cannot read file %s", path.c_str());
+	DEFER({
+		std::fclose(f);
+	});
+
+	// Get file size so we can make a single allocation
+	std::fseek(f, 0, SEEK_END);
+	size_t len = std::ftell(f);
+	std::fseek(f, 0, SEEK_SET);
+
+	data.resize(len);
+	std::fread(data.data(), 1, len, f);
+	return data;
+}
+
+
+void writeFile(const std::string& path, const std::vector<uint8_t>& data) {
+	FILE* f = std::fopen(path.c_str(), "wb");
+	if (!f)
+		throw Exception("Cannot create file %s", path.c_str());
+	DEFER({
+		std::fclose(f);
+	});
+
+	std::fwrite(data.data(), 1, data.size(), f);
+}
+
+
 /** Returns `p` in relative path form, relative to `base`
 Limitation: `p` must be a descendant of `base`. Doesn't support adding `../` to the return path.
 */
