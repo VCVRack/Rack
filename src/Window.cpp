@@ -485,13 +485,9 @@ void Window::step() {
 	glfwSwapBuffers(win);
 
 	// On some platforms, glfwSwapBuffers() doesn't wait on monitor refresh, so we have to sleep as a fallback.
-	if (internal->frameSwapInterval > 0) {
-		double frameDurationExpected = internal->frameSwapInterval / internal->monitorRefreshRate * 0.90;
-		double swapBuffersTime = system::getTime();
-		double frameDurationRemaining = frameDurationExpected - (swapBuffersTime - frameTime);
-		if (frameDurationRemaining > 0.0) {
-			std::this_thread::sleep_for(std::chrono::duration<double>(frameDurationRemaining));
-		}
+	double frameDurationRemaining = getFrameDurationRemaining();
+	if (frameDurationRemaining > 0.0) {
+		std::this_thread::sleep_for(std::chrono::duration<double>(frameDurationRemaining));
 	}
 
 	t5 = system::getTime();
@@ -666,10 +662,9 @@ double Window::getLastFrameDuration() {
 }
 
 
-double Window::getFrameTimeOverdue() {
-	double desiredFrameDuration = internal->frameSwapInterval / internal->monitorRefreshRate;
-	double frameDuration = system::getTime() - internal->frameTime;
-	return frameDuration - desiredFrameDuration;
+double Window::getFrameDurationRemaining() {
+	double frameDurationDesired = internal->frameSwapInterval / internal->monitorRefreshRate;
+	return frameDurationDesired - (system::getTime() - internal->frameTime);
 }
 
 

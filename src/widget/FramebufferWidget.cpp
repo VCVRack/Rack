@@ -114,7 +114,7 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	}
 
 	// It's more important to not lag the frame than to draw the framebuffer
-	if (dirty && APP->window->getFrameTimeOverdue() < 0.0) {
+	if (dirty && APP->window->getFrameDurationRemaining() > 0.0) {
 		render(scale, offsetF);
 	}
 

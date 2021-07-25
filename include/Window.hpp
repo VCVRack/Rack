@@ -84,7 +84,7 @@ struct Window {
 	double getMonitorRefreshRate();
 	double getFrameTime();
 	double getLastFrameDuration();
-	double getFrameTimeOverdue();
+	double getFrameDurationRemaining();
 
 	std::shared_ptr<Font> loadFont(const std::string& filename);
 	std::shared_ptr<Image> loadImage(const std::string& filename);
