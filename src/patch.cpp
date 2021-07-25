@@ -148,9 +148,9 @@ void PatchManager::saveAsDialog() {
 	}
 	DEFER({std::free(pathC);});
 
-	// Append .vcv extension if no extension was given.
+	// Automatically append .vcv extension
 	std::string path = pathC;
-	if (system::getExtension(path) == "") {
+	if (system::getExtension(path) != ".vcv") {
 		path += ".vcv";
 	}
 

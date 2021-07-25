@@ -957,7 +957,8 @@ void ModuleWidget::saveDialog() {
 	DEFER({std::free(pathC);});
 
 	std::string path = pathC;
-	if (system::getExtension(path) == "")
+	// Automatically append .vcvm extension
+	if (system::getExtension(path) != ".vcvm")
 		path += ".vcvm";
 
 	save(path);
