@@ -84,88 +84,122 @@ struct WriteLock {
 };
 
 
+/** Barrier based on mutexes.
+Not finished or tested, do not use.
+*/
 struct Barrier {
+	int count = 0;
+	uint8_t step = 0;
+	int threads = 0;
+
 	std::mutex mutex;
 	std::condition_variable cv;
-	int count = 0;
-	int total = 0;
+
+	void setThreads(int threads) {
+		this->threads = threads;
+	}
 
 	void wait() {
-		// Waiting on one thread is trivial.
-		if (total <= 1)
-			return;
 		std::unique_lock<std::mutex> lock(mutex);
-		int id = ++count;
-		if (id == total) {
+		uint8_t s = step;
+		if (++count >= threads) {
+			// We're the last thread. Reset next phase.
 			count = 0;
+			// Allow other threads to exit wait()
+			step++;
 			cv.notify_all();
+			return;
 		}
-		else {
-			cv.wait(lock);
-		}
+
+		cv.wait(lock, [&] {
+			return step != s;
+		});
 	}
 };
 
 
+/** 2-phase barrier based on spin-locking.
+*/
 struct SpinBarrier {
 	std::atomic<int> count{0};
-	int total = 0;
+	std::atomic<uint8_t> step{0};
+	int threads = 0;
+
+	/** Must be called when no threads are calling wait().
+	*/
+	void setThreads(int threads) {
+		this->threads = threads;
+	}
 
 	void wait() {
-		int id = ++count;
-		if (id == total) {
+		uint8_t s = step;
+		if (count.fetch_add(1, std::memory_order_acquire) + 1 >= threads) {
+			// We're the last thread. Reset next phase.
 			count = 0;
+			// Allow other threads to exit wait()
+			step++;
+			return;
 		}
-		else {
-			while (count != 0) {
-				_mm_pause();
-			}
+
+		// Spin until the last thread begins waiting
+		while (true) {
+			if (step.load(std::memory_order_relaxed) != s)
+				return;
+			__builtin_ia32_pause();
 		}
 	}
 };
 
 
-/** Spinlocks until all `total` threads are waiting.
-If `yield` is set to true at any time, all threads will switch to waiting on a mutex instead.
-All threads must return before beginning a new phase. Alternating between two barriers solves this problem.
+/** Barrier that spin-locks until yield() is called, and then all threads switch to a mutex.
+yield() should be called if it is likely that all threads will block for a while and continuing to spin-lock is unnecessary.
+Saves CPU power after yield is called.
 */
 struct HybridBarrier {
-	std::atomic<int> count {0};
-	int total = 0;
+	std::atomic<int> count{0};
+	std::atomic<uint8_t> step{0};
+	int threads = 0;
 
+	std::atomic<bool> yielded{false};
 	std::mutex mutex;
 	std::condition_variable cv;
 
-	std::atomic<bool> yield {false};
+	void setThreads(int threads) {
+		this->threads = threads;
+	}
+
+	void yield() {
+		yielded = true;
+	}
 
 	void wait() {
-		int id = ++count;
-
-		// End and reset phase if this is the last thread
-		if (id == total) {
+		uint8_t s = step;
+		if (count.fetch_add(1, std::memory_order_acquire) + 1 >= threads) {
+			// We're the last thread. Reset next phase.
 			count = 0;
-			if (yield) {
+			bool wasYielded = yielded;
+			yielded = false;
+			// Allow other threads to exit wait()
+			step++;
+			if (wasYielded) {
 				std::unique_lock<std::mutex> lock(mutex);
 				cv.notify_all();
-				yield = false;
 			}
 			return;
 		}
 
-		// Spinlock
-		while (!yield) {
-			if (count == 0)
+		// Spin until the last thread begins waiting
+		while (!yielded.load(std::memory_order_relaxed)) {
+			if (step.load(std::memory_order_relaxed) != s)
 				return;
-			_mm_pause();
+			__builtin_ia32_pause();
 		}
 
-		// Wait on mutex
-		{
-			std::unique_lock<std::mutex> lock(mutex);
-			cv.wait(lock, [&] {
-				return count == 0;
-			});
-		}
+		// Wait on mutex CV
+		std::unique_lock<std::mutex> lock(mutex);
+		cv.wait(lock, [&] {
+			return step != s;
+		});
 	}
 };
 
@@ -296,8 +330,8 @@ static void Engine_relaunchWorkers(Engine* that, int threadCount) {
 	internal->threadCount = threadCount;
 
 	// Set barrier counts
-	internal->engineBarrier.total = threadCount;
-	internal->workerBarrier.total = threadCount;
+	internal->engineBarrier.setThreads(threadCount);
+	internal->workerBarrier.setThreads(threadCount);
 
 	if (threadCount > 0) {
 		// Create and start engine workers
@@ -641,7 +675,7 @@ float Engine::getSampleTime() {
 
 
 void Engine::yieldWorkers() {
-	internal->workerBarrier.yield = true;
+	internal->workerBarrier.yield();
 }
 
 
