@@ -18,6 +18,7 @@ namespace settings {
 std::string settingsPath;
 bool devMode = false;
 bool headless = false;
+bool isPlugin = false;
 
 std::string token;
 bool windowMaximized = false;

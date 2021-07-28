@@ -25,6 +25,7 @@ namespace settings {
 extern std::string settingsPath;
 extern bool devMode;
 extern bool headless;
+extern bool isPlugin;
 
 // Persistent state, serialized to settings.json.
 
