@@ -169,10 +169,12 @@ std::string getOperatingSystemInfo();
 
 /** Opens a URL in a browser.
 Shell injection is possible, so make sure the URL is trusted or hard coded.
-May block, so open in a new thread.
+Does not block.
 */
 void openBrowser(const std::string& url);
-/** Opens Windows Explorer, Finder, etc at a directory location. */
+/** Opens Windows Explorer, Finder, etc at a directory location.
+Does not block.
+*/
 void openDirectory(const std::string& path);
 /** Runs an executable without blocking.
 The launched process will continue running if the current process is closed.

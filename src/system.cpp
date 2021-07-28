@@ -711,32 +711,40 @@ std::string getOperatingSystemInfo() {
 
 
 void openBrowser(const std::string& url) {
+	std::string urlL = url;
+	std::thread t([=] {
 #if defined ARCH_LIN
-	std::string command = "xdg-open \"" + url + "\"";
-	(void) std::system(command.c_str());
+		std::string command = "xdg-open \"" + urlL + "\"";
+		(void) std::system(command.c_str());
 #endif
 #if defined ARCH_MAC
-	std::string command = "open \"" + url + "\"";
-	std::system(command.c_str());
+		std::string command = "open \"" + urlL + "\"";
+		std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	ShellExecuteW(NULL, L"open", string::UTF8toUTF16(url).c_str(), NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecuteW(NULL, L"open", string::UTF8toUTF16(urlL).c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
+	});
+	t.detach();
 }
 
 
 void openDirectory(const std::string& path) {
+	std::string pathL = path;
+	std::thread t([=] {
 #if defined ARCH_LIN
-	std::string command = "xdg-open \"" + path + "\"";
-	(void) std::system(command.c_str());
+		std::string command = "xdg-open \"" + pathL + "\"";
+		(void) std::system(command.c_str());
 #endif
 #if defined ARCH_MAC
-	std::string command = "open \"" + path + "\"";
-	std::system(command.c_str());
+		std::string command = "open \"" + pathL + "\"";
+		std::system(command.c_str());
 #endif
 #if defined ARCH_WIN
-	ShellExecuteW(NULL, L"explore", string::UTF8toUTF16(path).c_str(), NULL, NULL, SW_SHOWDEFAULT);
+		ShellExecuteW(NULL, L"explore", string::UTF8toUTF16(pathL).c_str(), NULL, NULL, SW_SHOWDEFAULT);
 #endif
+	});
+	t.detach();
 }
 
 

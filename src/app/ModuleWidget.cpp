@@ -29,10 +29,7 @@ static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
 struct ModuleUrlItem : ui::MenuItem {
 	std::string url;
 	void onAction(const ActionEvent& e) override {
-		std::thread t([=]() {
-			system::openBrowser(url);
-		});
-		t.detach();
+		system::openBrowser(url);
 	}
 };
 
@@ -40,10 +37,7 @@ struct ModuleUrlItem : ui::MenuItem {
 struct ModuleDirItem : ui::MenuItem {
 	std::string path;
 	void onAction(const ActionEvent& e) override {
-		std::thread t([=]() {
-			system::openDirectory(path);
-		});
-		t.detach();
+		system::openDirectory(path);
 	}
 };
 

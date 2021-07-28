@@ -63,20 +63,14 @@ struct NotificationIcon : widget::Widget {
 struct UrlItem : ui::MenuItem {
 	std::string url;
 	void onAction(const ActionEvent& e) override {
-		std::thread t([=] {
-			system::openBrowser(url);
-		});
-		t.detach();
+		system::openBrowser(url);
 	}
 };
 
 struct DirItem : ui::MenuItem {
 	std::string path;
 	void onAction(const ActionEvent& e) override {
-		std::thread t([=] {
-			system::openDirectory(path);
-		});
-		t.detach();
+		system::openDirectory(path);
 	}
 };
 
@@ -84,118 +78,54 @@ struct DirItem : ui::MenuItem {
 // File
 ////////////////////
 
-struct NewItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->patch->loadTemplateDialog();
-	}
-};
-
-struct OpenItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->patch->loadDialog();
-	}
-};
-
-struct OpenPathItem : ui::MenuItem {
-	std::string path;
-	void onAction(const ActionEvent& e) override {
-		APP->patch->loadPathDialog(path);
-	}
-};
-
-struct OpenRecentItem : ui::MenuItem {
-	ui::Menu* createChildMenu() override {
-		ui::Menu* menu = new ui::Menu;
-
-		for (const std::string& path : settings::recentPatchPaths) {
-			OpenPathItem* item = new OpenPathItem;
-			item->text = system::getFilename(path);
-			item->path = path;
-			menu->addChild(item);
-		}
-
-		return menu;
-	}
-};
-
-struct SaveItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->patch->saveDialog();
-	}
-};
-
-struct SaveAsItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->patch->saveAsDialog();
-	}
-};
-
-struct SaveTemplateItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->patch->saveTemplateDialog();
-	}
-};
-
-struct RevertItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->patch->revertDialog();
-	}
-};
-
-struct QuitItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->window->close();
-	}
-};
-
 struct FileButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		NewItem* newItem = new NewItem;
-		newItem->text = "New";
-		newItem->rightText = RACK_MOD_CTRL_NAME "+N";
-		menu->addChild(newItem);
+		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
+			APP->patch->loadTemplateDialog();
+		}));
 
-		OpenItem* openItem = new OpenItem;
-		openItem->text = "Open";
-		openItem->rightText = RACK_MOD_CTRL_NAME "+O";
-		menu->addChild(openItem);
+		menu->addChild(createMenuItem("Open", RACK_MOD_CTRL_NAME "+O", []() {
+			APP->patch->loadDialog();
+		}));
 
-		OpenRecentItem* openRecentItem = new OpenRecentItem;
-		openRecentItem->text = "Open recent";
-		openRecentItem->rightText = RIGHT_ARROW;
+		ui::MenuItem* openRecentItem = createSubmenuItem("Open recent", [](ui::Menu* menu) {
+			for (const std::string& path : settings::recentPatchPaths) {
+				std::string name = system::getStem(path);
+				menu->addChild(createMenuItem(name, "", [=]() {
+					APP->patch->loadPathDialog(path);
+				}));
+			}
+		});
 		openRecentItem->disabled = settings::recentPatchPaths.empty();
 		menu->addChild(openRecentItem);
 
-		SaveItem* saveItem = new SaveItem;
-		saveItem->text = "Save";
-		saveItem->rightText = RACK_MOD_CTRL_NAME "+S";
-		menu->addChild(saveItem);
+		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
+			APP->patch->saveDialog();
+		}));
 
-		SaveAsItem* saveAsItem = new SaveAsItem;
-		saveAsItem->text = "Save as";
-		saveAsItem->rightText = RACK_MOD_CTRL_NAME "+Shift+S";
-		menu->addChild(saveAsItem);
+		menu->addChild(createMenuItem("Save as", RACK_MOD_CTRL_NAME "+Shift+S", []() {
+			APP->patch->saveAsDialog();
+		}));
 
-		SaveTemplateItem* saveTemplateItem = new SaveTemplateItem;
-		saveTemplateItem->text = "Save template";
-		menu->addChild(saveTemplateItem);
+		menu->addChild(createMenuItem("Save template", "", []() {
+			APP->patch->saveTemplateDialog();
+		}));
 
-		RevertItem* revertItem = new RevertItem;
-		revertItem->text = "Revert";
-		revertItem->rightText = RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O";
+		ui::MenuItem* revertItem = createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+			APP->patch->revertDialog();
+		});
 		revertItem->disabled = (APP->patch->path == "");
 		menu->addChild(revertItem);
 
 		menu->addChild(new ui::MenuSeparator);
 
-		QuitItem* quitItem = new QuitItem;
-		quitItem->text = "Quit";
-		quitItem->rightText = RACK_MOD_CTRL_NAME "+Q";
-		menu->addChild(quitItem);
+		menu->addChild(createMenuItem("Quit", RACK_MOD_CTRL_NAME "+Q", []() {
+			APP->window->close();
+		}));
 	}
 };
 

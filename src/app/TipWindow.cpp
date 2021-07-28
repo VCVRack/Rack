@@ -19,10 +19,7 @@ namespace app {
 struct UrlButton : ui::Button {
 	std::string url;
 	void onAction(const ActionEvent& e) override {
-		std::thread t([=] {
-			system::openBrowser(url);
-		});
-		t.detach();
+		system::openBrowser(url);
 	}
 };
 

@@ -191,10 +191,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
-			std::thread t([] {
-				system::openBrowser("https://vcvrack.com/manual/");
-			});
-			t.detach();
+			system::openBrowser("https://vcvrack.com/manual/");
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F3 && (e.mods & RACK_MOD_MASK) == 0) {
