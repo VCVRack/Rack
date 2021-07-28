@@ -350,6 +350,10 @@ Window::~Window() {
 		APP->scene->onContextDestroy(e);
 	}
 
+	// Fonts and Images in the cache must be deleted before the NanoVG context is deleted
+	internal->fontCache.clear();
+	internal->imageCache.clear();
+
 	// nvgDeleteClone(fbVg);
 
 #if defined NANOVG_GL2
