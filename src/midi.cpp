@@ -1,5 +1,6 @@
 #include <map>
 #include <utility>
+#include <queue>
 
 #include <midi.hpp>
 #include <string.hpp>
@@ -273,12 +274,71 @@ std::vector<int> Input::getChannels() {
 	return channels;
 }
 
+////////////////////
+// InputQueue
+////////////////////
+
+static const size_t InputQueue_maxSize = 8192;
+
+struct InputQueue_Compare {
+	bool operator()(const Message& a, const Message& b) {
+		return a.frame > b.frame;
+	}
+};
+
+struct InputQueue_Queue : std::priority_queue<Message, std::vector<Message>, InputQueue_Compare> {
+	void reserve(size_t capacity) {
+		c.reserve(capacity);
+	}
+	void clear() {
+		// Messing with the protected container is dangerous, but completely clearing it should be fine.
+		c.clear();
+	}
+};
+
+struct InputQueue::Internal {
+	InputQueue_Queue queue;
+};
+
+InputQueue::InputQueue() {
+	internal = new Internal;
+	internal->queue.reserve(InputQueue_maxSize);
+}
+
+InputQueue::~InputQueue() {
+	delete internal;
+}
+
 void InputQueue::onMessage(const Message& message) {
-	if ((int) queue.size() >= queueMaxSize)
+	if (internal->queue.size() >= InputQueue_maxSize)
 		return;
 	// Push to queue
-	queue.push(message);
+	internal->queue.push(message);
 }
+
+bool InputQueue::tryPop(Message* messageOut, int64_t maxFrame) {
+	if (!internal->queue.empty()) {
+		const Message& msg = internal->queue.top();
+		if (msg.frame <= maxFrame) {
+			*messageOut = msg;
+			internal->queue.pop();
+			return true;
+		}
+
+		// If next MIDI message is too far in the future, clear the queue.
+		// This solves the issue of unconsumed messages getting stuck in the future when a DAW rewinds the engine frame.
+		int futureFrames = 2 * APP->engine->getBlockFrames();
+		if (msg.frame - maxFrame > futureFrames) {
+			internal->queue.clear();
+		}
+	}
+	return false;
+}
+
+size_t InputQueue::size() {
+	return internal->queue.size();
+}
+
 
 ////////////////////
 // Output

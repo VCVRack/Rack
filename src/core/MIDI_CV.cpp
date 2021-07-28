@@ -125,13 +125,12 @@ struct MIDI_CV : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		while (!midiInput.queue.empty()) {
-			const midi::Message& msg = midiInput.queue.front();
-			// Don't process MIDI message until we've reached its frame.
-			if (msg.frame > args.frame)
-				break;
+		if (args.frame % 1000 == 0)
+			printf("queue size %lu\n", midiInput.size());
+
+		midi::Message msg;
+		while (midiInput.tryPop(&msg, args.frame)) {
 			processMessage(msg);
-			midiInput.queue.pop();
 		}
 
 		outputs[PITCH_OUTPUT].setChannels(channels);

@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <queue>
 #include <set>
 
 #include <jansson.h>
@@ -248,10 +247,20 @@ struct Input : Port {
 };
 
 
+/** An Input port that stores incoming MIDI messages and releases them when ready according to their frame timestamp.
+*/
 struct InputQueue : Input {
-	int queueMaxSize = 8192;
-	std::queue<Message> queue;
+	struct Internal;
+	Internal* internal;
+
+	InputQueue();
+	~InputQueue();
 	void onMessage(const Message& message) override;
+	/** Pops and returns the next message (by setting `messageOut`) if its frame timestamp is `maxFrame` or earlier.
+	Returns whether a message was returned.
+	*/
+	bool tryPop(Message* messageOut, int64_t maxFrame);
+	size_t size();
 };
 
 

@@ -82,13 +82,9 @@ struct MIDI_Map : Module {
 		if (!divider.process())
 			return;
 
-		while (!midiInput.queue.empty()) {
-			const midi::Message& msg = midiInput.queue.front();
-			// Don't process MIDI message until we've reached its frame.
-			if (msg.frame > args.frame)
-				break;
+		midi::Message msg;
+		while (midiInput.tryPop(&msg, args.frame)) {
 			processMessage(msg);
-			midiInput.queue.pop();
 		}
 
 		// Step channels
