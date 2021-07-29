@@ -228,7 +228,7 @@ def create_module(slug, panel_filename=None, source_filename=None):
 			raise UserException(f"Panel not found at {panel_filename}.")
 
 		if os.path.exists(source_filename):
-			if input_default(f"{source_filename} already exists. Overwrite?", "n").lower() != "y":
+			if input_default(f"{source_filename} already exists. Overwrite? (y/n)", "n").lower() != "y":
 				return
 
 		# Read SVG XML
@@ -296,10 +296,16 @@ def panel_to_components(tree):
 		c['name'] = name
 
 		# Get color
+		fill = el.get('fill')
 		style = el.get('style')
-		color_match = re.search(r'fill:\S*#(.{6});', style)
-		color = color_match.group(1).lower()
-		c['color'] = color
+		if fill:
+			color_match = re.search(r'#(.{6})', fill)
+			color = color_match.group(1).lower()
+		elif style:
+			color_match = re.search(r'fill:\S*#(.{6});', style)
+			color = color_match.group(1).lower()
+		else:
+			raise UserException("Cannot get color of component")
 
 		# Get position
 		if el.tag == "{http://www.w3.org/2000/svg}rect":
