@@ -102,6 +102,11 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 
 /** If path is blank, loads Core */
 static Plugin* loadPlugin(std::string path) {
+	if (path == "")
+		INFO("Loading Core plugin");
+	else
+		INFO("Loading plugin from %s", path.c_str());
+
 	Plugin* plugin = new Plugin;
 	try {
 		// Set plugin path
@@ -158,8 +163,8 @@ static Plugin* loadPlugin(std::string path) {
 		return NULL;
 	}
 
+	INFO("Loaded %s v%s", plugin->slug.c_str(), plugin->version.c_str());
 	plugins.push_back(plugin);
-	INFO("Loaded plugin %s v%s from %s", plugin->slug.c_str(), plugin->version.c_str(), plugin->path.c_str());
 	return plugin;
 }
 
