@@ -177,7 +177,7 @@ int removeRecursively(const std::string& path) {
 		return fs::remove_all(fs::u8path(path));
 	}
 	catch (fs::filesystem_error& e) {
-		return false;
+		return 0;
 	}
 }
 
