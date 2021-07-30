@@ -79,7 +79,7 @@ else
 	cp -r --parents $(DISTRIBUTABLES) dist/$(SLUG)/
 endif
 	@# Create ZIP package
-	cd dist && tar -c $(SLUG) | zstd -$(ZSTD_COMPRESSION_LEVEL) -o "$(SLUG)"."$(VERSION)".$(ARCH).vcvplugin
+	cd dist && tar -c $(SLUG) | zstd -$(ZSTD_COMPRESSION_LEVEL) -o "$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin
 
 install: dist
 	mkdir -p "$(RACK_USER_DIR)"/plugins-v2/
