@@ -562,6 +562,9 @@ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 			fbw->addChild(mw);
 			fbw->box.size = mw->box.size;
 
+			// Step to allow the ModuleWidget state to set its default appearance.
+			fbw->step();
+
 			// Draw to framebuffer
 			fbw->render(math::Vec(zoom, zoom), math::Vec(0, 0));
 
