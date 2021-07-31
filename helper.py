@@ -267,17 +267,13 @@ def panel_to_components(tree):
 
 	# Get components layer
 	root = tree.getroot()
-	groups = root.findall(".//svg:g[@inkscape:label='components']", ns)
+	group = root.find(".//svg:g[@inkscape:label='components']", ns)
 	# Illustrator uses `id` for the group name.
-	if len(groups) < 1:
-		groups = root.findall(".//svg:g[@id='components']", ns)
-	if len(groups) < 1:
+	# Don't test with `not group` since Elements with no subelements are falsy.
+	if group is None:
+		group = root.find(".//svg:g[@id='components']", ns)
+	if group is None:
 		raise UserException("Could not find \"components\" layer on panel")
-
-	# Get circles and rects
-	components_group = groups[0]
-	circles = components_group.findall(".//svg:circle", ns)
-	rects = components_group.findall(".//svg:rect", ns)
 
 	components = {}
 	components['params'] = []
@@ -286,14 +282,38 @@ def panel_to_components(tree):
 	components['lights'] = []
 	components['widgets'] = []
 
-	for el in circles + rects:
+	for el in group:
 		c = {}
+
 		# Get name
-		name = el.get('{http://www.inkscape.org/namespaces/inkscape}label')
-		if name is None:
+		name = el.get('{' + ns['inkscape'] + '}label')
+		if not name:
 			name = el.get('id')
+		if not name:
+			name = ""
 		name = str_to_identifier(name).upper()
 		c['name'] = name
+
+		# Get position
+		if el.tag == '{' + ns['svg'] + '}rect':
+			x = float(el.get('x'))
+			y = float(el.get('y'))
+			width = float(el.get('width'))
+			height = float(el.get('height'))
+			c['x'] = round(x, 3)
+			c['y'] = round(y, 3)
+			c['width'] = round(width, 3)
+			c['height'] = round(height, 3)
+			c['cx'] = round(x + width / 2, 3)
+			c['cy'] = round(y + height / 2, 3)
+		elif el.tag == '{' + ns['svg'] + '}circle' or el.tag == '{' + ns['svg'] + '}ellipse':
+			cx = float(el.get('cx'))
+			cy = float(el.get('cy'))
+			c['cx'] = round(cx, 3)
+			c['cy'] = round(cy, 3)
+		else:
+			print(f"Element in components layer is not rect, circle, or ellipse: {el}")
+			continue
 
 		# Get color
 		fill = el.get('fill')
@@ -305,25 +325,8 @@ def panel_to_components(tree):
 			color_match = re.search(r'fill:\S*#(.{6});', style)
 			color = color_match.group(1).lower()
 		else:
-			raise UserException("Cannot get color of component")
-
-		# Get position
-		if el.tag == "{http://www.w3.org/2000/svg}rect":
-			x = float(el.get('x'))
-			y = float(el.get('y'))
-			width = float(el.get('width'))
-			height = float(el.get('height'))
-			c['x'] = round(x, 3)
-			c['y'] = round(y, 3)
-			c['width'] = round(width, 3)
-			c['height'] = round(height, 3)
-			c['cx'] = round(x + width / 2, 3)
-			c['cy'] = round(y + height / 2, 3)
-		elif el.tag == "{http://www.w3.org/2000/svg}circle":
-			cx = float(el.get('cx'))
-			cy = float(el.get('cy'))
-			c['cx'] = round(cx, 3)
-			c['cy'] = round(cy, 3)
+			print(f"Cannot get color of component: {el}")
+			continue
 
 		if color == 'ff0000':
 			components['params'].append(c)
