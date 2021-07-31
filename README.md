@@ -4,6 +4,8 @@
 
 - [VCV website](https://vcvrack.com/)
 - [Manual](https://vcvrack.com/manual/)
+- [Support](https://vcvrack.com/support)
+- [Module Library](https://library.vcvrack.com/)
 - [Rack source code](https://github.com/VCVRack/Rack)
 - [Building](https://vcvrack.com/manual/Building)
 - [Communities](https://vcvrack.com/manual/Communities)
