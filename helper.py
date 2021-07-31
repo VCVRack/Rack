@@ -265,8 +265,15 @@ def panel_to_components(tree):
 		"inkscape": "http://www.inkscape.org/namespaces/inkscape",
 	}
 
-	# Get components layer
 	root = tree.getroot()
+	# Get SVG scale
+	root_width = root.get('width')
+	svg_dpi = 75
+	scale = 1
+	if re.match('\d+px', root_width):
+		scale = 25.4 / svg_dpi
+
+	# Get components layer
 	group = root.find(".//svg:g[@inkscape:label='components']", ns)
 	# Illustrator uses `id` for the group name.
 	# Don't test with `not group` since Elements with no subelements are falsy.
@@ -296,10 +303,10 @@ def panel_to_components(tree):
 
 		# Get position
 		if el.tag == '{' + ns['svg'] + '}rect':
-			x = float(el.get('x'))
-			y = float(el.get('y'))
-			width = float(el.get('width'))
-			height = float(el.get('height'))
+			x = float(el.get('x')) * scale
+			y = float(el.get('y')) * scale
+			width = float(el.get('width')) * scale
+			height = float(el.get('height')) * scale
 			c['x'] = round(x, 3)
 			c['y'] = round(y, 3)
 			c['width'] = round(width, 3)
@@ -307,8 +314,8 @@ def panel_to_components(tree):
 			c['cx'] = round(x + width / 2, 3)
 			c['cy'] = round(y + height / 2, 3)
 		elif el.tag == '{' + ns['svg'] + '}circle' or el.tag == '{' + ns['svg'] + '}ellipse':
-			cx = float(el.get('cx'))
-			cy = float(el.get('cy'))
+			cx = float(el.get('cx')) * scale
+			cy = float(el.get('cy')) * scale
 			c['cx'] = round(cx, 3)
 			c['cy'] = round(cy, 3)
 		else:
