@@ -89,4 +89,4 @@ ifdef ARCH_MAC
 endif
 
 build/%.html: %.md
-	markdown -f fencedcode -o $@ $<
+	markdown $< > $@
