@@ -140,7 +140,7 @@ ifdef ARCH_WIN
 	windres $^ -O coff -o $@
 endif
 
-DIST_RES := res cacert.pem Core.json template.vcv
+DIST_RES := res cacert.pem Core.json template.vcv LICENSE-GPLv3.txt
 DIST_NAME := Rack-$(EDITION)-"$(VERSION)"-$(ARCH)
 DIST_SDK_DIR := Rack-SDK
 DIST_SDK := Rack-SDK-$(VERSION).zip
