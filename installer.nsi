@@ -2,20 +2,19 @@
 
 !define NAME_FULL "VCV Rack ${EDITION_NAME} ${VERSION}"
 !define NAME "VCV Rack ${EDITION} ${VERSION_MAJOR}"
+!define RACK_DIR "Rack${EDITION}${VERSION_MAJOR}"
+!define INSTALL_REG "Software\VCV\Rack${EDITION}${VERSION_MAJOR}"
+!define UNINSTALL_REG "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCVRack${EDITION}${VERSION_MAJOR}"
+
 Name "${NAME_FULL}"
 SetCompressor /solid "lzma"
 SetCompressorDictSize 8
 CRCCheck On
 
 ; Default installation folder
-!define RACK_DIR "Rack${EDITION}${VERSION_MAJOR}"
 InstallDir "$PROGRAMFILES\VCV\${RACK_DIR}"
-
 ; Get installation folder from registry if available
-!define INSTALL_REG "Software\VCV\Rack${EDITION}${VERSION_MAJOR}"
 InstallDirRegKey HKLM "${INSTALL_REG}" ""
-
-!define UNINSTALL_REG "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCVRack${EDITION}${VERSION_MAJOR}"
 
 ; Request admin permissions so we can install to Program Files and add a registry entry
 RequestExecutionLevel admin
