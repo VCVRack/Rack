@@ -1,4 +1,7 @@
 RACK_DIR ?= .
+EDITION := CE
+EDITION_NAME := Community Edition
+VERSION_MAJOR := 2
 VERSION := 2.dev.$(shell git rev-parse --short HEAD)
 # VERSION := 2.0.0
 
@@ -137,15 +140,14 @@ ifdef ARCH_WIN
 	windres $^ -O coff -o $@
 endif
 
-
 DIST_RES := res cacert.pem Core.json template.vcv
-DIST_NAME := Rack-"$(VERSION)"-$(ARCH)
+DIST_NAME := Rack-$(EDITION)-"$(VERSION)"-$(ARCH)
 DIST_SDK_DIR := Rack-SDK
 DIST_SDK := Rack-SDK-$(VERSION).zip
 ifdef ARCH_MAC
-	DIST_DIR := VCV Rack.app
+	DIST_BUNDLE := VCV Rack $(EDITION) $(VERSION_MAJOR).app
 else
-	DIST_DIR := Rack
+	DIST_DIR := Rack$(EDITION)$(VERSION_MAJOR)
 endif
 DIST_MD := $(wildcard *.md)
 DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
@@ -171,35 +173,35 @@ ifdef ARCH_LIN
 	cp $(DIST_HTML) dist/"$(DIST_DIR)"/
 	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/Fundamental.vcvplugin
 	# Make ZIP
-	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack
+	cd dist && zip -q -9 -r $(DIST_NAME).zip $(DIST_DIR)
 endif
 ifdef ARCH_MAC
-	mkdir -p dist/"$(DIST_DIR)"
-	mkdir -p dist/"$(DIST_DIR)"/Contents
-	mkdir -p dist/"$(DIST_DIR)"/Contents/Resources
-	mkdir -p dist/"$(DIST_DIR)"/Contents/MacOS
-	cp $(TARGET) dist/"$(DIST_DIR)"/Contents/Resources/
-	cp $(STANDALONE_TARGET) dist/"$(DIST_DIR)"/Contents/MacOS/
-	$(STRIP) -S dist/"$(DIST_DIR)"/Contents/Resources/$(TARGET)
-	$(STRIP) -S dist/"$(DIST_DIR)"/Contents/MacOS/$(STANDALONE_TARGET)
-	install_name_tool -change $(TARGET) @executable_path/../Resources/$(TARGET) dist/"$(DIST_DIR)"/Contents/MacOS/$(STANDALONE_TARGET)
+	mkdir -p dist/"$(DIST_BUNDLE)"
+	mkdir -p dist/"$(DIST_BUNDLE)"/Contents
+	mkdir -p dist/"$(DIST_BUNDLE)"/Contents/Resources
+	mkdir -p dist/"$(DIST_BUNDLE)"/Contents/MacOS
+	cp $(TARGET) dist/"$(DIST_BUNDLE)"/Contents/Resources/
+	cp $(STANDALONE_TARGET) dist/"$(DIST_BUNDLE)"/Contents/MacOS/
+	$(STRIP) -S dist/"$(DIST_BUNDLE)"/Contents/Resources/$(TARGET)
+	$(STRIP) -S dist/"$(DIST_BUNDLE)"/Contents/MacOS/$(STANDALONE_TARGET)
+	install_name_tool -change $(TARGET) @executable_path/../Resources/$(TARGET) dist/"$(DIST_BUNDLE)"/Contents/MacOS/$(STANDALONE_TARGET)
 	# Manually check that no nonstandard shared libraries are linked
-	otool -L dist/"$(DIST_DIR)"/Contents/Resources/$(TARGET)
-	otool -L dist/"$(DIST_DIR)"/Contents/MacOS/$(STANDALONE_TARGET)
+	otool -L dist/"$(DIST_BUNDLE)"/Contents/Resources/$(TARGET)
+	otool -L dist/"$(DIST_BUNDLE)"/Contents/MacOS/$(STANDALONE_TARGET)
 	# Copy resources
-	cp Info.plist dist/"$(DIST_DIR)"/Contents/
-	$(SED) 's/{VERSION}/$(VERSION)/g' dist/"$(DIST_DIR)"/Contents/Info.plist
-	cp -R $(DIST_RES) dist/"$(DIST_DIR)"/Contents/Resources/
-	cp $(DIST_HTML) dist/"$(DIST_DIR)"/Contents/Resources/
-	cp -R icon.icns dist/"$(DIST_DIR)"/Contents/Resources/
-	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/Fundamental.vcvplugin
+	cp Info.plist dist/"$(DIST_BUNDLE)"/Contents/
+	$(SED) 's/{VERSION}/$(VERSION)/g' dist/"$(DIST_BUNDLE)"/Contents/Info.plist
+	cp -R $(DIST_RES) dist/"$(DIST_BUNDLE)"/Contents/Resources/
+	cp $(DIST_HTML) dist/"$(DIST_BUNDLE)"/Contents/Resources/
+	cp -R icon.icns dist/"$(DIST_BUNDLE)"/Contents/Resources/
+	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_BUNDLE)"/Fundamental.vcvplugin
 	# Clean up and sign bundle
-	xattr -cr dist/"$(DIST_DIR)"
+	xattr -cr dist/"$(DIST_BUNDLE)"
 	# This will only work if you have the private key to my certificate
-	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --deep dist/"$(DIST_DIR)"
-	codesign --verify --deep --strict --verbose=2 dist/"$(DIST_DIR)"
+	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --deep dist/"$(DIST_BUNDLE)"
+	codesign --verify --deep --strict --verbose=2 dist/"$(DIST_BUNDLE)"
 	# Make ZIP
-	cd dist && zip -q -9 -r $(DIST_NAME).zip "$(DIST_DIR)"
+	cd dist && zip -q -9 -r $(DIST_NAME).zip "$(DIST_BUNDLE)"
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/"$(DIST_DIR)"
@@ -218,8 +220,7 @@ ifdef ARCH_WIN
 	cd dist && zip -q -9 -r $(DIST_NAME).zip "$(DIST_DIR)"
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
-	makensis -DVERSION=$(VERSION) installer.nsi
-	mv installer.exe dist/$(DIST_NAME).exe
+	makensis -DEDITION="$(EDITION)" -DEDITION_NAME="$(EDITION_NAME)" -DVERSION_MAJOR="$(VERSION_MAJOR)" -DVERSION="$(VERSION)" "-XOutFile dist/$(DIST_NAME).exe" installer.nsi
 endif
 
 	# Build Rack SDK
@@ -236,7 +237,7 @@ endif
 notarize:
 ifdef ARCH_MAC
 	# This will only work if you have my Apple ID password in your keychain
-	xcrun altool --notarize-app -f dist/"$(DIST_DIR)"-$(VERSION)-$(ARCH).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/UploadInfo.plist
+	xcrun altool --notarize-app -f dist/"$(DIST_BUNDLE)"-"$(VERSION)"-$(ARCH).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/UploadInfo.plist
 	# Wait for Apple's servers to approve the app
 	while true; do \
 		echo "Waiting on Apple servers..." ; \
@@ -247,9 +248,9 @@ ifdef ARCH_MAC
 		sleep 10 ; \
 	done
 	# Mark app as notarized, check, and re-zip
-	xcrun stapler staple dist/"$(DIST_DIR)"
-	spctl --assess --type execute --ignore-cache --no-cache -vv dist/"$(DIST_DIR)"
-	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack.app
+	xcrun stapler staple dist/"$(DIST_BUNDLE)"
+	spctl --assess --type execute --ignore-cache --no-cache -vv dist/"$(DIST_BUNDLE)"
+	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_BUNDLE)"
 endif
 
 
