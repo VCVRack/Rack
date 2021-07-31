@@ -138,7 +138,7 @@ ifdef ARCH_WIN
 endif
 
 
-DIST_RES := LICENSE* CHANGELOG.md res cacert.pem Core.json template.vcv
+DIST_RES := res cacert.pem Core.json template.vcv
 DIST_NAME := Rack-"$(VERSION)"-$(ARCH)
 DIST_SDK_DIR := Rack-SDK
 DIST_SDK := Rack-SDK-$(VERSION).zip
@@ -147,9 +147,12 @@ ifdef ARCH_MAC
 else
 	DIST_DIR := Rack
 endif
+DIST_MD := $(wildcard *.md)
+DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
+
 
 # This target is not supported for public use
-dist: $(TARGET) $(STANDALONE_TARGET)
+dist: $(TARGET) $(STANDALONE_TARGET) $(DIST_HTML)
 	rm -rf dist
 	mkdir -p dist
 
@@ -165,7 +168,8 @@ ifdef ARCH_LIN
 	ldd dist/"$(DIST_DIR)"/$(STANDALONE_TARGET)
 	# Copy resources
 	cp -R $(DIST_RES) dist/"$(DIST_DIR)"/
-	cp Fundamental.vcvplugin dist/"$(DIST_DIR)"/
+	cp $(DIST_HTML) dist/"$(DIST_DIR)"/
+	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/Fundamental.vcvplugin
 	# Make ZIP
 	cd dist && zip -q -9 -r $(DIST_NAME).zip Rack
 endif
@@ -186,8 +190,9 @@ ifdef ARCH_MAC
 	cp Info.plist dist/"$(DIST_DIR)"/Contents/
 	$(SED) 's/{VERSION}/$(VERSION)/g' dist/"$(DIST_DIR)"/Contents/Info.plist
 	cp -R $(DIST_RES) dist/"$(DIST_DIR)"/Contents/Resources/
+	cp $(DIST_HTML) dist/"$(DIST_DIR)"/Contents/Resources/
 	cp -R icon.icns dist/"$(DIST_DIR)"/Contents/Resources/
-	cp Fundamental.vcvplugin dist/"$(DIST_DIR)"/Contents/Resources/
+	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/Fundamental.vcvplugin
 	# Clean up and sign bundle
 	xattr -cr dist/"$(DIST_DIR)"
 	# This will only work if you have the private key to my certificate
@@ -204,10 +209,11 @@ ifdef ARCH_WIN
 	$(STRIP) -s dist/"$(DIST_DIR)"/$(STANDALONE_TARGET)
 	# Copy resources
 	cp -R $(DIST_RES) dist/"$(DIST_DIR)"/
+	cp $(DIST_HTML) dist/"$(DIST_DIR)"/
 	cp /mingw64/bin/libwinpthread-1.dll dist/"$(DIST_DIR)"/
 	cp /mingw64/bin/libstdc++-6.dll dist/"$(DIST_DIR)"/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/"$(DIST_DIR)"/
-	cp Fundamental.vcvplugin dist/"$(DIST_DIR)"/
+	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/Fundamental.vcvplugin
 	# Make ZIP
 	cd dist && zip -q -9 -r $(DIST_NAME).zip "$(DIST_DIR)"
 	# Make NSIS installer

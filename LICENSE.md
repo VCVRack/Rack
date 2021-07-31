@@ -1,4 +1,4 @@
-# VCV Rack Licenses
+# VCV Rack licenses
 
 VCV Rack **source code** is copyright © 2016-2021 VCV.
 

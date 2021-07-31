@@ -87,3 +87,6 @@ ifdef ARCH_MAC
 	@# Apple makes this needlessly complicated, so just generate a C file with an array.
 	xxd -i $< | $(CC) $(MAC_SDK_FLAGS) -c -o $@ -xc -
 endif
+
+build/%.html: %.md
+	markdown -f fencedcode -o $@ $<

@@ -28,7 +28,7 @@
 - [NanoVG](https://github.com/memononen/nanovg)
 - [NanoSVG](https://github.com/memononen/nanosvg)
 - [oui-blendish](https://github.com/geetrepo/oui-blendish)
-- [osdialog](https://github.com/AndrewBelt/osdialog) (written by Andrew Belt)
+- [osdialog](https://github.com/AndrewBelt/osdialog) (written by Andrew Belt for VCV Rack)
 - [ghc::filesystem](https://github.com/gulrak/filesystem)
 - [Jansson](https://digip.org/jansson/)
 - [libcurl](https://curl.se/libcurl/)

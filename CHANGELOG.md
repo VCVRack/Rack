@@ -1,4 +1,4 @@
-#### Preface
+# VCV Rack changelog
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
