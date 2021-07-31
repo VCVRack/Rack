@@ -56,7 +56,6 @@ static void fatalSignalHandler(int sig) {
 }
 
 
-// TODO Use -municode on Windows and change this to wmain. Convert argv to UTF-8.
 int main(int argc, char* argv[]) {
 #if defined ARCH_WIN
 	// Windows global mutex to prevent multiple instances
@@ -258,3 +257,18 @@ int main(int argc, char* argv[]) {
 
 	return 0;
 }
+
+
+#ifdef UNICODE
+/** UTF-16 to UTF-8 wrapper for Windows with unicode */
+int wmain(int argc, wchar_t* argvU16[]) {
+	// Initialize char* array with string-owned buffers
+	std::string argvStr[argc];
+	const char* argvU8[argc];
+	for (int i = 0; i < argc; i++) {
+		argvStr[i] = string::UTF16toUTF8(argvU16[i]);
+		argvU8[i] = argvStr[i].c_str();
+	}
+	return main(argc, (char**) argvU8);
+}
+#endif

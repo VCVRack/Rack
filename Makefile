@@ -84,12 +84,11 @@ include compile.mk
 ifdef ARCH_MAC
 	STANDALONE_LDFLAGS += $(MAC_SDK_FLAGS)
 endif
-STANDALONE_OBJECTS += $(patsubst %, build/%.o, $(STANDALONE_SOURCES))
-STANDALONE_DEPENDENCIES := $(patsubst %, build/%.d, $(STANDALONE_SOURCES))
+STANDALONE_OBJECTS += $(TARGET)
 -include $(STANDALONE_DEPENDENCIES)
 
-$(STANDALONE_TARGET): $(STANDALONE_OBJECTS) $(TARGET)
-	$(CXX) -o $@ $^ $(STANDALONE_LDFLAGS)
+$(STANDALONE_TARGET): $(STANDALONE_OBJECTS) $(STANDALONE_SOURCES)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(STANDALONE_LDFLAGS)
 
 # Convenience targets
 
@@ -131,7 +130,7 @@ valgrind: $(STANDALONE_TARGET)
 	valgrind --suppressions=valgrind.supp ./$< -d
 
 clean:
-	rm -rfv $(TARGET) $(STANDALONE_TARGET) libRack.dll.a Rack.res build dist
+	rm -rfv $(TARGET) $(STANDALONE_TARGET) libRack.dll.a Rack.res build dist *.d
 
 
 # For Windows resources
