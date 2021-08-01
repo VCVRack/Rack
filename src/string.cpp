@@ -205,22 +205,28 @@ bool CaseInsensitiveCompare::operator()(const std::string& a, const std::string&
 }
 
 
-std::vector<std::string> split(const std::string& s, const std::string& separator) {
+std::vector<std::string> split(const std::string& s, const std::string& separator, size_t maxTokens) {
 	if (separator.empty())
 		throw Exception("split(): separator cannot be empty string");
 	// Special case of empty string
 	if (s == "")
 		return {};
+	if (maxTokens == 1)
+		return {s};
 
 	std::vector<std::string> v;
 	size_t sepLen = separator.size();
 	size_t start = 0;
 	size_t end;
 	while ((end = s.find(separator, start)) != std::string::npos) {
+		// Add token to vector
 		std::string token = s.substr(start, end - start);
 		v.push_back(token);
 		// Don't include delimiter
 		start = end + sepLen;
+		// Stop searching for tokens if we're at the token limit
+		if (maxTokens == v.size() + 1)
+			break;
 	}
 
 	v.push_back(s.substr(start));
