@@ -264,11 +264,12 @@ int main(int argc, char* argv[]) {
 int wmain(int argc, wchar_t* argvU16[]) {
 	// Initialize char* array with string-owned buffers
 	std::string argvStr[argc];
-	const char* argvU8[argc];
+	const char* argvU8[argc + 1];
 	for (int i = 0; i < argc; i++) {
 		argvStr[i] = string::UTF16toUTF8(argvU16[i]);
 		argvU8[i] = argvStr[i].c_str();
 	}
+	argvU8[argc] = NULL;
 	return main(argc, (char**) argvU8);
 }
 #endif
