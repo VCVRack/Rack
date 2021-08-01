@@ -176,7 +176,7 @@ void svgDraw(NVGcontext* vg, NSVGimage* svg) {
 
 		// Opacity
 		if (shape->opacity < 1.0)
-			nvgGlobalAlpha(vg, shape->opacity);
+			nvgAlpha(vg, shape->opacity);
 
 		// Build path
 		nvgBeginPath(vg);
