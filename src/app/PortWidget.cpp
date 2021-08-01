@@ -158,8 +158,9 @@ void PortWidget::draw(const DrawArgs& args) {
 	CableWidget* cw = APP->scene->rack->incompleteCable;
 	if (cw) {
 		// Dim the PortWidget if the active cable cannot plug into this PortWidget
-		if (type == engine::Port::OUTPUT ? cw->outputPort : cw->inputPort)
-			nvgGlobalAlpha(args.vg, 0.5);
+		if (type == engine::Port::OUTPUT ? cw->outputPort : cw->inputPort) {
+			nvgTint(args.vg, nvgRGBf(0.33, 0.33, 0.33));
+		}
 	}
 	Widget::draw(args);
 }

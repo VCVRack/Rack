@@ -160,7 +160,7 @@ static void CableWidget_drawCable(CableWidget* that, const widget::Widget::DrawA
 	if (opacity > 0.0) {
 		nvgSave(args.vg);
 		// This power scaling looks more linear than actual linear scaling
-		nvgGlobalAlpha(args.vg, std::pow(opacity, 1.5));
+		nvgAlpha(args.vg, std::pow(opacity, 1.5));
 
 		float dist = pos1.minus(pos2).norm();
 		math::Vec slump;
