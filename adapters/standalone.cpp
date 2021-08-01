@@ -140,6 +140,7 @@ int main(int argc, char* argv[]) {
 #if defined ARCH_MAC
 	INFO("Bundle path: %s", asset::bundlePath.c_str());
 #endif
+	INFO("System time: %lf", system::getUnixTime());
 
 	// Load settings
 	settings::init();
