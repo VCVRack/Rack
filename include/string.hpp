@@ -74,7 +74,7 @@ Examples:
 	split("abc", "+") // {"abc"}
 	split("a++c", "+") // {"a", "", "c"}
 	split("", "+") // {}
-	split("abc", "") // {"a", "b", "c"}
+	split("abc", "") // throws rack::Exception
 */
 std::vector<std::string> split(const std::string& s, const std::string& seperator);
 
