@@ -43,6 +43,11 @@ struct Model {
 	std::string manualUrl;
 	std::string modularGridUrl;
 
+	/** Hides model from the Module Browser but able to be loaded from a patch file.
+	Useful for deprecating modules without breaking old patches.
+	*/
+	bool hidden = false;
+
 	virtual ~Model() {}
 	/** Creates a Module. */
 	virtual engine::Module* createModule() {

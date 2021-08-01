@@ -54,6 +54,17 @@ void Model::fromJson(json_t* rootJ) {
 	json_t* modularGridUrlJ = json_object_get(rootJ, "modularGridUrl");
 	if (modularGridUrlJ)
 		modularGridUrl = json_string_value(modularGridUrlJ);
+
+	// hidden
+	json_t* hiddenJ = json_object_get(rootJ, "hidden");
+	// Use `disabled` as an alias which was deprecated in Rack 2.0
+	if (!hiddenJ)
+		hiddenJ = json_object_get(rootJ, "disabled");
+	if (hiddenJ) {
+		// Don't un-hide Model if already hidden by C++
+		if (json_boolean_value(hiddenJ))
+			hidden = true;
+	}
 }
 
 

@@ -116,13 +116,6 @@ void Plugin::fromJson(json_t* rootJ) {
 		size_t moduleId;
 		json_t* moduleJ;
 		json_array_foreach(modulesJ, moduleId, moduleJ) {
-			// Check if model is disabled
-			json_t* disabledJ = json_object_get(moduleJ, "disabled");
-			if (disabledJ) {
-				if (json_boolean_value(disabledJ))
-					continue;
-			}
-
 			// Get model slug
 			json_t* modelSlugJ = json_object_get(moduleJ, "slug");
 			if (!modelSlugJ) {

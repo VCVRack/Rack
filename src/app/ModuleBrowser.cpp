@@ -52,6 +52,9 @@ static void fuzzySearchInit() {
 	for (plugin::Plugin* plugin : plugin::plugins) {
 		// Iterate model in plugin
 		for (plugin::Model* model : plugin->models) {
+			if (model->hidden)
+				continue;
+
 			// Get search fields for model
 			std::string tagStr;
 			for (int tagId : model->tagIds) {
@@ -531,6 +534,9 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			// Iterate models in plugin
 			int modelIndex = 0;
 			for (plugin::Model* model : plugin->models) {
+				if (model->hidden)
+					continue;
+
 				// Don't show module if plugin whitelist exists but the module is not in it.
 				if (pluginIt != settings::moduleWhitelist.end()) {
 					auto moduleIt = std::find(pluginIt->second.begin(), pluginIt->second.end(), model->slug);
