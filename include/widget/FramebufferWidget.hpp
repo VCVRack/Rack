@@ -19,6 +19,10 @@ struct FramebufferWidget : Widget {
 	float oversample = 1.0;
 	/** Redraw when the world offset of the FramebufferWidget changes its fractional value. */
 	bool dirtyOnSubpixelChange = true;
+	/** If finite, the maximum size of the framebuffer is the viewport expanded by this margin.
+	The framebuffer is re-rendered when the viewport moves outside the margin.
+	*/
+	math::Vec viewportMargin = math::Vec(INFINITY, INFINITY);
 
 	FramebufferWidget();
 	~FramebufferWidget();
@@ -35,7 +39,7 @@ struct FramebufferWidget : Widget {
 	/** Re-renders the framebuffer, re-creating it if necessary.
 	Handles oversampling (if >1) by rendering to a temporary (larger) framebuffer and then downscaling it to the main persistent framebuffer.
 	*/
-	void render(math::Vec scale, math::Vec offsetF);
+	void render(math::Vec scale = math::Vec(1, 1), math::Vec offsetF = math::Vec(0, 0), math::Rect clipBox = math::Rect::inf());
 	/** Initializes the current GL context and draws children to it.
 	*/
 	virtual void drawFramebuffer();

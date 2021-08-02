@@ -435,14 +435,16 @@ struct Rect {
 
 inline Vec Vec::clamp(Rect bound) const {
 	return Vec(
-	         math::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
-	         math::clamp(y, bound.pos.y, bound.pos.y + bound.size.y));
+		math::clamp(x, bound.pos.x, bound.pos.x + bound.size.x),
+		math::clamp(y, bound.pos.y, bound.pos.y + bound.size.y)
+	);
 }
 
 inline Vec Vec::clampSafe(Rect bound) const {
 	return Vec(
-	         math::clampSafe(x, bound.pos.x, bound.pos.x + bound.size.x),
-	         math::clampSafe(y, bound.pos.y, bound.pos.y + bound.size.y));
+		math::clampSafe(x, bound.pos.x, bound.pos.x + bound.size.x),
+		math::clampSafe(y, bound.pos.y, bound.pos.y + bound.size.y)
+	);
 }
 
 

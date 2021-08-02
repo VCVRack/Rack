@@ -23,6 +23,9 @@ struct FramebufferWidget::Internal {
 	math::Vec fbScale;
 	/** Framebuffer's subpixel offset relative to fbBox in world coordinates */
 	math::Vec fbOffsetF;
+	/** Local box where framebuffer content is valid.
+	*/
+	math::Rect fbClipBox = math::Rect::inf();
 };
 
 
@@ -100,22 +103,26 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	math::Vec offsetI = offset.floor();
 	math::Vec offsetF = offset.minus(offsetI);
 
-	// If drawing to a new subpixel location, rerender in the next frame.
+	// Re-render if drawing to a new subpixel location.
 	// Anything less than 0.1 pixels isn't noticeable.
 	math::Vec offsetFDelta = offsetF.minus(internal->fbOffsetF);
 	if (dirtyOnSubpixelChange && APP->window->fbDirtyOnSubpixelChange() && offsetFDelta.square() >= std::pow(0.1f, 2)) {
 		// DEBUG("%p dirty subpixel (%f, %f) (%f, %f)", this, VEC_ARGS(offsetF), VEC_ARGS(internal->fbOffsetF));
 		setDirty();
 	}
-	if (!scale.equals(internal->fbScale)) {
-		// If rescaled, rerender in the next frame.
+	// Re-render if rescaled.
+	else if (!scale.equals(internal->fbScale)) {
 		// DEBUG("%p dirty scale", this);
+		setDirty();
+	}
+	// Re-render if viewport is outside framebuffer's clipbox when it was rendered.
+	else if (!internal->fbClipBox.contains(args.clipBox)) {
 		setDirty();
 	}
 
 	// It's more important to not lag the frame than to draw the framebuffer
 	if (dirty && APP->window->getFrameDurationRemaining() > 0.0) {
-		render(scale, offsetF);
+		render(scale, offsetF, args.clipBox);
 	}
 
 	if (!internal->fb)
@@ -153,7 +160,7 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 }
 
 
-void FramebufferWidget::render(math::Vec scale, math::Vec offsetF) {
+void FramebufferWidget::render(math::Vec scale, math::Vec offsetF, math::Rect clipBox) {
 	// In case we fail drawing the framebuffer, don't try again the next frame, so reset `dirty` here.
 	dirty = false;
 	NVGcontext* vg = APP->window->vg;
@@ -170,7 +177,13 @@ void FramebufferWidget::render(math::Vec scale, math::Vec offsetF) {
 		localBox = getVisibleChildrenBoundingBox();
 	}
 
-	// DEBUG("rendering FramebufferWidget localBox (%g %g %g %g) fbOffset (%g %g) fbScale (%g %g)", RECT_ARGS(localBox), VEC_ARGS(internal->fbOffsetF), VEC_ARGS(internal->fbScale));
+	// Intersect local box with viewport if viewportMargin is set
+	internal->fbClipBox = clipBox.grow(viewportMargin);
+	if (internal->fbClipBox.size.isFinite()) {
+		localBox = localBox.intersect(internal->fbClipBox);
+	}
+
+	// DEBUG("rendering FramebufferWidget localBox (%f, %f; %f, %f) fbOffset (%f, %f) fbScale (%f, %f)", RECT_ARGS(localBox), VEC_ARGS(internal->fbOffsetF), VEC_ARGS(internal->fbScale));
 	// Transform to world coordinates, then expand to nearest integer coordinates
 	math::Vec min = localBox.getTopLeft().mult(internal->fbScale).plus(internal->fbOffsetF).floor();
 	math::Vec max = localBox.getBottomRight().mult(internal->fbScale).plus(internal->fbOffsetF).ceil();

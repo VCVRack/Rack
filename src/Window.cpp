@@ -566,7 +566,7 @@ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 			fbw->step();
 
 			// Draw to framebuffer
-			fbw->render(math::Vec(zoom, zoom), math::Vec(0, 0));
+			fbw->render(math::Vec(zoom, zoom));
 
 			// Read pixels
 			nvgluBindFramebuffer(fbw->getFramebuffer());
