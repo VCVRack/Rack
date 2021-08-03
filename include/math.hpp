@@ -308,9 +308,15 @@ struct Rect {
 	Rect() {}
 	Rect(Vec pos, Vec size) : pos(pos), size(size) {}
 	Rect(float posX, float posY, float sizeX, float sizeY) : pos(Vec(posX, posY)), size(Vec(sizeX, sizeY)) {}
-	/** Constructs a Rect from the upper-left position `a` and lower-right pos `b`. */
+	/** Constructs a Rect from a top-left and bottom-right vector.
+	*/
 	static Rect fromMinMax(Vec a, Vec b) {
 		return Rect(a, b.minus(a));
+	}
+	/** Constructs a Rect from any two opposite corners.
+	*/
+	static Rect fromCorners(Vec a, Vec b) {
+		return fromMinMax(a.min(b), a.max(b));
 	}
 	/** Returns the infinite Rect. */
 	static Rect inf() {

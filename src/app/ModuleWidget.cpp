@@ -418,6 +418,8 @@ struct ModuleWidget::Internal {
 	math::Vec oldPos;
 
 	widget::Widget* panel = NULL;
+
+	bool selected = false;
 };
 
 
@@ -596,6 +598,17 @@ void ModuleWidget::draw(const DrawArgs& args) {
 	// 	std::string debugText = string::f("%d", module->id);
 	// 	bndLabel(args.vg, 0, 0, INFINITY, INFINITY, -1, debugText.c_str());
 	// }
+
+	// Selection
+	if (internal->selected) {
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0.0, 0.0, VEC_ARGS(box.size));
+		nvgFillColor(args.vg, nvgRGBAf(1, 0, 0, 0.25));
+		nvgFill(args.vg);
+		nvgStrokeWidth(args.vg, 2.0);
+		nvgStrokeColor(args.vg, nvgRGBAf(1, 0, 0, 0.5));
+		nvgStroke(args.vg);
+	}
 
 	nvgResetScissor(args.vg);
 }
@@ -1208,6 +1221,12 @@ engine::Module* ModuleWidget::releaseModule() {
 	this->module = NULL;
 	return module;
 }
+
+
+bool& ModuleWidget::selected() {
+	return internal->selected;
+}
+
 
 
 } // namespace app

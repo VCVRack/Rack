@@ -38,8 +38,12 @@ struct RackWidget : widget::OpaqueWidget {
 
 	void onHover(const HoverEvent& e) override;
 	void onHoverKey(const HoverKeyEvent& e) override;
-	void onDragHover(const DragHoverEvent& e) override;
 	void onButton(const ButtonEvent& e) override;
+	void onDragStart(const DragStartEvent& e) override;
+	void onDragEnd(const DragEndEvent& e) override;
+	void onDragHover(const DragHoverEvent& e) override;
+
+	// Rack methods
 
 	/** Completely clear the rack's modules and cables */
 	void clear();
@@ -65,6 +69,7 @@ struct RackWidget : widget::OpaqueWidget {
 	bool isEmpty();
 	void updateModuleOldPositions();
 	history::ComplexAction* getModuleDragAction();
+	void updateModuleSelections();
 
 	// Cable methods
 

@@ -72,12 +72,15 @@ struct CableContainer : widget::TransparentWidget {
 };
 
 
-// struct RackWidget::Internal {
-// };
+struct RackWidget::Internal {
+	bool selecting = false;
+	math::Vec selectionStart;
+	math::Vec selectionEnd;
+};
 
 
 RackWidget::RackWidget() {
-	// internal = new Internal;
+	internal = new Internal;
 
 	rail = new RailWidget;
 	addChild(rail);
@@ -91,7 +94,7 @@ RackWidget::RackWidget() {
 
 RackWidget::~RackWidget() {
 	clear();
-	// delete internal;
+	delete internal;
 }
 
 void RackWidget::step() {
@@ -104,11 +107,24 @@ void RackWidget::draw(const DrawArgs& args) {
 	nvgGlobalTint(args.vg, nvgRGBAf(b, b, b, 1));
 
 	Widget::draw(args);
+
+	// Draw selection rectangle
+	if (internal->selecting) {
+		nvgBeginPath(args.vg);
+		math::Rect selectionBox = math::Rect::fromCorners(internal->selectionStart, internal->selectionEnd);
+		nvgRect(args.vg, RECT_ARGS(selectionBox));
+		nvgFillColor(args.vg, nvgRGBAf(1, 0, 0, 0.25));
+		nvgFill(args.vg);
+		nvgStrokeWidth(args.vg, 2.0);
+		nvgStrokeColor(args.vg, nvgRGBAf(1, 0, 0, 0.5));
+		nvgStroke(args.vg);
+	}
 }
 
 void RackWidget::onHover(const HoverEvent& e) {
 	// Set before calling children's onHover()
 	mousePos = e.pos;
+
 	OpaqueWidget::onHover(e);
 }
 
@@ -125,12 +141,6 @@ void RackWidget::onHoverKey(const HoverKeyEvent& e) {
 	}
 }
 
-void RackWidget::onDragHover(const DragHoverEvent& e) {
-	// Set before calling children's onDragHover()
-	mousePos = e.pos;
-	OpaqueWidget::onDragHover(e);
-}
-
 void RackWidget::onButton(const ButtonEvent& e) {
 	Widget::onButton(e);
 	e.stopPropagating();
@@ -141,6 +151,37 @@ void RackWidget::onButton(const ButtonEvent& e) {
 		APP->scene->moduleBrowser->show();
 		e.consume(this);
 	}
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		e.consume(this);
+	}
+}
+
+void RackWidget::onDragStart(const DragStartEvent& e) {
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		// Deselect all modules
+		updateModuleSelections();
+		internal->selecting = true;
+		internal->selectionStart = mousePos;
+		internal->selectionEnd = mousePos;
+	}
+}
+
+void RackWidget::onDragEnd(const DragEndEvent& e) {
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		internal->selecting = false;
+	}
+}
+
+void RackWidget::onDragHover(const DragHoverEvent& e) {
+	// Set before calling children's onDragHover()
+	mousePos = e.pos;
+
+	if (internal->selecting) {
+		internal->selectionEnd = mousePos;
+		updateModuleSelections();
+	}
+
+	OpaqueWidget::onDragHover(e);
 }
 
 void RackWidget::clear() {
@@ -590,6 +631,15 @@ history::ComplexAction* RackWidget::getModuleDragAction() {
 	return h;
 }
 
+void RackWidget::updateModuleSelections() {
+	math::Rect selectionBox = math::Rect::fromCorners(internal->selectionStart, internal->selectionEnd);
+	for (widget::Widget* w : moduleContainer->children) {
+		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		bool selected = internal->selecting && selectionBox.intersects(mw->box);
+		mw->selected() = selected;
+	}
+}
 
 void RackWidget::clearCables() {
 	incompleteCable = NULL;
