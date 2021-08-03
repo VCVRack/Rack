@@ -218,7 +218,7 @@ struct RtAudioDriver : audio::Driver {
 	std::string getName() override {
 		static const std::map<RtAudio::Api, std::string> apiNames = {
 			{RtAudio::LINUX_ALSA, "ALSA"},
-			{RtAudio::UNIX_JACK, "JACK (unsupported)"},
+			{RtAudio::UNIX_JACK, "JACK"},
 			{RtAudio::LINUX_PULSE, "PulseAudio"},
 			{RtAudio::LINUX_OSS, "OSS"},
 			{RtAudio::WINDOWS_WASAPI, "WASAPI"},
