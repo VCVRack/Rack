@@ -21,7 +21,7 @@ struct TransformWidget : Widget {
 
 	void translate(math::Vec delta) {
 		float t[6];
-		nvgTransformTranslate(t, delta.x, delta.y);
+		nvgTransformTranslate(t, VEC_ARGS(delta));
 		nvgTransformPremultiply(transform, t);
 	}
 
@@ -29,6 +29,12 @@ struct TransformWidget : Widget {
 		float t[6];
 		nvgTransformRotate(t, angle);
 		nvgTransformPremultiply(transform, t);
+	}
+
+	void rotate(float angle, math::Vec origin) {
+		translate(origin);
+		rotate(angle);
+		translate(origin.neg());
 	}
 
 	void scale(math::Vec s) {

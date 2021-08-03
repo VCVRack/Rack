@@ -1,9 +1,8 @@
 #pragma once
 #include <map>
 #include <app/common.hpp>
-#include <widget/OpaqueWidget.hpp>
+#include <widget/Widget.hpp>
 #include <app/PortWidget.hpp>
-#include <app/ModuleWidget.hpp>
 #include <engine/Cable.hpp>
 
 
@@ -11,13 +10,19 @@ namespace rack {
 namespace app {
 
 
-struct CableWidget : widget::OpaqueWidget {
+struct PlugWidget;
+
+
+struct CableWidget : widget::Widget {
 	struct Internal;
 	Internal* internal;
 
 	/** Owned. */
 	engine::Cable* cable = NULL;
 	NVGcolor color;
+	PlugWidget* inputPlug;
+	PlugWidget* outputPlug;
+
 	PortWidget* inputPort = NULL;
 	PortWidget* outputPort = NULL;
 	PortWidget* hoveredInputPort = NULL;
@@ -38,8 +43,8 @@ struct CableWidget : widget::OpaqueWidget {
 	math::Vec getOutputPos();
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
+	void step() override;
 	void draw(const DrawArgs& args) override;
-	void drawPlugs(const DrawArgs& args);
 	engine::Cable* releaseCable();
 };
 

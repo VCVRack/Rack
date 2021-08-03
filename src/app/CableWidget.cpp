@@ -1,30 +1,129 @@
 #include <app/CableWidget.hpp>
+#include <widget/SvgWidget.hpp>
+#include <widget/TransformWidget.hpp>
 #include <app/Scene.hpp>
 #include <app/RackWidget.hpp>
-#include <Window.hpp>
+#include <app/ModuleWidget.hpp>
 #include <context.hpp>
-#include <patch.hpp>
 #include <asset.hpp>
 #include <settings.hpp>
 #include <engine/Engine.hpp>
 #include <engine/Port.hpp>
+#include <app/MultiLightWidget.hpp>
+#include <componentlibrary.hpp>
 
 
 namespace rack {
 namespace app {
 
 
+struct TintWidget : widget::Widget {
+	NVGcolor color = color::WHITE;
+	void draw(const DrawArgs& args) override {
+		nvgTint(args.vg, color);
+		Widget::draw(args);
+	}
+};
+
+
+struct PlugLight : componentlibrary::TRedGreenBlueLight<componentlibrary::TGrayModuleLightWidget<componentlibrary::MediumLight<app::MultiLightWidget>>> {
+};
+
+
+struct PlugWidget : widget::Widget {
+	float angle = 0.f;
+	PortWidget* portWidget = NULL;
+
+	widget::FramebufferWidget* fb;
+	widget::TransformWidget* plugTransform;
+	TintWidget* plugTint;
+	widget::SvgWidget* plug;
+
+	widget::SvgWidget* plugPort;
+
+	app::MultiLightWidget* plugLight;
+
+	PlugWidget() {
+		fb = new widget::FramebufferWidget;
+		addChild(fb);
+
+		plugTransform = new widget::TransformWidget;
+		fb->addChild(plugTransform);
+
+		plugTint = new TintWidget;
+		plugTransform->addChild(plugTint);
+
+		plug = new widget::SvgWidget;
+		plug->setSvg(Svg::load(asset::system("res/ComponentLibrary/Plug.svg")));
+		plugTint->addChild(plug);
+		plugTransform->setSize(plug->getSize());
+		plugTransform->setPosition(plug->getSize().mult(-0.5));
+		plugTint->setSize(plug->getSize());
+
+		plugPort = new widget::SvgWidget;
+		plugPort->setSvg(Svg::load(asset::system("res/ComponentLibrary/PlugPort.svg")));
+		plugPort->setPosition(plugPort->getSize().mult(-0.5));
+		fb->addChild(plugPort);
+
+		plugLight = new PlugLight;
+		plugLight->setPosition(plugLight->getSize().mult(-0.5));
+		addChild(plugLight);
+	}
+
+	void step() override {
+		std::vector<float> values(3);
+		if (portWidget && plugLight->isVisible()) {
+			engine::Port* port = portWidget->getPort();
+			if (port) {
+				for (int i = 0; i < 3; i++) {
+					values[i] = port->plugLights[i].getBrightness();
+				}
+			}
+		}
+		plugLight->setBrightnesses(values);
+
+		Widget::step();
+	}
+
+	void setColor(NVGcolor color) {
+		if (color::isEqual(color, plugTint->color))
+			return;
+		plugTint->color = color;
+		fb->setDirty();
+	}
+
+	void setAngle(float angle) {
+		if (angle == this->angle)
+			return;
+		this->angle = angle;
+		plugTransform->identity();
+		plugTransform->rotate(angle - 0.5f * M_PI, plug->getSize().div(2));
+		fb->setDirty();
+	}
+
+	void setPortWidget(PortWidget* portWidget) {
+		this->portWidget = portWidget;
+	}
+
+	void setTop(bool top) {
+		plugLight->setVisible(top);
+	}
+};
+
+
 struct CableWidget::Internal {
-	std::shared_ptr<Svg> plugSvg;
-	std::shared_ptr<Svg> plugPortSvg;
 };
 
 
 CableWidget::CableWidget() {
 	internal = new Internal;
 	color = color::BLACK_TRANSPARENT;
-	internal->plugSvg = Svg::load(asset::system("res/ComponentLibrary/Plug.svg"));
-	internal->plugPortSvg = Svg::load(asset::system("res/ComponentLibrary/PlugPort.svg"));
+
+	inputPlug = new PlugWidget;
+	addChild(inputPlug);
+
+	outputPlug = new PlugWidget;
+	addChild(outputPlug);
 }
 
 CableWidget::~CableWidget() {
@@ -126,7 +225,7 @@ void CableWidget::fromJson(json_t* rootJ) {
 	}
 }
 
-static math::Vec getCableSlump(math::Vec pos1, math::Vec pos2) {
+static math::Vec getSlumpPos(math::Vec pos1, math::Vec pos2) {
 	float dist = pos1.minus(pos2).norm();
 	math::Vec avg = pos1.plus(pos2).div(2);
 	// Lower average point as distance increases
@@ -134,87 +233,44 @@ static math::Vec getCableSlump(math::Vec pos1, math::Vec pos2) {
 	return avg;
 }
 
-static void CableWidget_drawPlug(CableWidget* that, const widget::Widget::DrawArgs& args, math::Vec pos, math::Vec slump, NVGcolor color, bool top) {
-	if (!top)
-		return;
+void CableWidget::step() {
+	math::Vec outputPos = getOutputPos();
+	math::Vec inputPos = getInputPos();
+	math::Vec slump = getSlumpPos(outputPos, inputPos);
 
-	nvgSave(args.vg);
-	nvgTranslate(args.vg, pos.x, pos.y);
+	// Draw output plug
+	bool outputTop = !isComplete() || APP->scene->rack->getTopCable(outputPort) == this;
+	outputPlug->setPosition(outputPos);
+	outputPlug->setTop(outputTop);
+	outputPlug->setAngle(slump.minus(outputPos).arg());
+	outputPlug->setColor(color);
+	outputPlug->setPortWidget(outputPort);
 
-	// Plug
-	nvgSave(args.vg);
-	nvgTint(args.vg, color);
-	std::shared_ptr<Svg> plugSvg = that->internal->plugSvg;
-	math::Vec plugSize = plugSvg->getSize();
-	float angle = slump.minus(pos).arg() - 0.5f * M_PI;
-	nvgRotate(args.vg, angle);
-	nvgTranslate(args.vg, VEC_ARGS(plugSize.div(2).neg()));
-	plugSvg->draw(args.vg);
-	nvgRestore(args.vg);
+	// Draw input plug
+	bool inputTop = !isComplete() || APP->scene->rack->getTopCable(inputPort) == this;
+	inputPlug->setPosition(inputPos);
+	inputPlug->setTop(inputTop);
+	inputPlug->setAngle(slump.minus(inputPos).arg());
+	inputPlug->setColor(color);
+	inputPlug->setPortWidget(inputPort);
 
-	// Port
-	nvgSave(args.vg);
-	std::shared_ptr<Svg> plugPortSvg = that->internal->plugPortSvg;
-	math::Vec plugPortSize = plugPortSvg->getSize();
-	nvgTranslate(args.vg, VEC_ARGS(plugPortSize.div(2).neg()));
-	plugPortSvg->draw(args.vg);
-	nvgRestore(args.vg);
-
-	nvgRestore(args.vg);
-}
-
-static void CableWidget_drawCable(CableWidget* that, const widget::Widget::DrawArgs& args, math::Vec pos1, math::Vec pos2, NVGcolor color, bool thick, float opacity) {
-	if (opacity <= 0.0)
-		return;
-
-	float thickness = thick ? 10.0 : 6.0;
-
-	// The endpoints are off-center
-	math::Vec slump = getCableSlump(pos1, pos2);
-	pos1 = pos1.plus(slump.minus(pos1).normalize().mult(13.0));
-	pos2 = pos2.plus(slump.minus(pos2).normalize().mult(13.0));
-
-	nvgSave(args.vg);
-	nvgAlpha(args.vg, std::pow(opacity, 1.5));
-
-	nvgLineCap(args.vg, NVG_ROUND);
-	// Avoids glitches when cable is bent
-	nvgLineJoin(args.vg, NVG_ROUND);
-
-	// Shadow
-	math::Vec shadowSlump = slump.plus(math::Vec(0, 30));
-	nvgBeginPath(args.vg);
-	nvgMoveTo(args.vg, VEC_ARGS(pos1));
-	nvgQuadTo(args.vg, VEC_ARGS(shadowSlump), VEC_ARGS(pos2));
-	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.10);
-	nvgStrokeColor(args.vg, shadowColor);
-	nvgStrokeWidth(args.vg, thickness - 1.0);
-	nvgStroke(args.vg);
-
-	// Cable solid
-	nvgBeginPath(args.vg);
-	nvgMoveTo(args.vg, VEC_ARGS(pos1));
-	nvgQuadTo(args.vg, VEC_ARGS(slump), VEC_ARGS(pos2));
-	// nvgStrokePaint(args.vg, nvgLinearGradient(args.vg, VEC_ARGS(pos1), VEC_ARGS(pos2), color::mult(color, 0.5), color));
-	nvgStrokeColor(args.vg, color::mult(color, 0.75));
-	nvgStrokeWidth(args.vg, thickness);
-	nvgStroke(args.vg);
-
-	nvgStrokeColor(args.vg, color);
-	nvgStrokeWidth(args.vg, thickness - 1.0);
-	nvgStroke(args.vg);
-
-	nvgRestore(args.vg);
+	Widget::step();
 }
 
 void CableWidget::draw(const DrawArgs& args) {
+	if (args.layer == 0) {
+		// Draw PlugWidgets
+		Widget::draw(args);
+		return;
+	}
+
 	float opacity = settings::cableOpacity;
 	bool thick = false;
 
 	if (isComplete()) {
 		engine::Output* output = &cable->outputModule->outputs[cable->outputId];
 		// Increase thickness if output port is polyphonic
-		if (output->channels > 1) {
+		if (output->isPolyphonic()) {
 			thick = true;
 		}
 
@@ -224,7 +280,7 @@ void CableWidget::draw(const DrawArgs& args) {
 			opacity = 1.0;
 		}
 		// Draw translucent cable if not active (i.e. 0 channels)
-		else if (output->channels == 0) {
+		else if (output->getChannels() == 0) {
 			opacity *= 0.5;
 		}
 	}
@@ -233,43 +289,51 @@ void CableWidget::draw(const DrawArgs& args) {
 		opacity = 1.0;
 	}
 
+	if (opacity <= 0.0)
+		return;
+	nvgAlpha(args.vg, std::pow(opacity, 1.5));
+
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
-	CableWidget_drawCable(this, args, outputPos, inputPos, color, thick, opacity);
-}
 
-void CableWidget::drawPlugs(const DrawArgs& args) {
-	math::Vec outputPos = getOutputPos();
-	math::Vec inputPos = getInputPos();
-	math::Vec slump = getCableSlump(outputPos, inputPos);
+	float thickness = thick ? 10.0 : 6.0;
 
-	// Draw output plug
-	bool outputTop = !isComplete() || APP->scene->rack->getTopCable(outputPort) == this;
-	CableWidget_drawPlug(this, args, outputPos, slump, color, outputTop);
-	if (outputTop && isComplete()) {
-		// Draw output plug light
-		nvgSave(args.vg);
-		LightWidget* plugLight = outputPort->getPlugLight();
-		math::Vec plugPos = outputPos.minus(plugLight->getSize().div(2));
-		nvgTranslate(args.vg, VEC_ARGS(plugPos));
-		plugLight->draw(args);
-		nvgRestore(args.vg);
+	// The endpoints are off-center
+	math::Vec slump = getSlumpPos(outputPos, inputPos);
+	outputPos = outputPos.plus(slump.minus(outputPos).normalize().mult(13.0));
+	inputPos = inputPos.plus(slump.minus(inputPos).normalize().mult(13.0));
+
+	nvgLineCap(args.vg, NVG_ROUND);
+	// Avoids glitches when cable is bent
+	nvgLineJoin(args.vg, NVG_ROUND);
+
+	if (args.layer == 1) {
+		// Draw cable shadow
+		math::Vec shadowSlump = slump.plus(math::Vec(0, 30));
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, VEC_ARGS(outputPos));
+		nvgQuadTo(args.vg, VEC_ARGS(shadowSlump), VEC_ARGS(inputPos));
+		NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.10);
+		nvgStrokeColor(args.vg, shadowColor);
+		nvgStrokeWidth(args.vg, thickness - 1.0);
+		nvgStroke(args.vg);
 	}
+	else if (args.layer == 2) {
+		// Draw cable outline
+		nvgBeginPath(args.vg);
+		nvgMoveTo(args.vg, VEC_ARGS(outputPos));
+		nvgQuadTo(args.vg, VEC_ARGS(slump), VEC_ARGS(inputPos));
+		// nvgStrokePaint(args.vg, nvgLinearGradient(args.vg, VEC_ARGS(outputPos), VEC_ARGS(inputPos), color::mult(color, 0.5), color));
+		nvgStrokeColor(args.vg, color::mult(color, 0.75));
+		nvgStrokeWidth(args.vg, thickness);
+		nvgStroke(args.vg);
 
-	// Draw input plug
-	bool inputTop = !isComplete() || APP->scene->rack->getTopCable(inputPort) == this;
-	CableWidget_drawPlug(this, args, inputPos, slump, color, inputTop);
-	if (inputTop && isComplete()) {
-		// Draw input plug light
-		nvgSave(args.vg);
-		LightWidget* plugLight = inputPort->getPlugLight();
-		math::Vec plugPos = inputPos.minus(plugLight->getSize().div(2));
-		nvgTranslate(args.vg, VEC_ARGS(plugPos));
-		plugLight->draw(args);
-		nvgRestore(args.vg);
+		// Draw cable
+		nvgStrokeColor(args.vg, color);
+		nvgStrokeWidth(args.vg, thickness - 1.0);
+		nvgStroke(args.vg);
 	}
 }
-
 
 engine::Cable* CableWidget::releaseCable() {
 	engine::Cable* cable = this->cable;

@@ -125,9 +125,12 @@ struct Widget : WeakBase {
 	virtual void step();
 
 	struct DrawArgs {
-		NVGcontext* vg;
+		NVGcontext* vg = NULL;
+		/** Local box representing the visible viewport. */
 		math::Rect clipBox;
 		NVGLUframebuffer* fb = NULL;
+		/** Custom widgets may draw children multiple times, passing a different layer number each time. */
+		int layer = 0;
 	};
 
 	/** Draws the widget to the NanoVG context */

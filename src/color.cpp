@@ -6,6 +6,14 @@ namespace rack {
 namespace color {
 
 
+bool isEqual(NVGcolor a, NVGcolor b) {
+	for (int i = 0; i < 4; i++) {
+		if (a.rgba[i] != b.rgba[i])
+			return false;
+	}
+	return true;
+}
+
 NVGcolor clamp(NVGcolor a) {
 	for (int i = 0; i < 4; i++)
 		a.rgba[i] = math::clamp(a.rgba[i], 0.f, 1.f);

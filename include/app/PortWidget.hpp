@@ -2,7 +2,6 @@
 #include <app/common.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <ui/Tooltip.hpp>
-#include <app/MultiLightWidget.hpp>
 #include <engine/Module.hpp>
 #include <engine/PortInfo.hpp>
 
@@ -24,7 +23,6 @@ struct PortWidget : widget::OpaqueWidget {
 	~PortWidget();
 	engine::Port* getPort();
 	engine::PortInfo* getPortInfo();
-	LightWidget* getPlugLight();
 	void createTooltip();
 	void destroyTooltip();
 
@@ -39,7 +37,6 @@ struct PortWidget : widget::OpaqueWidget {
 	void onDragDrop(const DragDropEvent& e) override;
 	void onDragEnter(const DragEnterEvent& e) override;
 	void onDragLeave(const DragLeaveEvent& e) override;
-	void onContextDestroy(const ContextDestroyEvent& e) override;
 };
 
 

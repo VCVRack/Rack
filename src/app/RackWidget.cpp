@@ -56,18 +56,18 @@ struct ModuleContainer : widget::Widget {
 
 struct CableContainer : widget::TransparentWidget {
 	void draw(const DrawArgs& args) override {
-		// Draw cable plugs
-		for (widget::Widget* w : children) {
-			CableWidget* cw = dynamic_cast<CableWidget*>(w);
-			assert(cw);
-
-			DrawArgs childArgs = args;
-			// TODO Make clip box equal actual viewport
-			childArgs.clipBox = math::Rect::inf();
-			cw->drawPlugs(childArgs);
-		}
-
+		// Draw Plugs
 		Widget::draw(args);
+
+		// Draw cable shadows
+		DrawArgs args1 = args;
+		args1.layer = 1;
+		Widget::draw(args1);
+
+		// Draw cables
+		DrawArgs args2 = args;
+		args2.layer = 2;
+		Widget::draw(args2);
 	}
 };
 

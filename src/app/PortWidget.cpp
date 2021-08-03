@@ -5,7 +5,6 @@
 #include <history.hpp>
 #include <engine/Engine.hpp>
 #include <settings.hpp>
-#include <componentlibrary.hpp>
 
 
 namespace rack {
@@ -66,21 +65,11 @@ struct PortTooltip : ui::Tooltip {
 
 struct PortWidget::Internal {
 	ui::Tooltip* tooltip = NULL;
-	app::MultiLightWidget* plugLight;
 };
 
 
 PortWidget::PortWidget() {
 	internal = new Internal;
-
-	using namespace componentlibrary;
-	struct PlugLight : TRedGreenBlueLight<TGrayModuleLightWidget<MediumLight<app::MultiLightWidget>>> {
-		PlugLight() {
-			// fb->bypassed = true;
-			fb->oversample = 1.0;
-		}
-	};
-	internal->plugLight = new PlugLight;
 }
 
 PortWidget::~PortWidget() {
@@ -89,8 +78,6 @@ PortWidget::~PortWidget() {
 		APP->scene->rack->clearCablesOnPort(this);
 	// HACK: In case onDragDrop() is called but not onLeave() afterwards...
 	destroyTooltip();
-	// plugLight is not a child but owned by the PortWidget, so we need to delete it here
-	delete internal->plugLight;
 	delete internal;
 }
 
@@ -110,10 +97,6 @@ engine::PortInfo* PortWidget::getPortInfo() {
 		return module->inputInfos[portId];
 	else
 		return module->outputInfos[portId];
-}
-
-LightWidget* PortWidget::getPlugLight() {
-	return internal->plugLight;
 }
 
 void PortWidget::createTooltip() {
@@ -138,19 +121,6 @@ void PortWidget::destroyTooltip() {
 }
 
 void PortWidget::step() {
-	if (!module)
-		return;
-
-	std::vector<float> values(3);
-	for (int i = 0; i < 3; i++) {
-		if (type == engine::Port::OUTPUT)
-			values[i] = module->outputs[portId].plugLights[i].getBrightness();
-		else
-			values[i] = module->inputs[portId].plugLights[i].getBrightness();
-	}
-	internal->plugLight->setBrightnesses(values);
-	internal->plugLight->step();
-
 	Widget::step();
 }
 
@@ -334,11 +304,6 @@ void PortWidget::onDragLeave(const DragLeaveEvent& e) {
 		else
 			cw->hoveredInputPort = NULL;
 	}
-}
-
-void PortWidget::onContextDestroy(const ContextDestroyEvent& e) {
-	internal->plugLight->onContextDestroy(e);
-	Widget::onContextDestroy(e);
 }
 
 

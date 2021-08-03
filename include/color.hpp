@@ -26,6 +26,7 @@ static const NVGcolor YELLOW = nvgRGB(0xff, 0xff, 0x00);
 static const NVGcolor WHITE = nvgRGB(0xff, 0xff, 0xff);
 
 
+bool isEqual(NVGcolor a, NVGcolor b);
 NVGcolor clamp(NVGcolor a);
 NVGcolor minus(NVGcolor a, NVGcolor b);
 NVGcolor plus(NVGcolor a, NVGcolor b);
