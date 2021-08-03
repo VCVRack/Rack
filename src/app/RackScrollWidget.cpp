@@ -56,7 +56,7 @@ void RackScrollWidget::step() {
 	internal->zoomPos = box.size.div(2);
 
 	// Compute module bounding box
-	math::Rect moduleBox = rackWidget->moduleContainer->getChildrenBoundingBox();
+	math::Rect moduleBox = rackWidget->getModuleContainer()->getChildrenBoundingBox();
 	if (!moduleBox.size.isFinite())
 		moduleBox = math::Rect(RACK_OFFSET, math::Vec(0, 0));
 

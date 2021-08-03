@@ -73,6 +73,12 @@ struct CableContainer : widget::TransparentWidget {
 
 
 struct RackWidget::Internal {
+	RailWidget* rail = NULL;
+	widget::Widget* moduleContainer = NULL;
+	widget::Widget* cableContainer = NULL;
+	/** The last mouse position in the RackWidget */
+	math::Vec mousePos;
+
 	bool selecting = false;
 	math::Vec selectionStart;
 	math::Vec selectionEnd;
@@ -82,14 +88,14 @@ struct RackWidget::Internal {
 RackWidget::RackWidget() {
 	internal = new Internal;
 
-	rail = new RailWidget;
-	addChild(rail);
+	internal->rail = new RailWidget;
+	addChild(internal->rail);
 
-	moduleContainer = new ModuleContainer;
-	addChild(moduleContainer);
+	internal->moduleContainer = new ModuleContainer;
+	addChild(internal->moduleContainer);
 
-	cableContainer = new CableContainer;
-	addChild(cableContainer);
+	internal->cableContainer = new CableContainer;
+	addChild(internal->cableContainer);
 }
 
 RackWidget::~RackWidget() {
@@ -123,7 +129,7 @@ void RackWidget::draw(const DrawArgs& args) {
 
 void RackWidget::onHover(const HoverEvent& e) {
 	// Set before calling children's onHover()
-	mousePos = e.pos;
+	internal->mousePos = e.pos;
 
 	OpaqueWidget::onHover(e);
 }
@@ -161,8 +167,8 @@ void RackWidget::onDragStart(const DragStartEvent& e) {
 		// Deselect all modules
 		updateModuleSelections();
 		internal->selecting = true;
-		internal->selectionStart = mousePos;
-		internal->selectionEnd = mousePos;
+		internal->selectionStart = internal->mousePos;
+		internal->selectionEnd = internal->mousePos;
 	}
 }
 
@@ -174,21 +180,33 @@ void RackWidget::onDragEnd(const DragEndEvent& e) {
 
 void RackWidget::onDragHover(const DragHoverEvent& e) {
 	// Set before calling children's onDragHover()
-	mousePos = e.pos;
+	internal->mousePos = e.pos;
 
 	if (internal->selecting) {
-		internal->selectionEnd = mousePos;
+		internal->selectionEnd = internal->mousePos;
 		updateModuleSelections();
 	}
 
 	OpaqueWidget::onDragHover(e);
 }
 
+widget::Widget* RackWidget::getModuleContainer() {
+	return internal->moduleContainer;
+}
+
+widget::Widget* RackWidget::getCableContainer() {
+	return internal->cableContainer;
+}
+
+math::Vec RackWidget::getMousePos() {
+	return internal->mousePos;
+}
+
 void RackWidget::clear() {
 	// This isn't required because removing all ModuleWidgets should remove all cables, but do it just in case.
 	clearCables();
 	// Remove ModuleWidgets
-	std::list<widget::Widget*> widgets = moduleContainer->children;
+	std::list<widget::Widget*> widgets = internal->moduleContainer->children;
 	for (widget::Widget* w : widgets) {
 		ModuleWidget* moduleWidget = dynamic_cast<ModuleWidget*>(w);
 		assert(moduleWidget);
@@ -200,10 +218,10 @@ void RackWidget::clear() {
 void RackWidget::mergeJson(json_t* rootJ) {
 	// Get module offset so modules are aligned to (0, 0) when the patch is loaded.
 	math::Vec moduleOffset = math::Vec(INFINITY, INFINITY);
-	for (widget::Widget* w : moduleContainer->children) {
+	for (widget::Widget* w : internal->moduleContainer->children) {
 		moduleOffset = moduleOffset.min(w->box.pos);
 	}
-	if (moduleContainer->children.empty()) {
+	if (internal->moduleContainer->children.empty()) {
 		moduleOffset = RACK_OFFSET;
 	}
 
@@ -392,14 +410,14 @@ void RackWidget::pastePresetClipboardAction() {
 }
 
 static void RackWidget_updateExpanders(RackWidget* that) {
-	for (widget::Widget* w : that->moduleContainer->children) {
+	for (widget::Widget* w : that->internal->moduleContainer->children) {
 		math::Vec pLeft = w->box.pos.div(RACK_GRID_SIZE).round();
 		math::Vec pRight = w->box.getTopRight().div(RACK_GRID_SIZE).round();
 		ModuleWidget* mwLeft = NULL;
 		ModuleWidget* mwRight = NULL;
 
 		// Find adjacent modules
-		for (widget::Widget* w2 : that->moduleContainer->children) {
+		for (widget::Widget* w2 : that->internal->moduleContainer->children) {
 			if (w2 == w)
 				continue;
 
@@ -433,7 +451,7 @@ void RackWidget::addModule(ModuleWidget* m) {
 	if (m->box.size.y != RACK_GRID_HEIGHT)
 		throw Exception("Module %s height is %g px, must be %g px", m->model->getFullName().c_str(), m->box.size.y, RACK_GRID_HEIGHT);
 
-	moduleContainer->addChild(m);
+	internal->moduleContainer->addChild(m);
 
 	RackWidget_updateExpanders(this);
 }
@@ -441,7 +459,7 @@ void RackWidget::addModule(ModuleWidget* m) {
 void RackWidget::addModuleAtMouse(ModuleWidget* mw) {
 	assert(mw);
 	// Move module nearest to the mouse position
-	math::Vec pos = mousePos.minus(mw->box.size.div(2));
+	math::Vec pos = internal->mousePos.minus(mw->box.size.div(2));
 	setModulePosNearest(mw, pos);
 	addModule(mw);
 }
@@ -458,13 +476,13 @@ void RackWidget::removeModule(ModuleWidget* m) {
 	m->disconnect();
 
 	// Remove module from ModuleContainer
-	moduleContainer->removeChild(m);
+	internal->moduleContainer->removeChild(m);
 }
 
 bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 	// Check intersection with other modules
 	math::Rect mwBox = math::Rect(pos, mw->box.size);
-	for (widget::Widget* w2 : moduleContainer->children) {
+	for (widget::Widget* w2 : internal->moduleContainer->children) {
 		// Don't intersect with self
 		if (mw == w2)
 			continue;
@@ -543,7 +561,7 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 	// Collect modules to the left and right of `mw`
 	std::set<widget::Widget*, decltype(cmp)> leftModules(cmp);
 	std::set<widget::Widget*, decltype(cmp)> rightModules(cmp);
-	for (widget::Widget* w2 : moduleContainer->children) {
+	for (widget::Widget* w2 : internal->moduleContainer->children) {
 		if (w2 == mw)
 			continue;
 		// Modules must be on the same row as `mw`
@@ -585,7 +603,7 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 }
 
 ModuleWidget* RackWidget::getModule(int64_t moduleId) {
-	for (widget::Widget* w : moduleContainer->children) {
+	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
 		if (mw->module->id == moduleId)
@@ -595,12 +613,12 @@ ModuleWidget* RackWidget::getModule(int64_t moduleId) {
 }
 
 bool RackWidget::isEmpty() {
-	return moduleContainer->children.empty();
+	return internal->moduleContainer->children.empty();
 }
 
 void RackWidget::updateModuleOldPositions() {
 	// Set all modules' oldPos field from their current position.
-	for (widget::Widget* w : moduleContainer->children) {
+	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
 		mw->oldPos() = mw->box.pos;
@@ -610,7 +628,7 @@ void RackWidget::updateModuleOldPositions() {
 history::ComplexAction* RackWidget::getModuleDragAction() {
 	history::ComplexAction* h = new history::ComplexAction;
 
-	for (widget::Widget* w : moduleContainer->children) {
+	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
 		// Create ModuleMove action if the module was moved.
@@ -633,7 +651,7 @@ history::ComplexAction* RackWidget::getModuleDragAction() {
 
 void RackWidget::updateModuleSelections() {
 	math::Rect selectionBox = math::Rect::fromCorners(internal->selectionStart, internal->selectionEnd);
-	for (widget::Widget* w : moduleContainer->children) {
+	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
 		bool selected = internal->selecting && selectionBox.intersects(mw->box);
@@ -643,7 +661,7 @@ void RackWidget::updateModuleSelections() {
 
 void RackWidget::clearCables() {
 	incompleteCable = NULL;
-	cableContainer->clearChildren();
+	internal->cableContainer->clearChildren();
 }
 
 void RackWidget::clearCablesAction() {
@@ -651,7 +669,7 @@ void RackWidget::clearCablesAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "clear cables";
 
-	for (widget::Widget* w : cableContainer->children) {
+	for (widget::Widget* w : internal->cableContainer->children) {
 		CableWidget* cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 		if (!cw->isComplete())
@@ -675,7 +693,7 @@ void RackWidget::clearCablesOnPort(PortWidget* port) {
 		// Check if cable is connected to port
 		if (cw == incompleteCable) {
 			incompleteCable = NULL;
-			cableContainer->removeChild(cw);
+			internal->cableContainer->removeChild(cw);
 		}
 		else {
 			removeCable(cw);
@@ -686,22 +704,22 @@ void RackWidget::clearCablesOnPort(PortWidget* port) {
 
 void RackWidget::addCable(CableWidget* cw) {
 	assert(cw->isComplete());
-	cableContainer->addChild(cw);
+	internal->cableContainer->addChild(cw);
 }
 
 void RackWidget::removeCable(CableWidget* cw) {
 	assert(cw->isComplete());
-	cableContainer->removeChild(cw);
+	internal->cableContainer->removeChild(cw);
 }
 
 void RackWidget::setIncompleteCable(CableWidget* cw) {
 	if (incompleteCable) {
-		cableContainer->removeChild(incompleteCable);
+		internal->cableContainer->removeChild(incompleteCable);
 		delete incompleteCable;
 		incompleteCable = NULL;
 	}
 	if (cw) {
-		cableContainer->addChild(cw);
+		internal->cableContainer->addChild(cw);
 		incompleteCable = cw;
 	}
 }
@@ -711,13 +729,13 @@ CableWidget* RackWidget::releaseIncompleteCable() {
 		return NULL;
 
 	CableWidget* cw = incompleteCable;
-	cableContainer->removeChild(incompleteCable);
+	internal->cableContainer->removeChild(incompleteCable);
 	incompleteCable = NULL;
 	return cw;
 }
 
 CableWidget* RackWidget::getTopCable(PortWidget* port) {
-	for (auto it = cableContainer->children.rbegin(); it != cableContainer->children.rend(); it++) {
+	for (auto it = internal->cableContainer->children.rbegin(); it != internal->cableContainer->children.rend(); it++) {
 		CableWidget* cw = dynamic_cast<CableWidget*>(*it);
 		assert(cw);
 		if (cw->inputPort == port || cw->outputPort == port)
@@ -727,7 +745,7 @@ CableWidget* RackWidget::getTopCable(PortWidget* port) {
 }
 
 CableWidget* RackWidget::getCable(int64_t cableId) {
-	for (widget::Widget* w : cableContainer->children) {
+	for (widget::Widget* w : internal->cableContainer->children) {
 		CableWidget* cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 		if (!cw->cable)
@@ -741,7 +759,7 @@ CableWidget* RackWidget::getCable(int64_t cableId) {
 std::list<CableWidget*> RackWidget::getCablesOnPort(PortWidget* port) {
 	assert(port);
 	std::list<CableWidget*> cws;
-	for (widget::Widget* w : cableContainer->children) {
+	for (widget::Widget* w : internal->cableContainer->children) {
 		CableWidget* cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 		if (cw->inputPort == port || cw->outputPort == port) {

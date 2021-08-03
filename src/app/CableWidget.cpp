@@ -193,7 +193,7 @@ math::Vec CableWidget::getInputPos() {
 		return hoveredInputPort->getRelativeOffset(hoveredInputPort->box.zeroPos().getCenter(), APP->scene->rack);
 	}
 	else {
-		return APP->scene->rack->mousePos;
+		return APP->scene->rack->getMousePos();
 	}
 }
 
@@ -205,7 +205,7 @@ math::Vec CableWidget::getOutputPos() {
 		return hoveredOutputPort->getRelativeOffset(hoveredOutputPort->box.zeroPos().getCenter(), APP->scene->rack);
 	}
 	else {
-		return APP->scene->rack->mousePos;
+		return APP->scene->rack->getMousePos();
 	}
 }
 

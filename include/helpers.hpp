@@ -34,7 +34,7 @@ plugin::Model* createModel(const std::string& slug) {
 				tm = dynamic_cast<TModule*>(m);
 			}
 			app::ModuleWidget* mw = new TModuleWidget(tm);
-			mw->model = this;
+			mw->setModel(this);
 			return mw;
 		}
 	};

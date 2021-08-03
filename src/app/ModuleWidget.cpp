@@ -434,6 +434,19 @@ ModuleWidget::~ModuleWidget() {
 	delete internal;
 }
 
+plugin::Model* ModuleWidget::getModel() {
+	return model;
+}
+
+void ModuleWidget::setModel(plugin::Model* model) {
+	assert(!this->model);
+	this->model = model;
+}
+
+engine::Module* ModuleWidget::getModule() {
+	return module;
+}
+
 void ModuleWidget::setModule(engine::Module* module) {
 	if (this->module) {
 		APP->engine->removeModule(this->module);
@@ -720,7 +733,7 @@ void ModuleWidget::onDragEnd(const DragEndEvent& e) {
 void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (!settings::lockModules) {
-			math::Vec mousePos = APP->scene->rack->mousePos;
+			math::Vec mousePos = APP->scene->rack->getMousePos();
 
 			if (!internal->dragEnabled) {
 				// Set dragRackPos on the first time after dragging
@@ -1200,28 +1213,23 @@ void ModuleWidget::createContextMenu() {
 	appendContextMenu(menu);
 }
 
-
 math::Vec& ModuleWidget::dragOffset() {
 	return internal->dragOffset;
 }
-
 
 bool& ModuleWidget::dragEnabled() {
 	return internal->dragEnabled;
 }
 
-
 math::Vec& ModuleWidget::oldPos() {
 	return internal->oldPos;
 }
-
 
 engine::Module* ModuleWidget::releaseModule() {
 	engine::Module* module = this->module;
 	this->module = NULL;
 	return module;
 }
-
 
 bool& ModuleWidget::selected() {
 	return internal->selected;

@@ -68,7 +68,7 @@ struct ModuleResizeHandle : OpaqueWidget {
 		if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 			return;
 
-		dragPos = APP->scene->rack->mousePos;
+		dragPos = APP->scene->rack->getMousePos();
 		ModuleWidget* mw = getAncestorOfType<ModuleWidget>();
 		assert(mw);
 		originalBox = mw->box;
@@ -78,7 +78,7 @@ struct ModuleResizeHandle : OpaqueWidget {
 		ModuleWidget* mw = getAncestorOfType<ModuleWidget>();
 		assert(mw);
 
-		Vec newDragPos = APP->scene->rack->mousePos;
+		Vec newDragPos = APP->scene->rack->getMousePos();
 		float deltaX = newDragPos.x - dragPos.x;
 
 		Rect newBox = originalBox;

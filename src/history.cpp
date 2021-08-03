@@ -43,13 +43,13 @@ ModuleAdd::~ModuleAdd() {
 
 void ModuleAdd::setModule(app::ModuleWidget* mw) {
 	assert(mw);
-	model = mw->model;
-	assert(mw->module);
-	moduleId = mw->module->id;
+	model = mw->getModel();
+	assert(mw->getModule());
+	moduleId = mw->getModule()->id;
 	pos = mw->box.pos;
 	// ModuleAdd doesn't *really* need the state to be serialized, although ModuleRemove certainly does.
 	// However, creating a module may give it a nondeterministic initial state for whatever reason, so serialize anyway.
-	moduleJ = APP->engine->moduleToJson(mw->module);
+	moduleJ = APP->engine->moduleToJson(mw->getModule());
 }
 
 void ModuleAdd::undo() {

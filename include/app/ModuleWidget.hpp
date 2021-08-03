@@ -18,7 +18,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	Internal* internal;
 
 	plugin::Model* model = NULL;
-	/** Owned. */
+	/** Owned */
 	engine::Module* module = NULL;
 
 	ModuleWidget();
@@ -27,17 +27,15 @@ struct ModuleWidget : widget::OpaqueWidget {
 	}
 	~ModuleWidget();
 
-	plugin::Model* getModel() {
-		return model;
-	}
-	engine::Module* getModule() {
-		return module;
-	}
+	plugin::Model* getModel();
+	void setModel(plugin::Model* model);
 
+	engine::Module* getModule();
 	/** Associates this ModuleWidget with the Module.
 	Transfers ownership.
 	*/
 	void setModule(engine::Module* module);
+
 	/** Sets the panel and sets the size of the ModuleWidget from the panel.
 	Transfers ownership.
 	*/

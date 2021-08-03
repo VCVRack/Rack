@@ -21,12 +21,7 @@ struct RackWidget : widget::OpaqueWidget {
 	struct Internal;
 	Internal* internal;
 
-	RailWidget* rail;
-	widget::Widget* moduleContainer;
-	widget::Widget* cableContainer;
 	CableWidget* incompleteCable = NULL;
-	/** The last mouse position in the RackWidget */
-	math::Vec mousePos;
 	ParamWidget* touchedParam = NULL;
 	int nextCableColorId = 0;
 
@@ -44,6 +39,10 @@ struct RackWidget : widget::OpaqueWidget {
 	void onDragHover(const DragHoverEvent& e) override;
 
 	// Rack methods
+
+	widget::Widget* getModuleContainer();
+	widget::Widget* getCableContainer();
+	math::Vec getMousePos();
 
 	/** Completely clear the rack's modules and cables */
 	void clear();
