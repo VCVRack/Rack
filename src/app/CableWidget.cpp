@@ -298,7 +298,7 @@ void CableWidget::draw(const DrawArgs& args) {
 	math::Vec outputPos = getOutputPos();
 	math::Vec inputPos = getInputPos();
 
-	float thickness = thick ? 10.0 : 6.0;
+	float thickness = thick ? 9.0 : 6.0;
 
 	// The endpoints are off-center
 	math::Vec slump = getSlumpPos(outputPos, inputPos);
@@ -326,12 +326,12 @@ void CableWidget::draw(const DrawArgs& args) {
 		nvgMoveTo(args.vg, VEC_ARGS(outputPos));
 		nvgQuadTo(args.vg, VEC_ARGS(slump), VEC_ARGS(inputPos));
 		// nvgStrokePaint(args.vg, nvgLinearGradient(args.vg, VEC_ARGS(outputPos), VEC_ARGS(inputPos), color::mult(color, 0.5), color));
-		nvgStrokeColor(args.vg, color::mult(color, 0.75));
+		nvgStrokeColor(args.vg, color::mult(color, 0.8));
 		nvgStrokeWidth(args.vg, thickness);
 		nvgStroke(args.vg);
 
 		// Draw cable
-		nvgStrokeColor(args.vg, color);
+		nvgStrokeColor(args.vg, color::mult(color, 0.95));
 		nvgStrokeWidth(args.vg, thickness - 1.0);
 		nvgStroke(args.vg);
 	}
