@@ -68,6 +68,8 @@ struct PlugWidget : widget::Widget {
 		plugLight = new PlugLight;
 		plugLight->setPosition(plugLight->getSize().mult(-0.5));
 		addChild(plugLight);
+
+		setSize(plug->getSize());
 	}
 
 	void step() override {
