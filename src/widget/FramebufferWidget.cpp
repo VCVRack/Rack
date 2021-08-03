@@ -136,18 +136,19 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 	// DEBUG("%f %f %f %f", scaleRatio.x, scaleRatio.y, offsetF.x, offsetF.y);
 
 	// DEBUG("%f %f %f %f, %f %f", RECT_ARGS(internal->fbBox), VEC_ARGS(internal->fbSize));
+	// DEBUG("offsetI (%f, %f) fbBox (%f, %f; %f, %f)", VEC_ARGS(offsetI), RECT_ARGS(internal->fbBox));
 	nvgBeginPath(args.vg);
 	nvgRect(args.vg,
-	        offsetI.x + internal->fbBox.pos.x,
-	        offsetI.y + internal->fbBox.pos.y,
-	        internal->fbBox.size.x * scaleRatio.x,
-	        internal->fbBox.size.y * scaleRatio.y);
+		offsetI.x + internal->fbBox.pos.x * scaleRatio.x,
+		offsetI.y + internal->fbBox.pos.y * scaleRatio.y,
+		internal->fbBox.size.x * scaleRatio.x,
+		internal->fbBox.size.y * scaleRatio.y);
 	NVGpaint paint = nvgImagePattern(args.vg,
-	                                 offsetI.x + internal->fbBox.pos.x,
-	                                 offsetI.y + internal->fbBox.pos.y,
-	                                 internal->fbBox.size.x * scaleRatio.x,
-	                                 internal->fbBox.size.y * scaleRatio.y,
-	                                 0.0, internal->fb->image, 1.0);
+		offsetI.x + internal->fbBox.pos.x * scaleRatio.x,
+		offsetI.y + internal->fbBox.pos.y * scaleRatio.y,
+		internal->fbBox.size.x * scaleRatio.x,
+		internal->fbBox.size.y * scaleRatio.y,
+		0.0, internal->fb->image, 1.0);
 	nvgFillPaint(args.vg, paint);
 	nvgFill(args.vg);
 
