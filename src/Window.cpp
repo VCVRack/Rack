@@ -319,8 +319,7 @@ Window::Window() {
 	int nvgFlags = NVG_ANTIALIAS;
 #if defined NANOVG_GL2
 	vg = nvgCreateGL2(nvgFlags);
-	// TODO Instead of creating a whole other NanoVG context, create one that uses the same fonts and framebuffers as `fb`.
-	fbVg = nvgCreateGL2(nvgFlags);
+	fbVg = nvgCreateSharedGL2(vg, nvgFlags);
 #elif defined NANOVG_GL3
 	vg = nvgCreateGL3(nvgFlags);
 #elif defined NANOVG_GLES2
@@ -330,8 +329,6 @@ Window::Window() {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		exit(1);
 	}
-
-	// fbVg = nvgClone(vg);
 
 	// Load default Blendish font
 	uiFont = loadFont(asset::system("res/fonts/DejaVuSans.ttf"));
