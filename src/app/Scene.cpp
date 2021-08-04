@@ -230,6 +230,11 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 				rack->randomizeSelectedModulesAction();
 			e.consume(this);
 		}
+		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			if (rack->hasSelectedModules())
+				rack->cloneSelectedModulesAction();
+			e.consume(this);
+		}
 		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			if (rack->hasSelectedModules())
 				rack->disconnectSelectedModulesAction();

@@ -82,6 +82,7 @@ struct RackWidget : widget::OpaqueWidget {
 	void resetSelectedModulesAction();
 	void randomizeSelectedModulesAction();
 	void disconnectSelectedModulesAction();
+	void cloneSelectedModulesAction();
 	void bypassSelectedModulesAction(bool bypassed);
 	bool areSelectedModulesBypassed();
 	void deleteSelectedModulesAction();

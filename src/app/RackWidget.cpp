@@ -761,6 +761,10 @@ void RackWidget::disconnectSelectedModulesAction() {
 		delete complexAction;
 }
 
+void RackWidget::cloneSelectedModulesAction() {
+	// TODO
+}
+
 void RackWidget::bypassSelectedModulesAction(bool bypassed) {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = bypassed ? "bypass modules" : "un-bypass modules";
@@ -876,6 +880,11 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
 		disconnectSelectedModulesAction();
 	}, n == 0));
+
+	// Duplicate
+	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
+		cloneSelectedModulesAction();
+	}));
 
 	// Bypass
 	std::string bypassText = RACK_MOD_CTRL_NAME "+E";

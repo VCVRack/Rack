@@ -345,8 +345,10 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			cloneAction();
-			e.consume(this);
+			if (!APP->scene->rack->hasSelectedModules()) {
+				cloneAction();
+				e.consume(this);
+			}
 		}
 		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			if (!APP->scene->rack->hasSelectedModules()) {
