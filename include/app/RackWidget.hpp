@@ -52,12 +52,12 @@ struct RackWidget : widget::OpaqueWidget {
 
 	// Module methods
 
-	/** Adds a module and adds it to the Engine
-	Ownership rules work like add/removeChild()
+	/** Adds a module and adds it to the Engine, adopting ownership.
 	*/
 	void addModule(ModuleWidget* mw);
 	void addModuleAtMouse(ModuleWidget* mw);
-	/** Removes the module and transfers ownership to the caller */
+	/** Removes the module and transfers ownership to the caller.
+	*/
 	void removeModule(ModuleWidget* mw);
 	/** Sets a module's box if non-colliding. Returns true if set */
 	bool requestModulePos(ModuleWidget* mw, math::Vec pos);
@@ -65,21 +65,31 @@ struct RackWidget : widget::OpaqueWidget {
 	void setModulePosNearest(ModuleWidget* mw, math::Vec pos);
 	void setModulePosForce(ModuleWidget* mw, math::Vec pos);
 	ModuleWidget* getModule(int64_t moduleId);
-	bool isEmpty();
+	std::list<ModuleWidget*> getModules();
+	bool hasModules();
 	void updateModuleOldPositions();
 	history::ComplexAction* getModuleDragAction();
+
 	void updateModuleSelections();
+	int getNumSelectedModules();
+	std::list<ModuleWidget*> getSelectedModules();
+	void resetSelectedModulesAction();
+	void randomizeSelectedModulesAction();
+	void disconnectSelectedModulesAction();
+	void bypassSelectedModulesAction();
+	void deleteSelectedModulesAction();
 
 	// Cable methods
 
 	void clearCables();
 	void clearCablesAction();
-	/** Removes all complete cables connected to the port */
+	/** Removes all cables connected to the port */
 	void clearCablesOnPort(PortWidget* port);
-	/** Adds a complete cable.
-	Ownership rules work like add/removeChild()
+	/** Adds a complete cable and adopts ownership.
 	*/
 	void addCable(CableWidget* cw);
+	/** Removes cable and releases ownership to caller.
+	*/
 	void removeCable(CableWidget* cw);
 	/** Takes ownership of `cw` and adds it as a child if it isn't already. */
 	void setIncompleteCable(CableWidget* cw);
@@ -87,6 +97,7 @@ struct RackWidget : widget::OpaqueWidget {
 	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack. */
 	CableWidget* getTopCable(PortWidget* port);
 	CableWidget* getCable(int64_t cableId);
+	std::list<CableWidget*> getCompleteCables();
 	/** Returns all cables attached to port, complete or not. */
 	std::list<CableWidget*> getCablesOnPort(PortWidget* port);
 };

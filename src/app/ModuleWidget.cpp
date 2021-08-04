@@ -159,6 +159,51 @@ PortWidget* ModuleWidget::getOutput(int portId) {
 	});
 }
 
+template <class T, typename F>
+void doIfTypeRecursive(widget::Widget* w, F f) {
+	T* t = dynamic_cast<T*>(w);
+	if (t)
+		f(t);
+
+	for (widget::Widget* child : w->children) {
+		doIfTypeRecursive<T>(child, f);
+	}
+}
+
+std::list<ParamWidget*> ModuleWidget::getParams() {
+	std::list<ParamWidget*> pws;
+	doIfTypeRecursive<ParamWidget>(this, [&](ParamWidget* pw) {
+		pws.push_back(pw);
+	});
+	return pws;
+}
+
+std::list<PortWidget*> ModuleWidget::getPorts() {
+	std::list<PortWidget*> pws;
+	doIfTypeRecursive<PortWidget>(this, [&](PortWidget* pw) {
+		pws.push_back(pw);
+	});
+	return pws;
+}
+
+std::list<PortWidget*> ModuleWidget::getInputs() {
+	std::list<PortWidget*> pws;
+	doIfTypeRecursive<PortWidget>(this, [&](PortWidget* pw) {
+		if (pw->type == engine::Port::INPUT)
+			pws.push_back(pw);
+	});
+	return pws;
+}
+
+std::list<PortWidget*> ModuleWidget::getOutputs() {
+	std::list<PortWidget*> pws;
+	doIfTypeRecursive<PortWidget>(this, [&](PortWidget* pw) {
+		if (pw->type == engine::Port::OUTPUT)
+			pws.push_back(pw);
+	});
+	return pws;
+}
+
 void ModuleWidget::draw(const DrawArgs& args) {
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 
@@ -325,7 +370,12 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 	if (!e.isConsumed()) {
 		// Open context menu on right-click
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			createContextMenu();
+			if (internal->selected) {
+				createSelectionContextMenu();
+			}
+			else {
+				createContextMenu();
+			}
 			e.consume(this);
 		}
 	}
@@ -615,21 +665,10 @@ void ModuleWidget::saveDialog() {
 	save(path);
 }
 
-template <class T, typename F>
-void doOfType(widget::Widget* w, F f) {
-	T* t = dynamic_cast<T*>(w);
-	if (t)
-		f(t);
-
-	for (widget::Widget* child : w->children) {
-		doOfType<T>(child, f);
-	}
-}
-
 void ModuleWidget::disconnect() {
-	doOfType<PortWidget>(this, [&](PortWidget* pw) {
+	for (PortWidget* pw : getPorts()) {
 		APP->scene->rack->clearCablesOnPort(pw);
-	});
+	}
 }
 
 void ModuleWidget::resetAction() {
@@ -662,30 +701,31 @@ void ModuleWidget::randomizeAction() {
 	APP->history->push(h);
 }
 
-static void disconnectActions(ModuleWidget* mw, history::ComplexAction* complexAction) {
-	// Add CableRemove action for all cables
-	doOfType<PortWidget>(mw, [&](PortWidget* pw) {
+void ModuleWidget::appendDisconnectActions(history::ComplexAction* complexAction) {
+	for (PortWidget* pw : getPorts()) {
 		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(pw)) {
 			if (!cw->isComplete())
-				continue;
-			// Avoid creating duplicate actions for self-patched cables
-			if (pw->type == engine::Port::INPUT && cw->outputPort->module == mw->module)
 				continue;
 			// history::CableRemove
 			history::CableRemove* h = new history::CableRemove;
 			h->setCable(cw);
 			complexAction->push(h);
+			// Delete cable
+			APP->scene->rack->removeCable(cw);
+			delete cw;
 		}
-	});
+	};
 }
 
 void ModuleWidget::disconnectAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "disconnect cables";
-	disconnectActions(this, complexAction);
-	APP->history->push(complexAction);
+	appendDisconnectActions(complexAction);
 
-	disconnect();
+	if (!complexAction->isEmpty())
+		APP->history->push(complexAction);
+	else
+		delete complexAction;
 }
 
 void ModuleWidget::cloneAction() {
@@ -722,11 +762,8 @@ void ModuleWidget::cloneAction() {
 	h->push(hma);
 
 	// Clone cables attached to input ports
-	doOfType<PortWidget>(this, [&](PortWidget* pw) {
-		if (pw->type != engine::Port::INPUT)
-			return;
-		std::list<CableWidget*> cables = APP->scene->rack->getCablesOnPort(pw);
-		for (CableWidget* cw : cables) {
+	for (PortWidget* pw : getInputs()) {
+		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(pw)) {
 			// Create cable attached to cloned ModuleWidget's input
 			engine::Cable* clonedCable = new engine::Cable;
 			clonedCable->id = -1;
@@ -750,7 +787,7 @@ void ModuleWidget::cloneAction() {
 			hca->setCable(clonedCw);
 			h->push(hca);
 		}
-	});
+	}
 
 	APP->history->push(h);
 }
@@ -769,7 +806,7 @@ void ModuleWidget::bypassAction() {
 void ModuleWidget::removeAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "remove module";
-	disconnectActions(this, complexAction);
+	appendDisconnectActions(complexAction);
 
 	// history::ModuleRemove
 	history::ModuleRemove* moduleRemove = new history::ModuleRemove;
@@ -778,7 +815,7 @@ void ModuleWidget::removeAction() {
 
 	APP->history->push(complexAction);
 
-	// This disconnects cables, removes the module, and transfers ownership to caller
+	// This removes the module and transfers ownership to caller
 	APP->scene->rack->removeModule(this);
 	delete this;
 }
@@ -1016,6 +1053,38 @@ void ModuleWidget::createContextMenu() {
 	}));
 
 	appendContextMenu(menu);
+}
+
+void ModuleWidget::createSelectionContextMenu() {
+	ui::Menu* menu = createMenu();
+
+	int n = APP->scene->rack->getNumSelectedModules();
+	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
+
+	// Initialize
+	menu->addChild(createMenuItem("Initialize", "", [=]() {
+		APP->scene->rack->resetSelectedModulesAction();
+	}));
+
+	// Randomize
+	menu->addChild(createMenuItem("Randomize", "", [=]() {
+		APP->scene->rack->randomizeSelectedModulesAction();
+	}));
+
+	// Disconnect cables
+	menu->addChild(createMenuItem("Disconnect cables", "", [=]() {
+		APP->scene->rack->disconnectSelectedModulesAction();
+	}));
+
+	// Bypass
+	menu->addChild(createMenuItem("Bypass", "", [=]() {
+		APP->scene->rack->bypassSelectedModulesAction();
+	}));
+
+	// Delete
+	menu->addChild(createMenuItem("Delete", "", [=]() {
+		APP->scene->rack->deleteSelectedModulesAction();
+	}));
 }
 
 math::Vec& ModuleWidget::dragOffset() {

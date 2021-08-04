@@ -79,7 +79,7 @@ void PatchManager::clear() {
 static bool promptClear(std::string text) {
 	if (APP->history->isSaved())
 		return true;
-	if (APP->scene->rack->isEmpty())
+	if (APP->scene->rack->hasModules())
 		return true;
 	return osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, text.c_str());
 }

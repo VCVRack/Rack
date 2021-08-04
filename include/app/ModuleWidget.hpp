@@ -6,6 +6,8 @@
 #include <app/ParamWidget.hpp>
 #include <plugin/Model.hpp>
 #include <engine/Module.hpp>
+#include <history.hpp>
+#include <list>
 
 
 namespace rack {
@@ -54,12 +56,17 @@ struct ModuleWidget : widget::OpaqueWidget {
 	ParamWidget* getParam(int paramId);
 	PortWidget* getInput(int portId);
 	PortWidget* getOutput(int portId);
+	/** Scans children widgets recursively for all ParamWidgets. */
+	std::list<ParamWidget*> getParams();
+	std::list<PortWidget*> getPorts();
+	std::list<PortWidget*> getInputs();
+	std::list<PortWidget*> getOutputs();
 
 	void draw(const DrawArgs& args) override;
 	void drawShadow(const DrawArgs& args);
 
 	/** Override to add context menu entries to your subclass.
-	It is recommended to add a blank ui::MenuEntry first for spacing.
+	It is recommended to add a blank `ui::MenuSeparator` first for spacing.
 	*/
 	virtual void appendContextMenu(ui::Menu* menu) {}
 
@@ -98,12 +105,14 @@ struct ModuleWidget : widget::OpaqueWidget {
 	Called when the user clicks Randomize in the context menu.
 	*/
 	void randomizeAction();
+	void appendDisconnectActions(history::ComplexAction* complexAction);
 	void disconnectAction();
 	void cloneAction();
 	void bypassAction();
 	/** Deletes `this` */
 	void removeAction();
 	void createContextMenu();
+	void createSelectionContextMenu();
 
 	INTERNAL math::Vec& dragOffset();
 	INTERNAL bool& dragEnabled();

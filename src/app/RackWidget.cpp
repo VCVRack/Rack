@@ -612,7 +612,17 @@ ModuleWidget* RackWidget::getModule(int64_t moduleId) {
 	return NULL;
 }
 
-bool RackWidget::isEmpty() {
+std::list<ModuleWidget*> RackWidget::getModules() {
+	std::list<ModuleWidget*> mws;
+	for (widget::Widget* w : internal->moduleContainer->children) {
+		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		mws.push_back(mw);
+	}
+	return mws;
+}
+
+bool RackWidget::hasModules() {
 	return internal->moduleContainer->children.empty();
 }
 
@@ -659,6 +669,107 @@ void RackWidget::updateModuleSelections() {
 	}
 }
 
+int RackWidget::getNumSelectedModules() {
+	int count = 0;
+	for (widget::Widget* w : internal->moduleContainer->children) {
+		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		if (mw->selected())
+			count++;
+	}
+	return count;
+}
+
+std::list<ModuleWidget*> RackWidget::getSelectedModules() {
+	std::list<ModuleWidget*> mws;
+	for (widget::Widget* w : internal->moduleContainer->children) {
+		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		if (mw->selected())
+			mws.push_back(mw);
+	}
+	return mws;
+}
+
+void RackWidget::resetSelectedModulesAction() {
+	history::ComplexAction* complexAction = new history::ComplexAction;
+	complexAction->name = "reset modules";
+
+	for (ModuleWidget* mw : getSelectedModules()) {
+		assert(mw->module);
+
+		// history::ModuleChange
+		history::ModuleChange* h = new history::ModuleChange;
+		h->moduleId = mw->module->id;
+		h->oldModuleJ = mw->toJson();
+
+		APP->engine->resetModule(mw->module);
+
+		h->newModuleJ = mw->toJson();
+		complexAction->push(h);
+	}
+
+	APP->history->push(complexAction);
+}
+
+void RackWidget::randomizeSelectedModulesAction() {
+	history::ComplexAction* complexAction = new history::ComplexAction;
+	complexAction->name = "randomize modules";
+
+	for (ModuleWidget* mw : getSelectedModules()) {
+		assert(mw->module);
+
+		// history::ModuleChange
+		history::ModuleChange* h = new history::ModuleChange;
+		h->moduleId = mw->module->id;
+		h->oldModuleJ = mw->toJson();
+
+		APP->engine->randomizeModule(mw->module);
+
+		h->newModuleJ = mw->toJson();
+		complexAction->push(h);
+	}
+
+	APP->history->push(complexAction);
+}
+
+void RackWidget::disconnectSelectedModulesAction() {
+	history::ComplexAction* complexAction = new history::ComplexAction;
+	complexAction->name = "disconnect cables";
+
+	for (ModuleWidget* mw : getSelectedModules()) {
+		mw->appendDisconnectActions(complexAction);
+	}
+
+	if (!complexAction->isEmpty())
+		APP->history->push(complexAction);
+	else
+		delete complexAction;
+}
+
+void RackWidget::bypassSelectedModulesAction() {
+	// TODO
+}
+
+void RackWidget::deleteSelectedModulesAction() {
+	history::ComplexAction* complexAction = new history::ComplexAction;
+	complexAction->name = "remove modules";
+
+	for (ModuleWidget* mw : getSelectedModules()) {
+		mw->appendDisconnectActions(complexAction);
+
+		// history::ModuleRemove
+		history::ModuleRemove* moduleRemove = new history::ModuleRemove;
+		moduleRemove->setModule(mw);
+		complexAction->push(moduleRemove);
+
+		removeModule(mw);
+		delete mw;
+	}
+
+	APP->history->push(complexAction);
+}
+
 void RackWidget::clearCables() {
 	incompleteCable = NULL;
 	internal->cableContainer->clearChildren();
@@ -669,12 +780,7 @@ void RackWidget::clearCablesAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "clear cables";
 
-	for (widget::Widget* w : internal->cableContainer->children) {
-		CableWidget* cw = dynamic_cast<CableWidget*>(w);
-		assert(cw);
-		if (!cw->isComplete())
-			continue;
-
+	for (CableWidget* cw : getCompleteCables()) {
 		// history::CableRemove
 		history::CableRemove* h = new history::CableRemove;
 		h->setCable(cw);
@@ -685,6 +791,7 @@ void RackWidget::clearCablesAction() {
 		APP->history->push(complexAction);
 	else
 		delete complexAction;
+
 	clearCables();
 }
 
@@ -754,6 +861,17 @@ CableWidget* RackWidget::getCable(int64_t cableId) {
 			return cw;
 	}
 	return NULL;
+}
+
+std::list<CableWidget*> RackWidget::getCompleteCables() {
+	std::list<CableWidget*> cws;
+	for (widget::Widget* w : internal->cableContainer->children) {
+		CableWidget* cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (cw->isComplete())
+			cws.push_back(cw);
+	}
+	return cws;
 }
 
 std::list<CableWidget*> RackWidget::getCablesOnPort(PortWidget* port) {
