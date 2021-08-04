@@ -654,9 +654,15 @@ void RackWidget::updateModuleSelections() {
 	}
 }
 
-void RackWidget::clearModuleSelections() {
+void RackWidget::deselectModules() {
 	for (ModuleWidget* mw : getModules()) {
 		mw->selected() = false;
+	}
+}
+
+void RackWidget::selectAllModules() {
+	for (ModuleWidget* mw : getModules()) {
+		mw->selected() = true;
 	}
 }
 
@@ -833,39 +839,44 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 	int n = getNumSelectedModules();
 	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
 
-	// Deselect
-	menu->addChild(createMenuItem("Deselect", "", [=]() {
-		clearModuleSelections();
+	// Select all
+	menu->addChild(createMenuItem("Select all", RACK_MOD_CTRL_NAME "+A", [=]() {
+		selectAllModules();
 	}));
+
+	// Deselect
+	menu->addChild(createMenuItem("Deselect", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+A", [=]() {
+		deselectModules();
+	}, n == 0));
 
 	// Initialize
 	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
 		resetSelectedModulesAction();
-	}));
+	}, n == 0));
 
 	// Randomize
 	menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [=]() {
 		randomizeSelectedModulesAction();
-	}));
+	}, n == 0));
 
 	// Disconnect cables
 	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
 		disconnectSelectedModulesAction();
-	}));
+	}, n == 0));
 
 	// Bypass
 	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
-	bool bypassed = areSelectedModulesBypassed();
+	bool bypassed = (n > 0) && areSelectedModulesBypassed();
 	if (bypassed)
 		bypassText += " " CHECKMARK_STRING;
 	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
 		bypassSelectedModulesAction(!bypassed);
-	}));
+	}, n == 0));
 
 	// Delete
 	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
 		deleteSelectedModulesAction();
-	}));
+	}, n == 0));
 }
 
 void RackWidget::clearCables() {

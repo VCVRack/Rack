@@ -212,6 +212,14 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 		}
 
 		// Module selections
+		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			rack->selectAllModules();
+			e.consume(this);
+		}
+		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
+			rack->deselectModules();
+			e.consume(this);
+		}
 		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			if (rack->hasSelectedModules())
 				rack->resetSelectedModulesAction();

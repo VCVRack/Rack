@@ -215,10 +215,8 @@ struct EditButton : MenuButton {
 		disconnectCablesItem->text = "Clear cables";
 		menu->addChild(disconnectCablesItem);
 
-		if (APP->scene->rack->hasSelectedModules()) {
-			menu->addChild(new ui::MenuSeparator);
-			APP->scene->rack->appendSelectionContextMenu(menu);
-		}
+		menu->addChild(new ui::MenuSeparator);
+		APP->scene->rack->appendSelectionContextMenu(menu);
 
 		menu->addChild(new ui::MenuSeparator);
 
