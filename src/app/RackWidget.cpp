@@ -1,6 +1,7 @@
 #include <map>
 #include <algorithm>
 #include <queue>
+#include <functional>
 
 #include <osdialog.h>
 
@@ -496,7 +497,7 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 	return true;
 }
 
-void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
+static void eachNearestGridPos(math::Vec pos, std::function<bool(math::Vec pos)> f) {
 	// Dijkstra's algorithm to generate a sorted list of Vecs closest to `pos`.
 
 	// Comparison of distance of Vecs to `pos`
@@ -520,7 +521,7 @@ void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
 	while (!queue.empty()) {
 		math::Vec testPos = queue.top();
 		// Check testPos
-		if (requestModulePos(mw, testPos))
+		if (f(testPos))
 			return;
 		// Move testPos to visited set
 		queue.pop();
@@ -543,6 +544,12 @@ void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
 
 	// We failed to find a box. This shouldn't happen on an infinite rack.
 	assert(false);
+}
+
+void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
+	eachNearestGridPos(pos, [&](math::Vec pos) -> bool {
+		return requestModulePos(mw, pos);
+	});
 }
 
 void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
@@ -833,6 +840,12 @@ bool RackWidget::requestSelectedModulePos(math::Vec delta) {
 	}
 	RackWidget_updateExpanders(this);
 	return true;
+}
+
+void RackWidget::setSelectedModulesPosNearest(math::Vec delta) {
+	eachNearestGridPos(delta, [&](math::Vec delta) -> bool {
+		return requestSelectedModulePos(delta);
+	});
 }
 
 void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {

@@ -86,6 +86,7 @@ struct RackWidget : widget::OpaqueWidget {
 	bool areSelectedModulesBypassed();
 	void deleteSelectedModulesAction();
 	bool requestSelectedModulePos(math::Vec delta);
+	void setSelectedModulesPosNearest(math::Vec delta);
 	void appendSelectionContextMenu(ui::Menu* menu);
 
 	// Cable methods
