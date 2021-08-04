@@ -206,12 +206,9 @@ void RackWidget::clear() {
 	// This isn't required because removing all ModuleWidgets should remove all cables, but do it just in case.
 	clearCables();
 	// Remove ModuleWidgets
-	std::list<widget::Widget*> widgets = internal->moduleContainer->children;
-	for (widget::Widget* w : widgets) {
-		ModuleWidget* moduleWidget = dynamic_cast<ModuleWidget*>(w);
-		assert(moduleWidget);
-		removeModule(moduleWidget);
-		delete moduleWidget;
+	for (ModuleWidget* mw : getModules()) {
+		removeModule(mw);
+		delete mw;
 	}
 }
 
@@ -486,9 +483,6 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 		// Don't intersect with self
 		if (mw == w2)
 			continue;
-		// Don't intersect with invisible modules
-		if (!w2->visible)
-			continue;
 		// Check intersection
 		math::Rect w2Box = w2->box;
 		if (mwBox.intersects(w2Box))
@@ -628,9 +622,7 @@ bool RackWidget::hasModules() {
 
 void RackWidget::updateModuleOldPositions() {
 	// Set all modules' oldPos field from their current position.
-	for (widget::Widget* w : internal->moduleContainer->children) {
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
-		assert(mw);
+	for (ModuleWidget* mw : getModules()) {
 		mw->oldPos() = mw->box.pos;
 	}
 }
@@ -638,9 +630,7 @@ void RackWidget::updateModuleOldPositions() {
 history::ComplexAction* RackWidget::getModuleDragAction() {
 	history::ComplexAction* h = new history::ComplexAction;
 
-	for (widget::Widget* w : internal->moduleContainer->children) {
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
-		assert(mw);
+	for (ModuleWidget* mw : getModules()) {
 		// Create ModuleMove action if the module was moved.
 		math::Vec oldPos = mw->oldPos();
 		if (!oldPos.equals(mw->box.pos)) {
@@ -652,18 +642,12 @@ history::ComplexAction* RackWidget::getModuleDragAction() {
 		}
 	}
 
-	if (h->isEmpty()) {
-		delete h;
-		return NULL;
-	}
 	return h;
 }
 
 void RackWidget::updateModuleSelections() {
 	math::Rect selectionBox = math::Rect::fromCorners(internal->selectionStart, internal->selectionEnd);
-	for (widget::Widget* w : internal->moduleContainer->children) {
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
-		assert(mw);
+	for (ModuleWidget* mw : getModules()) {
 		bool selected = internal->selecting && selectionBox.intersects(mw->box);
 		mw->selected() = selected;
 	}
@@ -768,6 +752,36 @@ void RackWidget::deleteSelectedModulesAction() {
 	}
 
 	APP->history->push(complexAction);
+}
+
+bool RackWidget::requestSelectedModulePos(math::Vec delta) {
+	// Check intersection with other modules
+	std::map<widget::Widget*, math::Rect> mwBoxes;
+	for (ModuleWidget* mw : getSelectedModules()) {
+		math::Rect mwBox = mw->box;
+		mwBox.pos += delta;
+		mwBoxes[mw] = mwBox;
+	}
+
+	for (widget::Widget* w2 : internal->moduleContainer->children) {
+		// Don't intersect with selected modules
+		auto it = mwBoxes.find(w2);
+		if (it != mwBoxes.end())
+			continue;
+		math::Rect w2Box = w2->box;
+		// Check intersection with all selected modules
+		for (const auto& pair : mwBoxes) {
+			if (pair.second.intersects(w2Box))
+				return false;
+		}
+	}
+
+	// Accept requested position
+	for (const auto& pair : mwBoxes) {
+		pair.first->setPosition(pair.second.pos);
+	}
+	RackWidget_updateExpanders(this);
+	return true;
 }
 
 void RackWidget::clearCables() {

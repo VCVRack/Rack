@@ -78,6 +78,7 @@ struct RackWidget : widget::OpaqueWidget {
 	void disconnectSelectedModulesAction();
 	void bypassSelectedModulesAction();
 	void deleteSelectedModulesAction();
+	bool requestSelectedModulePos(math::Vec delta);
 
 	// Cable methods
 
