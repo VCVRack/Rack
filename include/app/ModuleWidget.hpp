@@ -108,7 +108,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void appendDisconnectActions(history::ComplexAction* complexAction);
 	void disconnectAction();
 	void cloneAction();
-	void bypassAction();
+	void bypassAction(bool bypassed);
 	/** Deletes `this` */
 	void removeAction();
 	void createContextMenu();

@@ -316,11 +316,17 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			resetAction();
+			if (internal->selected)
+				APP->scene->rack->resetSelectedModulesAction();
+			else
+				resetAction();
 			e.consume(this);
 		}
 		if (e.keyName == "r" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			randomizeAction();
+			if (internal->selected)
+				APP->scene->rack->randomizeSelectedModulesAction();
+			else
+				randomizeAction();
 			e.consume(this);
 		}
 		if (e.keyName == "c" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -336,18 +342,27 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			disconnectAction();
+			if (internal->selected)
+				APP->scene->rack->disconnectSelectedModulesAction();
+			else
+				disconnectAction();
 			e.consume(this);
 		}
 		if (e.keyName == "e" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			bypassAction();
+			if (internal->selected)
+				APP->scene->rack->bypassSelectedModulesAction(!APP->scene->rack->areSelectedModulesBypassed());
+			else
+				bypassAction(!module->isBypassed());
 			e.consume(this);
 		}
 	}
 
 	if (e.action == RACK_HELD) {
 		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
-			removeAction();
+			if (internal->selected)
+				APP->scene->rack->deleteSelectedModulesAction();
+			else
+				removeAction();
 			e.consume(NULL);
 		}
 	}
@@ -800,14 +815,15 @@ void ModuleWidget::cloneAction() {
 	APP->history->push(h);
 }
 
-void ModuleWidget::bypassAction() {
+void ModuleWidget::bypassAction(bool bypassed) {
 	assert(module);
-	bool bypassed = !module->isBypassed();
 
 	// history::ModuleBypass
 	history::ModuleBypass* h = new history::ModuleBypass;
 	h->moduleId = module->id;
 	h->bypassed = bypassed;
+	if (!bypassed)
+		h->name = "un-bypass module";
 	APP->history->push(h);
 
 	APP->engine->bypassModule(module, bypassed);
@@ -1048,12 +1064,13 @@ void ModuleWidget::createContextMenu() {
 	}));
 
 	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
-	if (module && module->isBypassed())
+	bool bypassed = module && module->isBypassed();
+	if (bypassed)
 		bypassText += " " CHECKMARK_STRING;
 	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
 		if (!weakThis)
 			return;
-		weakThis->bypassAction();
+		weakThis->bypassAction(!bypassed);
 	}));
 
 	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
@@ -1072,32 +1089,31 @@ void ModuleWidget::createSelectionContextMenu() {
 	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
 
 	// Initialize
-	menu->addChild(createMenuItem("Initialize", "", [=]() {
+	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
 		APP->scene->rack->resetSelectedModulesAction();
 	}));
 
 	// Randomize
-	menu->addChild(createMenuItem("Randomize", "", [=]() {
+	menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [=]() {
 		APP->scene->rack->randomizeSelectedModulesAction();
 	}));
 
 	// Disconnect cables
-	menu->addChild(createMenuItem("Disconnect cables", "", [=]() {
+	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
 		APP->scene->rack->disconnectSelectedModulesAction();
 	}));
 
 	// Bypass
-	menu->addChild(createBoolMenuItem("Bypass",
-		[=]() {
-			return APP->scene->rack->areSelectedModulesBypassed();
-		},
-		[=](bool bypassed) {
-			APP->scene->rack->bypassSelectedModulesAction(bypassed);
-		}
-	));
+	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
+	bool bypassed = APP->scene->rack->areSelectedModulesBypassed();
+	if (bypassed)
+		bypassText += " " CHECKMARK_STRING;
+	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
+		APP->scene->rack->bypassSelectedModulesAction(!bypassed);
+	}));
 
 	// Delete
-	menu->addChild(createMenuItem("Delete", "", [=]() {
+	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
 		APP->scene->rack->deleteSelectedModulesAction();
 	}));
 }

@@ -733,7 +733,7 @@ void RackWidget::disconnectSelectedModulesAction() {
 
 void RackWidget::bypassSelectedModulesAction(bool bypassed) {
 	history::ComplexAction* complexAction = new history::ComplexAction;
-	complexAction->name = "bypass modules";
+	complexAction->name = bypassed ? "bypass modules" : "un-bypass modules";
 
 	for (ModuleWidget* mw : getSelectedModules()) {
 		assert(mw->module);
