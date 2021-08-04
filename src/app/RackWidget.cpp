@@ -731,8 +731,36 @@ void RackWidget::disconnectSelectedModulesAction() {
 		delete complexAction;
 }
 
-void RackWidget::bypassSelectedModulesAction() {
-	// TODO
+void RackWidget::bypassSelectedModulesAction(bool bypassed) {
+	history::ComplexAction* complexAction = new history::ComplexAction;
+	complexAction->name = "bypass modules";
+
+	for (ModuleWidget* mw : getSelectedModules()) {
+		assert(mw->module);
+		if (mw->module->isBypassed() == bypassed)
+			continue;
+
+		// history::ModuleBypass
+		history::ModuleBypass* h = new history::ModuleBypass;
+		h->moduleId = mw->module->id;
+		h->bypassed = bypassed;
+		complexAction->push(h);
+
+		APP->engine->bypassModule(mw->module, bypassed);
+	}
+
+	if (!complexAction->isEmpty())
+		APP->history->push(complexAction);
+	else
+		delete complexAction;
+}
+
+bool RackWidget::areSelectedModulesBypassed() {
+	for (ModuleWidget* mw : getSelectedModules()) {
+		if (!mw->getModule()->isBypassed())
+			return false;
+	}
+	return true;
 }
 
 void RackWidget::deleteSelectedModulesAction() {

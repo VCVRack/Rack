@@ -802,13 +802,15 @@ void ModuleWidget::cloneAction() {
 
 void ModuleWidget::bypassAction() {
 	assert(module);
-	APP->engine->bypassModule(module, !module->isBypassed());
+	bool bypassed = !module->isBypassed();
 
 	// history::ModuleBypass
 	history::ModuleBypass* h = new history::ModuleBypass;
 	h->moduleId = module->id;
-	h->bypassed = module->isBypassed();
+	h->bypassed = bypassed;
 	APP->history->push(h);
+
+	APP->engine->bypassModule(module, bypassed);
 }
 
 void ModuleWidget::removeAction() {
@@ -1085,9 +1087,14 @@ void ModuleWidget::createSelectionContextMenu() {
 	}));
 
 	// Bypass
-	menu->addChild(createMenuItem("Bypass", "", [=]() {
-		APP->scene->rack->bypassSelectedModulesAction();
-	}));
+	menu->addChild(createBoolMenuItem("Bypass",
+		[=]() {
+			return APP->scene->rack->areSelectedModulesBypassed();
+		},
+		[=](bool bypassed) {
+			APP->scene->rack->bypassSelectedModulesAction(bypassed);
+		}
+	));
 
 	// Delete
 	menu->addChild(createMenuItem("Delete", "", [=]() {
