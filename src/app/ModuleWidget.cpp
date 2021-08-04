@@ -921,7 +921,8 @@ void ModuleWidget::createContextMenu() {
 	WeakPtr<ModuleWidget> weakThis = this;
 
 	// Brand and module name
-	menu->addChild(createMenuLabel(model->plugin->brand + " " + model->name));
+	menu->addChild(createMenuLabel(model->name));
+	menu->addChild(createMenuLabel(model->plugin->brand));
 
 	// Info
 	menu->addChild(createSubmenuItem("Info", [=](ui::Menu* menu) {
