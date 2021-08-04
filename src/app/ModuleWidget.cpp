@@ -316,18 +316,17 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (internal->selected)
-				APP->scene->rack->resetSelectedModulesAction();
-			else
+			// Don't handle key commands if modules are selected, since it will interfere with Scene's module selection key commands
+			if (!APP->scene->rack->hasSelectedModules()) {
 				resetAction();
-			e.consume(this);
+				e.consume(this);
+			}
 		}
 		if (e.keyName == "r" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (internal->selected)
-				APP->scene->rack->randomizeSelectedModulesAction();
-			else
+			if (!APP->scene->rack->hasSelectedModules()) {
 				randomizeAction();
-			e.consume(this);
+				e.consume(this);
+			}
 		}
 		if (e.keyName == "c" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			copyClipboard();
@@ -342,28 +341,32 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (internal->selected)
-				APP->scene->rack->disconnectSelectedModulesAction();
-			else
+			if (!APP->scene->rack->hasSelectedModules()) {
 				disconnectAction();
-			e.consume(this);
+				e.consume(this);
+			}
 		}
 		if (e.keyName == "e" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (internal->selected)
-				APP->scene->rack->bypassSelectedModulesAction(!APP->scene->rack->areSelectedModulesBypassed());
-			else
+			if (!APP->scene->rack->hasSelectedModules()) {
 				bypassAction(!module->isBypassed());
-			e.consume(this);
+				e.consume(this);
+			}
+		}
+		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
+			if (!APP->scene->rack->hasSelectedModules()) {
+				removeAction();
+				e.consume(this);
+			}
 		}
 	}
 
 	if (e.action == RACK_HELD) {
+		// Also handle Delete/Backspace when holding the key while hovering
 		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
-			if (internal->selected)
-				APP->scene->rack->deleteSelectedModulesAction();
-			else
+			if (!APP->scene->rack->hasSelectedModules()) {
 				removeAction();
-			e.consume(NULL);
+				e.consume(NULL);
+			}
 		}
 	}
 }

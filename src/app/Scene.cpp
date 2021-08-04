@@ -210,6 +210,33 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 				APP->window->setFullScreen(false);
 			e.consume(this);
 		}
+
+		// Module selections
+		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			if (rack->hasSelectedModules())
+				rack->resetSelectedModulesAction();
+			e.consume(this);
+		}
+		if (e.keyName == "r" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			if (rack->hasSelectedModules())
+				rack->randomizeSelectedModulesAction();
+			e.consume(this);
+		}
+		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			if (rack->hasSelectedModules())
+				rack->disconnectSelectedModulesAction();
+			e.consume(this);
+		}
+		if (e.keyName == "e" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			if (rack->hasSelectedModules())
+				rack->bypassSelectedModulesAction(!rack->areSelectedModulesBypassed());
+			e.consume(this);
+		}
+		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
+			if (rack->hasSelectedModules())
+				rack->deleteSelectedModulesAction();
+			e.consume(this);
+		}
 	}
 }
 

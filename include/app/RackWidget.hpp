@@ -72,6 +72,7 @@ struct RackWidget : widget::OpaqueWidget {
 
 	void updateModuleSelections();
 	void clearModuleSelections();
+	bool hasSelectedModules();
 	int getNumSelectedModules();
 	std::list<ModuleWidget*> getSelectedModules();
 	void resetSelectedModulesAction();

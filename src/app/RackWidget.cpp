@@ -659,6 +659,16 @@ void RackWidget::clearModuleSelections() {
 	}
 }
 
+bool RackWidget::hasSelectedModules() {
+	for (widget::Widget* w : internal->moduleContainer->children) {
+		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		if (mw->selected())
+			return true;
+	}
+	return false;
+}
+
 int RackWidget::getNumSelectedModules() {
 	int count = 0;
 	for (widget::Widget* w : internal->moduleContainer->children) {
