@@ -309,6 +309,14 @@ void ModuleWidget::drawShadow(const DrawArgs& args) {
 	nvgFill(args.vg);
 }
 
+void ModuleWidget::onHover(const HoverEvent& e) {
+	if (internal->selected) {
+		e.consume(this);
+	}
+
+	OpaqueWidget::onHover(e);
+}
+
 void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 	OpaqueWidget::onHoverKey(e);
 	if (e.isConsumed())
@@ -372,6 +380,15 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 }
 
 void ModuleWidget::onButton(const ButtonEvent& e) {
+	if (internal->selected) {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+			ui::Menu* menu = createMenu();
+			APP->scene->rack->appendSelectionContextMenu(menu);
+		}
+
+		e.consume(this);
+	}
+
 	OpaqueWidget::onButton(e);
 
 	if (e.getTarget() == this) {
@@ -385,16 +402,10 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 		}
 	}
 
-	if (!e.isConsumed()) {
+	if (!e.isConsumed() && !internal->selected) {
 		// Open context menu on right-click
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			if (internal->selected) {
-				ui::Menu* menu = createMenu();
-				APP->scene->rack->appendSelectionContextMenu(menu);
-			}
-			else {
-				createContextMenu();
-			}
+			createContextMenu();
 			e.consume(this);
 		}
 	}
@@ -463,6 +474,14 @@ void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 			}
 		}
 	}
+}
+
+void ModuleWidget::onDragHover(const DragHoverEvent& e) {
+	if (internal->selected) {
+		e.consume(this);
+	}
+
+	OpaqueWidget::onDragHover(e);
 }
 
 json_t* ModuleWidget::toJson() {

@@ -70,11 +70,13 @@ struct ModuleWidget : widget::OpaqueWidget {
 	*/
 	virtual void appendContextMenu(ui::Menu* menu) {}
 
+	void onHover(const HoverEvent& e) override;
 	void onHoverKey(const HoverKeyEvent& e) override;
 	void onButton(const ButtonEvent& e) override;
 	void onDragStart(const DragStartEvent& e) override;
 	void onDragEnd(const DragEndEvent& e) override;
 	void onDragMove(const DragMoveEvent& e) override;
+	void onDragHover(const DragHoverEvent& e) override;
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
