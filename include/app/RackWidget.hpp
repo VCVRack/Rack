@@ -71,6 +71,7 @@ struct RackWidget : widget::OpaqueWidget {
 	history::ComplexAction* getModuleDragAction();
 
 	void updateModuleSelections();
+	void clearModuleSelections();
 	int getNumSelectedModules();
 	std::list<ModuleWidget*> getSelectedModules();
 	void resetSelectedModulesAction();

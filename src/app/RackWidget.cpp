@@ -653,6 +653,12 @@ void RackWidget::updateModuleSelections() {
 	}
 }
 
+void RackWidget::clearModuleSelections() {
+	for (ModuleWidget* mw : getModules()) {
+		mw->selected() = false;
+	}
+}
+
 int RackWidget::getNumSelectedModules() {
 	int count = 0;
 	for (widget::Widget* w : internal->moduleContainer->children) {

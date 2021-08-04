@@ -1088,6 +1088,11 @@ void ModuleWidget::createSelectionContextMenu() {
 	int n = APP->scene->rack->getNumSelectedModules();
 	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
 
+	// Deselect
+	menu->addChild(createMenuItem("Deselect", "", [=]() {
+		APP->scene->rack->clearModuleSelections();
+	}));
+
 	// Initialize
 	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
 		APP->scene->rack->resetSelectedModulesAction();
