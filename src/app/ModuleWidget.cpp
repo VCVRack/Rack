@@ -255,33 +255,13 @@ void ModuleWidget::drawShadow(const DrawArgs& args) {
 	nvgBeginPath(args.vg);
 	float r = 20; // Blur radius
 	float c = 20; // Corner radius
-	math::Vec b = math::Vec(-10, 30); // Offset from each corner
-	nvgRect(args.vg, b.x - r, b.y - r, box.size.x - 2 * b.x + 2 * r, box.size.y - 2 * b.y + 2 * r);
+	math::Rect shadowBox = box.zeroPos().grow(math::Vec(10, -30));
+	math::Rect shadowOutsideBox = shadowBox.grow(math::Vec(r, r));
+	nvgRect(args.vg, RECT_ARGS(shadowOutsideBox));
 	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
 	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
-	nvgFillPaint(args.vg, nvgBoxGradient(args.vg, b.x, b.y, box.size.x - 2 * b.x, box.size.y - 2 * b.y, c, r, shadowColor, transparentColor));
+	nvgFillPaint(args.vg, nvgBoxGradient(args.vg, RECT_ARGS(shadowBox), c, r, shadowColor, transparentColor));
 	nvgFill(args.vg);
-}
-
-void ModuleWidget::onButton(const ButtonEvent& e) {
-	// Don't consume left button if `lockModules` is enabled.
-	if (settings::lockModules)
-		Widget::onButton(e);
-	else
-		OpaqueWidget::onButton(e);
-
-	// Set starting drag position even if we don't consume it
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		internal->dragOffset = e.pos;
-	}
-
-	if (e.isConsumed())
-		return;
-
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		createContextMenu();
-		e.consume(this);
-	}
 }
 
 void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
@@ -328,6 +308,29 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 	}
 }
 
+void ModuleWidget::onButton(const ButtonEvent& e) {
+	OpaqueWidget::onButton(e);
+
+	if (e.getTarget() == this) {
+		// Set starting drag position
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+			internal->dragOffset = e.pos;
+		}
+		// Toggle selection on Shift-click
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+			internal->selected ^= true;
+		}
+	}
+
+	if (!e.isConsumed()) {
+		// Open context menu on right-click
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+			createContextMenu();
+			e.consume(this);
+		}
+	}
+}
+
 void ModuleWidget::onDragStart(const DragStartEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		// HACK Disable FramebufferWidget redrawing subpixels while dragging
@@ -365,14 +368,17 @@ void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 				if (!internal->dragRackPos.isFinite())
 					internal->dragRackPos = mousePos;
 				// Check if the mouse has moved enough to start dragging the module.
-				const float dist = RACK_GRID_WIDTH;
-				if (internal->dragRackPos.minus(mousePos).square() >= std::pow(dist, 2))
+				const float minDist = RACK_GRID_WIDTH;
+				if (internal->dragRackPos.minus(mousePos).square() >= std::pow(minDist, 2))
 					internal->dragEnabled = true;
 			}
 
 			// Move module
 			if (internal->dragEnabled) {
-				math::Vec pos = mousePos.minus(internal->dragOffset);
+				// Round y coordinate to nearest rack height
+				math::Vec pos = mousePos;
+				pos.x -= internal->dragOffset.x;
+				pos.y -= RACK_GRID_HEIGHT / 2;
 				if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
 					APP->scene->rack->setModulePosForce(this, pos);
 				else

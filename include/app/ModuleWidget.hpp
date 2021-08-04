@@ -63,8 +63,8 @@ struct ModuleWidget : widget::OpaqueWidget {
 	*/
 	virtual void appendContextMenu(ui::Menu* menu) {}
 
-	void onButton(const ButtonEvent& e) override;
 	void onHoverKey(const HoverKeyEvent& e) override;
+	void onButton(const ButtonEvent& e) override;
 	void onDragStart(const DragStartEvent& e) override;
 	void onDragEnd(const DragEndEvent& e) override;
 	void onDragMove(const DragMoveEvent& e) override;
