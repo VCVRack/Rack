@@ -238,6 +238,34 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 	}
+
+	// Scroll RackScrollWidget with arrow keys
+	if (e.action == RACK_HELD) {
+		float arrowSpeed = 32.f;
+		if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
+			arrowSpeed /= 4.f;
+		if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
+			arrowSpeed *= 4.f;
+		if ((e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
+			arrowSpeed /= 16.f;
+
+		if (e.key == GLFW_KEY_LEFT) {
+			rackScroll->offset.x -= arrowSpeed;
+			e.consume(this);
+		}
+		if (e.key == GLFW_KEY_RIGHT) {
+			rackScroll->offset.x += arrowSpeed;
+			e.consume(this);
+		}
+		if (e.key == GLFW_KEY_UP) {
+			rackScroll->offset.y -= arrowSpeed;
+			e.consume(this);
+		}
+		if (e.key == GLFW_KEY_DOWN) {
+			rackScroll->offset.y += arrowSpeed;
+			e.consume(this);
+		}
+	}
 }
 
 void Scene::onPathDrop(const PathDropEvent& e) {
