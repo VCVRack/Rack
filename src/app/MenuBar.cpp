@@ -221,7 +221,7 @@ struct EditButton : MenuButton {
 		menu->addChild(new ui::MenuSeparator);
 
 		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
-		allowCursorLockItem->text = "Lock cursor when dragging parameters";
+		allowCursorLockItem->text = "Hide cursor while dragging";
 		allowCursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
 		menu->addChild(allowCursorLockItem);
 
