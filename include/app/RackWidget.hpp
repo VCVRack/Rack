@@ -4,6 +4,7 @@
 #include <app/common.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <widget/FramebufferWidget.hpp>
+#include <ui/Menu.hpp>
 #include <app/RailWidget.hpp>
 #include <app/ModuleWidget.hpp>
 #include <app/CableWidget.hpp>
@@ -70,6 +71,8 @@ struct RackWidget : widget::OpaqueWidget {
 	void updateModuleOldPositions();
 	history::ComplexAction* getModuleDragAction();
 
+	// Module selection methods
+
 	void updateModuleSelections();
 	void clearModuleSelections();
 	bool hasSelectedModules();
@@ -82,6 +85,7 @@ struct RackWidget : widget::OpaqueWidget {
 	bool areSelectedModulesBypassed();
 	void deleteSelectedModulesAction();
 	bool requestSelectedModulePos(math::Vec delta);
+	void appendSelectionContextMenu(ui::Menu* menu);
 
 	// Cable methods
 

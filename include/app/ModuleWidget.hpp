@@ -112,7 +112,6 @@ struct ModuleWidget : widget::OpaqueWidget {
 	/** Deletes `this` */
 	void removeAction();
 	void createContextMenu();
-	void createSelectionContextMenu();
 
 	INTERNAL math::Vec& dragOffset();
 	INTERNAL bool& dragEnabled();

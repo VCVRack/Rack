@@ -389,7 +389,8 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 		// Open context menu on right-click
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (internal->selected) {
-				createSelectionContextMenu();
+				ui::Menu* menu = createMenu();
+				APP->scene->rack->appendSelectionContextMenu(menu);
 			}
 			else {
 				createContextMenu();
@@ -1083,47 +1084,6 @@ void ModuleWidget::createContextMenu() {
 	}));
 
 	appendContextMenu(menu);
-}
-
-void ModuleWidget::createSelectionContextMenu() {
-	ui::Menu* menu = createMenu();
-
-	int n = APP->scene->rack->getNumSelectedModules();
-	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
-
-	// Deselect
-	menu->addChild(createMenuItem("Deselect", "", [=]() {
-		APP->scene->rack->clearModuleSelections();
-	}));
-
-	// Initialize
-	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
-		APP->scene->rack->resetSelectedModulesAction();
-	}));
-
-	// Randomize
-	menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [=]() {
-		APP->scene->rack->randomizeSelectedModulesAction();
-	}));
-
-	// Disconnect cables
-	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
-		APP->scene->rack->disconnectSelectedModulesAction();
-	}));
-
-	// Bypass
-	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
-	bool bypassed = APP->scene->rack->areSelectedModulesBypassed();
-	if (bypassed)
-		bypassText += " " CHECKMARK_STRING;
-	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
-		APP->scene->rack->bypassSelectedModulesAction(!bypassed);
-	}));
-
-	// Delete
-	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
-		APP->scene->rack->deleteSelectedModulesAction();
-	}));
 }
 
 math::Vec& ModuleWidget::dragOffset() {

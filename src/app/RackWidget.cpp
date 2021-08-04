@@ -15,6 +15,7 @@
 #include <context.hpp>
 #include <asset.hpp>
 #include <patch.hpp>
+#include <helpers.hpp>
 
 
 namespace rack {
@@ -826,6 +827,45 @@ bool RackWidget::requestSelectedModulePos(math::Vec delta) {
 	}
 	RackWidget_updateExpanders(this);
 	return true;
+}
+
+void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
+	int n = getNumSelectedModules();
+	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
+
+	// Deselect
+	menu->addChild(createMenuItem("Deselect", "", [=]() {
+		clearModuleSelections();
+	}));
+
+	// Initialize
+	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
+		resetSelectedModulesAction();
+	}));
+
+	// Randomize
+	menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [=]() {
+		randomizeSelectedModulesAction();
+	}));
+
+	// Disconnect cables
+	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
+		disconnectSelectedModulesAction();
+	}));
+
+	// Bypass
+	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
+	bool bypassed = areSelectedModulesBypassed();
+	if (bypassed)
+		bypassText += " " CHECKMARK_STRING;
+	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
+		bypassSelectedModulesAction(!bypassed);
+	}));
+
+	// Delete
+	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
+		deleteSelectedModulesAction();
+	}));
 }
 
 void RackWidget::clearCables() {
