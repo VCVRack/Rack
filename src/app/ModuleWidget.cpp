@@ -26,381 +26,6 @@ namespace app {
 static const char PRESET_FILTERS[] = "VCV Rack module preset (.vcvm):vcvm";
 
 
-struct ModuleUrlItem : ui::MenuItem {
-	std::string url;
-	void onAction(const ActionEvent& e) override {
-		system::openBrowser(url);
-	}
-};
-
-
-struct ModuleDirItem : ui::MenuItem {
-	std::string path;
-	void onAction(const ActionEvent& e) override {
-		system::openDirectory(path);
-	}
-};
-
-
-struct ModuleInfoItem : ui::MenuItem {
-	plugin::Model* model;
-	ui::Menu* createChildMenu() override {
-		ui::Menu* menu = new ui::Menu;
-
-		// plugin
-		ModuleUrlItem* pluginItem = new ModuleUrlItem;
-		pluginItem->text = "Plugin: " + model->plugin->name + " " + model->plugin->version;
-		if (model->plugin->pluginUrl != "") {
-			pluginItem->url = model->plugin->pluginUrl;
-		}
-		else {
-			pluginItem->disabled = true;
-		}
-		menu->addChild(pluginItem);
-
-		// ui::MenuLabel* versionLabel = new ui::MenuLabel;
-		// versionLabel->text = model->plugin->version;
-		// menu->addChild(versionLabel);
-
-		// author
-		if (model->plugin->author != "") {
-			ModuleUrlItem* authorItem = new ModuleUrlItem;
-			authorItem->text = "Author: " + model->plugin->author;
-			if (model->plugin->authorUrl != "") {
-				authorItem->url = model->plugin->authorUrl;
-			}
-			else {
-				authorItem->disabled = true;
-			}
-			menu->addChild(authorItem);
-		}
-
-		// license
-		if (model->plugin->license != "") {
-			ui::MenuLabel* licenseLabel = new ui::MenuLabel;
-			licenseLabel->text = "License: " + model->plugin->license;
-			menu->addChild(licenseLabel);
-		}
-
-		// tags
-		if (!model->tagIds.empty()) {
-			ui::MenuLabel* tagsLabel = new ui::MenuLabel;
-			tagsLabel->text = "Tags:";
-			menu->addChild(tagsLabel);
-			for (int tagId : model->tagIds) {
-				ui::MenuLabel* tagLabel = new ui::MenuLabel;
-				tagLabel->text = "• " + tag::getTag(tagId);
-				menu->addChild(tagLabel);
-			}
-		}
-
-		menu->addChild(new ui::MenuSeparator);
-
-		// VCV Library page
-		ModuleUrlItem* libraryItem = new ModuleUrlItem;
-		libraryItem->text = "VCV Library page";
-		libraryItem->url = "https://library.vcvrack.com/" + model->plugin->slug + "/" + model->slug;
-		menu->addChild(libraryItem);
-
-		// modularGridUrl
-		if (model->modularGridUrl != "") {
-			ModuleUrlItem* modularGridItem = new ModuleUrlItem;
-			modularGridItem->text = "ModularGrid page";
-			modularGridItem->url = model->modularGridUrl;
-			menu->addChild(modularGridItem);
-		}
-
-		// manual
-		std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;
-		if (manualUrl != "") {
-			ModuleUrlItem* manualItem = new ModuleUrlItem;
-			manualItem->text = "User manual";
-			manualItem->url = manualUrl;
-			menu->addChild(manualItem);
-		}
-
-		// donate
-		if (model->plugin->donateUrl != "") {
-			ModuleUrlItem* donateItem = new ModuleUrlItem;
-			donateItem->text = "Donate";
-			donateItem->url = model->plugin->donateUrl;
-			menu->addChild(donateItem);
-		}
-
-		// source code
-		if (model->plugin->sourceUrl != "") {
-			ModuleUrlItem* sourceItem = new ModuleUrlItem;
-			sourceItem->text = "Source code";
-			sourceItem->url = model->plugin->sourceUrl;
-			menu->addChild(sourceItem);
-		}
-
-		// changelog
-		if (model->plugin->changelogUrl != "") {
-			ModuleUrlItem* changelogItem = new ModuleUrlItem;
-			changelogItem->text = "Changelog";
-			changelogItem->url = model->plugin->changelogUrl;
-			menu->addChild(changelogItem);
-		}
-
-		// plugin folder
-		if (model->plugin->path != "") {
-			ModuleDirItem* pathItem = new ModuleDirItem;
-			pathItem->text = "Open plugin folder";
-			pathItem->path = model->plugin->path;
-			menu->addChild(pathItem);
-		}
-
-		return menu;
-	}
-};
-
-
-struct ModuleDisconnectItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->disconnectAction();
-	}
-};
-
-
-struct ModuleResetItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->resetAction();
-	}
-};
-
-
-struct ModuleRandomizeItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->randomizeAction();
-	}
-};
-
-
-struct ModuleCopyItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->copyClipboard();
-	}
-};
-
-
-struct ModulePasteItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->pasteClipboardAction();
-	}
-};
-
-
-struct ModuleSaveItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->saveDialog();
-	}
-};
-
-
-struct ModuleSaveTemplateItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->saveTemplateDialog();
-	}
-};
-
-
-struct ModuleClearTemplateItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->clearTemplateDialog();
-	}
-};
-
-
-struct ModuleLoadItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->loadDialog();
-	}
-};
-
-
-static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir);
-
-
-struct ModulePresetFileItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	std::string path;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		try {
-			moduleWidget->loadAction(path);
-		}
-		catch (Exception& e) {
-			osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
-		}
-	}
-};
-
-
-struct ModulePresetDirItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	std::string path;
-	ui::Menu* createChildMenu() override {
-		if (!moduleWidget)
-			return NULL;
-		ui::Menu* menu = new ui::Menu;
-		appendPresetItems(menu, moduleWidget, path);
-		return menu;
-	}
-};
-
-
-// Create ModulePresetPathItems for each patch in a directory.
-static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
-	bool hasPresets = false;
-	// Note: This is not cached, so opening this menu each time might have a bit of latency.
-	if (system::isDirectory(presetDir)) {
-		for (const std::string& path : system::getEntries(presetDir)) {
-			std::string name = system::getStem(path);
-			// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
-			std::regex r("^\\d*_");
-			name = std::regex_replace(name, r, "");
-
-			if (system::isDirectory(path)) {
-				hasPresets = true;
-
-				ModulePresetDirItem* dirItem = new ModulePresetDirItem;
-				dirItem->rightText = RIGHT_ARROW;
-				dirItem->text = name;
-				dirItem->path = path;
-				dirItem->moduleWidget = moduleWidget;
-				menu->addChild(dirItem);
-			}
-			else if (system::getExtension(path) == ".vcvm") {
-				hasPresets = true;
-
-				ModulePresetFileItem* presetItem = new ModulePresetFileItem;
-				presetItem->text = name;
-				presetItem->path = path;
-				presetItem->moduleWidget = moduleWidget;
-				menu->addChild(presetItem);
-			}
-		}
-	}
-	if (!hasPresets) {
-		menu->addChild(createMenuLabel("(None)"));
-	}
-};
-
-
-struct ModulePresetItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	ui::Menu* createChildMenu() override {
-		if (!moduleWidget)
-			return NULL;
-		ui::Menu* menu = new ui::Menu;
-
-		ModuleCopyItem* copyItem = new ModuleCopyItem;
-		copyItem->text = "Copy";
-		copyItem->rightText = RACK_MOD_CTRL_NAME "+C";
-		copyItem->moduleWidget = moduleWidget;
-		menu->addChild(copyItem);
-
-		ModulePasteItem* pasteItem = new ModulePasteItem;
-		pasteItem->text = "Paste";
-		pasteItem->rightText = RACK_MOD_CTRL_NAME "+V";
-		pasteItem->moduleWidget = moduleWidget;
-		menu->addChild(pasteItem);
-
-		ModuleLoadItem* loadItem = new ModuleLoadItem;
-		loadItem->text = "Open";
-		loadItem->moduleWidget = moduleWidget;
-		menu->addChild(loadItem);
-
-		ModuleSaveItem* saveItem = new ModuleSaveItem;
-		saveItem->text = "Save as";
-		saveItem->moduleWidget = moduleWidget;
-		menu->addChild(saveItem);
-
-		ModuleSaveTemplateItem* saveTemplateItem = new ModuleSaveTemplateItem;
-		saveTemplateItem->text = "Save template";
-		saveTemplateItem->moduleWidget = moduleWidget;
-		menu->addChild(saveTemplateItem);
-
-		ModuleClearTemplateItem* clearTemplateItem = new ModuleClearTemplateItem;
-		clearTemplateItem->text = "Clear template";
-		clearTemplateItem->moduleWidget = moduleWidget;
-		clearTemplateItem->disabled = !moduleWidget->hasTemplate();
-		menu->addChild(clearTemplateItem);
-
-		// Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
-		menu->addChild(new ui::MenuSeparator);
-		menu->addChild(createMenuLabel("User presets"));
-		appendPresetItems(menu, moduleWidget, moduleWidget->model->getUserPresetDirectory());
-
-		// Scan `<plugin dir>/presets/<module slug>` for presets.
-		menu->addChild(new ui::MenuSeparator);
-		menu->addChild(createMenuLabel("Factory presets"));
-		appendPresetItems(menu, moduleWidget, moduleWidget->model->getFactoryPresetDirectory());
-
-		return menu;
-	}
-};
-
-
-struct ModuleCloneItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->cloneAction();
-	}
-};
-
-
-struct ModuleBypassItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->bypassAction();
-	}
-};
-
-
-struct ModuleDeleteItem : ui::MenuItem {
-	WeakPtr<ModuleWidget> moduleWidget;
-	void onAction(const ActionEvent& e) override {
-		if (!moduleWidget)
-			return;
-		moduleWidget->removeAction();
-	}
-};
-
-
 struct ModuleWidget::Internal {
 	/** The module position clicked on to start dragging in the rack.
 	*/
@@ -1152,63 +777,237 @@ void ModuleWidget::removeAction() {
 	delete this;
 }
 
+
+// Create ModulePresetPathItems for each patch in a directory.
+static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
+	bool hasPresets = false;
+	// Note: This is not cached, so opening this menu each time might have a bit of latency.
+	if (system::isDirectory(presetDir)) {
+		for (std::string path : system::getEntries(presetDir)) {
+			std::string name = system::getStem(path);
+			// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
+			std::regex r("^\\d*_");
+			name = std::regex_replace(name, r, "");
+
+			if (system::isDirectory(path)) {
+				hasPresets = true;
+
+				menu->addChild(createSubmenuItem(name, [=](ui::Menu* menu) {
+					if (!moduleWidget)
+						return;
+					appendPresetItems(menu, moduleWidget, path);
+				}));
+			}
+			else if (system::getExtension(path) == ".vcvm") {
+				hasPresets = true;
+
+				menu->addChild(createMenuItem(name, "", [=]() {
+					if (!moduleWidget)
+						return;
+					try {
+						moduleWidget->loadAction(path);
+					}
+					catch (Exception& e) {
+						osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
+					}
+				}));
+			}
+		}
+	}
+	if (!hasPresets) {
+		menu->addChild(createMenuLabel("(None)"));
+	}
+};
+
+
 void ModuleWidget::createContextMenu() {
 	ui::Menu* menu = createMenu();
 	assert(model);
 
-	ui::MenuLabel* modelLabel = new ui::MenuLabel;
-	modelLabel->text = model->plugin->brand + " " + model->name;
-	menu->addChild(modelLabel);
+	WeakPtr<ModuleWidget> weakThis = this;
 
-	ModuleInfoItem* infoItem = new ModuleInfoItem;
-	infoItem->text = "Info";
-	infoItem->rightText = RIGHT_ARROW;
-	infoItem->model = model;
-	menu->addChild(infoItem);
+	// Brand and module name
+	menu->addChild(createMenuLabel(model->plugin->brand + " " + model->name));
 
-	ModulePresetItem* presetsItem = new ModulePresetItem;
-	presetsItem->text = "Preset";
-	presetsItem->rightText = RIGHT_ARROW;
-	presetsItem->moduleWidget = this;
-	menu->addChild(presetsItem);
+	// Info
+	menu->addChild(createSubmenuItem("Info", [=](ui::Menu* menu) {
+		if (!weakThis)
+			return;
 
-	ModuleResetItem* resetItem = new ModuleResetItem;
-	resetItem->text = "Initialize";
-	resetItem->rightText = RACK_MOD_CTRL_NAME "+I";
-	resetItem->moduleWidget = this;
-	menu->addChild(resetItem);
+		// plugin
+		menu->addChild(createMenuItem("Plugin: " + model->plugin->name, "", [=]() {
+			system::openBrowser(model->plugin->pluginUrl);
+		}, model->plugin->pluginUrl == ""));
 
-	ModuleRandomizeItem* randomizeItem = new ModuleRandomizeItem;
-	randomizeItem->text = "Randomize";
-	randomizeItem->rightText = RACK_MOD_CTRL_NAME "+R";
-	randomizeItem->moduleWidget = this;
-	menu->addChild(randomizeItem);
+		// version
+		menu->addChild(createMenuLabel(model->plugin->version));
 
-	ModuleDisconnectItem* disconnectItem = new ModuleDisconnectItem;
-	disconnectItem->text = "Disconnect cables";
-	disconnectItem->rightText = RACK_MOD_CTRL_NAME "+U";
-	disconnectItem->moduleWidget = this;
-	menu->addChild(disconnectItem);
+		// author
+		if (model->plugin->author != "") {
+			menu->addChild(createMenuItem("Author: " + model->plugin->author, "", [=]() {
+				system::openBrowser(model->plugin->authorUrl);
+			}, model->plugin->authorUrl.empty()));
+		}
 
-	ModuleCloneItem* cloneItem = new ModuleCloneItem;
-	cloneItem->text = "Duplicate";
-	cloneItem->rightText = RACK_MOD_CTRL_NAME "+D";
-	cloneItem->moduleWidget = this;
-	menu->addChild(cloneItem);
+		// license
+		std::string license = model->plugin->license;
+		if (string::startsWith(license, "https://") || string::startsWith(license, "http://")) {
+			menu->addChild(createMenuItem("License: Open in browser", "", [=]() {
+				system::openBrowser(license);
+			}));
+		}
+		else if (license != "") {
+			menu->addChild(createMenuLabel("License: " + license));
+		}
 
-	ModuleBypassItem* bypassItem = new ModuleBypassItem;
-	bypassItem->text = "Bypass";
-	bypassItem->rightText = RACK_MOD_CTRL_NAME "+E";
+		// tags
+		if (!model->tagIds.empty()) {
+			menu->addChild(createMenuLabel("Tags:"));
+			for (int tagId : model->tagIds) {
+				menu->addChild(createMenuLabel("• " + tag::getTag(tagId)));
+			}
+		}
+
+		menu->addChild(new ui::MenuSeparator);
+
+		// VCV Library page
+		menu->addChild(createMenuItem("VCV Library page", "", [=]() {
+			system::openBrowser("https://library.vcvrack.com/" + model->plugin->slug + "/" + model->slug);
+		}));
+
+		// modularGridUrl
+		if (model->modularGridUrl != "") {
+			menu->addChild(createMenuItem("ModularGrid page", "", [=]() {
+				system::openBrowser(model->modularGridUrl);
+			}));
+		}
+
+		// manual
+		std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;
+		if (manualUrl != "") {
+			menu->addChild(createMenuItem("User manual", "", [=]() {
+				system::openBrowser(manualUrl);
+			}));
+		}
+
+		// donate
+		if (model->plugin->donateUrl != "") {
+			menu->addChild(createMenuItem("Donate", "", [=]() {
+				system::openBrowser(model->plugin->donateUrl);
+			}));
+		}
+
+		// source code
+		if (model->plugin->sourceUrl != "") {
+			menu->addChild(createMenuItem("Source code", "", [=]() {
+				system::openBrowser(model->plugin->sourceUrl);
+			}));
+		}
+
+		// changelog
+		if (model->plugin->changelogUrl != "") {
+			menu->addChild(createMenuItem("Changelog", "", [=]() {
+				system::openBrowser(model->plugin->changelogUrl);
+			}));
+		}
+
+		// plugin folder
+		if (model->plugin->path != "") {
+			menu->addChild(createMenuItem("Open plugin folder", "", [=]() {
+				system::openDirectory(model->plugin->path);
+			}));
+		}
+	}));
+
+	// Preset
+	menu->addChild(createSubmenuItem("Preset", [=](ui::Menu* menu) {
+		menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [=]() {
+			if (!weakThis)
+				return;
+			weakThis->copyClipboard();
+		}));
+
+		menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [=]() {
+			if (!weakThis)
+				return;
+			weakThis->pasteClipboardAction();
+		}));
+
+		menu->addChild(createMenuItem("Open", "", [=]() {
+			if (!weakThis)
+				return;
+			weakThis->loadDialog();
+		}));
+
+		menu->addChild(createMenuItem("Save as", "", [=]() {
+			if (!weakThis)
+				return;
+			weakThis->saveDialog();
+		}));
+
+		menu->addChild(createMenuItem("Save template", "", [=]() {
+			if (!weakThis)
+				return;
+			weakThis->saveTemplateDialog();
+		}));
+
+		menu->addChild(createMenuItem("Clear template", "", [=]() {
+			if (!weakThis)
+				return;
+			weakThis->clearTemplateDialog();
+		}, !weakThis->hasTemplate()));
+
+		// Scan `<user dir>/presets/<plugin slug>/<module slug>` for presets.
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("User presets"));
+		appendPresetItems(menu, weakThis, weakThis->model->getUserPresetDirectory());
+
+		// Scan `<plugin dir>/presets/<module slug>` for presets.
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Factory presets"));
+		appendPresetItems(menu, weakThis, weakThis->model->getFactoryPresetDirectory());
+	}));
+
+	// Initialize
+	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
+		if (!weakThis)
+			return;
+		weakThis->resetAction();
+	}));
+
+	// Randomize
+	menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [=]() {
+		if (!weakThis)
+			return;
+		weakThis->randomizeAction();
+	}));
+
+	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
+		if (!weakThis)
+			return;
+		weakThis->disconnectAction();
+	}));
+
+	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
+		if (!weakThis)
+			return;
+		weakThis->cloneAction();
+	}));
+
+	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
 	if (module && module->isBypassed())
-		bypassItem->rightText = CHECKMARK_STRING " " + bypassItem->rightText;
-	bypassItem->moduleWidget = this;
-	menu->addChild(bypassItem);
+		bypassText += " " CHECKMARK_STRING;
+	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
+		if (!weakThis)
+			return;
+		weakThis->bypassAction();
+	}));
 
-	ModuleDeleteItem* deleteItem = new ModuleDeleteItem;
-	deleteItem->text = "Delete";
-	deleteItem->rightText = "Backspace/Delete";
-	deleteItem->moduleWidget = this;
-	menu->addChild(deleteItem);
+	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
+		if (!weakThis)
+			return;
+		weakThis->removeAction();
+	}));
 
 	appendContextMenu(menu);
 }

@@ -204,7 +204,7 @@ Example:
 	));
 */
 template <class TMenuItem = ui::MenuItem>
-TMenuItem* createMenuItem(std::string text, std::string rightText, std::function<void()> action) {
+TMenuItem* createMenuItem(std::string text, std::string rightText, std::function<void()> action, bool disabled = false) {
 	struct Item : TMenuItem {
 		std::function<void()> action;
 		void onAction(const event::Action& e) override {
@@ -214,6 +214,7 @@ TMenuItem* createMenuItem(std::string text, std::string rightText, std::function
 
 	Item* item = createMenuItem<Item>(text, rightText);
 	item->action = action;
+	item->disabled = disabled;
 	return item;
 }
 
@@ -299,7 +300,7 @@ Example:
 		}
 	));
 */
-inline ui::MenuItem* createSubmenuItem(std::string text, std::function<void(ui::Menu* menu)> createMenu) {
+inline ui::MenuItem* createSubmenuItem(std::string text, std::function<void(ui::Menu* menu)> createMenu, bool disabled = false) {
 	struct Item : ui::MenuItem {
 		std::function<void(ui::Menu* menu)> createMenu;
 
@@ -312,6 +313,7 @@ inline ui::MenuItem* createSubmenuItem(std::string text, std::function<void(ui::
 
 	Item* item = createMenuItem<Item>(text, RIGHT_ARROW);
 	item->createMenu = createMenu;
+	item->disabled = disabled;
 	return item;
 }
 

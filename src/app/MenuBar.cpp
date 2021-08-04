@@ -92,16 +92,14 @@ struct FileButton : MenuButton {
 			APP->patch->loadDialog();
 		}));
 
-		ui::MenuItem* openRecentItem = createSubmenuItem("Open recent", [](ui::Menu* menu) {
+		menu->addChild(createSubmenuItem("Open recent", [](ui::Menu* menu) {
 			for (const std::string& path : settings::recentPatchPaths) {
 				std::string name = system::getStem(path);
 				menu->addChild(createMenuItem(name, "", [=]() {
 					APP->patch->loadPathDialog(path);
 				}));
 			}
-		});
-		openRecentItem->disabled = settings::recentPatchPaths.empty();
-		menu->addChild(openRecentItem);
+		}, settings::recentPatchPaths.empty()));
 
 		menu->addChild(createMenuItem("Save", RACK_MOD_CTRL_NAME "+S", []() {
 			APP->patch->saveDialog();
@@ -115,11 +113,9 @@ struct FileButton : MenuButton {
 			APP->patch->saveTemplateDialog();
 		}));
 
-		ui::MenuItem* revertItem = createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
+		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 			APP->patch->revertDialog();
-		});
-		revertItem->disabled = (APP->patch->path == "");
-		menu->addChild(revertItem);
+		}, APP->patch->path == ""));
 
 		menu->addChild(new ui::MenuSeparator);
 
