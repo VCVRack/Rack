@@ -884,7 +884,7 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 	// Duplicate
 	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
 		cloneSelectedModulesAction();
-	}));
+	}, n == 0));
 
 	// Bypass
 	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
