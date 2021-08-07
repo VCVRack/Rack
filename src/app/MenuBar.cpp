@@ -957,7 +957,7 @@ struct HelpButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 
-		menu->addChild(createMenuLabel(APP_VARIANT));
+		menu->addChild(createMenuLabel(APP_EDITION));
 
 		menu->addChild(createMenuLabel(APP_VERSION));
 	}

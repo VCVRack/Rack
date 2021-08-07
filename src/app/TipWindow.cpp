@@ -56,9 +56,9 @@ struct TipWindow : widget::OpaqueWidget {
 	UrlButton* linkButton;
 
 	TipWindow() {
-		box.size = math::Vec(500, 200);
+		box.size = math::Vec(550, 200);
 		const float margin = 10;
-		const float buttonWidth = 90;
+		const float buttonWidth = 100;
 
 		layout = new ui::SequentialLayout;
 		layout->box.pos = math::Vec(0, 10);
@@ -70,10 +70,10 @@ struct TipWindow : widget::OpaqueWidget {
 		addChild(layout);
 
 		ui::Label* header = new ui::Label;
-		header->box.size.x = box.size.x - 2*margin;
+		// header->box.size.x = box.size.x - 2*margin;
 		header->box.size.y = 20;
 		header->fontSize = 20;
-		header->text = "Welcome to VCV Rack " + APP_VERSION;
+		header->text = "Welcome to " + APP_NAME + " " + APP_EDITION + " " + APP_VERSION;
 		layout->addChild(header);
 
 		label = new ui::Label;
@@ -106,7 +106,7 @@ struct TipWindow : widget::OpaqueWidget {
 		static ShowQuantity showQuantity;
 
 		ui::OptionButton* showButton = new ui::OptionButton;
-		showButton->box.size.x = 180;
+		showButton->box.size.x = 200;
 		showButton->text = "Show tips at startup";
 		showButton->quantity = &showQuantity;
 		buttonLayout->addChild(showButton);
