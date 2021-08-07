@@ -50,42 +50,50 @@ static std::vector<TipInfo> tipInfos = {
 
 
 struct TipWindow : widget::OpaqueWidget {
+	ui::SequentialLayout* layout;
+	ui::SequentialLayout* buttonLayout;
 	ui::Label* label;
 	UrlButton* linkButton;
 
 	TipWindow() {
-		float margin = 10;
-		float buttonWidth = 90;
-		box.size.x = buttonWidth*5 + margin*6;
+		box.size = math::Vec(500, 200);
+		const float margin = 10;
+		const float buttonWidth = 90;
+
+		layout = new ui::SequentialLayout;
+		layout->box.pos = math::Vec(0, 10);
+		layout->box.size = box.size;
+		layout->orientation = ui::SequentialLayout::VERTICAL_ORIENTATION;
+		layout->margin = math::Vec(margin, margin);
+		layout->spacing = math::Vec(margin, margin);
+		layout->wrap = false;
+		addChild(layout);
 
 		ui::Label* header = new ui::Label;
-		header->box.pos.x = margin;
-		header->box.pos.y = 20;
-		// header->box.size.x = box.size.x - margin*2;
+		header->box.size.x = box.size.x - 2*margin;
 		header->box.size.y = 20;
 		header->fontSize = 20;
 		header->text = "Welcome to VCV Rack " + APP_VERSION;
-		addChild(header);
+		layout->addChild(header);
 
 		label = new ui::Label;
-		label->box.pos.x = margin;
-		label->box.pos.y = header->box.getBottom() + margin;
 		label->box.size.y = 80;
-		label->box.size.x = box.size.x - margin*2;
-		addChild(label);
+		label->box.size.x = box.size.x - 2*margin;
+		layout->addChild(label);
+
+		// Container for link button so hiding it won't shift layout
+		widget::Widget* linkPlaceholder = new widget::Widget;
+		layout->addChild(linkPlaceholder);
 
 		linkButton = new UrlButton;
-		linkButton->box.pos.x = margin;
-		linkButton->box.pos.y = label->box.getBottom() + margin;
-		linkButton->box.size.x = box.size.x - margin*2;
-		addChild(linkButton);
+		linkButton->box.size.x = box.size.x - 2*margin;
+		linkPlaceholder->box.size = linkButton->box.size;
+		linkPlaceholder->addChild(linkButton);
 
-		ui::SequentialLayout* buttonLayout = new ui::SequentialLayout;
-		buttonLayout->box.pos.x = margin;
-		buttonLayout->box.pos.y = linkButton->box.getBottom() + margin;
-		buttonLayout->box.size.x = box.size.x - margin*2;
+		buttonLayout = new ui::SequentialLayout;
+		buttonLayout->box.size.x = box.size.x - 2*margin;
 		buttonLayout->spacing = math::Vec(margin, margin);
-		addChild(buttonLayout);
+		layout->addChild(buttonLayout);
 
 		struct ShowQuantity : Quantity {
 			void setValue(float value) override {
@@ -98,9 +106,9 @@ struct TipWindow : widget::OpaqueWidget {
 		static ShowQuantity showQuantity;
 
 		ui::OptionButton* showButton = new ui::OptionButton;
+		showButton->box.size.x = 180;
 		showButton->text = "Show tips at startup";
 		showButton->quantity = &showQuantity;
-		showButton->box.size.x = buttonWidth * 2 + margin;
 		buttonLayout->addChild(showButton);
 
 		struct PreviousButton : ui::Button {
@@ -140,7 +148,6 @@ struct TipWindow : widget::OpaqueWidget {
 		buttonLayout->addChild(closeButton);
 
 		buttonLayout->box.size.y = closeButton->box.size.y;
-		box.size.y = buttonLayout->box.getBottom() + margin;
 
 		// When the TipWindow is created, choose the next tip
 		advanceTip();
@@ -158,8 +165,9 @@ struct TipWindow : widget::OpaqueWidget {
 	}
 
 	void step() override {
-		box.pos = parent->box.size.minus(box.size).div(2).round();
 		OpaqueWidget::step();
+
+		box.pos = parent->box.size.minus(box.size).div(2).round();
 	}
 
 	void draw(const DrawArgs& args) override {
