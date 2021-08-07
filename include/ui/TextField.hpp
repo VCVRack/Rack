@@ -19,6 +19,11 @@ struct TextField : widget::OpaqueWidget {
 	*/
 	int selection = 0;
 
+	/** For Tab and Shift-Tab focusing.
+	*/
+	Widget* prevField = NULL;
+	Widget* nextField = NULL;
+
 	TextField();
 	void draw(const DrawArgs& args) override;
 	void onDragHover(const DragHoverEvent& e) override;

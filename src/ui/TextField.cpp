@@ -220,6 +220,18 @@ void TextField::onSelectKey(const SelectKeyEvent& e) {
 			}
 			e.consume(this);
 		}
+		// Tab
+		if (e.key == GLFW_KEY_TAB && (e.mods & RACK_MOD_MASK) == 0) {
+			if (nextField)
+				APP->event->setSelected(nextField);
+			e.consume(this);
+		}
+		// Shift-Tab
+		if (e.key == GLFW_KEY_TAB && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+			if (prevField)
+				APP->event->setSelected(prevField);
+			e.consume(this);
+		}
 		// Consume all printable keys
 		if (e.keyName != "") {
 			e.consume(this);

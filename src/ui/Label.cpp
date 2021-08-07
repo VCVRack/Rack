@@ -7,7 +7,7 @@ namespace ui {
 
 Label::Label() {
 	box.size.y = BND_WIDGET_HEIGHT;
-	fontSize = 13;
+	fontSize = BND_LABEL_FONT_SIZE;
 	lineHeight = 1.2;
 	color = bndGetTheme()->regularTheme.textColor;
 }

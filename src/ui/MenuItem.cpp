@@ -6,9 +6,6 @@ namespace rack {
 namespace ui {
 
 
-#define BND_LABEL_FONT_SIZE 13
-
-
 void MenuItem::draw(const DrawArgs& args) {
 	BNDwidgetState state = BND_DEFAULT;
 

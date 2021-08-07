@@ -608,31 +608,10 @@ struct EngineButton : MenuButton {
 
 static bool isLoggingIn = false;
 
-struct AccountEmailField : ui::TextField {
-	ui::TextField* passwordField;
-
-	void onSelectKey(const SelectKeyEvent& e) override {
-		if (e.action == GLFW_PRESS && e.key == GLFW_KEY_TAB) {
-			APP->event->setSelected(passwordField);
-			e.consume(this);
-		}
-
-		if (!e.getTarget())
-			ui::TextField::onSelectKey(e);
-	}
-};
-
-struct AccountPasswordField : ui::PasswordField {
+struct AccountPasswordField : ui::TextField {
 	ui::MenuItem* logInItem;
-
-	void onSelectKey(const SelectKeyEvent& e) override {
-		if (e.action == GLFW_PRESS && (e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER)) {
-			logInItem->doAction();
-			e.consume(this);
-		}
-
-		if (!e.getTarget())
-			ui::PasswordField::onSelectKey(e);
+	void onAction(const ActionEvent& e) override {
+		logInItem->doAction();
 	}
 };
 
@@ -802,7 +781,7 @@ struct LibraryMenu : ui::Menu {
 			registerItem->url = "https://vcvrack.com/login";
 			addChild(registerItem);
 
-			AccountEmailField* emailField = new AccountEmailField;
+			ui::TextField* emailField = new ui::TextField;
 			emailField->placeholder = "Email";
 			emailField->box.size.x = 240.0;
 			addChild(emailField);
@@ -810,7 +789,8 @@ struct LibraryMenu : ui::Menu {
 			AccountPasswordField* passwordField = new AccountPasswordField;
 			passwordField->placeholder = "Password";
 			passwordField->box.size.x = 240.0;
-			emailField->passwordField = passwordField;
+			passwordField->nextField = emailField;
+			emailField->nextField = passwordField;
 			addChild(passwordField);
 
 			LogInItem* logInItem = new LogInItem;

@@ -16,6 +16,7 @@ SED := perl -pi -e
 
 SOURCES += dep/nanovg/src/nanovg.c
 SOURCES += dep/osdialog/osdialog.c
+SOURCES += dep/oui-blendish/blendish.c
 SOURCES += dep/pffft/pffft.c dep/pffft/fftpack.c
 SOURCES += $(wildcard src/*.c src/*/*.c)
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
@@ -130,7 +131,7 @@ valgrind: $(STANDALONE_TARGET)
 	valgrind --suppressions=valgrind.supp ./$< -d
 
 clean:
-	rm -rfv $(TARGET) $(STANDALONE_TARGET) libRack.dll.a Rack.res build dist *.d
+	rm -rfv build dist *.a Rack.res *.d $(TARGET) $(STANDALONE_TARGET)
 
 
 # For Windows resources
