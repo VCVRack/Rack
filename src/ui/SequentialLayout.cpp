@@ -62,7 +62,7 @@ void SequentialLayout::step() {
 		}
 
 		// Should we wrap the widget now?
-		if (!row.empty() && rowWidth + X(child->box.size) > boundWidth) {
+		if (wrap && !row.empty() && rowWidth + X(child->box.size) > boundWidth) {
 			flushRow();
 			rowWidth = 0.0;
 		}
