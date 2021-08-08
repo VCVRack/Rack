@@ -23,6 +23,8 @@ static CURL* createCurl() {
 
 	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
+	// 15 second timeout for requests
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15);
 
 	std::string caPath = asset::system("cacert.pem");
 	curl_easy_setopt(curl, CURLOPT_CAINFO, caPath.c_str());
