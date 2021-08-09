@@ -1,3 +1,4 @@
+#include <ctime>
 #include <cctype> // for tolower and toupper
 #include <algorithm> // for transform and equal
 #include <libgen.h> // for dirname and basename
@@ -231,6 +232,18 @@ std::vector<std::string> split(const std::string& s, const std::string& separato
 
 	v.push_back(s.substr(start));
 	return v;
+}
+
+
+std::string formatTime(const char* format, double timestamp) {
+	time_t t = timestamp;
+	char str[1024];
+	size_t s = std::strftime(str, sizeof(str), format, std::localtime(&t));
+	return std::string(str, s);
+}
+
+std::string formatTimeISO(double timestamp) {
+	return formatTime("%FT%T%z", timestamp);
 }
 
 

@@ -79,6 +79,9 @@ Examples:
 */
 std::vector<std::string> split(const std::string& s, const std::string& seperator, size_t maxTokens = 0);
 
+std::string formatTime(const char* format, double timestamp);
+std::string formatTimeISO(double timestamp);
+
 
 #if defined ARCH_WIN
 /** Performs a Unicode string conversion from UTF-16 to UTF-8.
