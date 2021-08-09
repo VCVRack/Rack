@@ -435,13 +435,18 @@ void Window::step() {
 		internal->lastWindowTitle = windowTitle;
 	}
 
-	// Get desired scaling
+	// Get desired pixel ratio
 	float newPixelRatio;
-	glfwGetWindowContentScale(win, &newPixelRatio, NULL);
-	newPixelRatio = std::floor(newPixelRatio + 0.5);
+	if (settings::pixelRatio > 0.0) {
+		newPixelRatio = settings::pixelRatio;
+	}
+	else {
+		glfwGetWindowContentScale(win, &newPixelRatio, NULL);
+		newPixelRatio = std::floor(newPixelRatio + 0.5);
+	}
 	if (newPixelRatio != pixelRatio) {
-		APP->event->handleDirty();
 		pixelRatio = newPixelRatio;
+		APP->event->handleDirty();
 	}
 
 	// Get framebuffer/window ratio

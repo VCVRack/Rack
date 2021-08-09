@@ -191,7 +191,8 @@ void FramebufferWidget::render(math::Vec scale, math::Vec offsetF, math::Rect cl
 	internal->fbBox = math::Rect::fromMinMax(min, max);
 	// DEBUG("%g %g %g %g", RECT_ARGS(internal->fbBox));
 
-	math::Vec newFbSize = internal->fbBox.size.mult(APP->window->pixelRatio).ceil();
+	float pixelRatio = std::fmax(1.f, std::floor(APP->window->pixelRatio));
+	math::Vec newFbSize = internal->fbBox.size.mult(pixelRatio).ceil();
 
 	// Create framebuffer if a new size is needed
 	if (!internal->fb || !newFbSize.equals(internal->fbSize)) {

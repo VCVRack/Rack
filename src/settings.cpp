@@ -26,6 +26,7 @@ math::Vec windowSize = math::Vec(1024, 768);
 math::Vec windowPos = math::Vec(NAN, NAN);
 float zoom = 0.0;
 bool invertZoom = false;
+float pixelRatio = 0.0;
 float cableOpacity = 0.5;
 float cableTension = 0.5;
 float rackBrightness = 1.0;
@@ -103,6 +104,8 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "zoom", json_real(zoom));
 
 	json_object_set_new(rootJ, "invertZoom", json_boolean(invertZoom));
+
+	json_object_set_new(rootJ, "pixelRatio", json_real(pixelRatio));
 
 	json_object_set_new(rootJ, "cableOpacity", json_real(cableOpacity));
 
@@ -223,6 +226,10 @@ void fromJson(json_t* rootJ) {
 	json_t* invertZoomJ = json_object_get(rootJ, "invertZoom");
 	if (invertZoomJ)
 		invertZoom = json_boolean_value(invertZoomJ);
+
+	json_t* pixelRatioJ = json_object_get(rootJ, "pixelRatio");
+	if (pixelRatioJ)
+		pixelRatio = json_number_value(pixelRatioJ);
 
 	json_t* cableOpacityJ = json_object_get(rootJ, "cableOpacity");
 	if (cableOpacityJ)

@@ -43,6 +43,10 @@ static const float zoomMax = 2.f;
 static const float zoomMin = -2.f;
 /** Reverse the zoom scroll direction */
 extern bool invertZoom;
+/** Ratio between UI pixel and physical screen pixel.
+0 for auto.
+*/
+extern float pixelRatio;
 /** Opacity of cables in the range [0, 1] */
 extern float cableOpacity;
 /** Straightness of cables in the range [0, 1]. Unitless and arbitrary. */
