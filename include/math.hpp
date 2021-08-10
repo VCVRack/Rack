@@ -194,7 +194,6 @@ struct Vec {
 	float y = 0.f;
 
 	Vec() {}
-	Vec(float x) : x(x), y(x) {}
 	Vec(float x, float y) : x(x), y(y) {}
 
 	float& operator[](int i) {
