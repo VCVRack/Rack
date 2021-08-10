@@ -4,28 +4,30 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
 ### 2.0.0 (in development)
 - Redesign Module Browser with compact layout, adjustable zoom levels, sorting options, intelligent searching, and multiple tag selection.
+- Redesign component graphics by [Pyer](https://www.pyer.be/).
 - Add port tooltips with name, voltage, and list of connected ports.
 - Evaluate mathematical expressions (such as `1+2*3`) in parameter context menu fields.
+- Add multiple module selection by highlighting a rectangle or Shift-clicking on a module panel.
 - Add module whitelist to Module Browser which synchronizes individual modules chosen in the VCV Library.
 - Restructure engine to no longer use an "engine thread".
 	- Improve engine performance and latency by no longer requiring thread synchronization between the engine thread and audio thread. The engine now runs directly on the audio thread.
 	- Add support for multiple simultaneous audio devices.
 	- Add "Primary module" context menu item to VCV Audio modules to select which audio device clocks the engine.
-	- Allow other modules such as VCV Recorder to be the primary module, to render audio faster than real-time.
+	- Allow other modules to be the primary module, such as VCV Recorder for rendering audio faster than real-time.
 	- Remove "Real-time priority" menu item, since the thread priority is now managed elsewhere (RtAudio, etc).
 	- Remove engine pausing as it no longer makes sense with the new engine architecture.
 - Replace module disabling with bypassing, which directly routes certain inputs to outputs if specified by the plugin.
 - Duplicate cables patched to inputs when a module is duplicated.
 - Add module tags to module context menu.
 - Add module manual URL (if plugin developer supplies it) to module context menu item.
-- Add quick access to user module patches from `<Rack user dir>/presets/<plugin slug>/<module slug>` to module context menu.
+- Add quick access to user module patches from `<Rack user dir>/presets/<plugin slug>/<module slug>` to module context menu. Supports subdirectories.
 - Add infinity and NaN protection to cables, so they won't propagate non-finite values from badly behaving modules.
 - Add basic headless support with the `-h` flag.
 - Add multiple parameter dragging modes: scaled linear, absolute rotary, and relative rotary.
 - Add "knobLinearSensitivity" property to settings.
 - Add timestamps to MIDI messages.
 - Allow sending and receiving SysEx messages through MIDI drivers.
-- Add ability to scroll the rack and other scroll containers using the left mouse button. This allows touch devices to scroll by dragging.
+- Allow scrolling with Alt-click and drag.
 - Add "File > Open recent" menu item for opening recent patches.
 - Add "Preset > Save template" to module context menu which saves the default module preset to load when a new instance is added to the rack.
 - Break Rack executable into libRack shared library and lightweight standalone Rack executable.
@@ -43,6 +45,12 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Check for Library updates every few seconds to avoid needing to restart Rack to check for updates.
 - When clicking on a module in the Module Browser and immediately releasing, place the module in the last cursor position in the rack, rather than the current cursor position.
 - When clicking and dragging a module from the Module Browser, fix the mouse handle offset to the center of the module.
+- Allow adjusting rack brightness for "Lights Off" mode.
+- Improve light rendering with a more physical blending algorithm.
+- Move interaction settings from View menu to Edit menu.
+- Add engine CPU meter and framerate meter to menu bar.
+- Allow zooming rack with extra mouse buttons 4 and 5.
+- Add `"pixelRatio"` to settings for forcing the UI pixel scale.
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
@@ -68,9 +76,22 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add `event::KeyBase::keyName`. Plugins should use this instead of `key` for alphanumeric keys in order to support all keyboard layouts.
 	- Improve thread safety of `dsp::RingBuffer`.
 	- Add several convenient filesystem routines to `system::`.
+	- Add `system::getTime()` and `getUnixTime()`.
+	- Add `system::readFile()` and `writeFile()`.
 	- Move all `string::` functions dealing with filesystem paths to `system::`.
 	- Change type of `Module::id` and `Cable::id` from `int` to `int64_t`.
-	- Add `system::getTime()` and `getUnixTime()`.
+	- Move event classes to inside `widget::Widget` class.
+	- Deprecate `Window::loadSvg()`. Un-deprecate `Svg::load()`.
+	- `Font` and `Image` can no longer be stored across UI frames. Load them with `APP->window->loadFont()` and `loadImage()` each `draw()` method.
+	- Add `Widget::hasChild()`, `addChildBottom()`, `addChildBelow()`, `addChildAbove()`, and `drawChild()`.
+	- Add `Module::createPatchStorageDirectory()` and `getPatchStorageDirectory()`.
+	- Add `createMenuLabel()`, `createMenuItem()`, `createCheckMenuItem()`, `createBoolMenuItem()`, `createBoolPtrMenuItem()`, `createSubmenuItem()`, `createIndexSubmenuItem()`, and `createIndexPtrSubmenuItem()` to helpers.
+	- Add `Module::onReset()` and `onRandomize()`. Overrides default param resetting and randomization behavior if overridden, unless super methods are called.
+	- Add `Module::SaveEvent`.
+	- Add operator overloads for `Vec`.
+	- Add `string::join()`, `split()`, `formatTime()`, and `formatTimeISO()`.
+	- Add `random::Xoroshiro128Plus` which can be used like C++ `<random>` classes.
+	- Add `Port::getVoltageRMS()`.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
