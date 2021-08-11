@@ -47,7 +47,6 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - When clicking and dragging a module from the Module Browser, fix the mouse handle offset to the center of the module.
 - Allow adjusting rack brightness for "Lights Off" mode.
 - Improve light rendering with a more physical blending algorithm.
-- Move interaction settings from View menu to Edit menu.
 - Add engine CPU meter and framerate meter to menu bar.
 - Allow zooming rack with extra mouse buttons 4 and 5.
 - Add `"pixelRatio"` to settings for forcing the UI pixel scale.

@@ -870,7 +870,7 @@ static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget
 			if (system::isDirectory(path)) {
 				hasPresets = true;
 
-				menu->addChild(createSubmenuItem(name, [=](ui::Menu* menu) {
+				menu->addChild(createSubmenuItem(name, "", [=](ui::Menu* menu) {
 					if (!moduleWidget)
 						return;
 					appendPresetItems(menu, moduleWidget, path);
@@ -909,7 +909,7 @@ void ModuleWidget::createContextMenu() {
 	menu->addChild(createMenuLabel(model->plugin->brand));
 
 	// Info
-	menu->addChild(createSubmenuItem("Info", [=](ui::Menu* menu) {
+	menu->addChild(createSubmenuItem("Info", "", [=](ui::Menu* menu) {
 		if (!weakThis)
 			return;
 
@@ -999,7 +999,7 @@ void ModuleWidget::createContextMenu() {
 	}));
 
 	// Preset
-	menu->addChild(createSubmenuItem("Preset", [=](ui::Menu* menu) {
+	menu->addChild(createSubmenuItem("Preset", "", [=](ui::Menu* menu) {
 		menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [=]() {
 			if (!weakThis)
 				return;

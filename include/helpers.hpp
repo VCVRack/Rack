@@ -293,14 +293,14 @@ ui::MenuItem* createBoolPtrMenuItem(std::string text, T* ptr) {
 /** Creates a MenuItem that opens a submenu.
 Example:
 
-	menu->addChild(createSubmenuItem("Edit",
+	menu->addChild(createSubmenuItem("Edit", "",
 		[=](Menu* menu) {
 			menu->addChild(createMenuItem("Copy", "", [=]() {copy();}));
 			menu->addChild(createMenuItem("Paste", "", [=]() {paste();}));
 		}
 	));
 */
-inline ui::MenuItem* createSubmenuItem(std::string text, std::function<void(ui::Menu* menu)> createMenu, bool disabled = false) {
+inline ui::MenuItem* createSubmenuItem(std::string text, std::string rightText, std::function<void(ui::Menu* menu)> createMenu, bool disabled = false) {
 	struct Item : ui::MenuItem {
 		std::function<void(ui::Menu* menu)> createMenu;
 
@@ -311,7 +311,7 @@ inline ui::MenuItem* createSubmenuItem(std::string text, std::function<void(ui::
 		}
 	};
 
-	Item* item = createMenuItem<Item>(text, RIGHT_ARROW);
+	Item* item = createMenuItem<Item>(text, rightText + (rightText.empty() ? "" : " ") + RIGHT_ARROW);
 	item->createMenu = createMenu;
 	item->disabled = disabled;
 	return item;

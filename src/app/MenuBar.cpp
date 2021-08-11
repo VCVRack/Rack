@@ -92,7 +92,7 @@ struct FileButton : MenuButton {
 			APP->patch->loadDialog();
 		}));
 
-		menu->addChild(createSubmenuItem("Open recent", [](ui::Menu* menu) {
+		menu->addChild(createSubmenuItem("Open recent", "", [](ui::Menu* menu) {
 			for (const std::string& path : settings::recentPatchPaths) {
 				std::string name = system::getStem(path);
 				menu->addChild(createMenuItem(name, "", [=]() {
@@ -147,52 +147,6 @@ struct DisconnectCablesItem : ui::MenuItem {
 	}
 };
 
-struct AllowCursorLockItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		settings::allowCursorLock ^= true;
-	}
-};
-
-struct KnobModeValueItem : ui::MenuItem {
-	settings::KnobMode knobMode;
-	void onAction(const ActionEvent& e) override {
-		settings::knobMode = knobMode;
-	}
-};
-
-struct KnobModeItem : ui::MenuItem {
-	ui::Menu* createChildMenu() override {
-		ui::Menu* menu = new ui::Menu;
-
-		static const std::vector<std::pair<settings::KnobMode, std::string>> knobModes = {
-			{settings::KNOB_MODE_LINEAR, "Linear"},
-			{settings::KNOB_MODE_SCALED_LINEAR, "Scaled linear"},
-			{settings::KNOB_MODE_ROTARY_ABSOLUTE, "Absolute rotary"},
-			{settings::KNOB_MODE_ROTARY_RELATIVE, "Relative rotary"},
-		};
-		for (const auto& pair : knobModes) {
-			KnobModeValueItem* item = new KnobModeValueItem;
-			item->knobMode = pair.first;
-			item->text = pair.second;
-			item->rightText = CHECKMARK(settings::knobMode == pair.first);
-			menu->addChild(item);
-		}
-		return menu;
-	}
-};
-
-struct KnobScrollItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		settings::knobScroll ^= true;
-	}
-};
-
-struct LockModulesItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		settings::lockModules ^= true;
-	}
-};
-
 struct EditButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
@@ -217,28 +171,6 @@ struct EditButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 		APP->scene->rack->appendSelectionContextMenu(menu);
-
-		menu->addChild(new ui::MenuSeparator);
-
-		AllowCursorLockItem* allowCursorLockItem = new AllowCursorLockItem;
-		allowCursorLockItem->text = "Hide cursor while dragging";
-		allowCursorLockItem->rightText = CHECKMARK(settings::allowCursorLock);
-		menu->addChild(allowCursorLockItem);
-
-		KnobModeItem* knobModeItem = new KnobModeItem;
-		knobModeItem->text = "Knob mode";
-		knobModeItem->rightText = RIGHT_ARROW;
-		menu->addChild(knobModeItem);
-
-		KnobScrollItem* knobScrollItem = new KnobScrollItem;
-		knobScrollItem->text = "Scroll wheel knob control";
-		knobScrollItem->rightText = CHECKMARK(settings::knobScroll);
-		menu->addChild(knobScrollItem);
-
-		LockModulesItem* lockModulesItem = new LockModulesItem;
-		lockModulesItem->text = "Lock module positions";
-		lockModulesItem->rightText = CHECKMARK(settings::lockModules);
-		menu->addChild(lockModulesItem);
 	}
 };
 
@@ -412,12 +344,6 @@ struct HaloBrightnessSlider : ui::Slider {
 	}
 };
 
-struct TooltipsItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		settings::tooltips ^= true;
-	}
-};
-
 struct FrameRateValueItem : ui::MenuItem {
 	int frameSwapInterval;
 	void onAction(const ActionEvent& e) override {
@@ -429,24 +355,10 @@ struct FrameRateItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
 
-		for (int i = 1; i <= 6; i++) {
-			double frameRate = APP->window->getMonitorRefreshRate() / i;
-
-			FrameRateValueItem* item = new FrameRateValueItem;
-			item->frameSwapInterval = i;
-			item->text = string::f("%.0f Hz", frameRate);
-			item->rightText += CHECKMARK(settings::frameSwapInterval == i);
-			menu->addChild(item);
-		}
 		return menu;
 	}
 };
 
-struct FullscreenItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->window->setFullScreen(!APP->window->isFullScreen());
-	}
-};
 
 struct ViewButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
@@ -454,10 +366,7 @@ struct ViewButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		TooltipsItem* tooltipsItem = new TooltipsItem;
-		tooltipsItem->text = "Show tooltips";
-		tooltipsItem->rightText = CHECKMARK(settings::tooltips);
-		menu->addChild(tooltipsItem);
+		menu->addChild(createBoolPtrMenuItem("Show tooltips", &settings::tooltips));
 
 		ZoomSlider* zoomSlider = new ZoomSlider;
 		zoomSlider->box.size.x = 250.0;
@@ -479,17 +388,44 @@ struct ViewButton : MenuButton {
 		haloBrightnessSlider->box.size.x = 250.0;
 		menu->addChild(haloBrightnessSlider);
 
-		FrameRateItem* frameRateItem = new FrameRateItem;
-		frameRateItem->text = "Frame rate";
-		frameRateItem->rightText = RIGHT_ARROW;
-		menu->addChild(frameRateItem);
+		double frameRate = APP->window->getMonitorRefreshRate() / settings::frameSwapInterval;
+		menu->addChild(createSubmenuItem("Frame rate", string::f("%.0f Hz", frameRate), [=](ui::Menu* menu) {
+			for (int i = 1; i <= 6; i++) {
+				double frameRate = APP->window->getMonitorRefreshRate() / i;
+				menu->addChild(createCheckMenuItem(string::f("%.0f Hz", frameRate),
+					[=]() {
+						return settings::frameSwapInterval == i;
+					},
+					[=]() {
+						settings::frameSwapInterval = i;
+					}
+				));
+			}
+		}));
 
-		FullscreenItem* fullscreenItem = new FullscreenItem;
-		fullscreenItem->text = "Fullscreen";
-		fullscreenItem->rightText = "F11";
-		if (APP->window->isFullScreen())
-			fullscreenItem->rightText = CHECKMARK_STRING " " + fullscreenItem->rightText;
-		menu->addChild(fullscreenItem);
+		bool fullscreen = APP->window->isFullScreen();
+		std::string fullscreenText = "F11";
+		if (fullscreen)
+			fullscreenText += " " CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Fullscreen", fullscreenText, [=]() {
+			APP->window->setFullScreen(!fullscreen);
+		}));
+
+		menu->addChild(new ui::MenuSeparator);
+
+		menu->addChild(createBoolPtrMenuItem("Hide cursor while dragging", &settings::allowCursorLock));
+
+		static const std::vector<std::string> knobModes = {
+			"Linear",
+			"Scaled linear",
+			"Absolute rotary",
+			"Relative rotary",
+		};
+		menu->addChild(createIndexPtrSubmenuItem("Knob mode", knobModes, &settings::knobMode));
+
+		menu->addChild(createBoolPtrMenuItem("Scroll wheel knob control", &settings::knobScroll));
+
+		menu->addChild(createBoolPtrMenuItem("Lock module positions", &settings::lockModules));
 	}
 };
 
@@ -497,51 +433,41 @@ struct ViewButton : MenuButton {
 // Engine
 ////////////////////
 
-struct CpuMeterItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		settings::cpuMeter ^= true;
-	}
-};
-
-struct SampleRateValueItem : ui::MenuItem {
-	float sampleRate;
-	void onAction(const ActionEvent& e) override {
-		settings::sampleRate = sampleRate;
-	}
-};
-
 struct SampleRateItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
 
-		SampleRateValueItem* autoItem = new SampleRateValueItem;
-		autoItem->sampleRate = 0;
-		autoItem->text = "Auto";
+		// Auto sample rate
+		std::string rightText;
 		if (settings::sampleRate == 0) {
 			float sampleRate = APP->engine->getSampleRate();
-			autoItem->rightText = string::f("(%g kHz) ", sampleRate / 1000.f);
-			autoItem->rightText += CHECKMARK_STRING;
+			rightText += string::f("(%g kHz) ", sampleRate / 1000.f);
+			rightText += CHECKMARK_STRING;
 		}
-		menu->addChild(autoItem);
+		menu->addChild(createMenuItem("Auto", rightText, [=]() {
+			settings::sampleRate = 0;
+		}));
 
+		// Power-of-2 oversample times 44.1kHz or 48kHz
 		for (int i = -2; i <= 4; i++) {
 			for (int j = 0; j < 2; j++) {
 				float oversample = std::pow(2.f, i);
 				float sampleRate = (j == 0) ? 44100.f : 48000.f;
 				sampleRate *= oversample;
 
-				SampleRateValueItem* item = new SampleRateValueItem;
-				item->sampleRate = sampleRate;
-				item->text = string::f("%g kHz", sampleRate / 1000.f);
+				std::string text = string::f("%g kHz", sampleRate / 1000.f);
+				std::string rightText;
 				if (oversample > 1.f) {
-					item->rightText += string::f("(%.0fx)", oversample);
+					rightText += string::f("(%.0fx)", oversample);
 				}
 				else if (oversample < 1.f) {
-					item->rightText += string::f("(1/%.0fx)", 1.f / oversample);
+					rightText += string::f("(1/%.0fx)", 1.f / oversample);
 				}
-				item->rightText += " ";
-				item->rightText += CHECKMARK(settings::sampleRate == sampleRate);
-				menu->addChild(item);
+				rightText += " ";
+				rightText += CHECKMARK(settings::sampleRate == sampleRate);
+				menu->addChild(createMenuItem(text, rightText, [=]() {
+					settings::sampleRate = sampleRate;
+				}));
 			}
 		}
 		return menu;
@@ -568,12 +494,6 @@ struct ThreadCountItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
 		ui::Menu* menu = new ui::Menu;
 
-		int coreCount = system::getLogicalCoreCount();
-		for (int i = 1; i <= coreCount; i++) {
-			ThreadCountValueItem* item = new ThreadCountValueItem;
-			item->setThreadCount(i);
-			menu->addChild(item);
-		}
 		return menu;
 	}
 };
@@ -584,21 +504,35 @@ struct EngineButton : MenuButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		CpuMeterItem* cpuMeterItem = new CpuMeterItem;
-		cpuMeterItem->text = "Performance meters";
-		cpuMeterItem->rightText = "F3 ";
-		cpuMeterItem->rightText += CHECKMARK(settings::cpuMeter);
-		menu->addChild(cpuMeterItem);
+		std::string cpuMeterText = "F3";
+		if (settings::cpuMeter)
+			cpuMeterText += " " CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Performance meters", cpuMeterText, [=]() {
+			settings::cpuMeter ^= true;
+		}));
 
 		SampleRateItem* sampleRateItem = new SampleRateItem;
 		sampleRateItem->text = "Sample rate";
 		sampleRateItem->rightText = RIGHT_ARROW;
 		menu->addChild(sampleRateItem);
 
-		ThreadCountItem* threadCount = new ThreadCountItem;
-		threadCount->text = "Threads";
-		threadCount->rightText = RIGHT_ARROW;
-		menu->addChild(threadCount);
+		menu->addChild(createSubmenuItem("Threads", string::f("%d", settings::threadCount), [=](ui::Menu* menu) {
+			// BUG This assumes SMT is enabled.
+			int cores = system::getLogicalCoreCount() / 2;
+
+			for (int i = 1; i <= 2 * cores; i++) {
+				std::string rightText;
+				if (i == cores)
+					rightText += "(most modules)";
+				else if (i == 1)
+					rightText += "(lowest CPU usage)";
+				if (settings::threadCount == i)
+					rightText += " " CHECKMARK_STRING;
+				menu->addChild(createMenuItem(string::f("%d", i), rightText, [=]() {
+					settings::threadCount = i;
+				}));
+			}
+		}));
 	}
 };
 
