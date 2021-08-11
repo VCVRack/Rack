@@ -259,10 +259,7 @@ void RackWidget::mergeJson(json_t* rootJ) {
 			continue;
 		}
 
-		// Merge CableWidget JSON
-		json_t* cwJ = cw->toJson();
-		json_object_update(cableJ, cwJ);
-		json_decref(cwJ);
+		cw->mergeJson(cableJ);
 	}
 }
 
@@ -277,7 +274,6 @@ void RackWidget::fromJson(json_t* rootJ) {
 	if (string::startsWith(version, "0.3.") || string::startsWith(version, "0.4.") || string::startsWith(version, "0.5.") || version == "dev") {
 		legacyV05 = true;
 	}
-
 
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
@@ -359,20 +355,8 @@ void RackWidget::fromJson(json_t* rootJ) {
 	}
 }
 
-void RackWidget::pasteClipboardAction() {
-	const char* moduleJson = glfwGetClipboardString(APP->window->win);
-	if (!moduleJson) {
-		WARN("Could not get text from clipboard.");
-		return;
-	}
-
-	json_error_t error;
-	json_t* moduleJ = json_loads(moduleJson, 0, &error);
-	if (!moduleJ) {
-		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		return;
-	}
-	DEFER({json_decref(moduleJ);});
+void RackWidget::fromJsonAction(json_t* rootJ) {
+	json_t* moduleJ = rootJ;
 
 	// Because we are creating a new module, we don't want to use the IDs from the JSON.
 	json_object_del(moduleJ, "id");
@@ -397,6 +381,24 @@ void RackWidget::pasteClipboardAction() {
 	history::ModuleAdd* h = new history::ModuleAdd;
 	h->setModule(mw);
 	APP->history->push(h);
+}
+
+void RackWidget::pasteClipboardAction() {
+	const char* moduleJson = glfwGetClipboardString(APP->window->win);
+	if (!moduleJson) {
+		WARN("Could not get text from clipboard.");
+		return;
+	}
+
+	json_error_t error;
+	json_t* moduleJ = json_loads(moduleJson, 0, &error);
+	if (!moduleJ) {
+		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+		return;
+	}
+	DEFER({json_decref(moduleJ);});
+
+	fromJsonAction(moduleJ);
 }
 
 static void RackWidget_updateExpanders(RackWidget* that) {
@@ -726,11 +728,7 @@ json_t* RackWidget::selectedModulesToJson() {
 			continue;
 
 		json_t* cableJ = cable->toJson();
-
-		// Merge CableWidget JSON
-		json_t* cwJ = cw->toJson();
-		json_object_update(cableJ, cwJ);
-		json_decref(cwJ);
+		cw->mergeJson(cableJ);
 
 		json_array_append_new(cablesJ, cableJ);
 	}

@@ -472,12 +472,38 @@ void ModuleWidget::onDragHover(const DragHoverEvent& e) {
 }
 
 json_t* ModuleWidget::toJson() {
-	json_t* moduleJ = APP->engine->moduleToJson(module);
-	return moduleJ;
+	json_t* rootJ = APP->engine->moduleToJson(module);
+	return rootJ;
 }
 
 void ModuleWidget::fromJson(json_t* rootJ) {
 	APP->engine->moduleFromJson(module, rootJ);
+}
+
+void ModuleWidget::fromJsonAction(json_t* rootJ) {
+	// Don't use IDs from JSON
+	json_object_del(rootJ, "id");
+	json_object_del(rootJ, "leftModuleId");
+	json_object_del(rootJ, "rightModuleId");
+
+	json_t* oldModuleJ = toJson();
+
+	try {
+		fromJson(rootJ);
+	}
+	catch (Exception& e) {
+		WARN("%s", e.what());
+		json_decref(oldModuleJ);
+		return;
+	}
+
+	// history::ModuleChange
+	history::ModuleChange* h = new history::ModuleChange;
+	h->name = "paste module preset";
+	h->moduleId = module->id;
+	h->oldModuleJ = oldModuleJ;
+	h->newModuleJ = toJson();
+	APP->history->push(h);
 }
 
 void ModuleWidget::copyClipboard() {
@@ -503,29 +529,7 @@ void ModuleWidget::pasteClipboardAction() {
 	}
 	DEFER({json_decref(moduleJ);});
 
-	// Don't use IDs from JSON
-	json_object_del(moduleJ, "id");
-	json_object_del(moduleJ, "leftModuleId");
-	json_object_del(moduleJ, "rightModuleId");
-
-	json_t* oldModuleJ = toJson();
-
-	try {
-		fromJson(moduleJ);
-	}
-	catch (Exception& e) {
-		WARN("%s", e.what());
-		json_decref(oldModuleJ);
-		return;
-	}
-
-	// history::ModuleChange
-	history::ModuleChange* h = new history::ModuleChange;
-	h->name = "paste module preset";
-	h->moduleId = module->id;
-	h->oldModuleJ = oldModuleJ;
-	h->newModuleJ = toJson();
-	APP->history->push(h);
+	fromJsonAction(moduleJ);
 }
 
 void ModuleWidget::load(std::string filename) {

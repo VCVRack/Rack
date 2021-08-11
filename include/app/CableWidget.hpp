@@ -42,7 +42,7 @@ struct CableWidget : widget::Widget {
 	engine::Cable* getCable();
 	math::Vec getInputPos();
 	math::Vec getOutputPos();
-	json_t* toJson();
+	void mergeJson(json_t* rootJ);
 	void fromJson(json_t* rootJ);
 	void step() override;
 	void draw(const DrawArgs& args) override;

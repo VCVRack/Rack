@@ -47,6 +47,7 @@ struct RackWidget : widget::OpaqueWidget {
 	void clear();
 	void mergeJson(json_t* rootJ);
 	void fromJson(json_t* rootJ);
+	void fromJsonAction(json_t* rootJ);
 	void pasteClipboardAction();
 
 	// Module methods

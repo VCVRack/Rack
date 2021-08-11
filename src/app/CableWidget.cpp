@@ -213,13 +213,9 @@ math::Vec CableWidget::getOutputPos() {
 	}
 }
 
-json_t* CableWidget::toJson() {
-	json_t* rootJ = json_object();
-
+void CableWidget::mergeJson(json_t* rootJ) {
 	std::string s = color::toHexString(color);
 	json_object_set_new(rootJ, "color", json_string(s.c_str()));
-
-	return rootJ;
 }
 
 void CableWidget::fromJson(json_t* rootJ) {
