@@ -1026,16 +1026,6 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 		pasteClipboardAction();
 	}));
 
-	// Duplicate
-	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
-		cloneSelectedModulesAction();
-	}, n == 0));
-
-	// Delete
-	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
-		deleteSelectedModulesAction();
-	}, n == 0));
-
 	// Initialize
 	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
 		resetSelectedModulesAction();
@@ -1058,6 +1048,16 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 		bypassText += " " CHECKMARK_STRING;
 	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
 		bypassSelectedModulesAction(!bypassed);
+	}, n == 0));
+
+	// Duplicate
+	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
+		cloneSelectedModulesAction();
+	}, n == 0));
+
+	// Delete
+	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
+		deleteSelectedModulesAction();
 	}, n == 0));
 }
 

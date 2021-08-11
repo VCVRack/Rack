@@ -331,10 +331,6 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			cloneAction();
 			e.consume(this);
 		}
-		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
-			removeAction();
-			e.consume(this);
-		}
 		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			resetAction();
 			e.consume(this);
@@ -351,13 +347,11 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			bypassAction(!module->isBypassed());
 			e.consume(this);
 		}
-	}
-
-	if (e.action == RACK_HELD) {
-		// Also handle Delete/Backspace when holding the key while hovering
 		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
+			// Deletes `this`
 			removeAction();
 			e.consume(NULL);
+			return;
 		}
 	}
 
