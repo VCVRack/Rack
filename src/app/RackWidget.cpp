@@ -1143,7 +1143,7 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 	}));
 
 	// Load
-	menu->addChild(createMenuItem("Load selection", "", [=]() {
+	menu->addChild(createMenuItem("Import selection", "", [=]() {
 		loadSelectionDialog();
 	}));
 
