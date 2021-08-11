@@ -14,6 +14,7 @@
 #include <plugin.hpp>
 #include <engine/Engine.hpp>
 #include <context.hpp>
+#include <system.hpp>
 #include <asset.hpp>
 #include <patch.hpp>
 #include <helpers.hpp>
@@ -876,12 +877,87 @@ json_t* RackWidget::selectionToJson() {
 	return rootJ;
 }
 
+static const char SELECTION_FILTERS[] = "VCV Rack module selection (.vcvs):vcvs";
+
+void RackWidget::loadSelection(std::string path) {
+	FILE* file = std::fopen(path.c_str(), "r");
+	if (!file)
+		throw Exception("Could not load selection file %s", path.c_str());
+	DEFER({std::fclose(file);});
+
+	INFO("Loading selection %s", path.c_str());
+
+	json_error_t error;
+	json_t* rootJ = json_loadf(file, 0, &error);
+	if (!rootJ)
+		throw Exception("File is not a valid selection file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
+	DEFER({json_decref(rootJ);});
+
+	pasteJsonAction(rootJ);
+}
+
 void RackWidget::loadSelectionDialog() {
-	// TODO
+	std::string selectionDir = asset::user("selections");
+	system::createDirectories(selectionDir);
+
+	osdialog_filters* filters = osdialog_filters_parse(SELECTION_FILTERS);
+	DEFER({osdialog_filters_free(filters);});
+
+	char* pathC = osdialog_file(OSDIALOG_OPEN, selectionDir.c_str(), NULL, filters);
+	if (!pathC) {
+		// No path selected
+		return;
+	}
+	DEFER({std::free(pathC);});
+
+	try {
+		loadSelection(pathC);
+	}
+	catch (Exception& e) {
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, e.what());
+	}
+}
+
+void RackWidget::saveSelection(std::string path) {
+	INFO("Saving selection %s", path.c_str());
+
+	json_t* rootJ = selectionToJson();
+	assert(rootJ);
+	DEFER({json_decref(rootJ);});
+
+	cleanupModuleJson(rootJ);
+
+	FILE* file = std::fopen(path.c_str(), "w");
+	if (!file) {
+		std::string message = string::f("Could not save selection to file %s", path.c_str());
+		osdialog_message(OSDIALOG_WARNING, OSDIALOG_OK, message.c_str());
+		return;
+	}
+	DEFER({std::fclose(file);});
+
+	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
 }
 
 void RackWidget::saveSelectionDialog() {
-	// TODO
+	std::string selectionDir = asset::user("selections");
+	system::createDirectories(selectionDir);
+
+	osdialog_filters* filters = osdialog_filters_parse(SELECTION_FILTERS);
+	DEFER({osdialog_filters_free(filters);});
+
+	char* pathC = osdialog_file(OSDIALOG_SAVE, selectionDir.c_str(), "Untitled.vcvs", filters);
+	if (!pathC) {
+		// No path selected
+		return;
+	}
+	DEFER({std::free(pathC);});
+
+	std::string path = pathC;
+	// Automatically append .vcvs extension
+	if (system::getExtension(path) != ".vcvs")
+		path += ".vcvs";
+
+	saveSelection(path);
 }
 
 void RackWidget::copyClipboardSelection() {
@@ -1072,7 +1148,7 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 	}));
 
 	// Save
-	menu->addChild(createMenuItem("Save selection", "", [=]() {
+	menu->addChild(createMenuItem("Save selection as", "", [=]() {
 		saveSelectionDialog();
 	}, n == 0));
 

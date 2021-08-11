@@ -80,7 +80,9 @@ struct RackWidget : widget::OpaqueWidget {
 	int getNumSelected();
 	std::vector<ModuleWidget*> getSelectedModules();
 	json_t* selectionToJson();
+	void loadSelection(std::string path);
 	void loadSelectionDialog();
+	void saveSelection(std::string path);
 	void saveSelectionDialog();
 	void copyClipboardSelection();
 	void resetSelectionAction();
