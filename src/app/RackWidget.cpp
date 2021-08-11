@@ -403,6 +403,8 @@ void RackWidget::pasteJsonAction(json_t* rootJ) {
 			delete complexAction;
 	});
 
+	std::map<int64_t, int64_t> oldIdMap;
+
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)
@@ -411,6 +413,11 @@ void RackWidget::pasteJsonAction(json_t* rootJ) {
 	size_t moduleIndex;
 	json_t* moduleJ;
 	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
+		json_t* idJ = json_object_get(moduleJ, "id");
+		if (!idJ)
+			continue;
+		int64_t id = json_integer_value(idJ);
+
 		cleanupModuleJson(moduleJ);
 
 		ModuleWidget* mw;
@@ -437,51 +444,71 @@ void RackWidget::pasteJsonAction(json_t* rootJ) {
 		internal->moduleContainer->addChild(mw);
 		mw->selected() = true;
 
+		oldIdMap[id] = mw->module->id;
+	}
+
+	// This calls RackWidget_updateExpanders()
+	setSelectedModulesPosNearest(math::Vec(0, 0));
+
+	// Add positioned selected modules to history
+	for (ModuleWidget* mw : getSelectedModules()) {
 		// history::ModuleAdd
 		history::ModuleAdd* h = new history::ModuleAdd;
 		h->setModule(mw);
 		complexAction->push(h);
 	}
 
-	// This calls RackWidget_updateExpanders()
-	setSelectedModulesPosNearest(math::Vec(0, 0));
+	// cables
+	json_t* cablesJ = json_object_get(rootJ, "cables");
+	if (!cablesJ)
+		return;
+	size_t cableIndex;
+	json_t* cableJ;
+	json_array_foreach(cablesJ, cableIndex, cableJ) {
+		json_object_del(cableJ, "id");
 
-	// TODO
-	// // cables
-	// json_t* cablesJ = json_object_get(rootJ, "cables");
-	// // In <=v0.6, cables were called wires
-	// if (!cablesJ)
-	// 	cablesJ = json_object_get(rootJ, "wires");
-	// if (!cablesJ)
-	// 	return;
-	// size_t cableIndex;
-	// json_t* cableJ;
-	// json_array_foreach(cablesJ, cableIndex, cableJ) {
-	// 	// Get cable ID
-	// 	json_t* idJ = json_object_get(cableJ, "id");
-	// 	int64_t id;
-	// 	if (idJ)
-	// 		id = json_integer_value(idJ);
-	// 	else
-	// 		id = cableIndex;
+		// Remap old module IDs to new IDs
+		json_t* inputModuleIdJ = json_object_get(cableJ, "inputModuleId");
+		if (!inputModuleIdJ)
+			continue;
+		int64_t inputModuleId = json_integer_value(inputModuleIdJ);
+		inputModuleId = get(oldIdMap, inputModuleId, -1);
+		if (inputModuleId < 0)
+			continue;
+		json_object_set(cableJ, "inputModuleId", json_integer(inputModuleId));
 
-	// 	// Get Cable
-	// 	engine::Cable* cable = APP->engine->getCable(id);
-	// 	if (!cable) {
-	// 		WARN("Cannot find Cable %" PRId64, id);
-	// 		continue;
-	// 	}
+		json_t* outputModuleIdJ = json_object_get(cableJ, "outputModuleId");
+		if (!outputModuleIdJ)
+			continue;
+		int64_t outputModuleId = json_integer_value(outputModuleIdJ);
+		outputModuleId = get(oldIdMap, outputModuleId, -1);
+		if (outputModuleId < 0)
+			continue;
+		json_object_set(cableJ, "outputModuleId", json_integer(outputModuleId));
 
-	// 	// Create CableWidget
-	// 	CableWidget* cw = new CableWidget;
-	// 	cw->setCable(cable);
-	// 	cw->fromJson(cableJ);
-	// 	// In <=v1, cable colors were not serialized, so choose one from the available colors.
-	// 	if (cw->color.a == 0.f) {
-	// 		cw->setNextCableColor();
-	// 	}
-	// 	addCable(cw);
-	// }
+		// Create Cable
+		engine::Cable* cable = new engine::Cable;
+		try {
+			cable->fromJson(cableJ);
+			APP->engine->addCable(cable);
+		}
+		catch (Exception& e) {
+			WARN("Cannot paste cable: %s", e.what());
+			delete cable;
+			continue;
+		}
+
+		// Create CableWidget
+		app::CableWidget* cw = new app::CableWidget;
+		cw->setCable(cable);
+		cw->fromJson(cableJ);
+		addCable(cw);
+
+		// history::CableAdd
+		history::CableAdd* h = new history::CableAdd;
+		h->setCable(cw);
+		complexAction->push(h);
+	}
 }
 
 void RackWidget::pasteModuleJsonAction(json_t* moduleJ) {
