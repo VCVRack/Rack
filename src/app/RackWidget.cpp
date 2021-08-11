@@ -618,18 +618,18 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 	return true;
 }
 
-static void eachNearestGridPos(math::Vec pos, std::function<bool(math::Vec pos)> f) {
+static math::Vec eachNearestGridPos(math::Vec pos, std::function<bool(math::Vec pos)> f) {
 	// Dijkstra's algorithm to generate a sorted list of Vecs closest to `pos`.
 
 	// Comparison of distance of Vecs to `pos`
-	auto cmpNearest = [&](const math::Vec & a, const math::Vec & b) {
+	auto cmpNearest = [&](const math::Vec& a, const math::Vec& b) {
 		return a.minus(pos).square() > b.minus(pos).square();
 	};
 	// Comparison of dictionary order of Vecs
-	auto cmp = [&](const math::Vec & a, const math::Vec & b) {
-		if (a.x != b.x)
-			return a.x < b.x;
-		return a.y < b.y;
+	auto cmp = [](const math::Vec& a, const math::Vec& b) {
+		if (a.y != b.y)
+			return a.y < b.y;
+		return a.x < b.x;
 	};
 	// Priority queue sorted by distance from `pos`
 	std::priority_queue<math::Vec, std::vector<math::Vec>, decltype(cmpNearest)> queue(cmpNearest);
@@ -643,17 +643,17 @@ static void eachNearestGridPos(math::Vec pos, std::function<bool(math::Vec pos)>
 		math::Vec testPos = queue.top();
 		// Check testPos
 		if (f(testPos))
-			return;
+			return testPos;
 		// Move testPos to visited set
 		queue.pop();
 		visited.insert(testPos);
 
 		// Add adjacent Vecs
 		static const std::vector<math::Vec> deltas = {
-			math::Vec(-1, 0).mult(RACK_GRID_SIZE),
 			math::Vec(1, 0).mult(RACK_GRID_SIZE),
-			math::Vec(0, -1).mult(RACK_GRID_SIZE),
 			math::Vec(0, 1).mult(RACK_GRID_SIZE),
+			math::Vec(-1, 0).mult(RACK_GRID_SIZE),
+			math::Vec(0, -1).mult(RACK_GRID_SIZE),
 		};
 		for (math::Vec delta : deltas) {
 			math::Vec newPos = testPos.plus(delta);
