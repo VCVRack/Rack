@@ -318,24 +318,7 @@ void ModuleWidget::onHover(const HoverEvent& e) {
 }
 
 void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
-	OpaqueWidget::onHoverKey(e);
-	if (e.isConsumed())
-		return;
-
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			// Don't handle key commands if modules are selected, since it will interfere with Scene's module selection key commands
-			if (!APP->scene->rack->hasSelectedModules()) {
-				resetAction();
-				e.consume(this);
-			}
-		}
-		if (e.keyName == "r" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (!APP->scene->rack->hasSelectedModules()) {
-				randomizeAction();
-				e.consume(this);
-			}
-		}
 		if (e.keyName == "c" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			copyClipboard();
 			e.consume(this);
@@ -345,40 +328,42 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (!APP->scene->rack->hasSelectedModules()) {
-				cloneAction();
-				e.consume(this);
-			}
-		}
-		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (!APP->scene->rack->hasSelectedModules()) {
-				disconnectAction();
-				e.consume(this);
-			}
-		}
-		if (e.keyName == "e" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (!APP->scene->rack->hasSelectedModules()) {
-				bypassAction(!module->isBypassed());
-				e.consume(this);
-			}
+			cloneAction();
+			e.consume(this);
 		}
 		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
-			if (!APP->scene->rack->hasSelectedModules()) {
-				removeAction();
-				e.consume(this);
-			}
+			removeAction();
+			e.consume(this);
+		}
+		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			resetAction();
+			e.consume(this);
+		}
+		if (e.keyName == "r" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			randomizeAction();
+			e.consume(this);
+		}
+		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			disconnectAction();
+			e.consume(this);
+		}
+		if (e.keyName == "e" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			bypassAction(!module->isBypassed());
+			e.consume(this);
 		}
 	}
 
 	if (e.action == RACK_HELD) {
 		// Also handle Delete/Backspace when holding the key while hovering
 		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
-			if (!APP->scene->rack->hasSelectedModules()) {
-				removeAction();
-				e.consume(NULL);
-			}
+			removeAction();
+			e.consume(NULL);
 		}
 	}
+
+	if (e.isConsumed())
+		return;
+	OpaqueWidget::onHoverKey(e);
 }
 
 void ModuleWidget::onButton(const ButtonEvent& e) {
@@ -1077,18 +1062,14 @@ void ModuleWidget::createContextMenu() {
 		weakThis->randomizeAction();
 	}));
 
+	// Disconnect cables
 	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
 		if (!weakThis)
 			return;
 		weakThis->disconnectAction();
 	}));
 
-	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
-		if (!weakThis)
-			return;
-		weakThis->cloneAction();
-	}));
-
+	// Bypass
 	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
 	bool bypassed = module && module->isBypassed();
 	if (bypassed)
@@ -1099,6 +1080,14 @@ void ModuleWidget::createContextMenu() {
 		weakThis->bypassAction(!bypassed);
 	}));
 
+	// Duplicate
+	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
+		if (!weakThis)
+			return;
+		weakThis->cloneAction();
+	}));
+
+	// Delete
 	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
 		if (!weakThis)
 			return;

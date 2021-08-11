@@ -1171,7 +1171,6 @@ json_t* Engine::toJson() {
 	// modules
 	json_t* modulesJ = json_array();
 	for (Module* module : internal->modules) {
-		// module
 		json_t* moduleJ = module->toJson();
 		json_array_append_new(modulesJ, moduleJ);
 	}
@@ -1180,7 +1179,6 @@ json_t* Engine::toJson() {
 	// cables
 	json_t* cablesJ = json_array();
 	for (Cable* cable : internal->cables) {
-		// cable
 		json_t* cableJ = cable->toJson();
 		json_array_append_new(cablesJ, cableJ);
 	}

@@ -138,15 +138,6 @@ void RackWidget::onHover(const HoverEvent& e) {
 
 void RackWidget::onHoverKey(const HoverKeyEvent& e) {
 	OpaqueWidget::onHoverKey(e);
-	if (e.isConsumed())
-		return;
-
-	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			pastePresetClipboardAction();
-			e.consume(this);
-		}
-	}
 }
 
 void RackWidget::onButton(const ButtonEvent& e) {
@@ -268,8 +259,8 @@ void RackWidget::mergeJson(json_t* rootJ) {
 			continue;
 		}
 
+		// Merge CableWidget JSON
 		json_t* cwJ = cw->toJson();
-		// Merge cable JSON object
 		json_object_update(cableJ, cwJ);
 		json_decref(cwJ);
 	}
@@ -368,7 +359,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 	}
 }
 
-void RackWidget::pastePresetClipboardAction() {
+void RackWidget::pasteClipboardAction() {
 	const char* moduleJson = glfwGetClipboardString(APP->window->win);
 	if (!moduleJson) {
 		WARN("Could not get text from clipboard.");
@@ -614,8 +605,8 @@ ModuleWidget* RackWidget::getModule(int64_t moduleId) {
 	return NULL;
 }
 
-std::list<ModuleWidget*> RackWidget::getModules() {
-	std::list<ModuleWidget*> mws;
+std::vector<ModuleWidget*> RackWidget::getModules() {
+	std::vector<ModuleWidget*> mws;
 	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
@@ -694,8 +685,8 @@ int RackWidget::getNumSelectedModules() {
 	return count;
 }
 
-std::list<ModuleWidget*> RackWidget::getSelectedModules() {
-	std::list<ModuleWidget*> mws;
+std::vector<ModuleWidget*> RackWidget::getSelectedModules() {
+	std::vector<ModuleWidget*> mws;
 	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
@@ -703,6 +694,49 @@ std::list<ModuleWidget*> RackWidget::getSelectedModules() {
 			mws.push_back(mw);
 	}
 	return mws;
+}
+
+json_t* RackWidget::selectedModulesToJson() {
+	json_t* rootJ = json_object();
+
+	std::set<engine::Module*> modules;
+
+	// modules
+	json_t* modulesJ = json_array();
+	for (ModuleWidget* mw : getSelectedModules()) {
+		json_t* moduleJ = mw->toJson();
+		json_array_append_new(modulesJ, moduleJ);
+
+		modules.insert(mw->getModule());
+	}
+	json_object_set_new(rootJ, "modules", modulesJ);
+
+	// cables
+	json_t* cablesJ = json_array();
+	for (CableWidget* cw : getCompleteCables()) {
+		// Only add cables attached on both ends to selected modules
+		engine::Cable* cable = cw->getCable();
+		if (!cable || !cable->inputModule || !cable->outputModule)
+			continue;
+		const auto inputIt = modules.find(cable->inputModule);
+		if (inputIt == modules.end())
+			continue;
+		const auto outputIt = modules.find(cable->outputModule);
+		if (outputIt == modules.end())
+			continue;
+
+		json_t* cableJ = cable->toJson();
+
+		// Merge CableWidget JSON
+		json_t* cwJ = cw->toJson();
+		json_object_update(cableJ, cwJ);
+		json_decref(cwJ);
+
+		json_array_append_new(cablesJ, cableJ);
+	}
+	json_object_set_new(rootJ, "cables", cablesJ);
+
+	return rootJ;
 }
 
 void RackWidget::resetSelectedModulesAction() {
@@ -797,6 +831,14 @@ bool RackWidget::areSelectedModulesBypassed() {
 	return true;
 }
 
+void RackWidget::copyClipboardSelectedModules() {
+	json_t* rootJ = selectedModulesToJson();
+	DEFER({json_decref(rootJ);});
+	char* moduleJson = json_dumps(rootJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	DEFER({std::free(moduleJson);});
+	glfwSetClipboardString(APP->window->win, moduleJson);
+}
+
 void RackWidget::deleteSelectedModulesAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "remove modules";
@@ -866,6 +908,26 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 		deselectModules();
 	}, n == 0));
 
+	// Copy
+	menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [=]() {
+		copyClipboardSelectedModules();
+	}, n == 0));
+
+	// Paste
+	menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [=]() {
+		pasteClipboardAction();
+	}));
+
+	// Duplicate
+	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
+		cloneSelectedModulesAction();
+	}, n == 0));
+
+	// Delete
+	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
+		deleteSelectedModulesAction();
+	}, n == 0));
+
 	// Initialize
 	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
 		resetSelectedModulesAction();
@@ -881,11 +943,6 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 		disconnectSelectedModulesAction();
 	}, n == 0));
 
-	// Duplicate
-	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
-		cloneSelectedModulesAction();
-	}, n == 0));
-
 	// Bypass
 	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
 	bool bypassed = (n > 0) && areSelectedModulesBypassed();
@@ -893,11 +950,6 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 		bypassText += " " CHECKMARK_STRING;
 	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
 		bypassSelectedModulesAction(!bypassed);
-	}, n == 0));
-
-	// Delete
-	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
-		deleteSelectedModulesAction();
 	}, n == 0));
 }
 
@@ -994,8 +1046,8 @@ CableWidget* RackWidget::getCable(int64_t cableId) {
 	return NULL;
 }
 
-std::list<CableWidget*> RackWidget::getCompleteCables() {
-	std::list<CableWidget*> cws;
+std::vector<CableWidget*> RackWidget::getCompleteCables() {
+	std::vector<CableWidget*> cws;
 	for (widget::Widget* w : internal->cableContainer->children) {
 		CableWidget* cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
@@ -1005,9 +1057,9 @@ std::list<CableWidget*> RackWidget::getCompleteCables() {
 	return cws;
 }
 
-std::list<CableWidget*> RackWidget::getCablesOnPort(PortWidget* port) {
+std::vector<CableWidget*> RackWidget::getCablesOnPort(PortWidget* port) {
 	assert(port);
-	std::list<CableWidget*> cws;
+	std::vector<CableWidget*> cws;
 	for (widget::Widget* w : internal->cableContainer->children) {
 		CableWidget* cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);

@@ -125,10 +125,6 @@ void Scene::onDragHover(const DragHoverEvent& e) {
 }
 
 void Scene::onHoverKey(const HoverKeyEvent& e) {
-	OpaqueWidget::onHoverKey(e);
-	if (e.isConsumed())
-		return;
-
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
 		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -220,35 +216,51 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			rack->deselectModules();
 			e.consume(this);
 		}
-		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules())
-				rack->resetSelectedModulesAction();
+		if (e.keyName == "c" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			if (rack->hasSelectedModules()) {
+				rack->copyClipboardSelectedModules();
+				e.consume(this);
+			}
+		}
+		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			rack->pasteClipboardAction();
 			e.consume(this);
+		}
+		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			if (rack->hasSelectedModules()) {
+				rack->resetSelectedModulesAction();
+				e.consume(this);
+			}
 		}
 		if (e.keyName == "r" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules())
+			if (rack->hasSelectedModules()) {
 				rack->randomizeSelectedModulesAction();
-			e.consume(this);
-		}
-		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules())
-				rack->cloneSelectedModulesAction();
-			e.consume(this);
+				e.consume(this);
+			}
 		}
 		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules())
+			if (rack->hasSelectedModules()) {
 				rack->disconnectSelectedModulesAction();
-			e.consume(this);
+				e.consume(this);
+			}
 		}
 		if (e.keyName == "e" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules())
+			if (rack->hasSelectedModules()) {
 				rack->bypassSelectedModulesAction(!rack->areSelectedModulesBypassed());
-			e.consume(this);
+				e.consume(this);
+			}
+		}
+		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			if (rack->hasSelectedModules()) {
+				rack->cloneSelectedModulesAction();
+				e.consume(this);
+			}
 		}
 		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
-			if (rack->hasSelectedModules())
+			if (rack->hasSelectedModules()) {
 				rack->deleteSelectedModulesAction();
-			e.consume(this);
+				e.consume(this);
+			}
 		}
 	}
 
@@ -279,6 +291,10 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 	}
+
+	if (e.isConsumed())
+		return;
+	OpaqueWidget::onHoverKey(e);
 }
 
 void Scene::onPathDrop(const PathDropEvent& e) {

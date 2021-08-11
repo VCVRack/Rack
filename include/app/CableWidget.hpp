@@ -39,6 +39,7 @@ struct CableWidget : widget::Widget {
 	Adopts ownership.
 	*/
 	void setCable(engine::Cable* cable);
+	engine::Cable* getCable();
 	math::Vec getInputPos();
 	math::Vec getOutputPos();
 	json_t* toJson();

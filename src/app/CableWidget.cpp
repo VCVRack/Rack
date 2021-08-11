@@ -185,6 +185,10 @@ void CableWidget::setCable(engine::Cable* cable) {
 	}
 }
 
+engine::Cable* CableWidget::getCable() {
+	return cable;
+}
+
 math::Vec CableWidget::getInputPos() {
 	if (inputPort) {
 		return inputPort->getRelativeOffset(inputPort->box.zeroPos().getCenter(), APP->scene->rack);

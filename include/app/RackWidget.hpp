@@ -1,6 +1,4 @@
 #pragma once
-#include <map>
-
 #include <app/common.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <widget/FramebufferWidget.hpp>
@@ -49,7 +47,7 @@ struct RackWidget : widget::OpaqueWidget {
 	void clear();
 	void mergeJson(json_t* rootJ);
 	void fromJson(json_t* rootJ);
-	void pastePresetClipboardAction();
+	void pasteClipboardAction();
 
 	// Module methods
 
@@ -66,7 +64,7 @@ struct RackWidget : widget::OpaqueWidget {
 	void setModulePosNearest(ModuleWidget* mw, math::Vec pos);
 	void setModulePosForce(ModuleWidget* mw, math::Vec pos);
 	ModuleWidget* getModule(int64_t moduleId);
-	std::list<ModuleWidget*> getModules();
+	std::vector<ModuleWidget*> getModules();
 	bool hasModules();
 	void updateModuleOldPositions();
 	history::ComplexAction* getModuleDragAction();
@@ -78,13 +76,15 @@ struct RackWidget : widget::OpaqueWidget {
 	void selectAllModules();
 	bool hasSelectedModules();
 	int getNumSelectedModules();
-	std::list<ModuleWidget*> getSelectedModules();
+	std::vector<ModuleWidget*> getSelectedModules();
+	json_t* selectedModulesToJson();
 	void resetSelectedModulesAction();
 	void randomizeSelectedModulesAction();
 	void disconnectSelectedModulesAction();
 	void cloneSelectedModulesAction();
 	void bypassSelectedModulesAction(bool bypassed);
 	bool areSelectedModulesBypassed();
+	void copyClipboardSelectedModules();
 	void deleteSelectedModulesAction();
 	bool requestSelectedModulePos(math::Vec delta);
 	void setSelectedModulesPosNearest(math::Vec delta);
@@ -108,9 +108,9 @@ struct RackWidget : widget::OpaqueWidget {
 	/** Returns the most recently added complete cable connected to the given Port, i.e. the top of the stack. */
 	CableWidget* getTopCable(PortWidget* port);
 	CableWidget* getCable(int64_t cableId);
-	std::list<CableWidget*> getCompleteCables();
+	std::vector<CableWidget*> getCompleteCables();
 	/** Returns all cables attached to port, complete or not. */
-	std::list<CableWidget*> getCablesOnPort(PortWidget* port);
+	std::vector<CableWidget*> getCablesOnPort(PortWidget* port);
 };
 
 
