@@ -737,11 +737,13 @@ ModuleWidget* RackWidget::getModule(int64_t moduleId) {
 
 std::vector<ModuleWidget*> RackWidget::getModules() {
 	std::vector<ModuleWidget*> mws;
+	mws.reserve(internal->moduleContainer->children.size());
 	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
 		mws.push_back(mw);
 	}
+	mws.shrink_to_fit();
 	return mws;
 }
 
@@ -817,12 +819,14 @@ int RackWidget::getNumSelectedModules() {
 
 std::vector<ModuleWidget*> RackWidget::getSelectedModules() {
 	std::vector<ModuleWidget*> mws;
+	mws.reserve(internal->moduleContainer->children.size());
 	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
 		if (mw->selected())
 			mws.push_back(mw);
 	}
+	mws.shrink_to_fit();
 	return mws;
 }
 
@@ -1183,12 +1187,14 @@ CableWidget* RackWidget::getCable(int64_t cableId) {
 
 std::vector<CableWidget*> RackWidget::getCompleteCables() {
 	std::vector<CableWidget*> cws;
+	cws.reserve(internal->cableContainer->children.size());
 	for (widget::Widget* w : internal->cableContainer->children) {
 		CableWidget* cw = dynamic_cast<CableWidget*>(w);
 		assert(cw);
 		if (cw->isComplete())
 			cws.push_back(cw);
 	}
+	cws.shrink_to_fit();
 	return cws;
 }
 
