@@ -73,23 +73,25 @@ struct RackWidget : widget::OpaqueWidget {
 
 	// Module selection methods
 
-	void updateModuleSelections();
-	void deselectModules();
-	void selectAllModules();
-	bool hasSelectedModules();
-	int getNumSelectedModules();
+	void updateSelectionFromRect();
+	void selectAll();
+	void deselect();
+	bool hasSelection();
+	int getNumSelected();
 	std::vector<ModuleWidget*> getSelectedModules();
-	json_t* selectedModulesToJson();
-	void resetSelectedModulesAction();
-	void randomizeSelectedModulesAction();
-	void disconnectSelectedModulesAction();
-	void cloneSelectedModulesAction();
-	void bypassSelectedModulesAction(bool bypassed);
-	bool areSelectedModulesBypassed();
-	void copyClipboardSelectedModules();
-	void deleteSelectedModulesAction();
-	bool requestSelectedModulePos(math::Vec delta);
-	void setSelectedModulesPosNearest(math::Vec delta);
+	json_t* selectionToJson();
+	void loadSelectionDialog();
+	void saveSelectionDialog();
+	void copyClipboardSelection();
+	void resetSelectionAction();
+	void randomizeSelectionAction();
+	void disconnectSelectionAction();
+	void cloneSelectionAction();
+	void bypassSelectionAction(bool bypassed);
+	bool isSelectionBypassed();
+	void deleteSelectionAction();
+	bool requestSelectionPos(math::Vec delta);
+	void setSelectionPosNearest(math::Vec delta);
 	void appendSelectionContextMenu(ui::Menu* menu);
 
 	// Cable methods

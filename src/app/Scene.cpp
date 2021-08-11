@@ -209,16 +209,16 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 
 		// Module selections
 		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			rack->selectAllModules();
+			rack->selectAll();
 			e.consume(this);
 		}
 		if (e.keyName == "a" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
-			rack->deselectModules();
+			rack->deselect();
 			e.consume(this);
 		}
 		if (e.keyName == "c" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules()) {
-				rack->copyClipboardSelectedModules();
+			if (rack->hasSelection()) {
+				rack->copyClipboardSelection();
 				e.consume(this);
 			}
 		}
@@ -227,38 +227,38 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules()) {
-				rack->resetSelectedModulesAction();
+			if (rack->hasSelection()) {
+				rack->resetSelectionAction();
 				e.consume(this);
 			}
 		}
 		if (e.keyName == "r" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules()) {
-				rack->randomizeSelectedModulesAction();
+			if (rack->hasSelection()) {
+				rack->randomizeSelectionAction();
 				e.consume(this);
 			}
 		}
 		if (e.keyName == "u" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules()) {
-				rack->disconnectSelectedModulesAction();
+			if (rack->hasSelection()) {
+				rack->disconnectSelectionAction();
 				e.consume(this);
 			}
 		}
 		if (e.keyName == "e" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules()) {
-				rack->bypassSelectedModulesAction(!rack->areSelectedModulesBypassed());
+			if (rack->hasSelection()) {
+				rack->bypassSelectionAction(!rack->isSelectionBypassed());
 				e.consume(this);
 			}
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			if (rack->hasSelectedModules()) {
-				rack->cloneSelectedModulesAction();
+			if (rack->hasSelection()) {
+				rack->cloneSelectionAction();
 				e.consume(this);
 			}
 		}
 		if ((e.key == GLFW_KEY_DELETE || e.key == GLFW_KEY_BACKSPACE) && (e.mods & RACK_MOD_MASK) == 0) {
-			if (rack->hasSelectedModules()) {
-				rack->deleteSelectedModulesAction();
+			if (rack->hasSelection()) {
+				rack->deleteSelectionAction();
 				e.consume(this);
 			}
 		}

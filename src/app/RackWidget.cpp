@@ -158,7 +158,7 @@ void RackWidget::onButton(const ButtonEvent& e) {
 void RackWidget::onDragStart(const DragStartEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		// Deselect all modules
-		updateModuleSelections();
+		updateSelectionFromRect();
 		internal->selecting = true;
 		internal->selectionStart = internal->mousePos;
 		internal->selectionEnd = internal->mousePos;
@@ -177,7 +177,7 @@ void RackWidget::onDragHover(const DragHoverEvent& e) {
 
 	if (internal->selecting) {
 		internal->selectionEnd = internal->mousePos;
-		updateModuleSelections();
+		updateSelectionFromRect();
 	}
 
 	OpaqueWidget::onDragHover(e);
@@ -392,7 +392,7 @@ static void cleanupModuleJson(json_t* moduleJ) {
 }
 
 void RackWidget::pasteJsonAction(json_t* rootJ) {
-	deselectModules();
+	deselect();
 
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "paste modules";
@@ -448,7 +448,7 @@ void RackWidget::pasteJsonAction(json_t* rootJ) {
 	}
 
 	// This calls RackWidget_updateExpanders()
-	setSelectedModulesPosNearest(math::Vec(0, 0));
+	setSelectionPosNearest(math::Vec(0, 0));
 
 	// Add positioned selected modules to history
 	for (ModuleWidget* mw : getSelectedModules()) {
@@ -777,7 +777,7 @@ history::ComplexAction* RackWidget::getModuleDragAction() {
 	return h;
 }
 
-void RackWidget::updateModuleSelections() {
+void RackWidget::updateSelectionFromRect() {
 	math::Rect selectionBox = math::Rect::fromCorners(internal->selectionStart, internal->selectionEnd);
 	for (ModuleWidget* mw : getModules()) {
 		bool selected = internal->selecting && selectionBox.intersects(mw->box);
@@ -785,19 +785,19 @@ void RackWidget::updateModuleSelections() {
 	}
 }
 
-void RackWidget::deselectModules() {
-	for (ModuleWidget* mw : getModules()) {
-		mw->selected() = false;
-	}
-}
-
-void RackWidget::selectAllModules() {
+void RackWidget::selectAll() {
 	for (ModuleWidget* mw : getModules()) {
 		mw->selected() = true;
 	}
 }
 
-bool RackWidget::hasSelectedModules() {
+void RackWidget::deselect() {
+	for (ModuleWidget* mw : getModules()) {
+		mw->selected() = false;
+	}
+}
+
+bool RackWidget::hasSelection() {
 	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		assert(mw);
@@ -807,7 +807,7 @@ bool RackWidget::hasSelectedModules() {
 	return false;
 }
 
-int RackWidget::getNumSelectedModules() {
+int RackWidget::getNumSelected() {
 	int count = 0;
 	for (widget::Widget* w : internal->moduleContainer->children) {
 		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
@@ -831,7 +831,7 @@ std::vector<ModuleWidget*> RackWidget::getSelectedModules() {
 	return mws;
 }
 
-json_t* RackWidget::selectedModulesToJson() {
+json_t* RackWidget::selectionToJson() {
 	json_t* rootJ = json_object();
 
 	std::set<engine::Module*> modules;
@@ -876,7 +876,23 @@ json_t* RackWidget::selectedModulesToJson() {
 	return rootJ;
 }
 
-void RackWidget::resetSelectedModulesAction() {
+void RackWidget::loadSelectionDialog() {
+	// TODO
+}
+
+void RackWidget::saveSelectionDialog() {
+	// TODO
+}
+
+void RackWidget::copyClipboardSelection() {
+	json_t* rootJ = selectionToJson();
+	DEFER({json_decref(rootJ);});
+	char* moduleJson = json_dumps(rootJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	DEFER({std::free(moduleJson);});
+	glfwSetClipboardString(APP->window->win, moduleJson);
+}
+
+void RackWidget::resetSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "reset modules";
 
@@ -897,7 +913,7 @@ void RackWidget::resetSelectedModulesAction() {
 	APP->history->push(complexAction);
 }
 
-void RackWidget::randomizeSelectedModulesAction() {
+void RackWidget::randomizeSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "randomize modules";
 
@@ -918,7 +934,7 @@ void RackWidget::randomizeSelectedModulesAction() {
 	APP->history->push(complexAction);
 }
 
-void RackWidget::disconnectSelectedModulesAction() {
+void RackWidget::disconnectSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "disconnect cables";
 
@@ -932,14 +948,14 @@ void RackWidget::disconnectSelectedModulesAction() {
 		delete complexAction;
 }
 
-void RackWidget::cloneSelectedModulesAction() {
-	json_t* rootJ = selectedModulesToJson();
+void RackWidget::cloneSelectionAction() {
+	json_t* rootJ = selectionToJson();
 	DEFER({json_decref(rootJ);});
 	// TODO The Action name is incorrect here.
 	pasteJsonAction(rootJ);
 }
 
-void RackWidget::bypassSelectedModulesAction(bool bypassed) {
+void RackWidget::bypassSelectionAction(bool bypassed) {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = bypassed ? "bypass modules" : "un-bypass modules";
 
@@ -963,7 +979,7 @@ void RackWidget::bypassSelectedModulesAction(bool bypassed) {
 		delete complexAction;
 }
 
-bool RackWidget::areSelectedModulesBypassed() {
+bool RackWidget::isSelectionBypassed() {
 	for (ModuleWidget* mw : getSelectedModules()) {
 		if (!mw->getModule()->isBypassed())
 			return false;
@@ -971,15 +987,7 @@ bool RackWidget::areSelectedModulesBypassed() {
 	return true;
 }
 
-void RackWidget::copyClipboardSelectedModules() {
-	json_t* rootJ = selectedModulesToJson();
-	DEFER({json_decref(rootJ);});
-	char* moduleJson = json_dumps(rootJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-	DEFER({std::free(moduleJson);});
-	glfwSetClipboardString(APP->window->win, moduleJson);
-}
-
-void RackWidget::deleteSelectedModulesAction() {
+void RackWidget::deleteSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "remove modules";
 
@@ -998,7 +1006,7 @@ void RackWidget::deleteSelectedModulesAction() {
 	APP->history->push(complexAction);
 }
 
-bool RackWidget::requestSelectedModulePos(math::Vec delta) {
+bool RackWidget::requestSelectionPos(math::Vec delta) {
 	// Check intersection with other modules
 	std::map<widget::Widget*, math::Rect> mwBoxes;
 	for (ModuleWidget* mw : getSelectedModules()) {
@@ -1028,29 +1036,29 @@ bool RackWidget::requestSelectedModulePos(math::Vec delta) {
 	return true;
 }
 
-void RackWidget::setSelectedModulesPosNearest(math::Vec delta) {
+void RackWidget::setSelectionPosNearest(math::Vec delta) {
 	eachNearestGridPos(delta, [&](math::Vec delta) -> bool {
-		return requestSelectedModulePos(delta);
+		return requestSelectionPos(delta);
 	});
 }
 
 void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
-	int n = getNumSelectedModules();
+	int n = getNumSelected();
 	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
 
 	// Select all
 	menu->addChild(createMenuItem("Select all", RACK_MOD_CTRL_NAME "+A", [=]() {
-		selectAllModules();
+		selectAll();
 	}));
 
 	// Deselect
 	menu->addChild(createMenuItem("Deselect", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+A", [=]() {
-		deselectModules();
+		deselect();
 	}, n == 0));
 
 	// Copy
 	menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [=]() {
-		copyClipboardSelectedModules();
+		copyClipboardSelection();
 	}, n == 0));
 
 	// Paste
@@ -1058,38 +1066,48 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 		pasteClipboardAction();
 	}));
 
+	// Load
+	menu->addChild(createMenuItem("Load selection", "", [=]() {
+		loadSelectionDialog();
+	}));
+
+	// Save
+	menu->addChild(createMenuItem("Save selection", "", [=]() {
+		saveSelectionDialog();
+	}, n == 0));
+
 	// Initialize
 	menu->addChild(createMenuItem("Initialize", RACK_MOD_CTRL_NAME "+I", [=]() {
-		resetSelectedModulesAction();
+		resetSelectionAction();
 	}, n == 0));
 
 	// Randomize
 	menu->addChild(createMenuItem("Randomize", RACK_MOD_CTRL_NAME "+R", [=]() {
-		randomizeSelectedModulesAction();
+		randomizeSelectionAction();
 	}, n == 0));
 
 	// Disconnect cables
 	menu->addChild(createMenuItem("Disconnect cables", RACK_MOD_CTRL_NAME "+U", [=]() {
-		disconnectSelectedModulesAction();
+		disconnectSelectionAction();
 	}, n == 0));
 
 	// Bypass
 	std::string bypassText = RACK_MOD_CTRL_NAME "+E";
-	bool bypassed = (n > 0) && areSelectedModulesBypassed();
+	bool bypassed = (n > 0) && isSelectionBypassed();
 	if (bypassed)
 		bypassText += " " CHECKMARK_STRING;
 	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
-		bypassSelectedModulesAction(!bypassed);
+		bypassSelectionAction(!bypassed);
 	}, n == 0));
 
 	// Duplicate
 	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
-		cloneSelectedModulesAction();
+		cloneSelectionAction();
 	}, n == 0));
 
 	// Delete
 	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
-		deleteSelectedModulesAction();
+		deleteSelectionAction();
 	}, n == 0));
 }
 

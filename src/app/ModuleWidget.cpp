@@ -444,7 +444,7 @@ void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 				if (internal->selected) {
 					pos = (pos / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
 					math::Vec delta = pos.minus(box.pos);
-					APP->scene->rack->setSelectedModulesPosNearest(delta);
+					APP->scene->rack->setSelectionPosNearest(delta);
 				}
 				else {
 					if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
