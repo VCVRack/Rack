@@ -901,7 +901,10 @@ void RackWidget::disconnectSelectedModulesAction() {
 }
 
 void RackWidget::cloneSelectedModulesAction() {
-	// TODO
+	json_t* rootJ = selectedModulesToJson();
+	DEFER({json_decref(rootJ);});
+	// TODO The Action name is incorrect here.
+	pasteJsonAction(rootJ);
 }
 
 void RackWidget::bypassSelectedModulesAction(bool bypassed) {
