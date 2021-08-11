@@ -2,19 +2,20 @@
 <!-- Generator: Adobe Illustrator 25.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.0"
 	 id="svg15246" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
-	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="44.6px" height="44.6px"
-	 viewBox="0 0 44.6 44.6" enable-background="new 0 0 44.6 44.6" xml:space="preserve">
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="33px" height="33px"
+	 viewBox="0 0 33 33" enable-background="new 0 0 33 33" xml:space="preserve">
 <sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="0" fit-margin-left="0" fit-margin-right="0" fit-margin-top="0" id="base" inkscape:current-layer="svg15246" inkscape:cx="12.608857" inkscape:cy="35.393282" inkscape:document-units="mm" inkscape:pagecheckerboard="0" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:snap-bbox="true" inkscape:snap-bbox-midpoints="true" inkscape:snap-nodes="false" inkscape:snap-others="false" inkscape:window-height="882" inkscape:window-maximized="1" inkscape:window-width="1600" inkscape:window-x="0" inkscape:window-y="18" inkscape:zoom="9.0412639" pagecolor="#ffffff" showgrid="false" units="px">
 	<inkscape:grid  id="grid1322" type="xygrid"></inkscape:grid>
 </sodipodi:namedview>
-<path fill="#FFFFFF" d="M31.33582,28.19863c1.10779-1.69714,1.75739-3.7207,1.75739-5.89862
+<path fill="#FFFFFF" d="M25.53582,22.39863c1.10779-1.69714,1.75739-3.7207,1.75739-5.89862
 	c0-5.97198-4.84125-10.81317-10.81317-10.81317c-5.97198,0-10.81317,4.84119-10.81317,10.81317
 	c0,2.17792,0.6496,4.20148,1.75739,5.89862l4.79089,7.89569c0.80066,1.53583,2.41302,2.59515,4.26489,2.59515
-	s3.46417-1.05933,4.26483-2.59515L31.33582,28.19863z"/>
-<path opacity="0.2" d="M22.28003,11.98684c5.6867,0,10.31317,4.62647,10.31317,10.31317c0,2.00026-0.57958,3.94546-1.68484,5.63924
-	l-4.80687,7.92393c-0.74805,1.43492-2.21235,2.3263-3.82146,2.3263c-1.60915,0-3.07347-0.89138-3.83743-2.35453l-4.79966-7.90962
-	c-1.0965-1.67986-1.67608-3.62506-1.67608-5.62532C11.96686,16.61331,16.59333,11.98684,22.28003,11.98684 M22.28003,11.48684
-	c-5.97198,0-10.81317,4.84119-10.81317,10.81317c0,2.17792,0.6496,4.20148,1.75738,5.89862l4.7909,7.89569
-	c0.80066,1.53583,2.41302,2.59516,4.26489,2.59516s3.46417-1.05933,4.26483-2.59516l4.79096-7.89569
-	c1.10778-1.69714,1.75738-3.7207,1.75738-5.89862C33.0932,16.32803,28.25195,11.48684,22.28003,11.48684L22.28003,11.48684z"/>
+	s3.46417-1.05933,4.26483-2.59515L25.53582,22.39863z"/>
+<path opacity="0.2" enable-background="new    " d="M16.48003,6.18684c5.6867,0,10.31317,4.62647,10.31317,10.31317
+	c0,2.00026-0.57958,3.94546-1.68484,5.63924l-4.80687,7.92393c-0.74805,1.43492-2.21235,2.3263-3.82146,2.3263
+	c-1.60915,0-3.07347-0.89138-3.83743-2.35453l-4.79966-7.90962c-1.0965-1.67986-1.67608-3.62506-1.67608-5.62532
+	C6.16686,10.81331,10.79333,6.18684,16.48003,6.18684 M16.48003,5.68684c-5.97198,0-10.81317,4.84119-10.81317,10.81317
+	c0,2.17792,0.6496,4.20148,1.75738,5.89862l4.7909,7.89569c0.80066,1.53583,2.41302,2.59516,4.26489,2.59516
+	s3.46417-1.05933,4.26483-2.59516l4.79096-7.89569c1.10778-1.69714,1.75738-3.7207,1.75738-5.89862
+	C27.2932,10.52803,22.45195,5.68684,16.48003,5.68684L16.48003,5.68684z"/>
 </svg>
