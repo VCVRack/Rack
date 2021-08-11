@@ -205,13 +205,42 @@ void RackWidget::clear() {
 	}
 }
 
+static void RackWidget_updateExpanders(RackWidget* that) {
+	for (widget::Widget* w : that->internal->moduleContainer->children) {
+		math::Vec pLeft = w->box.pos.div(RACK_GRID_SIZE).round();
+		math::Vec pRight = w->box.getTopRight().div(RACK_GRID_SIZE).round();
+		ModuleWidget* mwLeft = NULL;
+		ModuleWidget* mwRight = NULL;
+
+		// Find adjacent modules
+		for (widget::Widget* w2 : that->internal->moduleContainer->children) {
+			if (w2 == w)
+				continue;
+
+			math::Vec p2Left = w2->box.pos.div(RACK_GRID_SIZE).round();
+			math::Vec p2Right = w2->box.getTopRight().div(RACK_GRID_SIZE).round();
+
+			// Check if this is a left module
+			if (p2Right.equals(pLeft)) {
+				mwLeft = dynamic_cast<ModuleWidget*>(w2);
+			}
+
+			// Check if this is a right module
+			if (p2Left.equals(pRight)) {
+				mwRight = dynamic_cast<ModuleWidget*>(w2);
+			}
+		}
+
+		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
+		mw->module->leftExpander.moduleId = mwLeft ? mwLeft->module->id : -1;
+		mw->module->rightExpander.moduleId = mwRight ? mwRight->module->id : -1;
+	}
+}
+
 void RackWidget::mergeJson(json_t* rootJ) {
 	// Get module offset so modules are aligned to (0, 0) when the patch is loaded.
-	math::Vec moduleOffset = math::Vec(INFINITY, INFINITY);
-	for (widget::Widget* w : internal->moduleContainer->children) {
-		moduleOffset = moduleOffset.min(w->box.pos);
-	}
-	if (internal->moduleContainer->children.empty()) {
+	math::Vec moduleOffset = internal->moduleContainer->getChildrenBoundingBox().pos;
+	if (!moduleOffset.isFinite()) {
 		moduleOffset = RACK_OFFSET;
 	}
 
@@ -228,14 +257,14 @@ void RackWidget::mergeJson(json_t* rootJ) {
 			continue;
 		int64_t id = json_integer_value(idJ);
 		// TODO Legacy v0.6?
-		ModuleWidget* moduleWidget = getModule(id);
-		if (!moduleWidget) {
+		ModuleWidget* mw = getModule(id);
+		if (!mw) {
 			WARN("Cannot find ModuleWidget %" PRId64, id);
 			continue;
 		}
 
 		// pos
-		math::Vec pos = moduleWidget->box.pos.minus(moduleOffset);
+		math::Vec pos = mw->box.pos.minus(moduleOffset);
 		pos = pos.div(RACK_GRID_SIZE).round();
 		json_t* posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
 		json_object_set_new(moduleJ, "pos", posJ);
@@ -299,7 +328,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 		}
 
 		// Create ModuleWidget
-		ModuleWidget* moduleWidget = module->model->createModuleWidget(module);
+		ModuleWidget* mw = module->model->createModuleWidget(module);
 
 		// pos
 		json_t* posJ = json_object_get(moduleJ, "pos");
@@ -308,15 +337,16 @@ void RackWidget::fromJson(json_t* rootJ) {
 		math::Vec pos = math::Vec(x, y);
 		if (legacyV05) {
 			// In <=v0.5, positions were in pixel units
-			moduleWidget->box.pos = pos;
 		}
 		else {
-			moduleWidget->box.pos = pos.mult(RACK_GRID_SIZE);
+			pos = pos.mult(RACK_GRID_SIZE);
 		}
-		moduleWidget->box.pos = moduleWidget->box.pos.plus(RACK_OFFSET);
+		mw->box.pos = pos.plus(RACK_OFFSET);
 
-		addModule(moduleWidget);
+		internal->moduleContainer->addChild(mw);
 	}
+
+	RackWidget_updateExpanders(this);
 
 	// cables
 	json_t* cablesJ = json_object_get(rootJ, "cables");
@@ -355,13 +385,107 @@ void RackWidget::fromJson(json_t* rootJ) {
 	}
 }
 
-void RackWidget::fromJsonAction(json_t* rootJ) {
-	json_t* moduleJ = rootJ;
-
-	// Because we are creating a new module, we don't want to use the IDs from the JSON.
+static void cleanupModuleJson(json_t* moduleJ) {
 	json_object_del(moduleJ, "id");
 	json_object_del(moduleJ, "leftModuleId");
 	json_object_del(moduleJ, "rightModuleId");
+}
+
+void RackWidget::pasteJsonAction(json_t* rootJ) {
+	deselectModules();
+
+	history::ComplexAction* complexAction = new history::ComplexAction;
+	complexAction->name = "paste modules";
+	DEFER({
+		if (!complexAction->isEmpty())
+			APP->history->push(complexAction);
+		else
+			delete complexAction;
+	});
+
+	// modules
+	json_t* modulesJ = json_object_get(rootJ, "modules");
+	if (!modulesJ)
+		return;
+
+	size_t moduleIndex;
+	json_t* moduleJ;
+	json_array_foreach(modulesJ, moduleIndex, moduleJ) {
+		cleanupModuleJson(moduleJ);
+
+		ModuleWidget* mw;
+		try {
+			mw = moduleWidgetFromJson(moduleJ);
+		}
+		catch (Exception& e) {
+			WARN("%s", e.what());
+			continue;
+		}
+		assert(mw);
+		assert(mw->module);
+
+		APP->engine->addModule(mw->module);
+
+		// pos
+		json_t* posJ = json_object_get(moduleJ, "pos");
+		double x = 0.0, y = 0.0;
+		json_unpack(posJ, "[F, F]", &x, &y);
+		math::Vec pos = math::Vec(x, y);
+		pos = pos.mult(RACK_GRID_SIZE);
+		mw->box.pos = pos.plus(RACK_OFFSET);
+
+		internal->moduleContainer->addChild(mw);
+		mw->selected() = true;
+
+		// history::ModuleAdd
+		history::ModuleAdd* h = new history::ModuleAdd;
+		h->setModule(mw);
+		complexAction->push(h);
+	}
+
+	// This calls RackWidget_updateExpanders()
+	setSelectedModulesPosNearest(math::Vec(0, 0));
+
+	// TODO
+	// // cables
+	// json_t* cablesJ = json_object_get(rootJ, "cables");
+	// // In <=v0.6, cables were called wires
+	// if (!cablesJ)
+	// 	cablesJ = json_object_get(rootJ, "wires");
+	// if (!cablesJ)
+	// 	return;
+	// size_t cableIndex;
+	// json_t* cableJ;
+	// json_array_foreach(cablesJ, cableIndex, cableJ) {
+	// 	// Get cable ID
+	// 	json_t* idJ = json_object_get(cableJ, "id");
+	// 	int64_t id;
+	// 	if (idJ)
+	// 		id = json_integer_value(idJ);
+	// 	else
+	// 		id = cableIndex;
+
+	// 	// Get Cable
+	// 	engine::Cable* cable = APP->engine->getCable(id);
+	// 	if (!cable) {
+	// 		WARN("Cannot find Cable %" PRId64, id);
+	// 		continue;
+	// 	}
+
+	// 	// Create CableWidget
+	// 	CableWidget* cw = new CableWidget;
+	// 	cw->setCable(cable);
+	// 	cw->fromJson(cableJ);
+	// 	// In <=v1, cable colors were not serialized, so choose one from the available colors.
+	// 	if (cw->color.a == 0.f) {
+	// 		cw->setNextCableColor();
+	// 	}
+	// 	addCable(cw);
+	// }
+}
+
+void RackWidget::pasteModuleJsonAction(json_t* moduleJ) {
+	cleanupModuleJson(moduleJ);
 
 	ModuleWidget* mw;
 	try {
@@ -379,57 +503,34 @@ void RackWidget::fromJsonAction(json_t* rootJ) {
 
 	// history::ModuleAdd
 	history::ModuleAdd* h = new history::ModuleAdd;
+	h->name = "paste module";
 	h->setModule(mw);
 	APP->history->push(h);
 }
 
 void RackWidget::pasteClipboardAction() {
-	const char* moduleJson = glfwGetClipboardString(APP->window->win);
-	if (!moduleJson) {
+	const char* json = glfwGetClipboardString(APP->window->win);
+	if (!json) {
 		WARN("Could not get text from clipboard.");
 		return;
 	}
 
 	json_error_t error;
-	json_t* moduleJ = json_loads(moduleJson, 0, &error);
-	if (!moduleJ) {
+	json_t* rootJ = json_loads(json, 0, &error);
+	if (!rootJ) {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		return;
 	}
-	DEFER({json_decref(moduleJ);});
+	DEFER({json_decref(rootJ);});
 
-	fromJsonAction(moduleJ);
-}
-
-static void RackWidget_updateExpanders(RackWidget* that) {
-	for (widget::Widget* w : that->internal->moduleContainer->children) {
-		math::Vec pLeft = w->box.pos.div(RACK_GRID_SIZE).round();
-		math::Vec pRight = w->box.getTopRight().div(RACK_GRID_SIZE).round();
-		ModuleWidget* mwLeft = NULL;
-		ModuleWidget* mwRight = NULL;
-
-		// Find adjacent modules
-		for (widget::Widget* w2 : that->internal->moduleContainer->children) {
-			if (w2 == w)
-				continue;
-
-			math::Vec p2Left = w2->box.pos.div(RACK_GRID_SIZE).round();
-			math::Vec p2Right = w2->box.getTopRight().div(RACK_GRID_SIZE).round();
-
-			// Check if this is a left module
-			if (p2Right.equals(pLeft)) {
-				mwLeft = dynamic_cast<ModuleWidget*>(w2);
-			}
-
-			// Check if this is a right module
-			if (p2Left.equals(pRight)) {
-				mwRight = dynamic_cast<ModuleWidget*>(w2);
-			}
-		}
-
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
-		mw->module->leftExpander.moduleId = mwLeft ? mwLeft->module->id : -1;
-		mw->module->rightExpander.moduleId = mwRight ? mwRight->module->id : -1;
+	json_t* modulesJ = json_object_get(rootJ, "modules");
+	if (modulesJ) {
+		// JSON is a selection of modules
+		pasteJsonAction(rootJ);
+	}
+	else {
+		// JSON is a single module
+		pasteModuleJsonAction(rootJ);
 	}
 }
 
@@ -707,8 +808,14 @@ json_t* RackWidget::selectedModulesToJson() {
 	json_t* modulesJ = json_array();
 	for (ModuleWidget* mw : getSelectedModules()) {
 		json_t* moduleJ = mw->toJson();
-		json_array_append_new(modulesJ, moduleJ);
 
+		// pos
+		math::Vec pos = mw->box.pos.minus(RACK_OFFSET);
+		pos = pos.div(RACK_GRID_SIZE).round();
+		json_t* posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
+		json_object_set_new(moduleJ, "pos", posJ);
+
+		json_array_append_new(modulesJ, moduleJ);
 		modules.insert(mw->getModule());
 	}
 	json_object_set_new(rootJ, "modules", modulesJ);

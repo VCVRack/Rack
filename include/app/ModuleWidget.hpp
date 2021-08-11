@@ -80,7 +80,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
-	void fromJsonAction(json_t* rootJ);
+	void pasteJsonAction(json_t* rootJ);
 	void copyClipboard();
 	void pasteClipboardAction();
 	void load(std::string filename);

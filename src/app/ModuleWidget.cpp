@@ -471,25 +471,28 @@ void ModuleWidget::onDragHover(const DragHoverEvent& e) {
 	OpaqueWidget::onDragHover(e);
 }
 
+static void cleanupModuleJson(json_t* moduleJ) {
+	json_object_del(moduleJ, "id");
+	json_object_del(moduleJ, "leftModuleId");
+	json_object_del(moduleJ, "rightModuleId");
+}
+
 json_t* ModuleWidget::toJson() {
-	json_t* rootJ = APP->engine->moduleToJson(module);
-	return rootJ;
+	json_t* moduleJ = APP->engine->moduleToJson(module);
+	return moduleJ;
 }
 
-void ModuleWidget::fromJson(json_t* rootJ) {
-	APP->engine->moduleFromJson(module, rootJ);
+void ModuleWidget::fromJson(json_t* moduleJ) {
+	APP->engine->moduleFromJson(module, moduleJ);
 }
 
-void ModuleWidget::fromJsonAction(json_t* rootJ) {
-	// Don't use IDs from JSON
-	json_object_del(rootJ, "id");
-	json_object_del(rootJ, "leftModuleId");
-	json_object_del(rootJ, "rightModuleId");
+void ModuleWidget::pasteJsonAction(json_t* moduleJ) {
+	cleanupModuleJson(moduleJ);
 
 	json_t* oldModuleJ = toJson();
 
 	try {
-		fromJson(rootJ);
+		fromJson(moduleJ);
 	}
 	catch (Exception& e) {
 		WARN("%s", e.what());
@@ -502,34 +505,36 @@ void ModuleWidget::fromJsonAction(json_t* rootJ) {
 	h->name = "paste module preset";
 	h->moduleId = module->id;
 	h->oldModuleJ = oldModuleJ;
-	h->newModuleJ = toJson();
+	h->newModuleJ = moduleJ;
 	APP->history->push(h);
 }
 
 void ModuleWidget::copyClipboard() {
 	json_t* moduleJ = toJson();
+	cleanupModuleJson(moduleJ);
+
 	DEFER({json_decref(moduleJ);});
-	char* moduleJson = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
-	DEFER({std::free(moduleJson);});
-	glfwSetClipboardString(APP->window->win, moduleJson);
+	char* json = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	DEFER({std::free(json);});
+	glfwSetClipboardString(APP->window->win, json);
 }
 
 void ModuleWidget::pasteClipboardAction() {
-	const char* moduleJson = glfwGetClipboardString(APP->window->win);
-	if (!moduleJson) {
+	const char* json = glfwGetClipboardString(APP->window->win);
+	if (!json) {
 		WARN("Could not get text from clipboard.");
 		return;
 	}
 
 	json_error_t error;
-	json_t* moduleJ = json_loads(moduleJson, 0, &error);
+	json_t* moduleJ = json_loads(json, 0, &error);
 	if (!moduleJ) {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 		return;
 	}
 	DEFER({json_decref(moduleJ);});
 
-	fromJsonAction(moduleJ);
+	pasteJsonAction(moduleJ);
 }
 
 void ModuleWidget::load(std::string filename) {
@@ -546,11 +551,7 @@ void ModuleWidget::load(std::string filename) {
 		throw Exception("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	DEFER({json_decref(moduleJ);});
 
-	// Don't use IDs from JSON
-	json_object_del(moduleJ, "id");
-	json_object_del(moduleJ, "leftModuleId");
-	json_object_del(moduleJ, "rightModuleId");
-
+	cleanupModuleJson(moduleJ);
 	fromJson(moduleJ);
 }
 
@@ -569,6 +570,7 @@ void ModuleWidget::loadAction(std::string filename) {
 		throw;
 	}
 
+	// TODO We can use `moduleJ` here instead to save a toJson() call.
 	h->newModuleJ = toJson();
 	APP->history->push(h);
 }
@@ -622,6 +624,8 @@ void ModuleWidget::save(std::string filename) {
 	json_t* moduleJ = toJson();
 	assert(moduleJ);
 	DEFER({json_decref(moduleJ);});
+
+	cleanupModuleJson(moduleJ);
 
 	FILE* file = std::fopen(filename.c_str(), "w");
 	if (!file) {
