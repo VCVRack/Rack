@@ -766,6 +766,7 @@ void ModuleWidget::disconnectAction() {
 void ModuleWidget::cloneAction() {
 	// history::ComplexAction
 	history::ComplexAction* h = new history::ComplexAction;
+	h->name = "duplicate module";
 
 	// JSON serialization is the obvious way to do this
 	json_t* moduleJ = toJson();
@@ -789,7 +790,6 @@ void ModuleWidget::cloneAction() {
 
 	// history::ModuleAdd
 	history::ModuleAdd* hma = new history::ModuleAdd;
-	hma->name = "clone modules";
 	hma->setModule(clonedModuleWidget);
 	h->push(hma);
 

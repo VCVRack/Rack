@@ -760,6 +760,7 @@ void RackWidget::updateModuleOldPositions() {
 
 history::ComplexAction* RackWidget::getModuleDragAction() {
 	history::ComplexAction* h = new history::ComplexAction;
+	h->name = "move modules";
 
 	for (ModuleWidget* mw : getModules()) {
 		// Create ModuleMove action if the module was moved.
