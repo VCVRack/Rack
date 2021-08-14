@@ -749,19 +749,23 @@ struct HelpButton : MenuButton {
 			system::openBrowser("https://vcvrack.com/manual/");
 		}));
 
-		menu->addChild(createMenuItem("vcvrack.com", "", [=]() {
+		menu->addChild(createMenuItem("VCVRack.com", "", [=]() {
 			system::openBrowser("https://vcvrack.com/");
 		}));
 
-		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuItem("Open user folder", "", [=]() {
+			system::openDirectory(asset::user(""));
+		}));
 
 		if (library::isAppUpdateAvailable()) {
+			menu->addChild(new ui::MenuSeparator);
+
 			menu->addChild(createMenuItem("Update " + APP_NAME, APP_VERSION + " → " + library::appVersion, [=]() {
 				system::openBrowser(library::appDownloadUrl);
 				APP->window->close();
 			}));
 
-			menu->addChild(createMenuItem("Changelog", "", [=]() {
+			menu->addChild(createMenuItem("Review changelog", "", [=]() {
 				system::openBrowser(library::appChangelogUrl);
 			}));
 		}
@@ -771,12 +775,8 @@ struct HelpButton : MenuButton {
 					library::checkAppUpdate();
 				});
 				t.detach();
-			}));
+			}, false, true));
 		}
-
-		menu->addChild(createMenuItem("Open user folder", "", [=]() {
-			system::openDirectory(asset::user(""));
-		}));
 
 		menu->addChild(new ui::MenuSeparator);
 
