@@ -60,20 +60,6 @@ struct NotificationIcon : widget::Widget {
 	}
 };
 
-struct UrlItem : ui::MenuItem {
-	std::string url;
-	void onAction(const ActionEvent& e) override {
-		system::openBrowser(url);
-	}
-};
-
-struct DirItem : ui::MenuItem {
-	std::string path;
-	void onAction(const ActionEvent& e) override {
-		system::openDirectory(path);
-	}
-};
-
 ////////////////////
 // File
 ////////////////////
@@ -82,7 +68,6 @@ struct FileButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
 
 		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
 			APP->patch->loadTemplateDialog();
@@ -129,47 +114,39 @@ struct FileButton : MenuButton {
 // Edit
 ////////////////////
 
-struct UndoItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->history->undo();
-	}
-};
-
-struct RedoItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->history->redo();
-	}
-};
-
-struct DisconnectCablesItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->patch->disconnectDialog();
-	}
-};
-
 struct EditButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
 
-		UndoItem* undoItem = new UndoItem;
-		undoItem->text = "Undo " + APP->history->getUndoName();
-		undoItem->rightText = RACK_MOD_CTRL_NAME "+Z";
-		undoItem->disabled = !APP->history->canUndo();
-		menu->addChild(undoItem);
+		struct UndoItem : ui::MenuItem {
+			void step() override {
+				text = "Undo " + APP->history->getUndoName();
+				disabled = !APP->history->canUndo();
+			}
+			void onAction(const ActionEvent& e) override {
+				APP->history->undo();
+			}
+		};
+		menu->addChild(createMenuItem<UndoItem>("", RACK_MOD_CTRL_NAME "+Z"));
 
-		RedoItem* redoItem = new RedoItem;
-		redoItem->text = "Redo " + APP->history->getRedoName();
-		redoItem->rightText = RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+Z";
-		redoItem->disabled = !APP->history->canRedo();
-		menu->addChild(redoItem);
+		struct RedoItem : ui::MenuItem {
+			void step() override {
+				text = "Redo " + APP->history->getRedoName();
+				disabled = !APP->history->canRedo();
+			}
+			void onAction(const ActionEvent& e) override {
+				APP->history->redo();
+			}
+		};
+		menu->addChild(createMenuItem<RedoItem>("", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+Z"));
 
-		DisconnectCablesItem* disconnectCablesItem = new DisconnectCablesItem;
-		disconnectCablesItem->text = "Clear cables";
-		menu->addChild(disconnectCablesItem);
+		menu->addChild(createMenuItem("Clear cables", "", [=]() {
+			APP->patch->disconnectDialog();
+		}));
 
 		menu->addChild(new ui::MenuSeparator);
+
 		APP->scene->rack->appendSelectionContextMenu(menu);
 	}
 };
@@ -348,7 +325,6 @@ struct ViewButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
 
 		menu->addChild(createBoolPtrMenuItem("Show tooltips", &settings::tooltips));
 
@@ -458,35 +434,10 @@ struct SampleRateItem : ui::MenuItem {
 	}
 };
 
-struct ThreadCountValueItem : ui::MenuItem {
-	int threadCount;
-	void setThreadCount(int threadCount) {
-		this->threadCount = threadCount;
-		text = string::f("%d", threadCount);
-		if (threadCount == system::getLogicalCoreCount() / 2)
-			text += " (most modules)";
-		else if (threadCount == 1)
-			text += " (lowest CPU usage)";
-		rightText = CHECKMARK(settings::threadCount == threadCount);
-	}
-	void onAction(const ActionEvent& e) override {
-		settings::threadCount = threadCount;
-	}
-};
-
-struct ThreadCountItem : ui::MenuItem {
-	ui::Menu* createChildMenu() override {
-		ui::Menu* menu = new ui::Menu;
-
-		return menu;
-	}
-};
-
 struct EngineButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
 
 		std::string cpuMeterText = "F3";
 		if (settings::cpuMeter)
@@ -610,10 +561,10 @@ struct SyncUpdateItem : ui::MenuItem {
 
 		ui::Menu* menu = new ui::Menu;
 
-		UrlItem* changelogUrl = new UrlItem;
-		changelogUrl->text = "Changelog";
-		changelogUrl->url = update.changelogUrl;
-		menu->addChild(changelogUrl);
+		std::string changelogUrl = update.changelogUrl;
+		menu->addChild(createMenuItem("Changelog", "", [=]() {
+			system::openBrowser(changelogUrl);
+		}));
 
 		return menu;
 	}
@@ -655,23 +606,6 @@ struct SyncUpdateItem : ui::MenuItem {
 };
 
 
-struct CheckUpdatesItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		std::thread t([&] {
-			library::checkUpdates();
-		});
-		t.detach();
-	}
-};
-
-
-struct LogOutItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		library::logOut();
-	}
-};
-
-
 struct LibraryMenu : ui::Menu {
 	bool loggedIn = false;
 
@@ -694,10 +628,9 @@ struct LibraryMenu : ui::Menu {
 			addChild(createMenuLabel("Disabled in development mode"));
 		}
 		else if (!library::isLoggedIn()) {
-			UrlItem* registerItem = new UrlItem;
-			registerItem->text = "Register VCV account";
-			registerItem->url = "https://vcvrack.com/login";
-			addChild(registerItem);
+			addChild(createMenuItem("Register VCV account", "", [=]() {
+				system::openBrowser("https://vcvrack.com/login");
+			}));
 
 			ui::TextField* emailField = new ui::TextField;
 			emailField->placeholder = "Email";
@@ -720,14 +653,13 @@ struct LibraryMenu : ui::Menu {
 		else {
 			loggedIn = true;
 
-			LogOutItem* logOutItem = new LogOutItem;
-			logOutItem->text = "Log out";
-			addChild(logOutItem);
+			addChild(createMenuItem("Log out", "", [=]() {
+				library::logOut();
+			}));
 
-			UrlItem* manageItem = new UrlItem;
-			manageItem->text = "Browse VCV Library";
-			manageItem->url = "https://library.vcvrack.com/";
-			addChild(manageItem);
+			addChild(createMenuItem("Browse VCV Library", "", [=]() {
+				system::openBrowser("https://library.vcvrack.com/");
+			}));
 
 			SyncUpdatesItem* syncItem = new SyncUpdatesItem;
 			syncItem->text = "Update all";
@@ -747,6 +679,14 @@ struct LibraryMenu : ui::Menu {
 				}
 			}
 			else if (!settings::autoCheckUpdates) {
+				struct CheckUpdatesItem : ui::MenuItem {
+					void onAction(const ActionEvent& e) override {
+						std::thread t([&] {
+							library::checkUpdates();
+						});
+						t.detach();
+					}
+				};
 				CheckUpdatesItem* checkUpdatesItem = new CheckUpdatesItem;
 				checkUpdatesItem->text = "Check for updates";
 				addChild(checkUpdatesItem);
@@ -767,7 +707,6 @@ struct LibraryButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu<LibraryMenu>();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
 	}
 
 	void step() override {
@@ -790,42 +729,6 @@ struct LibraryButton : MenuButton {
 // Help
 ////////////////////
 
-struct AppUpdateItem : ui::MenuItem {
-	ui::Menu* createChildMenu() override {
-		ui::Menu* menu = new ui::Menu;
-
-		UrlItem* changelogItem = new UrlItem;
-		changelogItem->text = "Changelog";
-		changelogItem->url = library::appChangelogUrl;
-		menu->addChild(changelogItem);
-
-		return menu;
-	}
-
-	void onAction(const ActionEvent& e) override {
-		system::openBrowser(library::appDownloadUrl);
-		APP->window->close();
-	}
-};
-
-
-struct CheckAppUpdateItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		std::thread t([&]() {
-			library::checkAppUpdate();
-		});
-		t.detach();
-	}
-};
-
-
-struct TipItem : ui::MenuItem {
-	void onAction(const ActionEvent& e) override {
-		APP->scene->addChild(tipWindowCreate());
-	}
-};
-
-
 struct HelpButton : MenuButton {
 	NotificationIcon* notification;
 
@@ -837,41 +740,43 @@ struct HelpButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
 
-		TipItem* tipItem = new TipItem;
-		tipItem->text = "Tips";
-		menu->addChild(tipItem);
+		menu->addChild(createMenuItem("Tips", "", [=]() {
+			APP->scene->addChild(tipWindowCreate());
+		}));
 
-		UrlItem* manualItem = new UrlItem;
-		manualItem->text = "Manual";
-		manualItem->rightText = "F1";
-		manualItem->url = "https://vcvrack.com/manual/";
-		menu->addChild(manualItem);
+		menu->addChild(createMenuItem("Manual", "F1", [=]() {
+			system::openBrowser("https://vcvrack.com/manual/");
+		}));
 
-		UrlItem* websiteItem = new UrlItem;
-		websiteItem->text = "VCVRack.com";
-		websiteItem->url = "https://vcvrack.com/";
-		menu->addChild(websiteItem);
+		menu->addChild(createMenuItem("vcvrack.com", "", [=]() {
+			system::openBrowser("https://vcvrack.com/");
+		}));
 
 		menu->addChild(new ui::MenuSeparator);
 
 		if (library::isAppUpdateAvailable()) {
-			AppUpdateItem* appUpdateItem = new AppUpdateItem;
-			appUpdateItem->text = "Update " + APP_NAME;
-			appUpdateItem->rightText = APP_VERSION + " → " + library::appVersion;
-			menu->addChild(appUpdateItem);
+			menu->addChild(createMenuItem("Update " + APP_NAME, APP_VERSION + " → " + library::appVersion, [=]() {
+				system::openBrowser(library::appDownloadUrl);
+				APP->window->close();
+			}));
+
+			menu->addChild(createMenuItem("Changelog", "", [=]() {
+				system::openBrowser(library::appChangelogUrl);
+			}));
 		}
 		else if (!settings::autoCheckUpdates && !settings::devMode) {
-			CheckAppUpdateItem* checkAppUpdateItem = new CheckAppUpdateItem;
-			checkAppUpdateItem->text = "Check for " + APP_NAME + " update";
-			menu->addChild(checkAppUpdateItem);
+			menu->addChild(createMenuItem("Check for " + APP_NAME + " update", "", [=]() {
+				std::thread t([&]() {
+					library::checkAppUpdate();
+				});
+				t.detach();
+			}));
 		}
 
-		DirItem* dirItem = new DirItem;
-		dirItem->text = "Open user folder";
-		dirItem->path = asset::user("");
-		menu->addChild(dirItem);
+		menu->addChild(createMenuItem("Open user folder", "", [=]() {
+			system::openDirectory(asset::user(""));
+		}));
 
 		menu->addChild(new ui::MenuSeparator);
 
