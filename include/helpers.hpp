@@ -204,17 +204,22 @@ Example:
 	));
 */
 template <class TMenuItem = ui::MenuItem>
-TMenuItem* createMenuItem(std::string text, std::string rightText, std::function<void()> action, bool disabled = false) {
+TMenuItem* createMenuItem(std::string text, std::string rightText, std::function<void()> action, bool disabled = false, bool alwaysConsume = false) {
 	struct Item : TMenuItem {
 		std::function<void()> action;
+		bool alwaysConsume;
+
 		void onAction(const event::Action& e) override {
 			action();
+			if (alwaysConsume)
+				e.consume(this);
 		}
 	};
 
 	Item* item = createMenuItem<Item>(text, rightText);
 	item->action = action;
 	item->disabled = disabled;
+	item->alwaysConsume = alwaysConsume;
 	return item;
 }
 
@@ -231,17 +236,29 @@ Example:
 		}
 	));
 */
-inline ui::MenuItem* createCheckMenuItem(std::string text, std::function<bool()> checked, std::function<void()> action) {
-	struct Item : ui::MenuItem {
+template <class TMenuItem = ui::MenuItem>
+ui::MenuItem* createCheckMenuItem(std::string text, std::function<bool()> checked, std::function<void()> action, bool disabled = false, bool alwaysConsume = false) {
+	struct Item : TMenuItem {
+		std::function<bool()> checked;
 		std::function<void()> action;
+		bool alwaysConsume;
 
+		void step() override {
+			this->rightText = CHECKMARK(checked());
+			TMenuItem::step();
+		}
 		void onAction(const event::Action& e) override {
 			action();
+			if (alwaysConsume)
+				e.consume(this);
 		}
 	};
 
-	Item* item = createMenuItem<Item>(text, CHECKMARK(checked()));
+	Item* item = createMenuItem<Item>(text);
+	item->checked = checked;
 	item->action = action;
+	item->disabled = disabled;
+	item->alwaysConsume = alwaysConsume;
 	return item;
 }
 
@@ -258,20 +275,29 @@ Example:
 		}
 	));
 */
-inline ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> getter, std::function<void(bool state)> setter) {
-	struct Item : ui::MenuItem {
+template <class TMenuItem = ui::MenuItem>
+ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> getter, std::function<void(bool state)> setter, bool disabled = false, bool alwaysConsume = false) {
+	struct Item : TMenuItem {
+		std::function<bool()> getter;
 		std::function<void(size_t)> setter;
-		bool val;
+		bool alwaysConsume;
 
+		void step() override {
+			this->rightText = CHECKMARK(getter());
+			TMenuItem::step();
+		}
 		void onAction(const event::Action& e) override {
-			setter(val);
+			setter(!getter());
+			if (alwaysConsume)
+				e.consume(this);
 		}
 	};
 
-	bool currVal = getter();
-	Item* item = createMenuItem<Item>(text, CHECKMARK(currVal));
+	Item* item = createMenuItem<Item>(text);
+	item->getter = getter;
 	item->setter = setter;
-	item->val = !currVal;
+	item->disabled = disabled;
+	item->alwaysConsume = alwaysConsume;
 	return item;
 }
 
@@ -300,8 +326,9 @@ Example:
 		}
 	));
 */
-inline ui::MenuItem* createSubmenuItem(std::string text, std::string rightText, std::function<void(ui::Menu* menu)> createMenu, bool disabled = false) {
-	struct Item : ui::MenuItem {
+template <class TMenuItem = ui::MenuItem>
+ui::MenuItem* createSubmenuItem(std::string text, std::string rightText, std::function<void(ui::Menu* menu)> createMenu, bool disabled = false) {
+	struct Item : TMenuItem {
 		std::function<void(ui::Menu* menu)> createMenu;
 
 		ui::Menu* createChildMenu() override {
@@ -311,7 +338,7 @@ inline ui::MenuItem* createSubmenuItem(std::string text, std::string rightText, 
 		}
 	};
 
-	Item* item = createMenuItem<Item>(text, rightText + (rightText.empty() ? "" : " ") + RIGHT_ARROW);
+	Item* item = createMenuItem<Item>(text, rightText + (rightText.empty() ? "" : "  ") + RIGHT_ARROW);
 	item->createMenu = createMenu;
 	item->disabled = disabled;
 	return item;
@@ -331,40 +358,58 @@ Example:
 		}
 	));
 */
-inline ui::MenuItem* createIndexSubmenuItem(std::string text, std::vector<std::string> labels, std::function<size_t()> getter, std::function<void(size_t val)> setter) {
+template <class TMenuItem = ui::MenuItem>
+ui::MenuItem* createIndexSubmenuItem(std::string text, std::vector<std::string> labels, std::function<size_t()> getter, std::function<void(size_t val)> setter, bool disabled = false, bool alwaysConsume = false) {
 	struct IndexItem : ui::MenuItem {
+		std::function<size_t()> getter;
 		std::function<void(size_t)> setter;
 		size_t index;
+		bool alwaysConsume;
 
+		void step() override {
+			size_t currIndex = getter();
+			this->rightText = CHECKMARK(currIndex == index);
+			MenuItem::step();
+		}
 		void onAction(const event::Action& e) override {
 			setter(index);
+			if (alwaysConsume)
+				e.consume(this);
 		}
 	};
 
-	struct Item : ui::MenuItem {
+	struct Item : TMenuItem {
 		std::function<size_t()> getter;
 		std::function<void(size_t)> setter;
 		std::vector<std::string> labels;
+		bool alwaysConsume;
 
+		void step() override {
+			size_t currIndex = getter();
+			std::string label = (currIndex < labels.size()) ? labels[currIndex] : "";
+			this->rightText = label + "  " + RIGHT_ARROW;
+			TMenuItem::step();
+		}
 		ui::Menu* createChildMenu() override {
 			ui::Menu* menu = new ui::Menu;
-			size_t currIndex = getter();
 			for (size_t i = 0; i < labels.size(); i++) {
-				IndexItem* item = createMenuItem<IndexItem>(labels[i], CHECKMARK(currIndex == i));
+				IndexItem* item = createMenuItem<IndexItem>(labels[i]);
+				item->getter = getter;
 				item->setter = setter;
 				item->index = i;
+				item->alwaysConsume = alwaysConsume;
 				menu->addChild(item);
 			}
 			return menu;
 		}
 	};
 
-	size_t currIndex = getter();
-	std::string label = (currIndex < labels.size()) ? labels[currIndex] : "";
-	Item* item = createMenuItem<Item>(text, label + "  " + RIGHT_ARROW);
+	Item* item = createMenuItem<Item>(text);
 	item->getter = getter;
 	item->setter = setter;
 	item->labels = labels;
+	item->disabled = disabled;
+	item->alwaysConsume = alwaysConsume;
 	return item;
 }
 

@@ -344,22 +344,6 @@ struct HaloBrightnessSlider : ui::Slider {
 	}
 };
 
-struct FrameRateValueItem : ui::MenuItem {
-	int frameSwapInterval;
-	void onAction(const ActionEvent& e) override {
-		settings::frameSwapInterval = frameSwapInterval;
-	}
-};
-
-struct FrameRateItem : ui::MenuItem {
-	ui::Menu* createChildMenu() override {
-		ui::Menu* menu = new ui::Menu;
-
-		return menu;
-	}
-};
-
-
 struct ViewButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();

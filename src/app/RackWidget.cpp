@@ -1122,15 +1122,17 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 	int n = getNumSelected();
 	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
 
+	// Enable alwaysConsume of menu items if the number of selected modules changes
+
 	// Select all
 	menu->addChild(createMenuItem("Select all", RACK_MOD_CTRL_NAME "+A", [=]() {
 		selectAll();
-	}));
+	}, false, true));
 
 	// Deselect
 	menu->addChild(createMenuItem("Deselect", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+A", [=]() {
 		deselect();
-	}, n == 0));
+	}, n == 0, true));
 
 	// Copy
 	menu->addChild(createMenuItem("Copy", RACK_MOD_CTRL_NAME "+C", [=]() {
@@ -1140,12 +1142,12 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 	// Paste
 	menu->addChild(createMenuItem("Paste", RACK_MOD_CTRL_NAME "+V", [=]() {
 		pasteClipboardAction();
-	}));
+	}, false, true));
 
 	// Load
 	menu->addChild(createMenuItem("Import selection", "", [=]() {
 		loadSelectionDialog();
-	}));
+	}, false, true));
 
 	// Save
 	menu->addChild(createMenuItem("Save selection as", "", [=]() {
@@ -1174,7 +1176,7 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 		bypassText += " " CHECKMARK_STRING;
 	menu->addChild(createMenuItem("Bypass", bypassText, [=]() {
 		bypassSelectionAction(!bypassed);
-	}, n == 0));
+	}, n == 0, true));
 
 	// Duplicate
 	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
@@ -1184,7 +1186,7 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 	// Delete
 	menu->addChild(createMenuItem("Delete", "Backspace/Delete", [=]() {
 		deleteSelectionAction();
-	}, n == 0));
+	}, n == 0, true));
 }
 
 void RackWidget::clearCables() {

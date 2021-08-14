@@ -843,9 +843,8 @@ inline void TagItem::onAction(const ActionEvent& e) {
 	bool isSelected = (it != browser->tagIds.end());
 
 	if (tagId >= 0) {
-		// Actual tag
-		int mods = APP->window->getMods();
-		if ((mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+		// Specific tag
+		if (!e.isConsumed()) {
 			// Multi select
 			if (isSelected)
 				browser->tagIds.erase(tagId);

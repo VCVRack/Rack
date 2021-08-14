@@ -1091,7 +1091,7 @@ void ModuleWidget::createContextMenu() {
 		if (!weakThis)
 			return;
 		weakThis->removeAction();
-	}));
+	}, false, true));
 
 	appendContextMenu(menu);
 }
