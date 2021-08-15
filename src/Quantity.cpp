@@ -31,10 +31,17 @@ std::string Quantity::getDisplayValueString() {
 }
 
 void Quantity::setDisplayValueString(std::string s) {
-	double result = te_interp(s.c_str(), NULL);
-	if (std::isfinite(result)) {
-		setDisplayValue(result);
-	}
+	static const double inf = INFINITY;
+	static te_variable vars[] = {
+		{"inf", &inf},
+	};
+	te_expr* expr = te_compile(s.c_str(), vars, LENGTHOF(vars), NULL);
+	if (!expr)
+		return;
+
+	double result = te_eval(expr);
+	te_free(expr);
+	setDisplayValue(result);
 }
 
 std::string Quantity::getString() {
