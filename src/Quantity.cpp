@@ -33,7 +33,7 @@ std::string Quantity::getDisplayValueString() {
 void Quantity::setDisplayValueString(std::string s) {
 	static const double inf = INFINITY;
 	static te_variable vars[] = {
-		{"inf", &inf},
+		{"inf", &inf, TE_VARIABLE, NULL},
 	};
 	te_expr* expr = te_compile(s.c_str(), vars, LENGTHOF(vars), NULL);
 	if (!expr)
@@ -41,6 +41,9 @@ void Quantity::setDisplayValueString(std::string s) {
 
 	double result = te_eval(expr);
 	te_free(expr);
+	if (std::isnan(result))
+		return;
+
 	setDisplayValue(result);
 }
 

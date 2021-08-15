@@ -80,11 +80,17 @@ float ParamQuantity::getDisplayValue() {
 void ParamQuantity::setDisplayValue(float displayValue) {
 	if (!module)
 		return;
+
+	// Handle displayOffset
 	float v = displayValue - displayOffset;
+
+	// Handle displayMultiplier
 	if (displayMultiplier == 0.f)
 		v = 0.f;
 	else
 		v /= displayMultiplier;
+
+	// Handle displayBase
 	if (displayBase == 0.f) {
 		// Linear
 		// v is unchanged
@@ -97,6 +103,10 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 		// Exponential
 		v = std::log(v) / std::log(displayBase);
 	}
+
+	if (std::isnan(v))
+		return;
+
 	setValue(v);
 }
 
