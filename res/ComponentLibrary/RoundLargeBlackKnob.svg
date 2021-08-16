@@ -8,7 +8,7 @@
 	</sodipodi:namedview>
 <g>
 	
-		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-4492.3999" y1="2099.62012" x2="-4492.3999" y2="2134.57983" gradientTransform="matrix(1 0 0 1 0 -730)">
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="-4492.3999" y1="2905.62012" x2="-4492.3999" y2="2940.57983" gradientTransform="matrix(1 0 0 1 0 -1536)">
 		<stop  offset="0" style="stop-color:#D4D0D3"/>
 		<stop  offset="1" style="stop-color:#4A4A4A"/>
 	</linearGradient>
@@ -34,11 +34,11 @@
 <circle fill="none" cx="-4492.40381" cy="1387.1001" r="17.29248"/>
 <g>
 	
-		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="774.01343" y1="3200.56592" x2="804.521" y2="3200.56592" gradientTransform="matrix(6.123234e-17 1 -1 6.123234e-17 -1291.83301 597.83289)">
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="1022.01331" y1="2642.56592" x2="1052.52112" y2="2642.56592" gradientTransform="matrix(6.123234e-17 1 -1 6.123234e-17 -1849.83301 349.83289)">
 		<stop  offset="0.00559" style="stop-color:#4A4848"/>
 		<stop  offset="1" style="stop-color:#1F1F1F"/>
 	</linearGradient>
-	<circle fill="url(#SVGID_2_)" cx="-4492.39893" cy="1387.1001" r="15.25385"/>
+	<circle fill="url(#SVGID_2_)" cx="-4492.39893" cy="1387.1001" r="15.25391"/>
 	<g opacity="0.22">
 		<g>
 			<path fill="#1A1A1A" d="M-4492.39795,1386.23071c0.47949,0,0.86914,0.39001,0.86914,0.86938s-0.38965,0.86938-0.86914,0.86938
@@ -135,6 +135,13 @@
 	<path opacity="0.13" fill="#FFFFFF" enable-background="new    " d="M-4492.51367,1387.10242l-3.96924-14.8136
 		c-1.29443,0.3468-2.53809,0.86194-3.69873,1.5321c-1.16064,0.67004-2.22852,1.4895-3.17627,2.43713L-4492.51367,1387.10242z"/>
 </g>
-<rect x="17.11537" y="2.89254" fill="#EDEDED" width="1.76925" height="15.10746"/>
-<rect x="17.11537" y="1.98753" opacity="0.81" fill="#FFFFFF" enable-background="new    " width="1.76925" height="0.90492"/>
+<g>
+	<path opacity="0.4" d="M18.88461,0.04472v2.05347C27.27768,2.55986,33.9465,9.4915,33.9465,18.00004
+		c0,8.80688-7.13947,15.94641-15.94653,15.94641c-8.80701,0-15.94647-7.13953-15.94647-15.94641
+		c0-8.50854,6.66888-15.44018,15.06189-15.90185V0.04472C7.58792,0.50907,0.00003,8.35746,0.00003,18.00004
+		c0,9.94116,8.05884,18,18,18c9.9411,0,18-8.05884,18-18C36.00003,8.35746,28.41196,0.50883,18.88461,0.04472z"/>
+	<path fill="#EDEDED" d="M18.88463,2.09819h-1.76925v15.38372c0,0.28613,0.23196,0.51809,0.51809,0.51809h0.73308
+		c0.28613,0,0.51809-0.23196,0.51809-0.51809V2.09819z"/>
+	<rect x="17.11536" y="0" opacity="0.58" fill="#FFFFFF" width="1.76925" height="3.15529"/>
+</g>
 </svg>

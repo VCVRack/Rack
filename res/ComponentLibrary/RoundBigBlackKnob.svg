@@ -6,7 +6,13 @@
 	 viewBox="0 0 45 45.00001" enable-background="new 0 0 45 45.00001" xml:space="preserve">
 <sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="0" fit-margin-left="0" fit-margin-right="0" fit-margin-top="0" id="base" inkscape:current-layer="layer1" inkscape:cx="29.110815" inkscape:cy="14.88916" inkscape:document-units="mm" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="879" inkscape:window-maximized="1" inkscape:window-width="1600" inkscape:window-x="0" inkscape:window-y="21" inkscape:zoom="5.6" pagecolor="#ffffff" showgrid="false">
 	</sodipodi:namedview>
-<path fill="#EDEDED" d="M23.38463,2.89254h-1.76925v19.08557c0,0.28613,0.23196,0.51809,0.51809,0.51809h0.73308
-	c0.28613,0,0.51809-0.23196,0.51809-0.51809C23.38464,21.97811,23.38464,2.89254,23.38463,2.89254z"/>
-<rect x="21.61537" y="1.98753" opacity="0.81" fill="#FFFFFF" enable-background="new    " width="1.76925" height="0.90492"/>
+<g>
+	<path opacity="0.4" d="M23.38457,0.02254v2.30005c10.75464,0.46631,19.3374,9.30762,19.3374,20.17749
+		c0,11.16821-9.05371,20.22205-20.22192,20.22205c-11.16833,0-20.22205-9.05383-20.22205-20.22205
+		c0-10.86975,8.58264-19.71094,19.33728-20.17749V0.02254C9.59953,0.48787,0.00005,10.3702,0.00005,22.50008
+		c0,12.42627,10.07349,22.5,22.5,22.5c12.42639,0,22.5-10.07373,22.5-22.5C45.00005,10.3702,35.40031,0.48763,23.38457,0.02254z"/>
+	<path fill="#EDEDED" d="M23.38463,2.27799h-1.76925v19.70013c0,0.28613,0.23196,0.51809,0.51809,0.51809h0.73308
+		c0.28613,0,0.51809-0.23196,0.51809-0.51809L23.38463,2.27799z"/>
+	<rect x="21.61536" y="0" opacity="0.58" fill="#FFFFFF" width="1.76925" height="3.42269"/>
+</g>
 </svg>
