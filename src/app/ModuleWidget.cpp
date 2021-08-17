@@ -81,6 +81,10 @@ void ModuleWidget::setModule(engine::Module* module) {
 	this->module = module;
 }
 
+widget::Widget* ModuleWidget::getPanel() {
+	return internal->panel;
+}
+
 void ModuleWidget::setPanel(widget::Widget* panel) {
 	// Remove existing panel
 	if (internal->panel) {

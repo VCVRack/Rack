@@ -38,11 +38,11 @@ struct ModuleWidget : widget::OpaqueWidget {
 	*/
 	void setModule(engine::Module* module);
 
+	widget::Widget* getPanel();
 	/** Sets the panel and sets the size of the ModuleWidget from the panel.
 	Transfers ownership.
 	*/
 	void setPanel(widget::Widget* panel);
-	/** Use `setPanel(createPanel(svg))` instead. */
 	void setPanel(std::shared_ptr<Svg> svg);
 
 	/** Convenience functions for adding special widgets.
