@@ -10,8 +10,6 @@ FLAGS += -Iinclude -Idep/include
 
 include arch.mk
 
-SED := perl -pi -e
-
 # Sources and build flags
 
 SOURCES += dep/nanovg/src/nanovg.c
@@ -27,6 +25,7 @@ FLAGS += -fPIC
 LDFLAGS += -shared
 
 ifdef ARCH_LIN
+	SED := sed -i
 	TARGET := libRack.so
 
 	SOURCES += dep/osdialog/osdialog_gtk3.c
@@ -47,6 +46,7 @@ build/dep/osdialog/osdialog_gtk3.c.o: FLAGS += $(shell pkg-config --cflags gtk+-
 endif
 
 ifdef ARCH_MAC
+	SED := sed -i ''
 	TARGET := libRack.dylib
 
 	SOURCES += dep/osdialog/osdialog_mac.m
@@ -62,6 +62,7 @@ ifdef ARCH_MAC
 endif
 
 ifdef ARCH_WIN
+	SED := sed -i
 	TARGET := libRack.dll
 
 	SOURCES += dep/osdialog/osdialog_win.c
