@@ -219,10 +219,12 @@ struct Module {
 	}
 
 	/** Creates and returns the module's patch storage directory path.
-	Since the directory is created when this is called, do not call it frequently or in an audio/engine thread such as process().
+	Do not call this method in process() since filesystem operations block the audio thread. Calling getPatchStorageDirectory() is acceptable.
 
-	The Module must be added to Engine before this can be called, so it cannot be called in your Module constructor.
-	Override onAdd() instead.
+	Throws an Exception if Module is not yet added to the Engine.
+	Therefore, you may not call these methods in your Module constructor.
+	Instead, create your patch storage files in the onAdd() event and close them in the onRemove() event.
+	If patch storage files are not removed, they will be garbage collected when user saves the patch.
 	*/
 	std::string createPatchStorageDirectory();
 	std::string getPatchStorageDirectory();

@@ -90,6 +90,8 @@ std::string Module::createPatchStorageDirectory() {
 
 
 std::string Module::getPatchStorageDirectory() {
+	if (id < 0)
+		throw Exception("getPatchStorageDirectory() cannot be called unless Module belongs to Engine and thus has a valid ID");
 	return system::join(APP->patch->autosavePath, "modules", std::to_string(id));
 }
 
