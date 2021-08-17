@@ -610,6 +610,8 @@ void Engine::stepBlock(int frames) {
 
 
 void Engine::setPrimaryModule(Module* module) {
+	if (module == internal->primaryModule)
+		return;
 	WriteLock lock(internal->mutex);
 
 	if (internal->primaryModule) {
