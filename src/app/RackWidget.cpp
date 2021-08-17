@@ -342,7 +342,8 @@ void RackWidget::fromJson(json_t* rootJ) {
 		else {
 			pos = pos.mult(RACK_GRID_SIZE);
 		}
-		mw->box.pos = pos.plus(RACK_OFFSET);
+		pos = pos.plus(RACK_OFFSET);
+		setModulePosNearest(mw, pos);
 
 		internal->moduleContainer->addChild(mw);
 	}
@@ -1083,7 +1084,7 @@ void RackWidget::deleteSelectionAction() {
 }
 
 bool RackWidget::requestSelectionPos(math::Vec delta) {
-	// Check intersection with other modules
+	// Calculate new positions
 	std::map<widget::Widget*, math::Rect> mwBoxes;
 	for (ModuleWidget* mw : getSelectedModules()) {
 		math::Rect mwBox = mw->box;
@@ -1091,6 +1092,7 @@ bool RackWidget::requestSelectionPos(math::Vec delta) {
 		mwBoxes[mw] = mwBox;
 	}
 
+	// Check intersection with other modules
 	for (widget::Widget* w2 : internal->moduleContainer->children) {
 		// Don't intersect with selected modules
 		auto it = mwBoxes.find(w2);
