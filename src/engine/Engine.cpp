@@ -800,12 +800,19 @@ void Engine::removeModule_NoLock(Module* module) {
 		assert(cable->inputModule != module);
 		assert(cable->outputModule != module);
 	}
+	// Dispatch RemoveEvent
+	Module::RemoveEvent eRemove;
+	module->onRemove(eRemove);
 	// Update ParamHandles' module pointers
 	for (ParamHandle* paramHandle : internal->paramHandles) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = NULL;
 	}
-	// Update expander pointers
+	// Unset primary module
+	if (internal->primaryModule == module) {
+		internal->primaryModule = NULL;
+	}
+	// Update expanders of other modules
 	for (Module* m : internal->modules) {
 		if (m->leftExpander.module == module) {
 			m->leftExpander.moduleId = -1;
@@ -816,16 +823,14 @@ void Engine::removeModule_NoLock(Module* module) {
 			m->rightExpander.module = NULL;
 		}
 	}
-	// Dispatch RemoveEvent
-	Module::RemoveEvent eRemove;
-	module->onRemove(eRemove);
-	// Unset primary module
-	if (internal->primaryModule == module) {
-		internal->primaryModule = NULL;
-	}
 	// Remove module
 	internal->modulesCache.erase(module->id);
 	internal->modules.erase(it);
+	// Reset expanders
+	module->leftExpander.moduleId = -1;
+	module->leftExpander.module = NULL;
+	module->rightExpander.moduleId = -1;
+	module->rightExpander.module = NULL;
 }
 
 
