@@ -277,6 +277,9 @@ struct Module {
 	Expander& getRightExpander() {
 		return rightExpander;
 	}
+	Expander& getExpander(bool side) {
+		return side ? rightExpander : leftExpander;
+	}
 
 	// Virtual methods
 
