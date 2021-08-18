@@ -565,9 +565,7 @@ void Engine::stepBlock(int frames) {
 	ReadLock lock(internal->mutex);
 	// Configure thread
 	uint32_t csr = _mm_getcsr();
-	DEBUG("original MXCSR %x", csr);
 	initMXCSR();
-	DEBUG("new MXCSR %x", csr);
 	random::init();
 
 	internal->blockFrame = internal->frame;
