@@ -28,13 +28,17 @@ Example:
 	double r = normal(rng);
 */
 struct Xoroshiro128Plus {
-	uint64_t state[2];
+	uint64_t state[2] = {};
 
-	Xoroshiro128Plus(uint64_t s0 = 1, uint64_t s1 = 0) {
+	void seed(uint64_t s0, uint64_t s1) {
 		state[0] = s0;
 		state[1] = s1;
 		// A bad seed will give a bad first result, so shift the state
 		operator()();
+	}
+
+	bool isSeeded() {
+		return state[0] || state[1];
 	}
 
 	static uint64_t rotl(uint64_t x, int k) {

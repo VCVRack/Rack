@@ -16,9 +16,13 @@ static std::atomic<uint64_t> threadCounter {0};
 
 
 void init() {
+	// Don't reset state if already seeded
+	if (rng.isSeeded())
+		return;
+
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
-	rng = Xoroshiro128Plus(uint64_t(tv.tv_sec) * 1000000 + tv.tv_usec, threadCounter++);
+	rng.seed(uint64_t(tv.tv_sec) * 1000 * 1000 + tv.tv_usec, threadCounter++);
 	// Shift state a few times due to low seed entropy
 	for (int i = 0; i < 4; i++) {
 		rng();
