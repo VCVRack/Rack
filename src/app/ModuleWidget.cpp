@@ -512,7 +512,7 @@ void ModuleWidget::copyClipboard() {
 	cleanupModuleJson(moduleJ);
 
 	DEFER({json_decref(moduleJ);});
-	char* json = json_dumps(moduleJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	char* json = json_dumps(moduleJ, JSON_INDENT(2));
 	DEFER({std::free(json);});
 	glfwSetClipboardString(APP->window->win, json);
 }
@@ -633,7 +633,7 @@ void ModuleWidget::save(std::string filename) {
 	}
 	DEFER({std::fclose(file);});
 
-	json_dumpf(moduleJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	json_dumpf(moduleJ, file, JSON_INDENT(2));
 }
 
 void ModuleWidget::saveTemplate() {

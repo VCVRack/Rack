@@ -393,8 +393,7 @@ void save(std::string path) {
 		return;
 	DEFER({std::fclose(file);});
 
-	// 11 is enough precision to handle double UNIX time values to 0.1 seconds.
-	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(11));
+	json_dumpf(rootJ, file, JSON_INDENT(2));
 	json_decref(rootJ);
 }
 

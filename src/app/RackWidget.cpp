@@ -936,7 +936,7 @@ void RackWidget::saveSelection(std::string path) {
 	}
 	DEFER({std::fclose(file);});
 
-	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	json_dumpf(rootJ, file, JSON_INDENT(2));
 }
 
 void RackWidget::saveSelectionDialog() {
@@ -964,7 +964,7 @@ void RackWidget::saveSelectionDialog() {
 void RackWidget::copyClipboardSelection() {
 	json_t* rootJ = selectionToJson();
 	DEFER({json_decref(rootJ);});
-	char* moduleJson = json_dumps(rootJ, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	char* moduleJson = json_dumps(rootJ, JSON_INDENT(2));
 	DEFER({std::free(moduleJson);});
 	glfwSetClipboardString(APP->window->win, moduleJson);
 }

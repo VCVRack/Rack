@@ -203,7 +203,7 @@ void PatchManager::saveAutosave() {
 		return;
 	}
 
-	json_dumpf(rootJ, file, JSON_INDENT(2) | JSON_REAL_PRECISION(9));
+	json_dumpf(rootJ, file, JSON_INDENT(2));
 	std::fclose(file);
 	system::remove(patchPath);
 	system::rename(tmpPath, patchPath);
