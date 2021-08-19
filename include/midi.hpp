@@ -80,6 +80,14 @@ struct Message {
 	}
 
 	std::string toString() const;
+
+	int64_t getFrame() const {
+		return frame;
+	}
+
+	void setFrame(int64_t frame) {
+		this->frame = frame;
+	}
 };
 
 ////////////////////
