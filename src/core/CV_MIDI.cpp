@@ -76,7 +76,7 @@ struct CV_MIDI : Module {
 		if (rateLimiterTriggered)
 			rateLimiterTimer.time -= rateLimiterPeriod;
 
-		midiOutput.setFrame(args.frame + APP->engine->getBlockFrames());
+		midiOutput.setFrame(args.frame);
 
 		for (int c = 0; c < inputs[PITCH_INPUT].getChannels(); c++) {
 			int vel = (int) std::round(inputs[VEL_INPUT].getNormalPolyVoltage(10.f * 100 / 127, c) / 10.f * 127);

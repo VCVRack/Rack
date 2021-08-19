@@ -30,7 +30,7 @@ struct GateMidiOutput : midi::Output {
 			m.setStatus(0x8);
 			m.setNote(note);
 			m.setValue(0);
-			m.frame = frame;
+			m.setFrame(frame);
 			sendMessage(m);
 			lastGates[note] = false;
 		}
@@ -47,7 +47,7 @@ struct GateMidiOutput : midi::Output {
 			m.setStatus(0x9);
 			m.setNote(note);
 			m.setValue(vels[note]);
-			m.frame = frame;
+			m.setFrame(frame);
 			sendMessage(m);
 		}
 		else if (!gate && lastGates[note]) {
@@ -56,7 +56,7 @@ struct GateMidiOutput : midi::Output {
 			m.setStatus(0x8);
 			m.setNote(note);
 			m.setValue(vels[note]);
-			m.frame = frame;
+			m.setFrame(frame);
 			sendMessage(m);
 		}
 		lastGates[note] = gate;
@@ -107,7 +107,7 @@ struct CV_Gate : Module {
 	}
 
 	void process(const ProcessArgs& args) override {
-		midiOutput.setFrame(args.frame + APP->engine->getBlockFrames());
+		midiOutput.setFrame(args.frame);
 
 		for (int i = 0; i < 16; i++) {
 			int note = learnedNotes[i];

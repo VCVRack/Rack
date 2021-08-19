@@ -55,14 +55,12 @@ void InputDevice::onMessage(const Message& message) {
 		contextSet(input->context);
 
 		// Set timestamp to now if unset
-		if (message.frame < 0) {
+		if (message.getFrame() < 0) {
 			double deltaTime = system::getTime() - APP->engine->getBlockTime();
-			int deltaFrames = std::floor(deltaTime * APP->engine->getSampleRate());
-			int64_t nextBlockFrame = APP->engine->getBlockFrame() + APP->engine->getBlockFrames();
-			msg.frame = nextBlockFrame + deltaFrames;
-		}
-		else {
-			msg.frame = message.frame;
+			int64_t deltaFrames = std::floor(deltaTime * APP->engine->getSampleRate());
+			// Delay message by current Engine block size
+			deltaFrames += APP->engine->getBlockFrames();
+			msg.setFrame(APP->engine->getBlockFrame() + deltaFrames);
 		}
 
 		// Filter channel if message is not a system MIDI message
@@ -282,7 +280,7 @@ static const size_t InputQueue_maxSize = 8192;
 
 struct InputQueue_Compare {
 	bool operator()(const Message& a, const Message& b) {
-		return a.frame > b.frame;
+		return a.getFrame() > b.getFrame();
 	}
 };
 
@@ -319,7 +317,7 @@ void InputQueue::onMessage(const Message& message) {
 bool InputQueue::tryPop(Message* messageOut, int64_t maxFrame) {
 	if (!internal->queue.empty()) {
 		const Message& msg = internal->queue.top();
-		if (msg.frame <= maxFrame) {
+		if (msg.getFrame() <= maxFrame) {
 			*messageOut = msg;
 			internal->queue.pop();
 			return true;
@@ -328,7 +326,7 @@ bool InputQueue::tryPop(Message* messageOut, int64_t maxFrame) {
 		// If next MIDI message is too far in the future, clear the queue.
 		// This solves the issue of unconsumed messages getting stuck in the future when a DAW rewinds the engine frame.
 		int futureFrames = 2 * APP->engine->getBlockFrames();
-		if (msg.frame - maxFrame > futureFrames) {
+		if (msg.getFrame() - maxFrame > futureFrames) {
 			internal->queue.clear();
 		}
 	}

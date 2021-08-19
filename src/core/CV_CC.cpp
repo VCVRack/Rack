@@ -29,7 +29,7 @@ struct CCMidiOutput : midi::Output {
 		m.setStatus(0xb);
 		m.setNote(cc);
 		m.setValue(value);
-		m.frame = frame;
+		m.setFrame(frame);
 		sendMessage(m);
 	}
 
@@ -83,7 +83,7 @@ struct CV_CC : Module {
 		else
 			return;
 
-		midiOutput.setFrame(args.frame + APP->engine->getBlockFrames());
+		midiOutput.setFrame(args.frame);
 
 		for (int i = 0; i < 16; i++) {
 			int value = (int) std::round(inputs[CC_INPUTS + i].getVoltage() / 10.f * 127);

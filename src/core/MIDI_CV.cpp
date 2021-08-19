@@ -173,7 +173,7 @@ struct MIDI_CV : Module {
 	}
 
 	void processMessage(const midi::Message& msg) {
-		// DEBUG("MIDI: %ld %s", msg.frame, msg.toString().c_str());
+		// DEBUG("MIDI: %ld %s", msg.getFrame(), msg.toString().c_str());
 
 		switch (msg.getStatus()) {
 			// note off

@@ -144,15 +144,18 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 
 	void sendMessage(const midi::Message& message) override {
 		// If frame is undefined, send message immediately
-		if (message.frame < 0) {
+		if (message.getFrame() < 0) {
 			sendMessageNow(message);
 			return;
 		}
 		// Schedule message to be sent by worker thread
 		MessageSchedule ms;
 		ms.message = message;
+		int64_t deltaFrames = message.getFrame() - APP->engine->getBlockFrame();
+		// Delay message by current Engine block size
+		deltaFrames += APP->engine->getBlockFrames();
 		// Compute time in next Engine block to send message
-		double deltaTime = (message.frame - APP->engine->getBlockFrame()) * APP->engine->getSampleTime();
+		double deltaTime = deltaFrames * APP->engine->getSampleTime();
 		ms.timestamp = APP->engine->getBlockTime() + deltaTime;
 
 		std::lock_guard<decltype(mutex)> lock(mutex);
