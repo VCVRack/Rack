@@ -108,7 +108,9 @@ int main(int argc, char* argv[]) {
 	// Initialize environment
 	system::init();
 	asset::init();
-	bool loggerWasTruncated = logger::isTruncated();
+	if (!settings::devMode) {
+		logger::logPath = asset::user("log.txt");
+	}
 	logger::init();
 	random::init();
 
@@ -203,8 +205,8 @@ int main(int argc, char* argv[]) {
 #endif
 
 	// Initialize patch
-	if (loggerWasTruncated && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack crashed during the last session, possibly due to a buggy module in your patch. Clear your patch and start over?")) {
-		// Do nothing
+	if (logger::wasTruncated() && osdialog_message(OSDIALOG_INFO, OSDIALOG_YES_NO, "Rack crashed during the last session, possibly due to a buggy module in your patch. Clear your patch and start over?")) {
+		// Do nothing, which leaves a blank patch
 	}
 	else {
 		APP->patch->launch(patchPath);

@@ -14,6 +14,36 @@ namespace logger {
 std::string logPath;
 static FILE* outputFile = NULL;
 static std::mutex mutex;
+static bool truncated = false;
+
+
+static bool fileEndsWith(FILE* file, std::string str) {
+	// Seek to last `len` characters
+	size_t len = str.size();
+	std::fseek(file, -long(len), SEEK_END);
+	char actual[len];
+	if (std::fread(actual, 1, len, file) != len)
+		return false;
+	return std::string(actual, len) == str;
+}
+
+static bool isTruncated() {
+	if (logPath.empty())
+		return false;
+
+	// Open existing log file
+	FILE* file = std::fopen(logPath.c_str(), "r");
+	if (!file)
+		return false;
+	DEFER({std::fclose(file);});
+
+	if (fileEndsWith(file, "END"))
+		return false;
+	// legacy <=v1
+	if (fileEndsWith(file, "Destroying logger\n"))
+		return false;
+	return true;
+}
 
 
 void init() {
@@ -21,11 +51,11 @@ void init() {
 	std::lock_guard<std::mutex> lock(mutex);
 
 	// Don't open a file in development mode.
-	if (settings::devMode) {
+	if (logPath.empty()) {
 		outputFile = stderr;
 	}
 	else {
-		logPath = asset::user("log.txt");
+		truncated = isTruncated();
 
 		outputFile = std::fopen(logPath.c_str(), "w");
 		if (!outputFile) {
@@ -53,22 +83,22 @@ static const char* const levelLabels[] = {
 	"debug",
 	"info",
 	"warn",
-	"fatal"
+	"fatal",
 };
 
 static const int levelColors[] = {
 	35,
 	34,
 	33,
-	31
+	31,
 };
 
 static void logVa(Level level, const char* filename, int line, const char* func, const char* format, va_list args) {
-	std::lock_guard<std::mutex> lock(mutex);
 	if (!outputFile)
 		return;
-
 	double nowTime = system::getTime();
+	std::lock_guard<std::mutex> lock(mutex);
+
 	if (outputFile == stderr)
 		std::fprintf(outputFile, "\x1B[%dm", levelColors[level]);
 	std::fprintf(outputFile, "[%.03f %s %s:%d %s] ", nowTime, levelLabels[level], filename, line, func);
@@ -88,32 +118,8 @@ void log(Level level, const char* filename, int line, const char* func, const ch
 	va_end(args);
 }
 
-static bool fileEndsWith(FILE* file, std::string str) {
-	// Seek to last `len` characters
-	size_t len = str.size();
-	std::fseek(file, -long(len), SEEK_END);
-	char actual[len];
-	if (std::fread(actual, 1, len, file) != len)
-		return false;
-	return std::string(actual, len) == str;
-}
-
-bool isTruncated() {
-	if (logPath.empty())
-		return false;
-
-	// Open existing log file
-	FILE* file = std::fopen(logPath.c_str(), "r");
-	if (!file)
-		return false;
-	DEFER({std::fclose(file);});
-
-	if (fileEndsWith(file, "END"))
-		return false;
-	// legacy <=v1
-	if (fileEndsWith(file, "Destroying logger\n"))
-		return false;
-	return true;
+bool wasTruncated() {
+	return truncated;
 }
 
 
