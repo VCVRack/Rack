@@ -191,6 +191,8 @@ struct RtAudioDevice : audio::Device {
 		RtAudioDevice* device = (RtAudioDevice*) userData;
 		assert(device);
 
+		system::setThreadName("RtAudio");
+
 		int inputStride = device->getNumInputs();
 		int outputStride = device->getNumOutputs();
 		device->processBuffer((const float*) inputBuffer, inputStride, (float*) outputBuffer, outputStride, nFrames);

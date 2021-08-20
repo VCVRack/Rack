@@ -560,7 +560,7 @@ int getLogicalCoreCount() {
 
 void setThreadName(const std::string& name) {
 #if defined ARCH_LIN
-	pthread_setname_np(pthread_self(), name.c_str());
+	pthread_setname_np(pthread_self(), name.substr(0, 15).c_str());
 #elif defined ARCH_MAC
 	// Not supported (yet) on Mac
 #elif defined ARCH_WIN
