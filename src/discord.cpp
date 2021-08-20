@@ -7,10 +7,15 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/un.h>
+#if defined ARCH_LIN || defined ARCH_MAC
+	#include <unistd.h>
+	#include <sys/types.h>
+	#include <sys/socket.h>
+	#include <sys/un.h>
+#endif
+#if defined ARCH_WIN
+	#include <fcntl.h>
+#endif
 
 #include <jansson.h>
 
@@ -72,8 +77,8 @@ static void run() {
 	random::init();
 
 	// Open socket
+#if defined ARCH_LIN || defined ARCH_MAC
 	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
-	assert(fd);
 	if (fd < 0) {
 		WARN("Could not open Discord socket");
 		return;
@@ -101,6 +106,16 @@ static void run() {
 		// WARN("Could not bind Discord socket");
 		return;
 	}
+#endif
+#if defined ARCH_WIN
+	const char* path = "\\\\?\\pipe\\discord-ipc-0";
+	int fd = open(path, O_RDWR | O_APPEND);
+	if (fd < 0) {
+		WARN("Could not open Discord socket");
+		return;
+	}
+	DEFER({close(fd);});
+#endif
 
 	// Send handshake
 	json_t* handshakeJ = json_object();
