@@ -111,7 +111,8 @@ static void run() {
 	const char* path = "\\\\?\\pipe\\discord-ipc-0";
 	int fd = open(path, O_RDWR | O_APPEND);
 	if (fd < 0) {
-		WARN("Could not open Discord socket");
+		// Fail silently since this just means Discord isn't open.
+		// WARN("Could not open Discord socket");
 		return;
 	}
 	DEFER({close(fd);});
