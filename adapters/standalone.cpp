@@ -21,6 +21,7 @@
 #include <string.hpp>
 #include <library.hpp>
 #include <network.hpp>
+#include <discord.hpp>
 
 #include <osdialog.h>
 #include <thread>
@@ -175,6 +176,7 @@ int main(int argc, char* argv[]) {
 	gamepad::init();
 	plugin::init();
 	library::init();
+	discord::init();
 	if (!settings::headless) {
 		ui::init();
 		windowInit();
@@ -251,6 +253,7 @@ int main(int argc, char* argv[]) {
 		windowDestroy();
 		ui::destroy();
 	}
+	discord::destroy();
 	library::destroy();
 	midi::destroy();
 	audio::destroy();

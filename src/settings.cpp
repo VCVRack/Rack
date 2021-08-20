@@ -61,6 +61,7 @@ std::vector<NVGcolor> cableColors = {
 bool autoCheckUpdates = true;
 bool showTipsOnLaunch = true;
 int tipIndex = -1;
+bool discordUpdateActivity = true;
 ModuleBrowserSort moduleBrowserSort = MODULE_BROWSER_SORT_UPDATED;
 float moduleBrowserZoom = -1.f;
 std::map<std::string, std::set<std::string>> moduleWhitelist = {};
@@ -160,6 +161,9 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "showTipsOnLaunch", json_boolean(showTipsOnLaunch));
 
 	json_object_set_new(rootJ, "tipIndex", json_integer(tipIndex));
+
+	if (!discordUpdateActivity)
+		json_object_set_new(rootJ, "discordUpdateActivity", json_boolean(discordUpdateActivity));
 
 	json_object_set_new(rootJ, "moduleBrowserSort", json_integer((int) moduleBrowserSort));
 
@@ -332,6 +336,10 @@ void fromJson(json_t* rootJ) {
 	json_t* tipIndexJ = json_object_get(rootJ, "tipIndex");
 	if (tipIndexJ)
 		tipIndex = json_integer_value(tipIndexJ);
+
+	json_t* discordUpdateActivityJ = json_object_get(rootJ, "discordUpdateActivity");
+	if (discordUpdateActivityJ)
+		discordUpdateActivity = json_boolean_value(discordUpdateActivityJ);
 
 	json_t* moduleBrowserSortJ = json_object_get(rootJ, "moduleBrowserSort");
 	if (moduleBrowserSortJ)
