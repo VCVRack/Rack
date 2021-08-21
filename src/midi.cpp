@@ -48,26 +48,29 @@ void InputDevice::unsubscribe(Input* input) {
 }
 
 void InputDevice::onMessage(const Message& message) {
-	Message msg = message;
-
 	for (Input* input : subscribed) {
+		// Filter channel if message is not a system MIDI message
+		if (message.getStatus() != 0xf && input->channel >= 0 && message.getChannel() != input->channel)
+			continue;
+
 		// We're probably in the MIDI driver's thread, so set the Rack context.
 		contextSet(input->context);
 
 		// Set timestamp to now if unset
 		if (message.getFrame() < 0) {
+			Message msg = message;
 			double deltaTime = system::getTime() - APP->engine->getBlockTime();
 			int64_t deltaFrames = std::floor(deltaTime * APP->engine->getSampleRate());
 			// Delay message by current Engine block size
 			deltaFrames += APP->engine->getBlockFrames();
 			msg.setFrame(APP->engine->getBlockFrame() + deltaFrames);
+			// Pass message to Input port
+			input->onMessage(msg);
 		}
-
-		// Filter channel if message is not a system MIDI message
-		if (msg.getStatus() != 0xf && input->channel >= 0 && msg.getChannel() != input->channel)
-			continue;
-		// Pass message to Input port
-		input->onMessage(msg);
+		else {
+			// Pass message to Input port
+			input->onMessage(message);
+		}
 	}
 }
 
