@@ -40,6 +40,7 @@ struct Engine {
 	Write-locks.
 	*/
 	void setPrimaryModule(Module* module);
+	INTERNAL void setPrimaryModule_NoLock(Module* module);
 	Module* getPrimaryModule();
 
 	/** Returns the sample rate used by the engine for stepping each module.
@@ -223,6 +224,10 @@ struct Engine {
 	Write-locks.
 	*/
 	void fromJson(json_t* rootJ);
+
+	/** If no primary module is set, the fallback Engine thread will step blocks, using the CPU clock for timing.
+	*/
+	void startFallbackThread();
 };
 
 

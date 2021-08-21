@@ -279,7 +279,13 @@ struct Engine::Internal {
 	HybridBarrier engineBarrier;
 	HybridBarrier workerBarrier;
 	std::atomic<int> workerModuleIndex;
+	// For worker threads
 	Context* context;
+
+	bool fallbackRunning = false;
+	std::thread fallbackThread;
+	std::mutex fallbackMutex;
+	std::condition_variable fallbackCv;
 };
 
 
@@ -514,7 +520,19 @@ Engine::Engine() {
 
 
 Engine::~Engine() {
+	// Stop fallback thread if running
+	{
+		std::lock_guard<std::mutex> lock(internal->fallbackMutex);
+		internal->fallbackRunning = false;
+		internal->fallbackCv.notify_all();
+	}
+	if (internal->fallbackThread.joinable())
+		internal->fallbackThread.join();
+
+	// Shut down workers
 	Engine_relaunchWorkers(this, 0);
+
+	// Clear modules, cables, etc
 	clear();
 
 	// Make sure there are no cables or modules in the rack on destruction.
@@ -617,6 +635,13 @@ void Engine::setPrimaryModule(Module* module) {
 	if (module == internal->primaryModule)
 		return;
 	WriteLock lock(internal->mutex);
+	setPrimaryModule_NoLock(module);
+}
+
+
+void Engine::setPrimaryModule_NoLock(Module* module) {
+	if (module == internal->primaryModule)
+		return;
 
 	if (internal->primaryModule) {
 		// Dispatch UnsetPrimaryEvent
@@ -630,6 +655,11 @@ void Engine::setPrimaryModule(Module* module) {
 		// Dispatch SetPrimaryEvent
 		Module::SetPrimaryEvent e;
 		internal->primaryModule->onSetPrimary(e);
+	}
+
+	// Wake up fallback thread if primary module was unset
+	if (!internal->primaryModule) {
+		internal->fallbackCv.notify_all();
 	}
 }
 
@@ -795,15 +825,6 @@ void Engine::removeModule_NoLock(Module* module) {
 	// Check that the module actually exists
 	auto it = std::find(internal->modules.begin(), internal->modules.end(), module);
 	assert(it != internal->modules.end());
-	// If a param is being smoothed on this module, stop smoothing it immediately
-	if (module == internal->smoothModule) {
-		internal->smoothModule = NULL;
-	}
-	// Check that all cables are disconnected
-	for (Cable* cable : internal->cables) {
-		assert(cable->inputModule != module);
-		assert(cable->outputModule != module);
-	}
 	// Dispatch RemoveEvent
 	Module::RemoveEvent eRemove;
 	module->onRemove(eRemove);
@@ -813,8 +834,17 @@ void Engine::removeModule_NoLock(Module* module) {
 			paramHandle->module = NULL;
 	}
 	// Unset primary module
-	if (internal->primaryModule == module) {
-		internal->primaryModule = NULL;
+	if (getPrimaryModule() == module) {
+		setPrimaryModule_NoLock(NULL);
+	}
+	// If a param is being smoothed on this module, stop smoothing it immediately
+	if (module == internal->smoothModule) {
+		internal->smoothModule = NULL;
+	}
+	// Check that all cables are disconnected
+	for (Cable* cable : internal->cables) {
+		assert(cable->inputModule != module);
+		assert(cable->outputModule != module);
 	}
 	// Update expanders of other modules
 	for (Module* m : internal->modules) {
@@ -1306,6 +1336,43 @@ void EngineWorker::run() {
 		Engine_stepWorker(engine, id);
 		engine->internal->workerBarrier.wait();
 	}
+}
+
+
+static void Engine_fallbackRun(Engine* that) {
+	system::setThreadName("Engine fallback");
+	contextSet(that->internal->context);
+
+	while (that->internal->fallbackRunning) {
+		if (!that->getPrimaryModule()) {
+			// Step blocks and wait
+			double start = system::getTime();
+			int frames = std::floor(that->getSampleRate() / 60);
+			that->stepBlock(frames);
+			double end = system::getTime();
+
+			double duration = frames * that->getSampleTime() - (end - start);
+			if (duration > 0.0) {
+				std::this_thread::sleep_for(std::chrono::duration<double>(duration));
+			}
+		}
+		else {
+			// Wait for primary module to be unset, or for the request to stop running
+			std::unique_lock<std::mutex> lock(that->internal->fallbackMutex);
+			that->internal->fallbackCv.wait(lock, [&]() {
+				return !that->internal->fallbackRunning || !that->getPrimaryModule();
+			});
+		}
+	}
+}
+
+
+void Engine::startFallbackThread() {
+	if (internal->fallbackThread.joinable())
+		return;
+
+	internal->fallbackRunning = true;
+	internal->fallbackThread = std::thread(Engine_fallbackRun, this);
 }
 
 

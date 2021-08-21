@@ -214,6 +214,8 @@ int main(int argc, char* argv[]) {
 		APP->patch->launch(patchPath);
 	}
 
+	APP->engine->startFallbackThread();
+
 	// Run context
 	if (settings::headless) {
 		printf("Press enter to exit.\n");
