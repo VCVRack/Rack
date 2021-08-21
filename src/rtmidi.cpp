@@ -74,6 +74,8 @@ struct RtMidiInputDevice : midi::InputDevice {
 		if (!userData)
 			return;
 
+		system::setThreadName("RtMidi input");
+
 		RtMidiInputDevice* midiInputDevice = (RtMidiInputDevice*) userData;
 		if (!midiInputDevice)
 			return;
@@ -170,6 +172,8 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 	}
 
 	void runThread() {
+		system::setThreadName("RtMidi output");
+
 		std::unique_lock<decltype(mutex)> lock(mutex);
 		while (!stopped) {
 			if (messageQueue.empty()) {
@@ -210,7 +214,8 @@ struct RtMidiOutputDevice : midi::OutputDevice {
 			stopped = true;
 			cv.notify_one();
 		}
-		thread.join();
+		if (thread.joinable())
+			thread.join();
 	}
 };
 
