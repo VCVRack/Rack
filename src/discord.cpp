@@ -86,21 +86,20 @@ static void run() {
 	DEFER({close(fd);});
 
 	// Get socket path
-	const char* env = getenv("XDG_RUNTIME_DIR");
-	if (!env)
-		env = getenv("TMPDIR");
-	if (!env)
-		env = getenv("TMP");
-	if (!env)
-		env = getenv("TEMP");
-	if (!env)
-		env = "/tmp";
-	std::string path = std::string() + env + "/discord-ipc-0";
+	const char* dir = getenv("XDG_RUNTIME_DIR");
+	if (!dir)
+		dir = getenv("TMPDIR");
+	if (!dir)
+		dir = getenv("TMP");
+	if (!dir)
+		dir = getenv("TEMP");
+	if (!dir)
+		dir = "/tmp";
 
 	// Connect to socket
 	struct sockaddr_un addr;
 	addr.sun_family = AF_UNIX;
-	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", path.c_str());
+	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s/discord-ipc-0", dir);
 	if (connect(fd, (struct sockaddr*) &addr, sizeof(addr))) {
 		// Fail silently since this just means Discord isn't open.
 		// WARN("Could not bind Discord socket");
