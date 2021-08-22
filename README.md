@@ -46,6 +46,7 @@
 ## Contributions
 
 VCV cannot accept free contributions to Rack itself, but we encourage you to
+
 - Send us feature requests and bug reports.
 - Create a plugin that extends Rack's functionality. Most of Rack's functionality is exposed in its public plugin API.
-- Work at VCV! Check job openings at https://vcvrack.com/jobs
+- Work at VCV! Check job openings at <https://vcvrack.com/jobs>
