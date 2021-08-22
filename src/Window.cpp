@@ -423,7 +423,7 @@ void Window::step() {
 	gamepad::step();
 
 	// Set window title
-	std::string windowTitle = APP_NAME + " " + APP_EDITION + " " + APP_VERSION;
+	std::string windowTitle = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
 	if (APP->patch->path != "") {
 		windowTitle += " - ";
 		if (!APP->history->isSaved())

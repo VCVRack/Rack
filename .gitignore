@@ -12,6 +12,7 @@
 /Rack
 /dep
 /plugins
+/disabledplugins
 /build
 /dist
 /patches

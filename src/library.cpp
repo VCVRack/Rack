@@ -65,7 +65,11 @@ void destroy() {
 
 void checkAppUpdate() {
 	std::string versionUrl = API_URL + "/version";
-	json_t* resJ = network::requestJson(network::METHOD_GET, versionUrl, NULL);
+	json_t* reqJ = json_object();
+	json_object_set(reqJ, "edition", json_string(APP_EDITION.c_str()));
+	DEFER({json_decref(reqJ);});
+
+	json_t* resJ = network::requestJson(network::METHOD_GET, versionUrl, reqJ);
 	if (!resJ) {
 		WARN("Request for version failed");
 		return;
