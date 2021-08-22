@@ -156,9 +156,7 @@ DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
 
 # This target is not supported for public use
 dist: $(TARGET) $(STANDALONE_TARGET) $(DIST_HTML)
-	rm -rf dist
 	mkdir -p dist
-
 	# Copy Rack to dist
 ifdef ARCH_LIN
 	mkdir -p dist/"$(DIST_DIR)"
@@ -174,7 +172,7 @@ ifdef ARCH_LIN
 	cp $(DIST_HTML) dist/"$(DIST_DIR)"/
 	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/Fundamental.vcvplugin
 	# Make ZIP
-	cd dist && zip -q -9 -r $(DIST_NAME).zip $(DIST_DIR)
+	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_DIR)"
 endif
 ifdef ARCH_MAC
 	mkdir -p dist/"$(DIST_BUNDLE)"
@@ -202,7 +200,7 @@ ifdef ARCH_MAC
 	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --deep dist/"$(DIST_BUNDLE)"
 	codesign --verify --deep --strict --verbose=2 dist/"$(DIST_BUNDLE)"
 	# Make ZIP
-	cd dist && zip -q -9 -r $(DIST_NAME).zip "$(DIST_BUNDLE)"
+	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_BUNDLE)"
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/"$(DIST_DIR)"
@@ -218,7 +216,7 @@ ifdef ARCH_WIN
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/"$(DIST_DIR)"/
 	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/Fundamental.vcvplugin
 	# Make ZIP
-	cd dist && zip -q -9 -r $(DIST_NAME).zip "$(DIST_DIR)"
+	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_DIR)"
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
 	makensis -DEDITION="$(EDITION)" -DEDITION_NAME="$(EDITION_NAME)" -DVERSION_MAJOR="$(VERSION_MAJOR)" -DVERSION="$(VERSION)" "-XOutFile dist/$(DIST_NAME).exe" installer.nsi
@@ -232,7 +230,7 @@ endif
 ifdef ARCH_WIN
 	cp libRack.dll.a dist/"$(DIST_SDK_DIR)"/
 endif
-	cd dist && zip -q -9 -r $(DIST_SDK) "$(DIST_SDK_DIR)"
+	cd dist && zip -q -9 -r "$(DIST_SDK)" "$(DIST_SDK_DIR)"
 
 
 notarize:
