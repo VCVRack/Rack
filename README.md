@@ -9,7 +9,7 @@
 - [Rack source code](https://github.com/VCVRack/Rack)
 - [Building](https://vcvrack.com/manual/Building)
 - [Communities](https://vcvrack.com/manual/Communities)
-- [Licenses](LICENSE.md)
+- [Licenses](LICENSE.md) ([HTML](LICENSE.html))
 
 ## Credits
 
