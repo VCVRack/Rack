@@ -1,5 +1,4 @@
 #pragma once
-#include <list>
 #include <vector>
 
 #include <common.hpp>
@@ -24,10 +23,10 @@ template <typename... Paths>
 std::string join(const std::string& path1, const std::string& path2, Paths... paths) {
 	return join(join(path1, path2), paths...);
 }
-/** Returns a list of all entries (directories, files, symbolic links, etc) in a directory.
+/** Returns all entries (directories, files, symbolic links, etc) in a directory.
 `depth` is the number of directories to recurse. 0 depth does not recurse. -1 depth recurses infinitely.
 */
-std::list<std::string> getEntries(const std::string& dirPath, int depth = 0);
+std::vector<std::string> getEntries(const std::string& dirPath, int depth = 0);
 bool exists(const std::string& path);
 /** Returns whether the given path is a file. */
 bool isFile(const std::string& path);

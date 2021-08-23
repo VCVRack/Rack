@@ -58,25 +58,26 @@ std::string join(const std::string& path1, const std::string& path2) {
 }
 
 
-std::list<std::string> getEntries(const std::string& dirPath, int depth) {
+static void appendEntries(std::vector<std::string>& entries, const fs::path& dir, int depth) {
 	try {
-		std::list<std::string> entries;
-		for (auto& entry : fs::directory_iterator(fs::u8path(dirPath))) {
-			std::string subEntry = entry.path().generic_u8string();
-			entries.push_back(subEntry);
+		for (const auto& entry : fs::directory_iterator(dir)) {
+			entries.push_back(entry.path().generic_u8string());
 			// Recurse if depth > 0 (limited recursion) or depth < 0 (infinite recursion).
 			if (depth != 0) {
-				if (fs::is_directory(entry.path())) {
-					std::list<std::string> subEntries = getEntries(subEntry, depth - 1);
-					entries.splice(entries.end(), subEntries);
+				if (entry.is_directory()) {
+					appendEntries(entries, entry.path(), depth - 1);
 				}
 			}
 		}
-		return entries;
 	}
-	catch (fs::filesystem_error& e) {
-		return {};
-	}
+	catch (fs::filesystem_error& e) {}
+}
+
+
+std::vector<std::string> getEntries(const std::string& dirPath, int depth) {
+	std::vector<std::string> entries;
+	appendEntries(entries, fs::u8path(dirPath), depth);
+	return entries;
 }
 
 
