@@ -123,6 +123,7 @@ struct EditButton : MenuButton {
 			void step() override {
 				text = "Undo " + APP->history->getUndoName();
 				disabled = !APP->history->canUndo();
+				MenuItem::step();
 			}
 			void onAction(const ActionEvent& e) override {
 				APP->history->undo();
@@ -134,6 +135,7 @@ struct EditButton : MenuButton {
 			void step() override {
 				text = "Redo " + APP->history->getRedoName();
 				disabled = !APP->history->canRedo();
+				MenuItem::step();
 			}
 			void onAction(const ActionEvent& e) override {
 				APP->history->redo();
