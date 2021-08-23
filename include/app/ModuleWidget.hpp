@@ -7,7 +7,6 @@
 #include <plugin/Model.hpp>
 #include <engine/Module.hpp>
 #include <history.hpp>
-#include <list>
 
 
 namespace rack {
@@ -57,10 +56,10 @@ struct ModuleWidget : widget::OpaqueWidget {
 	PortWidget* getInput(int portId);
 	PortWidget* getOutput(int portId);
 	/** Scans children widgets recursively for all ParamWidgets. */
-	std::list<ParamWidget*> getParams();
-	std::list<PortWidget*> getPorts();
-	std::list<PortWidget*> getInputs();
-	std::list<PortWidget*> getOutputs();
+	std::vector<ParamWidget*> getParams();
+	std::vector<PortWidget*> getPorts();
+	std::vector<PortWidget*> getInputs();
+	std::vector<PortWidget*> getOutputs();
 
 	void draw(const DrawArgs& args) override;
 	void drawShadow(const DrawArgs& args);

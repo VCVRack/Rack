@@ -174,24 +174,24 @@ void doIfTypeRecursive(widget::Widget* w, F f) {
 	}
 }
 
-std::list<ParamWidget*> ModuleWidget::getParams() {
-	std::list<ParamWidget*> pws;
+std::vector<ParamWidget*> ModuleWidget::getParams() {
+	std::vector<ParamWidget*> pws;
 	doIfTypeRecursive<ParamWidget>(this, [&](ParamWidget* pw) {
 		pws.push_back(pw);
 	});
 	return pws;
 }
 
-std::list<PortWidget*> ModuleWidget::getPorts() {
-	std::list<PortWidget*> pws;
+std::vector<PortWidget*> ModuleWidget::getPorts() {
+	std::vector<PortWidget*> pws;
 	doIfTypeRecursive<PortWidget>(this, [&](PortWidget* pw) {
 		pws.push_back(pw);
 	});
 	return pws;
 }
 
-std::list<PortWidget*> ModuleWidget::getInputs() {
-	std::list<PortWidget*> pws;
+std::vector<PortWidget*> ModuleWidget::getInputs() {
+	std::vector<PortWidget*> pws;
 	doIfTypeRecursive<PortWidget>(this, [&](PortWidget* pw) {
 		if (pw->type == engine::Port::INPUT)
 			pws.push_back(pw);
@@ -199,8 +199,8 @@ std::list<PortWidget*> ModuleWidget::getInputs() {
 	return pws;
 }
 
-std::list<PortWidget*> ModuleWidget::getOutputs() {
-	std::list<PortWidget*> pws;
+std::vector<PortWidget*> ModuleWidget::getOutputs() {
+	std::vector<PortWidget*> pws;
 	doIfTypeRecursive<PortWidget>(this, [&](PortWidget* pw) {
 		if (pw->type == engine::Port::OUTPUT)
 			pws.push_back(pw);
@@ -802,7 +802,6 @@ void ModuleWidget::cloneAction() {
 		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(pw)) {
 			// Create cable attached to cloned ModuleWidget's input
 			engine::Cable* clonedCable = new engine::Cable;
-			clonedCable->id = -1;
 			clonedCable->inputModule = clonedModule;
 			clonedCable->inputId = cw->cable->inputId;
 			// If cable is self-patched, attach to cloned module instead

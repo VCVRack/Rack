@@ -393,24 +393,19 @@ static void cleanupModuleJson(json_t* moduleJ) {
 	json_object_del(moduleJ, "rightModuleId");
 }
 
-void RackWidget::pasteJsonAction(json_t* rootJ) {
-	deselect();
 
-	history::ComplexAction* complexAction = new history::ComplexAction;
-	complexAction->name = "paste modules";
-	DEFER({
-		if (!complexAction->isEmpty())
-			APP->history->push(complexAction);
-		else
-			delete complexAction;
-	});
+struct PasteJsonReturn {
+	std::map<int64_t, int64_t> newModuleIds;
+};
+static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, history::ComplexAction* complexAction) {
+	that->deselect();
 
-	std::map<int64_t, int64_t> oldIdMap;
+	std::map<int64_t, int64_t> newModuleIds;
 
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)
-		return;
+		return {};
 
 	size_t moduleIndex;
 	json_t* moduleJ;
@@ -443,17 +438,17 @@ void RackWidget::pasteJsonAction(json_t* rootJ) {
 		pos = pos.mult(RACK_GRID_SIZE);
 		mw->box.pos = pos.plus(RACK_OFFSET);
 
-		internal->moduleContainer->addChild(mw);
+		that->internal->moduleContainer->addChild(mw);
 		mw->selected() = true;
 
-		oldIdMap[id] = mw->module->id;
+		newModuleIds[id] = mw->module->id;
 	}
 
 	// This calls RackWidget_updateExpanders()
-	setSelectionPosNearest(math::Vec(0, 0));
+	that->setSelectionPosNearest(math::Vec(0, 0));
 
 	// Add positioned selected modules to history
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : that->getSelectedModules()) {
 		// history::ModuleAdd
 		history::ModuleAdd* h = new history::ModuleAdd;
 		h->setModule(mw);
@@ -462,55 +457,70 @@ void RackWidget::pasteJsonAction(json_t* rootJ) {
 
 	// cables
 	json_t* cablesJ = json_object_get(rootJ, "cables");
-	if (!cablesJ)
-		return;
-	size_t cableIndex;
-	json_t* cableJ;
-	json_array_foreach(cablesJ, cableIndex, cableJ) {
-		json_object_del(cableJ, "id");
+	if (cablesJ) {
+		size_t cableIndex;
+		json_t* cableJ;
+		json_array_foreach(cablesJ, cableIndex, cableJ) {
+			json_object_del(cableJ, "id");
 
-		// Remap old module IDs to new IDs
-		json_t* inputModuleIdJ = json_object_get(cableJ, "inputModuleId");
-		if (!inputModuleIdJ)
-			continue;
-		int64_t inputModuleId = json_integer_value(inputModuleIdJ);
-		inputModuleId = get(oldIdMap, inputModuleId, -1);
-		if (inputModuleId < 0)
-			continue;
-		json_object_set(cableJ, "inputModuleId", json_integer(inputModuleId));
+			// Remap old module IDs to new IDs
+			json_t* inputModuleIdJ = json_object_get(cableJ, "inputModuleId");
+			if (!inputModuleIdJ)
+				continue;
+			int64_t inputModuleId = json_integer_value(inputModuleIdJ);
+			inputModuleId = get(newModuleIds, inputModuleId, -1);
+			if (inputModuleId < 0)
+				continue;
+			json_object_set(cableJ, "inputModuleId", json_integer(inputModuleId));
 
-		json_t* outputModuleIdJ = json_object_get(cableJ, "outputModuleId");
-		if (!outputModuleIdJ)
-			continue;
-		int64_t outputModuleId = json_integer_value(outputModuleIdJ);
-		outputModuleId = get(oldIdMap, outputModuleId, -1);
-		if (outputModuleId < 0)
-			continue;
-		json_object_set(cableJ, "outputModuleId", json_integer(outputModuleId));
+			json_t* outputModuleIdJ = json_object_get(cableJ, "outputModuleId");
+			if (!outputModuleIdJ)
+				continue;
+			int64_t outputModuleId = json_integer_value(outputModuleIdJ);
+			outputModuleId = get(newModuleIds, outputModuleId, -1);
+			if (outputModuleId < 0)
+				continue;
+			json_object_set(cableJ, "outputModuleId", json_integer(outputModuleId));
 
-		// Create Cable
-		engine::Cable* cable = new engine::Cable;
-		try {
-			cable->fromJson(cableJ);
-			APP->engine->addCable(cable);
+			// Create Cable
+			engine::Cable* cable = new engine::Cable;
+			try {
+				cable->fromJson(cableJ);
+				APP->engine->addCable(cable);
+			}
+			catch (Exception& e) {
+				WARN("Cannot paste cable: %s", e.what());
+				delete cable;
+				continue;
+			}
+
+			// Create CableWidget
+			app::CableWidget* cw = new app::CableWidget;
+			cw->setCable(cable);
+			cw->fromJson(cableJ);
+			that->addCable(cw);
+
+			// history::CableAdd
+			history::CableAdd* h = new history::CableAdd;
+			h->setCable(cw);
+			complexAction->push(h);
 		}
-		catch (Exception& e) {
-			WARN("Cannot paste cable: %s", e.what());
-			delete cable;
-			continue;
-		}
-
-		// Create CableWidget
-		app::CableWidget* cw = new app::CableWidget;
-		cw->setCable(cable);
-		cw->fromJson(cableJ);
-		addCable(cw);
-
-		// history::CableAdd
-		history::CableAdd* h = new history::CableAdd;
-		h->setCable(cw);
-		complexAction->push(h);
 	}
+
+	return {newModuleIds};
+}
+
+void RackWidget::pasteJsonAction(json_t* rootJ) {
+	history::ComplexAction* complexAction = new history::ComplexAction;
+	complexAction->name = "paste modules";
+	DEFER({
+		if (!complexAction->isEmpty())
+			APP->history->push(complexAction);
+		else
+			delete complexAction;
+	});
+
+	RackWidget_pasteJson(this, rootJ, complexAction);
 }
 
 void RackWidget::pasteModuleJsonAction(json_t* moduleJ) {
@@ -1028,8 +1038,49 @@ void RackWidget::disconnectSelectionAction() {
 void RackWidget::cloneSelectionAction() {
 	json_t* rootJ = selectionToJson();
 	DEFER({json_decref(rootJ);});
-	// TODO The Action name is incorrect here.
-	pasteJsonAction(rootJ);
+
+	history::ComplexAction* complexAction = new history::ComplexAction;
+	complexAction->name = "duplicate modules";
+	DEFER({
+		if (!complexAction->isEmpty())
+			APP->history->push(complexAction);
+		else
+			delete complexAction;
+	});
+
+	auto p = RackWidget_pasteJson(this, rootJ, complexAction);
+
+	// Clone cables attached to inputs of selected modules but outputs of non-selected modules
+	for (CableWidget* cw : getCompleteCables()) {
+		auto inputIt = p.newModuleIds.find(cw->getCable()->inputModule->id);
+		if (inputIt == p.newModuleIds.end())
+			continue;
+
+		auto outputIt = p.newModuleIds.find(cw->getCable()->outputModule->id);
+		if (outputIt != p.newModuleIds.end())
+			continue;
+
+		int64_t clonedInputModuleId = inputIt->second;
+		engine::Module* clonedInputModule = APP->engine->getModule(clonedInputModuleId);
+
+		// Create cable attached to cloned ModuleWidget's input
+		engine::Cable* clonedCable = new engine::Cable;
+		clonedCable->inputModule = clonedInputModule;
+		clonedCable->inputId = cw->cable->inputId;
+		clonedCable->outputModule = cw->cable->outputModule;
+		clonedCable->outputId = cw->cable->outputId;
+		APP->engine->addCable(clonedCable);
+
+		app::CableWidget* clonedCw = new app::CableWidget;
+		clonedCw->setCable(clonedCable);
+		clonedCw->color = cw->color;
+		APP->scene->rack->addCable(clonedCw);
+
+		// history::CableAdd
+		history::CableAdd* hca = new history::CableAdd;
+		hca->setCable(clonedCw);
+		complexAction->push(hca);
+	}
 }
 
 void RackWidget::bypassSelectionAction(bool bypassed) {
