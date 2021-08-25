@@ -236,20 +236,12 @@ void TextField::onSelectKey(const SelectKeyEvent& e) {
 		if (e.keyName != "") {
 			e.consume(this);
 		}
-		// Esc
-		if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
-			APP->event->setSelected(NULL);
-			e.consume(this);
-		}
 
 		assert(0 <= cursor);
 		assert(cursor <= (int) text.size());
 		assert(0 <= selection);
 		assert(selection <= (int) text.size());
 	}
-
-	// Consume ALL keys with ALL actions
-	e.consume(this);
 }
 
 int TextField::getTextPosition(math::Vec mousePos) {
