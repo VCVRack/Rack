@@ -357,6 +357,12 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(NULL);
 			return;
 		}
+		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;
+			if (!manualUrl.empty())
+				system::openBrowser(manualUrl);
+			e.consume(this);
+		}
 	}
 
 	if (e.isConsumed())
@@ -967,7 +973,7 @@ void ModuleWidget::createContextMenu() {
 		// manual
 		std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;
 		if (manualUrl != "") {
-			menu->addChild(createMenuItem("User manual", "", [=]() {
+			menu->addChild(createMenuItem("User manual", RACK_MOD_CTRL_NAME "+F1", [=]() {
 				system::openBrowser(manualUrl);
 			}));
 		}
