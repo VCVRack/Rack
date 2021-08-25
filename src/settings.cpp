@@ -4,7 +4,6 @@
 #include <Window.hpp>
 #include <plugin.hpp>
 #include <app/Scene.hpp>
-#include <app/ModuleBrowser.hpp>
 #include <engine/Engine.hpp>
 #include <context.hpp>
 #include <patch.hpp>
@@ -62,8 +61,8 @@ bool autoCheckUpdates = true;
 bool showTipsOnLaunch = true;
 int tipIndex = -1;
 bool discordUpdateActivity = true;
-ModuleBrowserSort moduleBrowserSort = MODULE_BROWSER_SORT_UPDATED;
-float moduleBrowserZoom = -1.f;
+BrowserSort browserSort = BROWSER_SORT_UPDATED;
+float browserZoom = -1.f;
 std::map<std::string, std::map<std::string, ModuleInfo>> moduleInfos;
 
 
@@ -164,9 +163,9 @@ json_t* toJson() {
 	if (!discordUpdateActivity)
 		json_object_set_new(rootJ, "discordUpdateActivity", json_boolean(discordUpdateActivity));
 
-	json_object_set_new(rootJ, "moduleBrowserSort", json_integer((int) moduleBrowserSort));
+	json_object_set_new(rootJ, "browserSort", json_integer((int) browserSort));
 
-	json_object_set_new(rootJ, "moduleBrowserZoom", json_real(moduleBrowserZoom));
+	json_object_set_new(rootJ, "browserZoom", json_real(browserZoom));
 
 	json_t* moduleInfosJ = json_object();
 	for (const auto& pluginPair : moduleInfos) {
@@ -341,13 +340,13 @@ void fromJson(json_t* rootJ) {
 	if (discordUpdateActivityJ)
 		discordUpdateActivity = json_boolean_value(discordUpdateActivityJ);
 
-	json_t* moduleBrowserSortJ = json_object_get(rootJ, "moduleBrowserSort");
-	if (moduleBrowserSortJ)
-		moduleBrowserSort = (ModuleBrowserSort) json_integer_value(moduleBrowserSortJ);
+	json_t* browserSortJ = json_object_get(rootJ, "browserSort");
+	if (browserSortJ)
+		browserSort = (BrowserSort) json_integer_value(browserSortJ);
 
-	json_t* moduleBrowserZoomJ = json_object_get(rootJ, "moduleBrowserZoom");
-	if (moduleBrowserZoomJ)
-		moduleBrowserZoom = json_number_value(moduleBrowserZoomJ);
+	json_t* browserZoomJ = json_object_get(rootJ, "browserZoom");
+	if (browserZoomJ)
+		browserZoom = json_number_value(browserZoomJ);
 
 	moduleInfos.clear();
 	json_t* moduleInfosJ = json_object_get(rootJ, "moduleInfos");

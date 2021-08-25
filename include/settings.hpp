@@ -79,16 +79,16 @@ extern bool autoCheckUpdates;
 extern bool showTipsOnLaunch;
 extern int tipIndex;
 extern bool discordUpdateActivity;
-enum ModuleBrowserSort {
-	MODULE_BROWSER_SORT_UPDATED,
-	MODULE_BROWSER_SORT_LAST_USED,
-	MODULE_BROWSER_SORT_MOST_USED,
-	MODULE_BROWSER_SORT_BRAND,
-	MODULE_BROWSER_SORT_NAME,
-	MODULE_BROWSER_SORT_RANDOM,
+enum BrowserSort {
+	BROWSER_SORT_UPDATED,
+	BROWSER_SORT_LAST_USED,
+	BROWSER_SORT_MOST_USED,
+	BROWSER_SORT_BRAND,
+	BROWSER_SORT_NAME,
+	BROWSER_SORT_RANDOM,
 };
-extern ModuleBrowserSort moduleBrowserSort;
-extern float moduleBrowserZoom;
+extern BrowserSort browserSort;
+extern float browserZoom;
 
 struct ModuleInfo {
 	bool enabled = true;

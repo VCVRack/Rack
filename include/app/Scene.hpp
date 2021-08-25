@@ -17,7 +17,7 @@ struct Scene : widget::OpaqueWidget {
 	RackScrollWidget* rackScroll;
 	RackWidget* rack;
 	widget::Widget* menuBar;
-	widget::Widget* moduleBrowser;
+	widget::Widget* browser;
 
 	double lastAutosaveTime = 0.0;
 	/** The last mouse position in the Scene */

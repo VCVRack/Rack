@@ -3,7 +3,7 @@
 #include <osdialog.h>
 
 #include <app/Scene.hpp>
-#include <app/ModuleBrowser.hpp>
+#include <app/Browser.hpp>
 #include <app/TipWindow.hpp>
 #include <app/MenuBar.hpp>
 #include <context.hpp>
@@ -59,9 +59,9 @@ Scene::Scene() {
 	menuBar = createMenuBar();
 	addChild(menuBar);
 
-	moduleBrowser = moduleBrowserCreate();
-	moduleBrowser->hide();
-	addChild(moduleBrowser);
+	browser = browserCreate();
+	browser->hide();
+	addChild(browser);
 
 	if (settings::showTipsOnLaunch) {
 		addChild(tipWindowCreate());
@@ -183,7 +183,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && (e.mods & RACK_MOD_MASK) == 0) {
-			moduleBrowser->show();
+			browser->show();
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {

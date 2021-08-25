@@ -9,7 +9,6 @@
 #include <widget/TransparentWidget.hpp>
 #include <app/RailWidget.hpp>
 #include <app/Scene.hpp>
-#include <app/ModuleBrowser.hpp>
 #include <settings.hpp>
 #include <plugin.hpp>
 #include <engine/Engine.hpp>
@@ -148,7 +147,7 @@ void RackWidget::onButton(const ButtonEvent& e) {
 		return;
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		APP->scene->moduleBrowser->show();
+		APP->scene->browser->show();
 		e.consume(this);
 	}
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <thread>
 
-#include <app/ModuleBrowser.hpp>
+#include <app/Browser.hpp>
 #include <widget/OpaqueWidget.hpp>
 #include <widget/TransparentWidget.hpp>
 #include <widget/ZoomWidget.hpp>
@@ -36,7 +36,7 @@
 
 namespace rack {
 namespace app {
-namespace moduleBrowser {
+namespace browser {
 
 
 static fuzzysearch::Database<plugin::Model*> modelDb;
@@ -103,7 +103,7 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 	APP->history->push(h);
 
 	// Hide Module Browser
-	APP->scene->moduleBrowser->hide();
+	APP->scene->browser->hide();
 
 	return moduleWidget;
 }
@@ -112,7 +112,7 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 // Widgets
 
 
-struct ModuleBrowser;
+struct Browser;
 
 
 struct BrowserOverlay : ui::MenuOverlay {
@@ -147,7 +147,7 @@ struct ModelBox : widget::OpaqueWidget {
 	}
 
 	void updateZoom() {
-		float zoom = std::pow(2.f, settings::moduleBrowserZoom);
+		float zoom = std::pow(2.f, settings::browserZoom);
 
 		if (previewWidget) {
 			fb->setDirty();
@@ -310,7 +310,7 @@ struct ModelBox : widget::OpaqueWidget {
 
 
 struct BrowserSearchField : ui::TextField {
-	ModuleBrowser* browser;
+	Browser* browser;
 
 	void step() override {
 		// Steal focus when step is called
@@ -335,20 +335,20 @@ struct BrowserSearchField : ui::TextField {
 
 
 struct FavoriteQuantity : Quantity {
-	ModuleBrowser* browser;
+	Browser* browser;
 	void setValue(float value) override;
 	float getValue() override;
 };
 
 
 struct ClearButton : ui::Button {
-	ModuleBrowser* browser;
+	Browser* browser;
 	void onAction(const ActionEvent& e) override;
 };
 
 
 struct BrandItem : ui::MenuItem {
-	ModuleBrowser* browser;
+	Browser* browser;
 	std::string brand;
 	void onAction(const ActionEvent& e) override;
 	void step() override;
@@ -356,7 +356,7 @@ struct BrandItem : ui::MenuItem {
 
 
 struct BrandButton : ui::ChoiceButton {
-	ModuleBrowser* browser;
+	Browser* browser;
 
 	void onAction(const ActionEvent& e) override;
 	void step() override;
@@ -364,7 +364,7 @@ struct BrandButton : ui::ChoiceButton {
 
 
 struct TagItem : ui::MenuItem {
-	ModuleBrowser* browser;
+	Browser* browser;
 	int tagId;
 	void onAction(const ActionEvent& e) override;
 	void step() override;
@@ -372,7 +372,7 @@ struct TagItem : ui::MenuItem {
 
 
 struct TagButton : ui::ChoiceButton {
-	ModuleBrowser* browser;
+	Browser* browser;
 
 	void onAction(const ActionEvent& e) override;
 	void step() override;
@@ -390,28 +390,28 @@ static const std::string sortNames[] = {
 
 
 struct SortItem : ui::MenuItem {
-	ModuleBrowser* browser;
-	settings::ModuleBrowserSort sort;
+	Browser* browser;
+	settings::BrowserSort sort;
 	void onAction(const ActionEvent& e) override;
 	void step() override {
-		rightText = CHECKMARK(settings::moduleBrowserSort == sort);
+		rightText = CHECKMARK(settings::browserSort == sort);
 		MenuItem::step();
 	}
 };
 
 
 struct SortButton : ui::ChoiceButton {
-	ModuleBrowser* browser;
+	Browser* browser;
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		for (int sortId = 0; sortId <= settings::MODULE_BROWSER_SORT_RANDOM; sortId++) {
+		for (int sortId = 0; sortId <= settings::BROWSER_SORT_RANDOM; sortId++) {
 			SortItem* sortItem = new SortItem;
 			sortItem->text = sortNames[sortId];
-			sortItem->sort = (settings::ModuleBrowserSort) sortId;
+			sortItem->sort = (settings::BrowserSort) sortId;
 			sortItem->browser = browser;
 			menu->addChild(sortItem);
 		}
@@ -419,25 +419,25 @@ struct SortButton : ui::ChoiceButton {
 
 	void step() override {
 		text = "Sort: ";
-		text += sortNames[settings::moduleBrowserSort];
+		text += sortNames[settings::browserSort];
 		ChoiceButton::step();
 	}
 };
 
 
 struct ZoomItem : ui::MenuItem {
-	ModuleBrowser* browser;
+	Browser* browser;
 	float zoom;
 	void onAction(const ActionEvent& e) override;
 	void step() override {
-		rightText = CHECKMARK(settings::moduleBrowserZoom == zoom);
+		rightText = CHECKMARK(settings::browserZoom == zoom);
 		MenuItem::step();
 	}
 };
 
 
 struct ZoomButton : ui::ChoiceButton {
-	ModuleBrowser* browser;
+	Browser* browser;
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
@@ -455,7 +455,7 @@ struct ZoomButton : ui::ChoiceButton {
 
 	void step() override {
 		text = "Zoom: ";
-		text += string::f("%.0f%%", std::pow(2.f, settings::moduleBrowserZoom) * 100.f);
+		text += string::f("%.0f%%", std::pow(2.f, settings::browserZoom) * 100.f);
 		ChoiceButton::step();
 	}
 };
@@ -469,7 +469,7 @@ struct UrlButton : ui::Button {
 };
 
 
-struct ModuleBrowser : widget::OpaqueWidget {
+struct Browser : widget::OpaqueWidget {
 	ui::SequentialLayout* headerLayout;
 	BrowserSearchField* searchField;
 	BrandButton* brandButton;
@@ -492,7 +492,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	std::map<plugin::Model*, float> prefilteredModelScores;
 	std::map<plugin::Model*, int> modelOrders;
 
-	ModuleBrowser() {
+	Browser() {
 		const float margin = 10;
 
 		// Header
@@ -573,7 +573,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		clear();
 	}
 
-	~ModuleBrowser() {
+	~Browser() {
 		delete favoriteQuantity;
 	}
 
@@ -698,14 +698,14 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			}
 
 			// Sort ModelBoxes
-			if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_UPDATED) {
+			if (settings::browserSort == settings::BROWSER_SORT_UPDATED) {
 				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
 					int modelOrder = get(modelOrders, m->model, 0);
 					return std::make_tuple(-p->modifiedTimestamp, p->brand, p->name, modelOrder);
 				});
 			}
-			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_LAST_USED) {
+			else if (settings::browserSort == settings::BROWSER_SORT_LAST_USED) {
 				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
 					const settings::ModuleInfo* mi = settings::getModuleInfo(p->slug, m->model->slug);
@@ -714,7 +714,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 					return std::make_tuple(-lastAdded, -p->modifiedTimestamp, p->brand, p->name, modelOrder);
 				});
 			}
-			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_MOST_USED) {
+			else if (settings::browserSort == settings::BROWSER_SORT_MOST_USED) {
 				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
 					const settings::ModuleInfo* mi = settings::getModuleInfo(p->slug, m->model->slug);
@@ -724,20 +724,20 @@ struct ModuleBrowser : widget::OpaqueWidget {
 					return std::make_tuple(-added, -lastAdded, -p->modifiedTimestamp, p->brand, p->name, modelOrder);
 				});
 			}
-			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_BRAND) {
+			else if (settings::browserSort == settings::BROWSER_SORT_BRAND) {
 				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
 					int modelOrder = get(modelOrders, m->model, 0);
 					return std::make_tuple(p->brand, p->name, modelOrder);
 				});
 			}
-			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_NAME) {
+			else if (settings::browserSort == settings::BROWSER_SORT_NAME) {
 				sortModels([](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
 					return std::make_tuple(m->model->name, p->brand);
 				});
 			}
-			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_RANDOM) {
+			else if (settings::browserSort == settings::BROWSER_SORT_RANDOM) {
 				std::map<ModelBox*, uint64_t> randomOrder;
 				for (Widget* w : modelContainer->children) {
 					ModelBox* m = reinterpret_cast<ModelBox*>(w);
@@ -994,26 +994,26 @@ inline void TagButton::step() {
 }
 
 inline void SortItem::onAction(const ActionEvent& e) {
-	settings::moduleBrowserSort = sort;
+	settings::browserSort = sort;
 	browser->refresh();
 }
 
 inline void ZoomItem::onAction(const ActionEvent& e) {
-	if (zoom != settings::moduleBrowserZoom) {
-		settings::moduleBrowserZoom = zoom;
+	if (zoom != settings::browserZoom) {
+		settings::browserZoom = zoom;
 		browser->updateZoom();
 	}
 }
 
 
-} // namespace moduleBrowser
+} // namespace browser
 
 
-widget::Widget* moduleBrowserCreate() {
-	moduleBrowser::BrowserOverlay* overlay = new moduleBrowser::BrowserOverlay;
+widget::Widget* browserCreate() {
+	browser::BrowserOverlay* overlay = new browser::BrowserOverlay;
 	overlay->bgColor = nvgRGBAf(0, 0, 0, 0.33);
 
-	moduleBrowser::ModuleBrowser* browser = new moduleBrowser::ModuleBrowser;
+	browser::Browser* browser = new browser::Browser;
 	overlay->addChild(browser);
 
 	return overlay;
