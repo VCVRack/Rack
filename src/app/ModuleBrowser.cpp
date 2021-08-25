@@ -289,8 +289,7 @@ struct ModelBox : widget::OpaqueWidget {
 
 		menu->addChild(createBoolMenuItem("Favorite",
 			[=]() {
-				const settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
-				return mi && mi->favorite;
+				return isFavorite();
 			},
 			[=](bool favorite) {
 				setFavorite(favorite);
@@ -298,10 +297,14 @@ struct ModelBox : widget::OpaqueWidget {
 		));
 	}
 
+	bool isFavorite() {
+		const settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
+		return mi && mi->favorite;
+	}
+
 	void setFavorite(bool favorite) {
 		settings::ModuleInfo& mi = settings::moduleInfos[model->plugin->slug][model->slug];
 		mi.favorite = favorite;
-		// TODO Call user API
 	}
 };
 
