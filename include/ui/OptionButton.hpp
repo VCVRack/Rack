@@ -1,21 +1,16 @@
 #pragma once
-#include <widget/OpaqueWidget.hpp>
 #include <ui/common.hpp>
-#include <Quantity.hpp>
+#include <ui/RadioButton.hpp>
 
 
 namespace rack {
 namespace ui {
 
 
-struct OptionButton : widget::OpaqueWidget {
-	std::string text;
-	/** Not owned. Tracks the pressed state of the button.*/
-	Quantity* quantity = NULL;
-
-	OptionButton();
+/** Behaves like a RadioButton and appears with a checkmark beside text.
+*/
+struct OptionButton : RadioButton {
 	void draw(const DrawArgs& args) override;
-	void onDragDrop(const DragDropEvent& e) override;
 };
 
 

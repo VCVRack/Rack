@@ -1,20 +1,18 @@
 #pragma once
 #include <ui/common.hpp>
-#include <widget/OpaqueWidget.hpp>
-#include <Quantity.hpp>
-#include <context.hpp>
+#include <ui/Button.hpp>
 
 
 namespace rack {
 namespace ui {
 
 
-struct RadioButton : widget::OpaqueWidget {
-	/** Not owned. */
-	Quantity* quantity = NULL;
-
-	RadioButton();
+/** Toggles a Quantity between 1.0 and 0.0 when clicked.
+*/
+struct RadioButton : Button {
 	void draw(const DrawArgs& args) override;
+	void onDragStart(const DragStartEvent& e) override;
+	void onDragEnd(const DragEndEvent& e) override;
 	void onDragDrop(const DragDropEvent& e) override;
 };
 

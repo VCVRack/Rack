@@ -41,9 +41,9 @@
 #include <ui/MenuLabel.hpp>
 #include <ui/MenuItem.hpp>
 #include <ui/Button.hpp>
-#include <ui/IconButton.hpp>
 #include <ui/ChoiceButton.hpp>
 #include <ui/RadioButton.hpp>
+#include <ui/OptionButton.hpp>
 #include <ui/ProgressBar.hpp>
 
 #include <app/AudioWidget.hpp>
