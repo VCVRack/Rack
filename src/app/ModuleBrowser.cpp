@@ -17,6 +17,7 @@
 #include <ui/Button.hpp>
 #include <ui/ChoiceButton.hpp>
 #include <ui/RadioButton.hpp>
+#include <ui/OptionButton.hpp>
 #include <ui/Tooltip.hpp>
 #include <app/ModuleWidget.hpp>
 #include <app/Scene.hpp>
@@ -80,9 +81,9 @@ static void fuzzySearchInit() {
 
 static ModuleWidget* chooseModel(plugin::Model* model) {
 	// Record usage
-	settings::ModuleUsage& mu = settings::moduleUsages[model->plugin->slug][model->slug];
-	mu.count++;
-	mu.lastTime = system::getUnixTime();
+	settings::ModuleInfo& mi = settings::moduleInfos[model->plugin->slug][model->slug];
+	mi.added++;
+	mi.lastAdded = system::getUnixTime();
 
 	// Create Module and ModuleWidget
 	engine::Module* module = model->createModule();
@@ -122,6 +123,7 @@ struct BrowserOverlay : ui::MenuOverlay {
 	}
 
 	void onAction(const ActionEvent& e) override {
+		// Hide instead of requestDelete()
 		hide();
 	}
 };
@@ -188,14 +190,17 @@ struct ModelBox : widget::OpaqueWidget {
 		// Lazily create preview when drawn
 		createPreview();
 
+		const settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
+
 		// Draw shadow
 		nvgBeginPath(args.vg);
 		float r = 10; // Blur radius
-		float c = 10; // Corner radius
+		float c = 5; // Corner radius
 		nvgRect(args.vg, -r, -r, box.size.x + 2 * r, box.size.y + 2 * r);
 		NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.5);
-		NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
-		nvgFillPaint(args.vg, nvgBoxGradient(args.vg, 0, 0, box.size.x, box.size.y, c, r, shadowColor, transparentColor));
+		if (mi && mi->favorite)
+			shadowColor = nvgRGBAf(2, 2, 2, 1.0);
+		nvgFillPaint(args.vg, nvgBoxGradient(args.vg, 0, 0, box.size.x, box.size.y, c, r, shadowColor, color::BLACK_TRANSPARENT));
 		nvgFill(args.vg);
 
 		// To avoid blinding the user when rack brightness is low, draw framebuffer with the same brightness.
@@ -222,10 +227,6 @@ struct ModelBox : widget::OpaqueWidget {
 	}
 
 	void onButton(const ButtonEvent& e) override {
-		OpaqueWidget::onButton(e);
-		if (e.getTarget() != this)
-			return;
-
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 			ModuleWidget* mw = chooseModel(model);
 
@@ -237,12 +238,19 @@ struct ModelBox : widget::OpaqueWidget {
 			// Disable dragging temporarily until the mouse has moved a bit.
 			mw->dragEnabled() = false;
 		}
+
+		// Open context menu on right-click
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+			createContextMenu();
+			e.consume(this);
+		}
 	}
 
 	ui::Tooltip* createTooltip() {
 		std::string text;
-		text = model->plugin->brand;
-		text += " " + model->name;
+		text += model->name;
+		text += "\n";
+		text += model->plugin->brand;
 		// Description
 		if (model->description != "") {
 			text += "\n" + model->description;
@@ -272,6 +280,29 @@ struct ModelBox : widget::OpaqueWidget {
 		setTooltip(NULL);
 		OpaqueWidget::onHide(e);
 	}
+
+	void createContextMenu() {
+		ui::Menu* menu = createMenu();
+
+		// menu->addChild(createMenuLabel(model->name));
+		// menu->addChild(createMenuLabel(model->plugin->brand));
+
+		menu->addChild(createBoolMenuItem("Favorite",
+			[=]() {
+				const settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
+				return mi && mi->favorite;
+			},
+			[=](bool favorite) {
+				setFavorite(favorite);
+			}
+		));
+	}
+
+	void setFavorite(bool favorite) {
+		settings::ModuleInfo& mi = settings::moduleInfos[model->plugin->slug][model->slug];
+		mi.favorite = favorite;
+		// TODO Call user API
+	}
 };
 
 
@@ -297,6 +328,13 @@ struct BrowserSearchField : ui::TextField {
 		selectAll();
 		TextField::onShow(e);
 	}
+};
+
+
+struct FavoriteQuantity : Quantity {
+	ModuleBrowser* browser;
+	void setValue(float value) override;
+	float getValue() override;
 };
 
 
@@ -433,6 +471,8 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	BrowserSearchField* searchField;
 	BrandButton* brandButton;
 	TagButton* tagButton;
+	FavoriteQuantity* favoriteQuantity;
+	ui::OptionButton* favoriteButton;
 	ClearButton* clearButton;
 	ui::Label* countLabel;
 
@@ -443,6 +483,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	std::string search;
 	std::string brand;
 	std::set<int> tagIds = {};
+	bool favorite = false;
 
 	// Caches and temporary state
 	std::map<plugin::Model*, float> prefilteredModelScores;
@@ -474,6 +515,15 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		tagButton->box.size.x = 150;
 		tagButton->browser = this;
 		headerLayout->addChild(tagButton);
+
+		favoriteQuantity = new FavoriteQuantity;
+		favoriteQuantity->browser = this;
+
+		favoriteButton = new ui::OptionButton;
+		favoriteButton->quantity = favoriteQuantity;
+		favoriteButton->text = "Favorites";
+		favoriteButton->box.size.x = 70;
+		headerLayout->addChild(favoriteButton);
 
 		clearButton = new ClearButton;
 		clearButton->box.size.x = 100;
@@ -520,24 +570,19 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		clear();
 	}
 
+	~ModuleBrowser() {
+		delete favoriteQuantity;
+	}
+
 	void resetModelBoxes() {
 		modelContainer->clearChildren();
 		modelOrders.clear();
 		// Iterate plugins
 		// for (int i = 0; i < 100; i++)
 		for (plugin::Plugin* plugin : plugin::plugins) {
-			// Get module slugs from module whitelist
-			const auto& pluginIt = settings::moduleWhitelist.find(plugin->slug);
 			// Iterate models in plugin
 			int modelIndex = 0;
 			for (plugin::Model* model : plugin->models) {
-				// Don't show module if plugin whitelist exists but the module is not in it.
-				if (pluginIt != settings::moduleWhitelist.end()) {
-					auto moduleIt = std::find(pluginIt->second.begin(), pluginIt->second.end(), model->slug);
-					if (moduleIt == pluginIt->second.end())
-						continue;
-				}
-
 				// Create ModelBox
 				ModelBox* modelBox = new ModelBox;
 				modelBox->setModel(model);
@@ -579,10 +624,20 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		Widget::draw(args);
 	}
 
-	bool isModelVisible(plugin::Model* model, const std::string& brand, std::set<int> tagIds) {
+	bool isModelVisible(plugin::Model* model, const std::string& brand, std::set<int> tagIds, bool favorite) {
 		// Filter hidden
 		if (model->hidden)
 			return false;
+
+		settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
+		if (mi && !mi->enabled)
+			return false;
+
+		// Filter favorites
+		if (favorite) {
+			if (!mi || !mi->favorite)
+				return false;
+		}
 
 		// Filter brand
 		if (!brand.empty()) {
@@ -601,10 +656,10 @@ struct ModuleBrowser : widget::OpaqueWidget {
 	};
 
 	// Determines if there is at least 1 visible Model with a given brand and tag
-	bool hasVisibleModel(const std::string& brand, std::set<int> tagIds) {
+	bool hasVisibleModel(const std::string& brand, std::set<int> tagIds, bool favorite) {
 		for (const auto& pair : prefilteredModelScores) {
 			plugin::Model* model = pair.first;
-			if (isModelVisible(model, brand, tagIds))
+			if (isModelVisible(model, brand, tagIds, favorite))
 				return true;
 		}
 		return false;
@@ -628,7 +683,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		// Filter ModelBoxes by brand and tag
 		for (Widget* w : modelContainer->children) {
 			ModelBox* m = reinterpret_cast<ModelBox*>(w);
-			m->setVisible(isModelVisible(m->model, brand, tagIds));
+			m->setVisible(isModelVisible(m->model, brand, tagIds, favorite));
 		}
 
 		// Filter and sort by search results
@@ -650,20 +705,20 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_LAST_USED) {
 				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
-					const settings::ModuleUsage* mu = settings::getModuleUsage(p->slug, m->model->slug);
-					double lastTime = mu ? mu->lastTime : -INFINITY;
+					const settings::ModuleInfo* mi = settings::getModuleInfo(p->slug, m->model->slug);
+					double lastAdded = mi ? mi->lastAdded : -INFINITY;
 					int modelOrder = get(modelOrders, m->model, 0);
-					return std::make_tuple(-lastTime, -p->modifiedTimestamp, p->brand, p->name, modelOrder);
+					return std::make_tuple(-lastAdded, -p->modifiedTimestamp, p->brand, p->name, modelOrder);
 				});
 			}
 			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_MOST_USED) {
 				sortModels([this](ModelBox* m) {
 					plugin::Plugin* p = m->model->plugin;
-					const settings::ModuleUsage* mu = settings::getModuleUsage(p->slug, m->model->slug);
-					int count = mu ? mu->count : 0;
-					double lastTime = mu ? mu->lastTime : -INFINITY;
+					const settings::ModuleInfo* mi = settings::getModuleInfo(p->slug, m->model->slug);
+					int added = mi ? mi->added : 0;
+					double lastAdded = mi ? mi->lastAdded : -INFINITY;
 					int modelOrder = get(modelOrders, m->model, 0);
-					return std::make_tuple(-count, -lastTime, -p->modifiedTimestamp, p->brand, p->name, modelOrder);
+					return std::make_tuple(-added, -lastAdded, -p->modifiedTimestamp, p->brand, p->name, modelOrder);
 				});
 			}
 			else if (settings::moduleBrowserSort == settings::MODULE_BROWSER_SORT_BRAND) {
@@ -721,7 +776,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 			if (w->isVisible())
 				count++;
 		}
-		countLabel->text = string::f("%d modules", count);
+		countLabel->text = string::f("%d %s", count, (count == 1) ? "module" : "modules");
 	}
 
 	void clear() {
@@ -729,6 +784,7 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		searchField->setText("");
 		brand = "";
 		tagIds = {};
+		favorite = false;
 		refresh();
 	}
 
@@ -736,11 +792,28 @@ struct ModuleBrowser : widget::OpaqueWidget {
 		refresh();
 		OpaqueWidget::onShow(e);
 	}
+
+	void onButton(const ButtonEvent& e) override {
+		Widget::onButton(e);
+		e.stopPropagating();
+		// Consume all mouse buttons
+		if (!e.isConsumed())
+			e.consume(this);
+	}
 };
 
 
 // Implementations to resolve dependencies
 
+
+inline void FavoriteQuantity::setValue(float value) {
+	browser->favorite = value;
+	browser->refresh();
+}
+
+inline float FavoriteQuantity::getValue() {
+	return browser->favorite;
+}
 
 inline void ClearButton::onAction(const ActionEvent& e) {
 	browser->clear();
@@ -748,11 +821,6 @@ inline void ClearButton::onAction(const ActionEvent& e) {
 
 inline void BrowserSearchField::onSelectKey(const SelectKeyEvent& e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		if (e.key == GLFW_KEY_ESCAPE) {
-			BrowserOverlay* overlay = browser->getAncestorOfType<BrowserOverlay>();
-			overlay->hide();
-			e.consume(this);
-		}
 		// Backspace when the field is empty to clear filters.
 		if (e.key == GLFW_KEY_BACKSPACE) {
 			if (text == "") {
@@ -823,7 +891,7 @@ inline void BrandButton::onAction(const ActionEvent& e) {
 		brandItem->text = brand;
 		brandItem->brand = brand;
 		brandItem->browser = browser;
-		brandItem->disabled = !browser->hasVisibleModel(brand, browser->tagIds);
+		brandItem->disabled = !browser->hasVisibleModel(brand, browser->tagIds, browser->favorite);
 		menu->addChild(brandItem);
 	}
 }
@@ -901,7 +969,7 @@ inline void TagButton::onAction(const ActionEvent& e) {
 		tagItem->text = tag::getTag(tagId);
 		tagItem->tagId = tagId;
 		tagItem->browser = browser;
-		tagItem->disabled = !browser->hasVisibleModel(browser->brand, {tagId});
+		tagItem->disabled = !browser->hasVisibleModel(browser->brand, {tagId}, browser->favorite);
 		menu->addChild(tagItem);
 	}
 }

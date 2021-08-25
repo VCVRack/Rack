@@ -89,16 +89,18 @@ enum ModuleBrowserSort {
 };
 extern ModuleBrowserSort moduleBrowserSort;
 extern float moduleBrowserZoom;
-// pluginSlug -> moduleSlugs
-extern std::map<std::string, std::set<std::string>> moduleWhitelist;
 
-struct ModuleUsage {
-	int count = 0;
-	double lastTime = NAN;
+struct ModuleInfo {
+	bool enabled = true;
+	bool favorite = false;
+	int added = 0;
+	double lastAdded = NAN;
 };
-// pluginSlug, moduleSlug -> ModuleUsage
-extern std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages;
-ModuleUsage* getModuleUsage(const std::string& pluginSlug, const std::string& moduleSlug);
+// pluginSlug -> (moduleSlug -> ModuleInfo)
+extern std::map<std::string, std::map<std::string, ModuleInfo>> moduleInfos;
+/** Returns a ModuleInfo if exists for the given slugs.
+*/
+ModuleInfo* getModuleInfo(const std::string& pluginSlug, const std::string& moduleSlug);
 
 void init();
 json_t* toJson();

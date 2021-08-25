@@ -249,35 +249,36 @@ void checkUpdates() {
 	}
 
 	// Get module whitelist
-	{
-		std::string whitelistUrl = API_URL + "/modules";
-		json_t* whitelistResJ = network::requestJson(network::METHOD_GET, whitelistUrl, NULL, getTokenCookies());
-		if (!whitelistResJ) {
-			WARN("Request for module whitelist failed");
-			updateStatus = "Could not query updates";
-			return;
-		}
-		DEFER({json_decref(whitelistResJ);});
+	// TODO
+	// {
+	// 	std::string whitelistUrl = API_URL + "/modules";
+	// 	json_t* whitelistResJ = network::requestJson(network::METHOD_GET, whitelistUrl, NULL, getTokenCookies());
+	// 	if (!whitelistResJ) {
+	// 		WARN("Request for module whitelist failed");
+	// 		updateStatus = "Could not query updates";
+	// 		return;
+	// 	}
+	// 	DEFER({json_decref(whitelistResJ);});
 
-		std::map<std::string, std::set<std::string>> moduleWhitelist;
-		json_t* pluginsJ = json_object_get(whitelistResJ, "plugins");
+	// 	std::map<std::string, std::set<std::string>> moduleWhitelist;
+	// 	json_t* pluginsJ = json_object_get(whitelistResJ, "plugins");
 
-		// Iterate plugins
-		const char* pluginSlug;
-		json_t* modulesJ;
-		json_object_foreach(pluginsJ, pluginSlug, modulesJ) {
-			// Iterate modules in plugin
-			size_t moduleIndex;
-			json_t* moduleSlugJ;
-			json_array_foreach(modulesJ, moduleIndex, moduleSlugJ) {
-				std::string moduleSlug = json_string_value(moduleSlugJ);
-				// Insert module in whitelist
-				moduleWhitelist[pluginSlug].insert(moduleSlug);
-			}
-		}
+	// 	// Iterate plugins
+	// 	const char* pluginSlug;
+	// 	json_t* modulesJ;
+	// 	json_object_foreach(pluginsJ, pluginSlug, modulesJ) {
+	// 		// Iterate modules in plugin
+	// 		size_t moduleIndex;
+	// 		json_t* moduleSlugJ;
+	// 		json_array_foreach(modulesJ, moduleIndex, moduleSlugJ) {
+	// 			std::string moduleSlug = json_string_value(moduleSlugJ);
+	// 			// Insert module in whitelist
+	// 			moduleWhitelist[pluginSlug].insert(moduleSlug);
+	// 		}
+	// 	}
 
-		settings::moduleWhitelist = moduleWhitelist;
-	}
+	// 	settings::moduleWhitelist = moduleWhitelist;
+	// }
 
 	updateStatus = "";
 }

@@ -64,8 +64,18 @@ int tipIndex = -1;
 bool discordUpdateActivity = true;
 ModuleBrowserSort moduleBrowserSort = MODULE_BROWSER_SORT_UPDATED;
 float moduleBrowserZoom = -1.f;
-std::map<std::string, std::set<std::string>> moduleWhitelist = {};
-std::map<std::string, std::map<std::string, ModuleUsage>> moduleUsages = {};
+std::map<std::string, std::map<std::string, ModuleInfo>> moduleInfos;
+
+
+ModuleInfo* getModuleInfo(const std::string& pluginSlug, const std::string& moduleSlug) {
+	auto pluginIt = moduleInfos.find(pluginSlug);
+	if (pluginIt == moduleInfos.end())
+		return NULL;
+	auto moduleIt = pluginIt->second.find(moduleSlug);
+	if (moduleIt == pluginIt->second.end())
+		return NULL;
+	return &moduleIt->second;
+}
 
 
 void init() {
@@ -75,17 +85,6 @@ void init() {
 	else {
 		settingsPath = asset::user("settings-v" + APP_VERSION_MAJOR + ".json");
 	}
-}
-
-
-ModuleUsage* getModuleUsage(const std::string& pluginSlug, const std::string& moduleSlug) {
-	auto it1 = moduleUsages.find(pluginSlug);
-	if (it1 == moduleUsages.end())
-		return NULL;
-	auto it2 = it1->second.find(moduleSlug);
-	if (it2 == it1->second.end())
-		return NULL;
-	return &it2->second;
 }
 
 
@@ -169,33 +168,34 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "moduleBrowserZoom", json_real(moduleBrowserZoom));
 
-	json_t* moduleWhitelistJ = json_object();
-	for (const auto& pair : moduleWhitelist) {
-		json_t* moduleSlugsJ = json_array();
-		for (const std::string& moduleSlug : pair.second) {
-			json_array_append_new(moduleSlugsJ, json_string(moduleSlug.c_str()));
-		}
-		json_object_set_new(moduleWhitelistJ, pair.first.c_str(), moduleSlugsJ);
-	}
-	json_object_set_new(rootJ, "moduleWhitelist", moduleWhitelistJ);
-
-	json_t* moduleUsagesJ = json_object();
-	for (const auto& pair : moduleUsages) {
-		json_t* modulesJ = json_object();
-		for (const auto& modulePair : pair.second) {
-			const ModuleUsage& mu = modulePair.second;
-			if (mu.count <= 0 || !std::isfinite(mu.lastTime))
-				continue;
-			json_t* moduleUsagesJ = json_object();
+	json_t* moduleInfosJ = json_object();
+	for (const auto& pluginPair : moduleInfos) {
+		json_t* pluginJ = json_object();
+		for (const auto& modulePair : pluginPair.second) {
+			const ModuleInfo& m = modulePair.second;
+			json_t* moduleJ = json_object();
 			{
-				json_object_set_new(moduleUsagesJ, "count", json_integer(mu.count));
-				json_object_set_new(moduleUsagesJ, "lastTime", json_real(mu.lastTime));
+				// To make setting.json smaller, only set properties if not default values.
+				if (!m.enabled)
+					json_object_set_new(moduleJ, "enabled", json_boolean(m.enabled));
+				if (m.favorite)
+					json_object_set_new(moduleJ, "favorite", json_boolean(m.favorite));
+				if (m.added > 0)
+					json_object_set_new(moduleJ, "added", json_integer(m.added));
+				if (std::isfinite(m.lastAdded))
+					json_object_set_new(moduleJ, "lastAdded", json_real(m.lastAdded));
 			}
-			json_object_set_new(modulesJ, modulePair.first.c_str(), moduleUsagesJ);
+			if (json_object_size(moduleJ))
+				json_object_set_new(pluginJ, modulePair.first.c_str(), moduleJ);
+			else
+				json_decref(moduleJ);
 		}
-		json_object_set_new(moduleUsagesJ, pair.first.c_str(), modulesJ);
+		if (json_object_size(pluginJ))
+			json_object_set_new(moduleInfosJ, pluginPair.first.c_str(), pluginJ);
+		else
+			json_decref(pluginJ);
 	}
-	json_object_set_new(rootJ, "moduleUsages", moduleUsagesJ);
+	json_object_set_new(rootJ, "moduleInfos", moduleInfosJ);
 
 	return rootJ;
 }
@@ -349,39 +349,34 @@ void fromJson(json_t* rootJ) {
 	if (moduleBrowserZoomJ)
 		moduleBrowserZoom = json_number_value(moduleBrowserZoomJ);
 
-	moduleWhitelist.clear();
-	json_t* moduleWhitelistJ = json_object_get(rootJ, "moduleWhitelist");
-	if (moduleWhitelistJ) {
+	moduleInfos.clear();
+	json_t* moduleInfosJ = json_object_get(rootJ, "moduleInfos");
+	if (moduleInfosJ) {
 		const char* pluginSlug;
-		json_t* moduleSlugsJ;
-		json_object_foreach(moduleWhitelistJ, pluginSlug, moduleSlugsJ) {
-			auto& moduleSlugs = moduleWhitelist[pluginSlug];
-			size_t i;
-			json_t* moduleSlugJ;
-			json_array_foreach(moduleSlugsJ, i, moduleSlugJ) {
-				std::string moduleSlug = json_string_value(moduleSlugJ);
-				moduleSlugs.insert(moduleSlug);
-			}
-		}
-	}
-
-	moduleUsages.clear();
-	json_t* moduleUsagesJ = json_object_get(rootJ, "moduleUsages");
-	if (moduleUsagesJ) {
-		const char* pluginSlug;
-		json_t* modulesJ;
-		json_object_foreach(moduleUsagesJ, pluginSlug, modulesJ) {
+		json_t* pluginJ;
+		json_object_foreach(moduleInfosJ, pluginSlug, pluginJ) {
 			const char* moduleSlug;
 			json_t* moduleJ;
-			json_object_foreach(modulesJ, moduleSlug, moduleJ) {
-				ModuleUsage mu;
-				json_t* countJ = json_object_get(moduleJ, "count");
-				if (countJ)
-					mu.count = json_integer_value(countJ);
-				json_t* lastTimeJ = json_object_get(moduleJ, "lastTime");
-				if (lastTimeJ)
-					mu.lastTime = json_number_value(lastTimeJ);
-				moduleUsages[pluginSlug][moduleSlug] = mu;
+			json_object_foreach(pluginJ, moduleSlug, moduleJ) {
+				ModuleInfo m;
+
+				json_t* enabledJ = json_object_get(moduleJ, "enabled");
+				if (enabledJ)
+					m.enabled = json_boolean_value(enabledJ);
+
+				json_t* favoriteJ = json_object_get(moduleJ, "favorite");
+				if (favoriteJ)
+					m.favorite = json_boolean_value(favoriteJ);
+
+				json_t* addedJ = json_object_get(moduleJ, "added");
+				if (addedJ)
+					m.added = json_integer_value(addedJ);
+
+				json_t* lastAddedJ = json_object_get(moduleJ, "lastAdded");
+				if (lastAddedJ)
+					m.lastAdded = json_number_value(lastAddedJ);
+
+				moduleInfos[pluginSlug][moduleSlug] = m;
 			}
 		}
 	}
