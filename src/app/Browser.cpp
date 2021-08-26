@@ -284,8 +284,11 @@ struct ModelBox : widget::OpaqueWidget {
 	void createContextMenu() {
 		ui::Menu* menu = createMenu();
 
-		// menu->addChild(createMenuLabel(model->name));
-		// menu->addChild(createMenuLabel(model->plugin->brand));
+		menu->addChild(createMenuLabel(model->name));
+		menu->addChild(createMenuLabel(model->plugin->brand));
+		model->appendContextMenu(menu);
+
+		menu->addChild(new ui::MenuSeparator);
 
 		menu->addChild(createBoolMenuItem("Favorite",
 			[=]() {

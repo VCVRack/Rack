@@ -6,6 +6,9 @@
 #include <system.hpp>
 #include <string.hpp>
 #include <tag.hpp>
+#include <ui/Menu.hpp>
+#include <ui/MenuSeparator.hpp>
+#include <helpers.hpp>
 
 
 namespace rack {
@@ -84,6 +87,98 @@ std::string Model::getUserPresetDirectory() {
 }
 
 
+std::string Model::getManualUrl() {
+	if (!manualUrl.empty())
+		return manualUrl;
+	return plugin->manualUrl;
+}
+
+
+void Model::appendContextMenu(ui::Menu* menu) {
+	// plugin
+	menu->addChild(createMenuItem("Plugin: " + plugin->name, "", [=]() {
+		system::openBrowser(plugin->pluginUrl);
+	}, plugin->pluginUrl == ""));
+
+	// version
+	menu->addChild(createMenuLabel(plugin->version));
+
+	// author
+	if (plugin->author != "") {
+		menu->addChild(createMenuItem("Author: " + plugin->author, "", [=]() {
+			system::openBrowser(plugin->authorUrl);
+		}, plugin->authorUrl.empty()));
+	}
+
+	// license
+	std::string license = plugin->license;
+	if (string::startsWith(license, "https://") || string::startsWith(license, "http://")) {
+		menu->addChild(createMenuItem("License: Open in browser", "", [=]() {
+			system::openBrowser(license);
+		}));
+	}
+	else if (license != "") {
+		menu->addChild(createMenuLabel("License: " + license));
+	}
+
+	// tags
+	if (!tagIds.empty()) {
+		menu->addChild(createMenuLabel("Tags:"));
+		for (int tagId : tagIds) {
+			menu->addChild(createMenuLabel("• " + tag::getTag(tagId)));
+		}
+	}
+
+	menu->addChild(new ui::MenuSeparator);
+
+	// VCV Library page
+	menu->addChild(createMenuItem("VCV Library page", "", [=]() {
+		system::openBrowser("https://library.vcvrack.com/" + plugin->slug + "/" + slug);
+	}));
+
+	// modularGridUrl
+	if (modularGridUrl != "") {
+		menu->addChild(createMenuItem("ModularGrid page", "", [=]() {
+			system::openBrowser(modularGridUrl);
+		}));
+	}
+
+	// manual
+	std::string manualUrl = getManualUrl();
+	if (manualUrl != "") {
+		menu->addChild(createMenuItem("User manual", RACK_MOD_CTRL_NAME "+F1", [=]() {
+			system::openBrowser(manualUrl);
+		}));
+	}
+
+	// donate
+	if (plugin->donateUrl != "") {
+		menu->addChild(createMenuItem("Donate", "", [=]() {
+			system::openBrowser(plugin->donateUrl);
+		}));
+	}
+
+	// source code
+	if (plugin->sourceUrl != "") {
+		menu->addChild(createMenuItem("Source code", "", [=]() {
+			system::openBrowser(plugin->sourceUrl);
+		}));
+	}
+
+	// changelog
+	if (plugin->changelogUrl != "") {
+		menu->addChild(createMenuItem("Changelog", "", [=]() {
+			system::openBrowser(plugin->changelogUrl);
+		}));
+	}
+
+	// plugin folder
+	if (plugin->path != "") {
+		menu->addChild(createMenuItem("Open plugin folder", "", [=]() {
+			system::openDirectory(plugin->path);
+		}));
+	}
+}
 
 
 } // namespace plugin

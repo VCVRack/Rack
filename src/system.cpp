@@ -712,6 +712,9 @@ std::string getOperatingSystemInfo() {
 
 
 void openBrowser(const std::string& url) {
+	if (url.empty())
+		return;
+
 	std::string urlL = url;
 	std::thread t([=] {
 #if defined ARCH_LIN
@@ -731,6 +734,9 @@ void openBrowser(const std::string& url) {
 
 
 void openDirectory(const std::string& path) {
+	if (path.empty())
+		return;
+
 	std::string pathL = path;
 	std::thread t([=] {
 #if defined ARCH_LIN

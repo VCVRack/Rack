@@ -10,6 +10,11 @@
 namespace rack {
 
 
+namespace ui {
+struct Menu;
+} // namespace app
+
+
 namespace app {
 struct ModuleWidget;
 } // namespace app
@@ -65,6 +70,9 @@ struct Model {
 	std::string getFullName();
 	std::string getFactoryPresetDirectory();
 	std::string getUserPresetDirectory();
+	/** Returns the module or plugin manual URL, whichever exists. */
+	std::string getManualUrl();
+	void appendContextMenu(ui::Menu* menu);
 };
 
 

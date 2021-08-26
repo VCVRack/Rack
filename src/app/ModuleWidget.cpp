@@ -16,7 +16,6 @@
 #include <settings.hpp>
 #include <history.hpp>
 #include <string.hpp>
-#include <tag.hpp>
 
 
 namespace rack {
@@ -358,9 +357,7 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			return;
 		}
 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;
-			if (!manualUrl.empty())
-				system::openBrowser(manualUrl);
+			system::openBrowser(model->getManualUrl());
 			e.consume(this);
 		}
 	}
@@ -919,92 +916,7 @@ void ModuleWidget::createContextMenu() {
 
 	// Info
 	menu->addChild(createSubmenuItem("Info", "", [=](ui::Menu* menu) {
-		if (!weakThis)
-			return;
-
-		// plugin
-		menu->addChild(createMenuItem("Plugin: " + model->plugin->name, "", [=]() {
-			system::openBrowser(model->plugin->pluginUrl);
-		}, model->plugin->pluginUrl == ""));
-
-		// version
-		menu->addChild(createMenuLabel(model->plugin->version));
-
-		// author
-		if (model->plugin->author != "") {
-			menu->addChild(createMenuItem("Author: " + model->plugin->author, "", [=]() {
-				system::openBrowser(model->plugin->authorUrl);
-			}, model->plugin->authorUrl.empty()));
-		}
-
-		// license
-		std::string license = model->plugin->license;
-		if (string::startsWith(license, "https://") || string::startsWith(license, "http://")) {
-			menu->addChild(createMenuItem("License: Open in browser", "", [=]() {
-				system::openBrowser(license);
-			}));
-		}
-		else if (license != "") {
-			menu->addChild(createMenuLabel("License: " + license));
-		}
-
-		// tags
-		if (!model->tagIds.empty()) {
-			menu->addChild(createMenuLabel("Tags:"));
-			for (int tagId : model->tagIds) {
-				menu->addChild(createMenuLabel("• " + tag::getTag(tagId)));
-			}
-		}
-
-		menu->addChild(new ui::MenuSeparator);
-
-		// VCV Library page
-		menu->addChild(createMenuItem("VCV Library page", "", [=]() {
-			system::openBrowser("https://library.vcvrack.com/" + model->plugin->slug + "/" + model->slug);
-		}));
-
-		// modularGridUrl
-		if (model->modularGridUrl != "") {
-			menu->addChild(createMenuItem("ModularGrid page", "", [=]() {
-				system::openBrowser(model->modularGridUrl);
-			}));
-		}
-
-		// manual
-		std::string manualUrl = (model->manualUrl != "") ? model->manualUrl : model->plugin->manualUrl;
-		if (manualUrl != "") {
-			menu->addChild(createMenuItem("User manual", RACK_MOD_CTRL_NAME "+F1", [=]() {
-				system::openBrowser(manualUrl);
-			}));
-		}
-
-		// donate
-		if (model->plugin->donateUrl != "") {
-			menu->addChild(createMenuItem("Donate", "", [=]() {
-				system::openBrowser(model->plugin->donateUrl);
-			}));
-		}
-
-		// source code
-		if (model->plugin->sourceUrl != "") {
-			menu->addChild(createMenuItem("Source code", "", [=]() {
-				system::openBrowser(model->plugin->sourceUrl);
-			}));
-		}
-
-		// changelog
-		if (model->plugin->changelogUrl != "") {
-			menu->addChild(createMenuItem("Changelog", "", [=]() {
-				system::openBrowser(model->plugin->changelogUrl);
-			}));
-		}
-
-		// plugin folder
-		if (model->plugin->path != "") {
-			menu->addChild(createMenuItem("Open plugin folder", "", [=]() {
-				system::openDirectory(model->plugin->path);
-			}));
-		}
+		model->appendContextMenu(menu);
 	}));
 
 	// Preset

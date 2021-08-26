@@ -168,10 +168,12 @@ std::string getOperatingSystemInfo();
 
 /** Opens a URL in a browser.
 Shell injection is possible, so make sure the URL is trusted or hard coded.
+Does nothing if string is blank.
 Does not block.
 */
 void openBrowser(const std::string& url);
 /** Opens Windows Explorer, Finder, etc at a directory location.
+Does nothing if string is blank.
 Does not block.
 */
 void openDirectory(const std::string& path);
