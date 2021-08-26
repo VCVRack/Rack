@@ -218,6 +218,8 @@ RTAUDIO_FLAGS += -DRTAUDIO_API_DS=ON -DRTAUDIO_API_WASAPI=ON
 # However, since VCV owns the copyright of all GPL'd code in the Rack package, we include ASIO in the Windows build for convenience to our users.
 ifdef RTAUDIO_ASIO
 RTAUDIO_FLAGS += -DRTAUDIO_API_ASIO=ON
+else
+RTAUDIO_FLAGS += -DRTAUDIO_API_ASIO=OFF
 endif
 endif
 
