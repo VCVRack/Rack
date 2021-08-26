@@ -213,7 +213,12 @@ ifdef ARCH_MAC
 RTAUDIO_FLAGS += -DRTAUDIO_API_CORE=ON -DRTAUDIO_API_PULSE=OFF -DRTAUDIO_API_JACK=OFF
 endif
 ifdef ARCH_WIN
-RTAUDIO_FLAGS += -DRTAUDIO_API_DS=ON -DRTAUDIO_API_WASAPI=ON -DRTAUDIO_API_ASIO=ON
+RTAUDIO_FLAGS += -DRTAUDIO_API_DS=ON -DRTAUDIO_API_WASAPI=ON
+# ASIO is proprietary software owned by Steinberg, so distributing it with your own VCV Rack build would violate Rack's GPLv3 license.
+# However, since VCV owns the copyright of all GPL'd code in the Rack package, we include ASIO in the Windows build for convenience to our users.
+ifdef RTAUDIO_ASIO
+RTAUDIO_FLAGS += -DRTAUDIO_API_ASIO=ON
+endif
 endif
 
 $(rtaudio): | rtaudio
