@@ -227,7 +227,7 @@ struct ModelBox : widget::OpaqueWidget {
 	}
 
 	void onButton(const ButtonEvent& e) override {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
 			ModuleWidget* mw = chooseModel(model);
 
 			// Pretend the moduleWidget was clicked so it can be dragged in the RackWidget
@@ -239,11 +239,29 @@ struct ModelBox : widget::OpaqueWidget {
 			mw->dragEnabled() = false;
 		}
 
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			setFavorite(!isFavorite());
+			e.consume(this);
+		}
+
 		// Open context menu on right-click
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			createContextMenu();
 			e.consume(this);
 		}
+	}
+
+	void onHoverKey(const HoverKeyEvent& e) override {
+		if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
+			if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+				system::openBrowser(model->getManualUrl());
+				e.consume(this);
+			}
+		}
+
+		if (e.isConsumed())
+			return;
+		OpaqueWidget::onHoverKey(e);
 	}
 
 	ui::Tooltip* createTooltip() {
