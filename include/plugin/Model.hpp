@@ -73,6 +73,8 @@ struct Model {
 	/** Returns the module or plugin manual URL, whichever exists. */
 	std::string getManualUrl();
 	void appendContextMenu(ui::Menu* menu);
+	bool isFavorite();
+	void setFavorite(bool favorite);
 };
 
 

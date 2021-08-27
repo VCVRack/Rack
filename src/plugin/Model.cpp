@@ -4,6 +4,7 @@
 #include <plugin.hpp>
 #include <asset.hpp>
 #include <system.hpp>
+#include <settings.hpp>
 #include <string.hpp>
 #include <tag.hpp>
 #include <ui/Menu.hpp>
@@ -178,6 +179,28 @@ void Model::appendContextMenu(ui::Menu* menu) {
 			system::openDirectory(plugin->path);
 		}));
 	}
+
+	// Favorite
+	menu->addChild(createBoolMenuItem("Favorite",
+		[=]() {
+			return isFavorite();
+		},
+		[=](bool favorite) {
+			setFavorite(favorite);
+		}
+	));
+}
+
+
+bool Model::isFavorite() {
+	const settings::ModuleInfo* mi = settings::getModuleInfo(plugin->slug, slug);
+	return mi && mi->favorite;
+}
+
+
+void Model::setFavorite(bool favorite) {
+	settings::ModuleInfo& mi = settings::moduleInfos[plugin->slug][slug];
+	mi.favorite = favorite;
 }
 
 

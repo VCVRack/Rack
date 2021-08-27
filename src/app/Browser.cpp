@@ -239,8 +239,9 @@ struct ModelBox : widget::OpaqueWidget {
 			mw->dragEnabled() = false;
 		}
 
+		// Toggle favorite
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			setFavorite(!isFavorite());
+			model->setFavorite(!model->isFavorite());
 			e.consume(this);
 		}
 
@@ -305,27 +306,6 @@ struct ModelBox : widget::OpaqueWidget {
 		menu->addChild(createMenuLabel(model->name));
 		menu->addChild(createMenuLabel(model->plugin->brand));
 		model->appendContextMenu(menu);
-
-		menu->addChild(new ui::MenuSeparator);
-
-		menu->addChild(createBoolMenuItem("Favorite",
-			[=]() {
-				return isFavorite();
-			},
-			[=](bool favorite) {
-				setFavorite(favorite);
-			}
-		));
-	}
-
-	bool isFavorite() {
-		const settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
-		return mi && mi->favorite;
-	}
-
-	void setFavorite(bool favorite) {
-		settings::ModuleInfo& mi = settings::moduleInfos[model->plugin->slug][model->slug];
-		mi.favorite = favorite;
 	}
 };
 
