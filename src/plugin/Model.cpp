@@ -101,7 +101,7 @@ void Model::appendContextMenu(ui::Menu* menu) {
 	}, plugin->pluginUrl == ""));
 
 	// version
-	menu->addChild(createMenuLabel(plugin->version));
+	menu->addChild(createMenuLabel("Version: " + plugin->version));
 
 	// author
 	if (plugin->author != "") {
