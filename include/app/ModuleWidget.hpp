@@ -119,7 +119,6 @@ struct ModuleWidget : widget::OpaqueWidget {
 	INTERNAL bool& dragEnabled();
 	INTERNAL math::Vec& oldPos();
 	INTERNAL engine::Module* releaseModule();
-	INTERNAL bool& selected();
 };
 
 

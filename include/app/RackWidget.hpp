@@ -10,6 +10,8 @@
 #include <app/ParamWidget.hpp>
 #include <history.hpp>
 
+#include <set>
+
 
 namespace rack {
 namespace app {
@@ -75,10 +77,11 @@ struct RackWidget : widget::OpaqueWidget {
 
 	void updateSelectionFromRect();
 	void selectAll();
-	void deselect();
+	void deselectAll();
+	void select(ModuleWidget* mw, bool selected = true);
 	bool hasSelection();
-	int getNumSelected();
-	std::vector<ModuleWidget*> getSelectedModules();
+	const std::set<ModuleWidget*>& getSelected();
+	bool isSelected(ModuleWidget* mw);
 	json_t* selectionToJson();
 	void loadSelection(std::string path);
 	void loadSelectionDialog();

@@ -84,6 +84,7 @@ struct RackWidget::Internal {
 	bool selecting = false;
 	math::Vec selectionStart;
 	math::Vec selectionEnd;
+	std::set<ModuleWidget*> selectedModules;
 };
 
 
@@ -397,7 +398,7 @@ struct PasteJsonReturn {
 	std::map<int64_t, int64_t> newModuleIds;
 };
 static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, history::ComplexAction* complexAction) {
-	that->deselect();
+	that->deselectAll();
 
 	std::map<int64_t, int64_t> newModuleIds;
 
@@ -438,7 +439,7 @@ static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 		mw->box.pos = pos.plus(RACK_OFFSET);
 
 		that->internal->moduleContainer->addChild(mw);
-		mw->selected() = true;
+		that->select(mw);
 
 		newModuleIds[id] = mw->module->id;
 	}
@@ -447,7 +448,7 @@ static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 	that->setSelectionPosNearest(math::Vec(0, 0));
 
 	// Add positioned selected modules to history
-	for (ModuleWidget* mw : that->getSelectedModules()) {
+	for (ModuleWidget* mw : that->getSelected()) {
 		// history::ModuleAdd
 		history::ModuleAdd* h = new history::ModuleAdd;
 		h->setModule(mw);
@@ -790,56 +791,49 @@ history::ComplexAction* RackWidget::getModuleDragAction() {
 
 void RackWidget::updateSelectionFromRect() {
 	math::Rect selectionBox = math::Rect::fromCorners(internal->selectionStart, internal->selectionEnd);
+	deselectAll();
 	for (ModuleWidget* mw : getModules()) {
 		bool selected = internal->selecting && selectionBox.intersects(mw->box);
-		mw->selected() = selected;
+		if (selected)
+			select(mw);
 	}
 }
 
 void RackWidget::selectAll() {
-	for (ModuleWidget* mw : getModules()) {
-		mw->selected() = true;
+	internal->selectedModules.clear();
+	for (widget::Widget* w : internal->moduleContainer->children) {
+		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
+		assert(mw);
+		internal->selectedModules.insert(mw);
 	}
 }
 
-void RackWidget::deselect() {
-	for (ModuleWidget* mw : getModules()) {
-		mw->selected() = false;
+void RackWidget::deselectAll() {
+	internal->selectedModules.clear();
+}
+
+void RackWidget::select(ModuleWidget* mw, bool selected) {
+	if (selected) {
+		internal->selectedModules.insert(mw);
+	}
+	else {
+		auto it = internal->selectedModules.find(mw);
+		if (it != internal->selectedModules.end())
+			internal->selectedModules.erase(it);
 	}
 }
 
 bool RackWidget::hasSelection() {
-	for (widget::Widget* w : internal->moduleContainer->children) {
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
-		assert(mw);
-		if (mw->selected())
-			return true;
-	}
-	return false;
+	return !internal->selectedModules.empty();
 }
 
-int RackWidget::getNumSelected() {
-	int count = 0;
-	for (widget::Widget* w : internal->moduleContainer->children) {
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
-		assert(mw);
-		if (mw->selected())
-			count++;
-	}
-	return count;
+const std::set<ModuleWidget*>& RackWidget::getSelected() {
+	return internal->selectedModules;
 }
 
-std::vector<ModuleWidget*> RackWidget::getSelectedModules() {
-	std::vector<ModuleWidget*> mws;
-	mws.reserve(internal->moduleContainer->children.size());
-	for (widget::Widget* w : internal->moduleContainer->children) {
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
-		assert(mw);
-		if (mw->selected())
-			mws.push_back(mw);
-	}
-	mws.shrink_to_fit();
-	return mws;
+bool RackWidget::isSelected(ModuleWidget* mw) {
+	auto it = internal->selectedModules.find(mw);
+	return (it != internal->selectedModules.end());
 }
 
 json_t* RackWidget::selectionToJson() {
@@ -849,7 +843,7 @@ json_t* RackWidget::selectionToJson() {
 
 	// modules
 	json_t* modulesJ = json_array();
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : getSelected()) {
 		json_t* moduleJ = mw->toJson();
 
 		// pos
@@ -982,7 +976,7 @@ void RackWidget::resetSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "reset modules";
 
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : getSelected()) {
 		assert(mw->module);
 
 		// history::ModuleChange
@@ -1003,7 +997,7 @@ void RackWidget::randomizeSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "randomize modules";
 
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : getSelected()) {
 		assert(mw->module);
 
 		// history::ModuleChange
@@ -1024,7 +1018,7 @@ void RackWidget::disconnectSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "disconnect cables";
 
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : getSelected()) {
 		mw->appendDisconnectActions(complexAction);
 	}
 
@@ -1086,7 +1080,7 @@ void RackWidget::bypassSelectionAction(bool bypassed) {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = bypassed ? "bypass modules" : "un-bypass modules";
 
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : getSelected()) {
 		assert(mw->module);
 		if (mw->module->isBypassed() == bypassed)
 			continue;
@@ -1107,7 +1101,7 @@ void RackWidget::bypassSelectionAction(bool bypassed) {
 }
 
 bool RackWidget::isSelectionBypassed() {
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : getSelected()) {
 		if (!mw->getModule()->isBypassed())
 			return false;
 	}
@@ -1118,7 +1112,7 @@ void RackWidget::deleteSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "remove modules";
 
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : getSelected()) {
 		mw->appendDisconnectActions(complexAction);
 
 		// history::ModuleRemove
@@ -1136,7 +1130,7 @@ void RackWidget::deleteSelectionAction() {
 bool RackWidget::requestSelectionPos(math::Vec delta) {
 	// Calculate new positions
 	std::map<widget::Widget*, math::Rect> mwBoxes;
-	for (ModuleWidget* mw : getSelectedModules()) {
+	for (ModuleWidget* mw : getSelected()) {
 		math::Rect mwBox = mw->box;
 		mwBox.pos += delta;
 		mwBoxes[mw] = mwBox;
@@ -1171,7 +1165,7 @@ void RackWidget::setSelectionPosNearest(math::Vec delta) {
 }
 
 void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
-	int n = getNumSelected();
+	int n = getSelected().size();
 	menu->addChild(createMenuLabel(string::f("%d selected %s", n, n == 1 ? "module" : "modules")));
 
 	// Enable alwaysConsume of menu items if the number of selected modules changes
@@ -1183,7 +1177,7 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 
 	// Deselect
 	menu->addChild(createMenuItem("Deselect", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+A", [=]() {
-		deselect();
+		deselectAll();
 	}, n == 0, true));
 
 	// Copy

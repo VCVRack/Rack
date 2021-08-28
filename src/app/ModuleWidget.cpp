@@ -42,8 +42,6 @@ struct ModuleWidget::Internal {
 	math::Vec oldPos;
 
 	widget::Widget* panel = NULL;
-
-	bool selected = false;
 };
 
 
@@ -286,7 +284,7 @@ void ModuleWidget::draw(const DrawArgs& args) {
 	// }
 
 	// Selection
-	if (internal->selected) {
+	if (APP->scene->rack->isSelected(this)) {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0.0, 0.0, VEC_ARGS(box.size));
 		nvgFillColor(args.vg, nvgRGBAf(1, 0, 0, 0.25));
@@ -313,7 +311,7 @@ void ModuleWidget::drawShadow(const DrawArgs& args) {
 }
 
 void ModuleWidget::onHover(const HoverEvent& e) {
-	if (internal->selected) {
+	if (APP->scene->rack->isSelected(this)) {
 		e.consume(this);
 	}
 
@@ -368,7 +366,9 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 }
 
 void ModuleWidget::onButton(const ButtonEvent& e) {
-	if (internal->selected) {
+	bool selected = APP->scene->rack->isSelected(this);
+
+	if (selected) {
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			ui::Menu* menu = createMenu();
 			APP->scene->rack->appendSelectionContextMenu(menu);
@@ -386,11 +386,11 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 		}
 		// Toggle selection on Shift-click
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-			internal->selected ^= true;
+			APP->scene->rack->select(this, !selected);
 		}
 	}
 
-	if (!e.isConsumed() && !internal->selected) {
+	if (!e.isConsumed() && !selected) {
 		// Open context menu on right-click
 		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			createContextMenu();
@@ -448,7 +448,7 @@ void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 				math::Vec pos = mousePos;
 				pos.x -= internal->dragOffset.x;
 				pos.y -= RACK_GRID_HEIGHT / 2;
-				if (internal->selected) {
+				if (APP->scene->rack->isSelected(this)) {
 					pos = (pos / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
 					math::Vec delta = pos.minus(box.pos);
 					APP->scene->rack->setSelectionPosNearest(delta);
@@ -465,7 +465,7 @@ void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 }
 
 void ModuleWidget::onDragHover(const DragHoverEvent& e) {
-	if (internal->selected) {
+	if (APP->scene->rack->isSelected(this)) {
 		e.consume(this);
 	}
 
@@ -1034,11 +1034,6 @@ engine::Module* ModuleWidget::releaseModule() {
 	this->module = NULL;
 	return module;
 }
-
-bool& ModuleWidget::selected() {
-	return internal->selected;
-}
-
 
 
 } // namespace app
