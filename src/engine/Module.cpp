@@ -14,18 +14,18 @@ namespace engine {
 
 
 // Arbitrary prime number so it doesn't over- or under-estimate time of buffered processors.
-static const int meterDivider = 1;
-static const int meterBufferLength = 128;
+static const int METER_DIVIDER = 37;
+static const int METER_BUFFER_LEN = 32;
+static const float METER_TIME = 1.0f;
 
 
 struct Module::Internal {
 	bool bypassed = false;
 
-	int64_t meterLastBlock = 0;
 	int meterSamples = 0;
-	float meterTimeTotal = 0.f;
+	float meterDurationTotal = 0.f;
 
-	float meterBuffer[meterBufferLength] = {};
+	float meterBuffer[METER_BUFFER_LEN] = {};
 	int meterIndex = 0;
 };
 
@@ -299,7 +299,7 @@ const float* Module::meterBuffer() {
 
 
 int Module::meterLength() {
-	return meterBufferLength;
+	return METER_BUFFER_LEN;
 }
 
 
@@ -332,7 +332,7 @@ static void Port_step(Port* that, float deltaTime) {
 
 void Module::doProcess(const ProcessArgs& args) {
 	// This global setting can change while the function is running, so use a local variable.
-	bool meterEnabled = settings::cpuMeter && (args.frame % meterDivider == 0);
+	bool meterEnabled = settings::cpuMeter && (args.frame % METER_DIVIDER == 0);
 
 	// Start CPU timer
 	double startTime;
@@ -351,21 +351,23 @@ void Module::doProcess(const ProcessArgs& args) {
 		double endTime = system::getTime();
 		float duration = endTime - startTime;
 
-		int64_t block = APP->engine->getBlock();
-		if (block > internal->meterLastBlock) {
+		internal->meterSamples++;
+		internal->meterDurationTotal += duration;
+
+		// Seconds we've been measuring
+		float meterTime = internal->meterSamples * METER_DIVIDER * args.sampleTime;
+
+		if (meterTime >= METER_TIME) {
 			// Push time to buffer
 			if (internal->meterSamples > 0) {
-				internal->meterBuffer[internal->meterIndex++] = internal->meterTimeTotal / internal->meterSamples;
-				internal->meterIndex %= meterBufferLength;
+				internal->meterIndex++;
+				internal->meterIndex %= METER_BUFFER_LEN;
+				internal->meterBuffer[internal->meterIndex] = internal->meterDurationTotal / internal->meterSamples;
 			}
 			// Reset total
 			internal->meterSamples = 0;
-			internal->meterTimeTotal = 0.f;
+			internal->meterDurationTotal = 0.f;
 		}
-
-		internal->meterLastBlock = block;
-		internal->meterSamples++;
-		internal->meterTimeTotal += duration;
 	}
 
 	// Iterate ports to step plug lights

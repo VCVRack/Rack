@@ -221,17 +221,6 @@ void ModuleWidget::draw(const DrawArgs& args) {
 		int meterLength = module->meterLength();
 		int meterIndex = module->meterIndex();
 
-		float meterMax = 0.f;
-		float meterAvg = 0.f;
-		for (int i = 0; i < meterLength; i++) {
-			float m = meterBuffer[i];
-			meterAvg += m;
-			meterMax = std::max(meterMax, m);
-		}
-		meterAvg /= meterLength;
-		float percentMax = meterMax * sampleRate;
-		float mult = (percentMax <= 0.1f) ? 10.f : 1.f;
-
 		// // Text background
 		// nvgBeginPath(args.vg);
 		// nvgRect(args.vg, 0.0, box.size.y - infoHeight, box.size.x, infoHeight);
@@ -240,48 +229,40 @@ void ModuleWidget::draw(const DrawArgs& args) {
 
 		// Draw time plot
 		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, box.size.x, box.size.y);
+		nvgMoveTo(args.vg, 0.0, box.size.y);
+		math::Vec p1;
 		for (int i = 0; i < meterLength; i++) {
-			int index = (meterIndex - i + meterLength) % meterLength;
-			float percent = math::clamp(meterBuffer[index] * mult * sampleRate, 0.f, 1.f);
+			int index = math::eucMod(meterIndex + i + 1, meterLength);
+			float meter = math::clamp(meterBuffer[index] * sampleRate, 0.f, 1.f);
 			math::Vec p;
-			p.x = (1.f - (float) i / (meterLength - 1)) * box.size.x;
-			p.y = (1.f - percent) * (box.size.y);
-			nvgLineTo(args.vg, p.x, p.y);
+			p.x = (float) i / (meterLength - 1) * box.size.x;
+			p.y = (1.f - meter) * box.size.y;
+			if (i == 0) {
+				nvgLineTo(args.vg, VEC_ARGS(p));
+			}
+			else {
+				math::Vec p2 = p;
+				p2.x -= 0.5f / (meterLength - 1) * box.size.x;
+				nvgBezierTo(args.vg, VEC_ARGS(p1), VEC_ARGS(p2), VEC_ARGS(p));
+			}
+			p1 = p;
+			p1.x += 0.5f / (meterLength - 1) * box.size.x;
 		}
-		NVGcolor color;
-		if (mult == 1.f)
-			color = nvgRGBAf(0.5, 0, 0, 0.85);
-		else if (mult == 10.f)
-			color = nvgRGBAf(0.85, 0, 0, 0.85);
-		nvgLineTo(args.vg, 0.0, box.size.y);
+		nvgLineTo(args.vg, box.size.x, box.size.y);
 		nvgClosePath(args.vg);
-		nvgFillColor(args.vg, color);
+		NVGcolor color = nvgRGBAf(0.5, 0.5, 0.5, 1.0);
+		nvgFillColor(args.vg, color::alpha(color, 0.5));
 		nvgFill(args.vg);
+		nvgStrokeWidth(args.vg, 2.0);
+		nvgStrokeColor(args.vg, color);
+		nvgStroke(args.vg);
 
 		// Text
-		float percent = meterAvg * sampleRate * 100.f;
-		float microseconds = meterAvg * 1e6f;
-		std::string meterText = string::f("%.0fx\n%.2f μs\n%.1f%%", mult, microseconds, percent);
-		bndLabel(args.vg, 0.0, box.size.y - 60, INFINITY, INFINITY, -1, meterText.c_str());
-
-		// Draw border
-		nvgStrokeColor(args.vg, color);
-		nvgBeginPath(args.vg);
-		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
-		nvgStrokeWidth(args.vg, 2.0);
-		nvgStroke(args.vg);
+		float percent = meterBuffer[meterIndex] * sampleRate * 100.f;
+		float microseconds = meterBuffer[meterIndex] * 1e6f;
+		std::string meterText = string::f("%.2f μs/sample %.1f%%", microseconds, percent);
+		bndLabel(args.vg, box.size.x - 130.0, 0.0, INFINITY, INFINITY, -1, meterText.c_str());
 	}
-
-	// if (module) {
-	// 	nvgBeginPath(args.vg);
-	// 	nvgRect(args.vg, 0, 0, 20, 20);
-	// 	nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 0.75));
-	// 	nvgFill(args.vg);
-
-	// 	std::string debugText = string::f("%d", module->id);
-	// 	bndLabel(args.vg, 0, 0, INFINITY, INFINITY, -1, debugText.c_str());
-	// }
 
 	// Selection
 	if (APP->scene->rack->isSelected(this)) {

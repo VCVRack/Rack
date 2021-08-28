@@ -231,17 +231,6 @@ struct Module {
 	std::string createPatchStorageDirectory();
 	std::string getPatchStorageDirectory();
 
-	struct ProcessArgs {
-		/** The current sample rate in Hz. */
-		float sampleRate;
-		/** The timestep of process() in seconds.
-		Defined by `1 / sampleRate`.
-		*/
-		float sampleTime;
-		/** Number of audio samples since the Engine's first sample. */
-		int64_t frame;
-	};
-
 	/** Getters for members */
 	plugin::Model* getModel() {
 		return model;
@@ -285,14 +274,26 @@ struct Module {
 
 	// Virtual methods
 
+	struct ProcessArgs {
+		/** The current sample rate in Hz. */
+		float sampleRate;
+		/** The timestep of process() in seconds.
+		Defined by `1 / sampleRate`.
+		*/
+		float sampleTime;
+		/** Number of audio samples since the Engine's first sample. */
+		int64_t frame;
+	};
 	/** Advances the module by one audio sample.
 	Override this method to read Inputs and Params and to write Outputs and Lights.
 	*/
 	virtual void process(const ProcessArgs& args) {
 		step();
 	}
+
 	/** DEPRECATED. Override `process(const ProcessArgs& args)` instead. */
 	virtual void step() {}
+
 	/** Called instead of process() when Module is bypassed.
 	Typically you do not need to override this. Use configBypass() instead.
 	If you do override it, avoid reading param values, since the state of the module should have no effect on routing.
