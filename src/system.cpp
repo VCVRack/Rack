@@ -711,7 +711,13 @@ double getThreadTime() {
 		return 0.0;
 	return info.user_time.seconds + info.user_time.microseconds * 1e-6;
 #elif defined ARCH_WIN
-	return 0.0;
+	FILETIME creationTime;
+	FILETIME exitTime;
+	FILETIME kernelTime;
+	FILETIME userTime;
+	if (GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime, &kernelTime, &userTime) == 0)
+		return 0.0;
+	return ((uint64_t(userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime) * 1e-7;
 #endif
 }
 
