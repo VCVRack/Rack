@@ -264,15 +264,8 @@ void ModuleWidget::draw(const DrawArgs& args) {
 
 		// Text
 		float percent = meterBuffer[meterIndex] * sampleRate * 100.f;
-		float microseconds = meterBuffer[meterIndex] * 1e6f;
-		std::string meterText;
-		if (box.size.x >= RACK_GRID_WIDTH * 9)
-			meterText = string::f("%.2f μs/sample  %.1f%%", microseconds, percent);
-		else if (box.size.x >= RACK_GRID_WIDTH * 6)
-			meterText = string::f("%.2f μs  %.1f%%", microseconds, percent);
-		else
-			meterText = string::f("%.1f%%", percent);
-
+		// float microseconds = meterBuffer[meterIndex] * 1e6f;
+		std::string meterText = string::f("%.1f%%", percent);
 		float x = box.size.x - bndLabelWidth(args.vg, -1, meterText.c_str());
 		bndMenuLabel(args.vg, x, plotHeight, INFINITY, BND_WIDGET_HEIGHT, -1, meterText.c_str());
 	}
