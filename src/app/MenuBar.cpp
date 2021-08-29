@@ -67,6 +67,7 @@ struct NotificationIcon : widget::Widget {
 struct FileButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuItem("New", RACK_MOD_CTRL_NAME "+N", []() {
@@ -117,6 +118,7 @@ struct FileButton : MenuButton {
 struct EditButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		struct UndoItem : ui::MenuItem {
@@ -326,6 +328,7 @@ struct HaloBrightnessSlider : ui::Slider {
 struct ViewButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createBoolPtrMenuItem("Show tooltips", &settings::tooltips));
@@ -439,6 +442,7 @@ struct SampleRateItem : ui::MenuItem {
 struct EngineButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		std::string cpuMeterText = "F3";
@@ -708,6 +712,7 @@ struct LibraryButton : MenuButton {
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu<LibraryMenu>();
+		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 	}
 
@@ -741,6 +746,7 @@ struct HelpButton : MenuButton {
 
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
+		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
 		menu->addChild(createMenuItem("Tips", "", [=]() {

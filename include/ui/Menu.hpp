@@ -13,6 +13,7 @@ struct Menu : widget::OpaqueWidget {
 	Menu* childMenu = NULL;
 	/** The entry which created the child menu */
 	MenuEntry* activeEntry = NULL;
+	BNDcornerFlags cornerFlags = BND_CORNER_NONE;
 
 	Menu();
 	~Menu();
