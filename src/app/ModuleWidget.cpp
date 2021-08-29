@@ -231,7 +231,7 @@ void ModuleWidget::draw(const DrawArgs& args) {
 		// Draw time plot
 		const float plotHeight = box.size.y - BND_WIDGET_HEIGHT;
 		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, 0.0, box.size.y);
+		nvgMoveTo(args.vg, 0.0, plotHeight);
 		math::Vec p1;
 		for (int i = 0; i < meterLength; i++) {
 			int index = math::eucMod(meterIndex + i + 1, meterLength);
@@ -250,7 +250,7 @@ void ModuleWidget::draw(const DrawArgs& args) {
 			p1 = p;
 			p1.x += 0.5f / (meterLength - 1) * box.size.x;
 		}
-		nvgLineTo(args.vg, box.size.x, box.size.y);
+		nvgLineTo(args.vg, box.size.x, plotHeight);
 		nvgClosePath(args.vg);
 		NVGcolor color = componentlibrary::SCHEME_ORANGE;
 		nvgFillColor(args.vg, color::alpha(color, 0.75));
