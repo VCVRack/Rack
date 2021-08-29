@@ -822,7 +822,7 @@ struct MeterLabel : ui::Label {
 
 		double meterAverage = APP->engine->getMeterAverage();
 		double meterMax = APP->engine->getMeterMax();
-		text = string::f("%.1f fps / %.1f%% avg / %.1f%% max", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100);
+		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100);
 		Label::step();
 	}
 };
