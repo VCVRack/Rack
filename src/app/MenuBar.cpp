@@ -824,18 +824,18 @@ struct MeterLabel : ui::Label {
 		}
 
 		// Compute UI thread CPU
-		double time = system::getTime();
-		double uiDuration = time - uiLastTime;
-		if (uiDuration >= 1.0) {
-			double threadTime = system::getThreadTime();
-			uiFrac = (threadTime - uiLastThreadTime) / uiDuration;
-			uiLastThreadTime = threadTime;
-			uiLastTime = time;
-		}
+		// double time = system::getTime();
+		// double uiDuration = time - uiLastTime;
+		// if (uiDuration >= 1.0) {
+		// 	double threadTime = system::getThreadTime();
+		// 	uiFrac = (threadTime - uiLastThreadTime) / uiDuration;
+		// 	uiLastThreadTime = threadTime;
+		// 	uiLastTime = time;
+		// }
 
 		double meterAverage = APP->engine->getMeterAverage();
 		double meterMax = APP->engine->getMeterMax();
-		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max  %.1f%% UI", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100, uiFrac * 100);
+		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100);
 		Label::step();
 	}
 };
