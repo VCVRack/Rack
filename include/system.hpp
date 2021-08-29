@@ -162,6 +162,7 @@ double getTime();
 /** Returns time since 1970-01-01 00:00:00 UTC in seconds.
 */
 double getUnixTime();
+double getThreadTime();
 std::string getOperatingSystemInfo();
 
 // Applications
