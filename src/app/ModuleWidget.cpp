@@ -16,6 +16,7 @@
 #include <settings.hpp>
 #include <history.hpp>
 #include <string.hpp>
+#include <componentlibrary.hpp>
 
 
 namespace rack {
@@ -228,6 +229,7 @@ void ModuleWidget::draw(const DrawArgs& args) {
 		// nvgFill(args.vg);
 
 		// Draw time plot
+		const float plotHeight = box.size.y - BND_WIDGET_HEIGHT;
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, 0.0, box.size.y);
 		math::Vec p1;
@@ -236,7 +238,7 @@ void ModuleWidget::draw(const DrawArgs& args) {
 			float meter = math::clamp(meterBuffer[index] * sampleRate, 0.f, 1.f);
 			math::Vec p;
 			p.x = (float) i / (meterLength - 1) * box.size.x;
-			p.y = (1.f - meter) * box.size.y;
+			p.y = (1.f - meter) * plotHeight;
 			if (i == 0) {
 				nvgLineTo(args.vg, VEC_ARGS(p));
 			}
@@ -250,18 +252,29 @@ void ModuleWidget::draw(const DrawArgs& args) {
 		}
 		nvgLineTo(args.vg, box.size.x, box.size.y);
 		nvgClosePath(args.vg);
-		NVGcolor color = nvgRGBAf(0.5, 0.5, 0.5, 1.0);
-		nvgFillColor(args.vg, color::alpha(color, 0.5));
+		NVGcolor color = componentlibrary::SCHEME_ORANGE;
+		nvgFillColor(args.vg, color::alpha(color, 0.75));
 		nvgFill(args.vg);
 		nvgStrokeWidth(args.vg, 2.0);
 		nvgStrokeColor(args.vg, color);
 		nvgStroke(args.vg);
 
+		// Text background
+		bndMenuBackground(args.vg, 0.0, plotHeight, box.size.x, BND_WIDGET_HEIGHT, BND_CORNER_ALL);
+
 		// Text
 		float percent = meterBuffer[meterIndex] * sampleRate * 100.f;
 		float microseconds = meterBuffer[meterIndex] * 1e6f;
-		std::string meterText = string::f("%.2f μs/sample %.1f%%", microseconds, percent);
-		bndLabel(args.vg, box.size.x - 130.0, 0.0, INFINITY, INFINITY, -1, meterText.c_str());
+		std::string meterText;
+		if (box.size.x >= RACK_GRID_WIDTH * 9)
+			meterText = string::f("%.2f μs/sample %.1f%%", microseconds, percent);
+		else if (box.size.x >= RACK_GRID_WIDTH * 6)
+			meterText = string::f("%.2f μs %.1f%%", microseconds, percent);
+		else
+			meterText = string::f("%.1f%%", percent);
+
+		float x = box.size.x - bndLabelWidth(args.vg, -1, meterText.c_str());
+		bndMenuLabel(args.vg, x, plotHeight, INFINITY, BND_WIDGET_HEIGHT, -1, meterText.c_str());
 	}
 
 	// Selection
