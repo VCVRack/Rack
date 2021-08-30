@@ -238,14 +238,26 @@ struct Module {
 	int64_t getId() {
 		return id;
 	}
+	int getNumParams() {
+		return params.size();
+	}
 	Param& getParam(int index) {
 		return params[index];
+	}
+	int getNumInputs() {
+		return inputs.size();
 	}
 	Input& getInput(int index) {
 		return inputs[index];
 	}
+	int getNumOutputs() {
+		return outputs.size();
+	}
 	Output& getOutput(int index) {
 		return outputs[index];
+	}
+	int getNumLights() {
+		return lights.size();
 	}
 	Light& getLight(int index) {
 		return lights[index];
