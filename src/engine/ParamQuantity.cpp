@@ -22,13 +22,13 @@ void ParamQuantity::setSmoothValue(float value) {
 	value = math::clampSafe(value, getMinValue(), getMaxValue());
 	if (snapEnabled)
 		value = std::round(value);
-	APP->engine->setSmoothParam(module, paramId, value);
+	APP->engine->setParamSmoothValue(module, paramId, value);
 }
 
 float ParamQuantity::getSmoothValue() {
 	if (!module)
 		return 0.f;
-	return APP->engine->getSmoothParam(module, paramId);
+	return APP->engine->getParamSmoothValue(module, paramId);
 }
 
 void ParamQuantity::setSmoothScaledValue(float scaledValue) {
@@ -38,7 +38,7 @@ void ParamQuantity::setSmoothScaledValue(float scaledValue) {
 		setSmoothValue(math::rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue()));
 }
 
-float ParamQuantity::getScaledValue() {
+float ParamQuantity::getSmoothScaledValue() {
 	if (!isBounded())
 		return getSmoothValue();
 	else if (getMinValue() == getMaxValue())
@@ -53,13 +53,13 @@ void ParamQuantity::setValue(float value) {
 	value = math::clampSafe(value, getMinValue(), getMaxValue());
 	if (snapEnabled)
 		value = std::round(value);
-	APP->engine->setParam(module, paramId, value);
+	APP->engine->setParamValue(module, paramId, value);
 }
 
 float ParamQuantity::getValue() {
 	if (!module)
 		return 0.f;
-	return APP->engine->getParam(module, paramId);
+	return APP->engine->getParamValue(module, paramId);
 }
 
 float ParamQuantity::getMinValue() {

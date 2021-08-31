@@ -131,14 +131,14 @@ void ParamChange::undo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
 	if (!module)
 		return;
-	APP->engine->setParam(module, paramId, oldValue);
+	APP->engine->setParamValue(module, paramId, oldValue);
 }
 
 void ParamChange::redo() {
 	engine::Module* module = APP->engine->getModule(moduleId);
 	if (!module)
 		return;
-	APP->engine->setParam(module, paramId, newValue);
+	APP->engine->setParamValue(module, paramId, newValue);
 }
 
 

@@ -182,14 +182,14 @@ struct Engine {
 	Cable* getCable(int64_t cableId);
 
 	// Params
-	void setParam(Module* module, int paramId, float value);
-	float getParam(Module* module, int paramId);
+	void setParamValue(Module* module, int paramId, float value);
+	float getParamValue(Module* module, int paramId);
 	/** Requests the parameter to smoothly change toward `value`.
 	*/
-	void setSmoothParam(Module* module, int paramId, float value);
+	void setParamSmoothValue(Module* module, int paramId, float value);
 	/** Returns the target value before smoothing.
 	*/
-	float getSmoothParam(Module* module, int paramId);
+	float getParamSmoothValue(Module* module, int paramId);
 
 	// ParamHandles
 	/** Adds a ParamHandle to the rack.

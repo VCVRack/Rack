@@ -1083,7 +1083,7 @@ Cable* Engine::getCable(int64_t cableId) {
 }
 
 
-void Engine::setParam(Module* module, int paramId, float value) {
+void Engine::setParamValue(Module* module, int paramId, float value) {
 	// If param is being smoothed, cancel smoothing.
 	if (internal->smoothModule == module && internal->smoothParamId == paramId) {
 		internal->smoothModule = NULL;
@@ -1093,12 +1093,12 @@ void Engine::setParam(Module* module, int paramId, float value) {
 }
 
 
-float Engine::getParam(Module* module, int paramId) {
+float Engine::getParamValue(Module* module, int paramId) {
 	return module->params[paramId].value;
 }
 
 
-void Engine::setSmoothParam(Module* module, int paramId, float value) {
+void Engine::setParamSmoothValue(Module* module, int paramId, float value) {
 	// If another param is being smoothed, jump value
 	if (internal->smoothModule && !(internal->smoothModule == module && internal->smoothParamId == paramId)) {
 		internal->smoothModule->params[internal->smoothParamId].value = internal->smoothValue;
@@ -1110,7 +1110,7 @@ void Engine::setSmoothParam(Module* module, int paramId, float value) {
 }
 
 
-float Engine::getSmoothParam(Module* module, int paramId) {
+float Engine::getParamSmoothValue(Module* module, int paramId) {
 	if (internal->smoothModule == module && internal->smoothParamId == paramId)
 		return internal->smoothValue;
 	return module->params[paramId].value;
