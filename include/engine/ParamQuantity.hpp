@@ -58,6 +58,8 @@ struct ParamQuantity : Quantity {
 	Unbounded (infinite) parameters are not randomizable, regardless of this setting.
 	*/
 	bool randomizeEnabled = true;
+	/** Enables per-sample Engine parameter smoothing when setSmoothValue() is called. */
+	bool smoothEnabled = false;
 	/** Rounds values to the nearest integer. */
 	bool snapEnabled = false;
 

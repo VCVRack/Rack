@@ -40,6 +40,8 @@ void Knob::initParamQuantity() {
 	if (pq) {
 		if (snap)
 			pq->snapEnabled = true;
+		if (smooth)
+			pq->smoothEnabled = true;
 	}
 }
 
@@ -133,7 +135,7 @@ void Knob::onDragMove(const DragMoveEvent& e) {
 
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		float value = smooth ? pq->getSmoothValue() : pq->getValue();
+		float value = pq->getSmoothValue();
 
 		// Ratio between parameter value scale / (angle range / 2*pi)
 		float rangeRatio;
@@ -206,10 +208,7 @@ void Knob::onDragMove(const DragMoveEvent& e) {
 		}
 
 		// Set value
-		if (smooth)
-			pq->setSmoothValue(value);
-		else
-			pq->setValue(value);
+		pq->setSmoothValue(value);
 	}
 
 	ParamWidget::onDragMove(e);
@@ -230,7 +229,7 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 	if (settings::knobScroll) {
 		engine::ParamQuantity* pq = getParamQuantity();
 		if (pq) {
-			float value = smooth ? pq->getSmoothValue() : pq->getValue();
+			float value = pq->getSmoothValue();
 
 			float rangeRatio;
 			if (pq->isBounded()) {
@@ -254,10 +253,7 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 			}
 
 			value += delta;
-			if (smooth)
-				pq->setSmoothValue(value);
-			else
-				pq->setValue(value);
+			pq->setSmoothValue(value);
 
 			e.consume(this);
 		}

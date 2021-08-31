@@ -17,7 +17,7 @@ struct Knob : ParamWidget {
 	bool horizontal = false;
 	/** Enables per-sample value smoothing while dragging. */
 	bool smooth = true;
-	/** DEPRECATED. Use `ParamQuantity::snapEnabled`. */
+	/** Enables value snapping to the nearest integer. */
 	bool snap = false;
 	/** Multiplier for mouse movement to adjust knob value */
 	float speed = 1.f;

@@ -14,6 +14,7 @@ void Switch::initParamQuantity() {
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
 		pq->snapEnabled = true;
+		pq->smoothEnabled = false;
 		if (momentary) {
 			pq->resetEnabled = false;
 			pq->randomizeEnabled = false;
