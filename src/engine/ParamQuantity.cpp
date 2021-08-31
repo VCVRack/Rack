@@ -38,6 +38,15 @@ void ParamQuantity::setSmoothScaledValue(float scaledValue) {
 		setSmoothValue(math::rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue()));
 }
 
+float ParamQuantity::getScaledValue() {
+	if (!isBounded())
+		return getSmoothValue();
+	else if (getMinValue() == getMaxValue())
+		return 0.f;
+	else
+		return math::rescale(getSmoothValue(), getMinValue(), getMaxValue(), 0.f, 1.f);
+}
+
 void ParamQuantity::setValue(float value) {
 	if (!module)
 		return;

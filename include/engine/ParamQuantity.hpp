@@ -66,6 +66,7 @@ struct ParamQuantity : Quantity {
 	void setSmoothValue(float value);
 	float getSmoothValue();
 	void setSmoothScaledValue(float scaledValue);
+	float getSmoothScaledValue();
 
 	void setValue(float value) override;
 	float getValue() override;
