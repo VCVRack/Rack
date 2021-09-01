@@ -87,20 +87,8 @@ void Quantity::toggle() {
 	setValue(isMin() ? getMaxValue() : getMinValue());
 }
 
-void Quantity::setScaledValue(float scaledValue) {
-	if (!isBounded())
-		setValue(scaledValue);
-	else
-		setValue(math::rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue()));
-}
-
-float Quantity::getScaledValue() {
-	if (!isBounded())
-		return getValue();
-	else if (getMinValue() == getMaxValue())
-		return 0.f;
-	else
-		return math::rescale(getValue(), getMinValue(), getMaxValue(), 0.f, 1.f);
+void Quantity::moveValue(float deltaValue) {
+	setValue(getValue() + deltaValue);
 }
 
 float Quantity::getRange() {
@@ -111,8 +99,28 @@ bool Quantity::isBounded() {
 	return std::isfinite(getMinValue()) && std::isfinite(getMaxValue());
 }
 
-void Quantity::moveValue(float deltaValue) {
-	setValue(getValue() + deltaValue);
+float Quantity::toScaled(float value) {
+	if (!isBounded())
+		return value;
+	else if (getMinValue() == getMaxValue())
+		return 0.f;
+	else
+		return math::rescale(value, getMinValue(), getMaxValue(), 0.f, 1.f);
+}
+
+float Quantity::fromScaled(float scaledValue) {
+	if (!isBounded())
+		return scaledValue;
+	else
+		return math::rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue());
+}
+
+void Quantity::setScaledValue(float scaledValue) {
+	setValue(fromScaled(scaledValue));
+}
+
+float Quantity::getScaledValue() {
+	return toScaled(getValue());
 }
 
 void Quantity::moveScaledValue(float deltaScaledValue) {

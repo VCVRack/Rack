@@ -64,11 +64,9 @@ struct ParamQuantity : Quantity {
 	bool snapEnabled = false;
 
 	Param* getParam();
-	/** Request to the engine to smoothly set the value */
+	/** If smoothEnabled is true, requests to the engine to smoothly set the value. */
 	void setSmoothValue(float value);
 	float getSmoothValue();
-	void setSmoothScaledValue(float scaledValue);
-	float getSmoothScaledValue();
 
 	void setValue(float value) override;
 	float getValue() override;

@@ -11,8 +11,10 @@ namespace engine {
 
 
 engine::Param* ParamQuantity::getParam() {
-	assert(module);
-	assert(0 <= paramId && paramId < (int) module->params.size());
+	if (!module)
+		return NULL;
+	if (!(0 <= paramId && paramId < (int) module->params.size()))
+		return NULL;
 	return &module->params[paramId];
 }
 
@@ -35,22 +37,6 @@ float ParamQuantity::getSmoothValue() {
 		return APP->engine->getParamSmoothValue(module, paramId);
 	else
 		return APP->engine->getParamValue(module, paramId);
-}
-
-void ParamQuantity::setSmoothScaledValue(float scaledValue) {
-	if (!isBounded())
-		setSmoothValue(scaledValue);
-	else
-		setSmoothValue(math::rescale(scaledValue, 0.f, 1.f, getMinValue(), getMaxValue()));
-}
-
-float ParamQuantity::getSmoothScaledValue() {
-	if (!isBounded())
-		return getSmoothValue();
-	else if (getMinValue() == getMaxValue())
-		return 0.f;
-	else
-		return math::rescale(getSmoothValue(), getMinValue(), getMaxValue(), 0.f, 1.f);
 }
 
 void ParamQuantity::setValue(float value) {
@@ -81,8 +67,7 @@ float ParamQuantity::getDefaultValue() {
 }
 
 float ParamQuantity::getDisplayValue() {
-	if (!module)
-		return Quantity::getDisplayValue();
+	// We don't want the text to be smoothed (animated), so get the smooth target value.
 	float v = getSmoothValue();
 	if (displayBase == 0.f) {
 		// Linear
@@ -100,9 +85,6 @@ float ParamQuantity::getDisplayValue() {
 }
 
 void ParamQuantity::setDisplayValue(float displayValue) {
-	if (!module)
-		return;
-
 	// Handle displayOffset
 	float v = displayValue - displayOffset;
 
@@ -129,6 +111,7 @@ void ParamQuantity::setDisplayValue(float displayValue) {
 	if (std::isnan(v))
 		return;
 
+	// Set the value directly without smoothing
 	setValue(v);
 }
 
@@ -201,6 +184,7 @@ std::string SwitchQuantity::getDisplayValueString() {
 }
 
 void SwitchQuantity::setDisplayValueString(std::string s) {
+	// Find label that matches string, case insensitive.
 	auto it = std::find_if(labels.begin(), labels.end(), [&](const std::string& a) {
 		return string::lowercase(a) == string::lowercase(s);
 	});

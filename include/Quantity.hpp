@@ -40,7 +40,7 @@ struct Quantity {
 		return 0.f;
 	}
 
-	/** Returns the value, possibly transformed for displaying.
+	/** Returns the value, transformed for displaying.
 	Useful for logarithmic scaling, multiplying by 100 for percentages, etc.
 	*/
 	virtual float getDisplayValue();
@@ -90,16 +90,21 @@ struct Quantity {
 	void setMax();
 	/** Sets the value to max if the current value is min, otherwise sets the value to min. */
 	void toggle();
-	/** Sets value from the range 0 to 1. */
-	void setScaledValue(float scaledValue);
-	/** Returns the value rescaled to the range 0 to 1. */
-	float getScaledValue();
+	/** Adds an amount to the value. */
+	void moveValue(float deltaValue);
+
 	/** The difference between the max and min values. */
 	float getRange();
 	/** Checks whether the bounds are finite. */
 	bool isBounded();
-	/** Adds an amount to the value. */
-	void moveValue(float deltaValue);
+	/** Transforms a value to the range 0 to 1. */
+	float toScaled(float value);
+	/** Transforms a value from the range 0 to 1. */
+	float fromScaled(float scaledValue);
+	/** Sets value from the range 0 to 1. */
+	void setScaledValue(float scaledValue);
+	/** Returns the value scaled to the range 0 to 1. */
+	float getScaledValue();
 	/** Adds an amount to the value scaled to the range 0 to 1. */
 	void moveScaledValue(float deltaScaledValue);
 };
