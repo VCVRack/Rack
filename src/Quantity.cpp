@@ -21,11 +21,7 @@ int Quantity::getDisplayPrecision() {
 
 std::string Quantity::getDisplayValueString() {
 	float v = getDisplayValue();
-	if (v == INFINITY)
-		return "∞";
-	else if (v == -INFINITY)
-		return "-∞";
-	else if (std::isnan(v))
+	if (std::isnan(v))
 		return "NaN";
 	return string::f("%.*g", getDisplayPrecision(), math::normalizeZero(v));
 }
