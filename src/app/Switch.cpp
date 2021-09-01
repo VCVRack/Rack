@@ -9,6 +9,21 @@ namespace rack {
 namespace app {
 
 
+struct Switch::Internal {
+	/** Hysteresis state for momentary switch */
+	bool momentaryPressed = false;
+	bool momentaryReleased = false;
+};
+
+
+Switch::Switch() {
+	internal = new Internal;
+}
+
+Switch::~Switch() {
+	delete internal;
+}
+
 void Switch::initParamQuantity() {
 	ParamWidget::initParamQuantity();
 	engine::ParamQuantity* pq = getParamQuantity();
@@ -24,12 +39,12 @@ void Switch::initParamQuantity() {
 
 void Switch::step() {
 	engine::ParamQuantity* pq = getParamQuantity();
-	if (momentaryPressed) {
-		momentaryPressed = false;
+	if (internal->momentaryPressed) {
+		internal->momentaryPressed = false;
 		// Wait another frame.
 	}
-	else if (momentaryReleased) {
-		momentaryReleased = false;
+	else if (internal->momentaryReleased) {
+		internal->momentaryReleased = false;
 		if (pq) {
 			// Set to minimum value
 			pq->setMin();
@@ -40,6 +55,7 @@ void Switch::step() {
 
 void Switch::onDoubleClick(const DoubleClickEvent& e) {
 	// Don't reset parameter on double-click
+	OpaqueWidget::onDoubleClick(e);
 }
 
 void Switch::onDragStart(const DragStartEvent& e) {
@@ -50,10 +66,10 @@ void Switch::onDragStart(const DragStartEvent& e) {
 
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (momentary) {
+		internal->momentaryPressed = true;
 		if (pq) {
 			// Set to maximum value
 			pq->setMax();
-			momentaryPressed = true;
 		}
 	}
 	else {
@@ -84,11 +100,13 @@ void Switch::onDragStart(const DragStartEvent& e) {
 }
 
 void Switch::onDragEnd(const DragEndEvent& e) {
+	ParamWidget::onDragEnd(e);
+
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
 	if (momentary) {
-		momentaryReleased = true;
+		internal->momentaryReleased = true;
 	}
 }
 

@@ -13,12 +13,14 @@ When maxValue is reached, the next click resets to minValue.
 In momentary mode, the value is instead set to maxValue when the mouse is held and minValue when released.
 */
 struct Switch : ParamWidget {
+	struct Internal;
+	Internal* internal;
+
 	/** Return to original position when released */
 	bool momentary = false;
-	/** Hysteresis state for momentary switch */
-	bool momentaryPressed = false;
-	bool momentaryReleased = false;
 
+	Switch();
+	~Switch();
 	void initParamQuantity() override;
 	void step() override;
 	void onDoubleClick(const DoubleClickEvent& e) override;
