@@ -315,7 +315,7 @@ struct BrowserSearchField : ui::TextField {
 
 	void step() override {
 		// Steal focus when step is called
-		APP->event->setSelected(this);
+		APP->event->setSelectedWidget(this);
 		TextField::step();
 	}
 
@@ -324,7 +324,7 @@ struct BrowserSearchField : ui::TextField {
 	void onAction(const ActionEvent& e) override;
 
 	void onHide(const HideEvent& e) override {
-		APP->event->setSelected(NULL);
+		APP->event->setSelectedWidget(NULL);
 		ui::TextField::onHide(e);
 	}
 

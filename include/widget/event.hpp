@@ -141,10 +141,14 @@ struct EventState {
 		return selectedWidget;
 	}
 
-	void setHovered(Widget* w);
-	void setDragged(Widget* w, int button);
-	void setDragHovered(Widget* w);
-	void setSelected(Widget* w);
+	void setHoveredWidget(Widget* w);
+	void setDraggedWidget(Widget* w, int button);
+	void setDragHoveredWidget(Widget* w);
+	void setSelectedWidget(Widget* w);
+	DEPRECATED void setHovered(Widget* w) {setHoveredWidget(w);}
+	DEPRECATED void setDragged(Widget* w, int button) {setDraggedWidget(w, button);}
+	DEPRECATED void setDragHovered(Widget* w) {setDragHoveredWidget(w);}
+	DEPRECATED void setSelected(Widget* w) {setSelectedWidget(w);}
 	/** Prepares a widget for deletion */
 	void finalizeWidget(Widget* w);
 

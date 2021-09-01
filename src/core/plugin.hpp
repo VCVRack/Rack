@@ -91,7 +91,7 @@ struct CcChoice : LedDisplayChoice {
 
 			// Cancel focus if no longer learning
 			if (APP->event->getSelectedWidget() == this)
-				APP->event->setSelected(NULL);
+				APP->event->setSelectedWidget(NULL);
 		}
 
 		// Set text
@@ -178,7 +178,7 @@ struct NoteChoice : LedDisplayChoice {
 
 			// Cancel focus if no longer learning
 			if (APP->event->getSelectedWidget() == this)
-				APP->event->setSelected(NULL);
+				APP->event->setSelectedWidget(NULL);
 		}
 
 		// Set text

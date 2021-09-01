@@ -351,14 +351,14 @@ struct MIDI_MapChoice : LedDisplayChoice {
 
 			// HACK
 			if (APP->event->selectedWidget != this)
-				APP->event->setSelected(this);
+				APP->event->setSelectedWidget(this);
 		}
 		else {
 			bgColor = nvgRGBA(0, 0, 0, 0);
 
 			// HACK
 			if (APP->event->selectedWidget == this)
-				APP->event->setSelected(NULL);
+				APP->event->setSelectedWidget(NULL);
 		}
 
 		// Set text

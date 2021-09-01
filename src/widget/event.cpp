@@ -9,7 +9,7 @@ namespace rack {
 namespace widget {
 
 
-void EventState::setHovered(widget::Widget* w) {
+void EventState::setHoveredWidget(widget::Widget* w) {
 	if (w == hoveredWidget)
 		return;
 
@@ -31,7 +31,7 @@ void EventState::setHovered(widget::Widget* w) {
 	}
 }
 
-void EventState::setDragged(widget::Widget* w, int button) {
+void EventState::setDraggedWidget(widget::Widget* w, int button) {
 	if (w == draggedWidget)
 		return;
 
@@ -57,7 +57,7 @@ void EventState::setDragged(widget::Widget* w, int button) {
 	}
 }
 
-void EventState::setDragHovered(widget::Widget* w) {
+void EventState::setDragHoveredWidget(widget::Widget* w) {
 	if (w == dragHoveredWidget)
 		return;
 
@@ -83,7 +83,7 @@ void EventState::setDragHovered(widget::Widget* w) {
 	}
 }
 
-void EventState::setSelected(widget::Widget* w) {
+void EventState::setSelectedWidget(widget::Widget* w) {
 	if (w == selectedWidget)
 		return;
 
@@ -107,13 +107,13 @@ void EventState::setSelected(widget::Widget* w) {
 
 void EventState::finalizeWidget(widget::Widget* w) {
 	if (hoveredWidget == w)
-		setHovered(NULL);
+		setHoveredWidget(NULL);
 	if (draggedWidget == w)
-		setDragged(NULL, 0);
+		setDraggedWidget(NULL, 0);
 	if (dragHoveredWidget == w)
-		setDragHovered(NULL);
+		setDragHoveredWidget(NULL);
 	if (selectedWidget == w)
-		setSelected(NULL);
+		setSelectedWidget(NULL);
 	if (lastClickedWidget == w)
 		lastClickedWidget = NULL;
 }
@@ -136,11 +136,11 @@ bool EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 	}
 
 	if (action == GLFW_PRESS) {
-		setDragged(clickedWidget, button);
+		setDraggedWidget(clickedWidget, button);
 	}
 
 	if (action == GLFW_RELEASE) {
-		setDragHovered(NULL);
+		setDragHoveredWidget(NULL);
 
 		if (clickedWidget && draggedWidget) {
 			// Dispatch DragDropEvent
@@ -150,12 +150,12 @@ bool EventState::handleButton(math::Vec pos, int button, int action, int mods) {
 			clickedWidget->onDragDrop(eDragDrop);
 		}
 
-		setDragged(NULL, 0);
+		setDraggedWidget(NULL, 0);
 	}
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (action == GLFW_PRESS) {
-			setSelected(clickedWidget);
+			setSelectedWidget(clickedWidget);
 		}
 
 		if (action == GLFW_PRESS) {
@@ -206,7 +206,7 @@ bool EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 			eDragHover.origin = draggedWidget;
 			rootWidget->onDragHover(eDragHover);
 
-			setDragHovered(cDragHover.target);
+			setDragHoveredWidget(cDragHover.target);
 			// If consumed, don't continue after DragMoveEvent so HoverEvent is not triggered.
 			if (cDragHover.target)
 				dragHovered = true;
@@ -230,7 +230,7 @@ bool EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 		eHover.mouseDelta = mouseDelta;
 		rootWidget->onHover(eHover);
 
-		setHovered(cHover.target);
+		setHoveredWidget(cHover.target);
 		if (cHover.target)
 			return true;
 	}
@@ -240,8 +240,8 @@ bool EventState::handleHover(math::Vec pos, math::Vec mouseDelta) {
 bool EventState::handleLeave() {
 	heldKeys.clear();
 	// When leaving the window, don't un-hover widgets because the mouse might be dragging.
-	// setDragHovered(NULL);
-	// setHovered(NULL);
+	// setDragHoveredWidget(NULL);
+	// setHoveredWidget(NULL);
 	return true;
 }
 

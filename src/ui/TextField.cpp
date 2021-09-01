@@ -13,7 +13,7 @@ struct TextFieldCopyItem : ui::MenuItem {
 		if (!textField)
 			return;
 		textField->copyClipboard();
-		APP->event->setSelected(textField);
+		APP->event->setSelectedWidget(textField);
 	}
 };
 
@@ -24,7 +24,7 @@ struct TextFieldCutItem : ui::MenuItem {
 		if (!textField)
 			return;
 		textField->cutClipboard();
-		APP->event->setSelected(textField);
+		APP->event->setSelectedWidget(textField);
 	}
 };
 
@@ -35,7 +35,7 @@ struct TextFieldPasteItem : ui::MenuItem {
 		if (!textField)
 			return;
 		textField->pasteClipboard();
-		APP->event->setSelected(textField);
+		APP->event->setSelectedWidget(textField);
 	}
 };
 
@@ -46,7 +46,7 @@ struct TextFieldSelectAllItem : ui::MenuItem {
 		if (!textField)
 			return;
 		textField->selectAll();
-		APP->event->setSelected(textField);
+		APP->event->setSelectedWidget(textField);
 	}
 };
 
@@ -223,13 +223,13 @@ void TextField::onSelectKey(const SelectKeyEvent& e) {
 		// Tab
 		if (e.key == GLFW_KEY_TAB && (e.mods & RACK_MOD_MASK) == 0) {
 			if (nextField)
-				APP->event->setSelected(nextField);
+				APP->event->setSelectedWidget(nextField);
 			e.consume(this);
 		}
 		// Shift-Tab
 		if (e.key == GLFW_KEY_TAB && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
 			if (prevField)
-				APP->event->setSelected(prevField);
+				APP->event->setSelectedWidget(prevField);
 			e.consume(this);
 		}
 		// Consume all printable keys

@@ -20,7 +20,7 @@ struct ParamField : ui::TextField {
 
 	void step() override {
 		// Keep selected
-		APP->event->setSelected(this);
+		APP->event->setSelectedWidget(this);
 		TextField::step();
 	}
 
