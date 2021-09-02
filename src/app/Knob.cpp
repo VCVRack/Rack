@@ -24,6 +24,8 @@ struct Knob::Internal {
 	/** The mouse has once escaped from the knob while dragging. */
 	bool rotaryDragEnabled = false;
 	float dragAngle = NAN;
+
+	float distDragged = 0.f;
 };
 
 
@@ -83,6 +85,9 @@ void Knob::onDragStart(const DragStartEvent& e) {
 	internal->rotaryDragEnabled = false;
 	internal->dragAngle = NAN;
 
+	// Reset distance dragged
+	internal->distDragged = 0.f;
+
 	ParamWidget::onDragStart(e);
 }
 
@@ -112,6 +117,13 @@ void Knob::onDragEnd(const DragEndEvent& e) {
 		internal->snapDelta = 0.f;
 	}
 	internal->oldValue = NAN;
+
+	// Dispatch Action event if mouse traveled less than a threshold distance
+	const float actionDistThreshold = 16.f;
+	if (internal->distDragged < actionDistThreshold) {
+		ActionEvent eAction;
+		onAction(eAction);
+	}
 
 	ParamWidget::onDragEnd(e);
 }
@@ -212,6 +224,8 @@ void Knob::onDragMove(const DragMoveEvent& e) {
 		// Set value
 		pq->setSmoothValue(value);
 	}
+
+	internal->distDragged += e.mouseDelta.norm();
 
 	ParamWidget::onDragMove(e);
 }
