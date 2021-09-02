@@ -358,12 +358,8 @@ struct ViewButton : MenuButton {
 			for (int i = 1; i <= 6; i++) {
 				double frameRate = APP->window->getMonitorRefreshRate() / i;
 				menu->addChild(createCheckMenuItem(string::f("%.0f Hz", frameRate),
-					[=]() {
-						return settings::frameSwapInterval == i;
-					},
-					[=]() {
-						settings::frameSwapInterval = i;
-					}
+					[=]() {return settings::frameSwapInterval == i;},
+					[=]() {settings::frameSwapInterval = i;}
 				));
 			}
 		}));
@@ -380,13 +376,21 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(createBoolPtrMenuItem("Hide cursor while dragging", &settings::allowCursorLock));
 
-		static const std::vector<std::string> knobModes = {
+		static const std::vector<std::string> knobModeLabels = {
 			"Linear",
 			"Scaled linear",
 			"Absolute rotary",
 			"Relative rotary",
 		};
-		menu->addChild(createIndexPtrSubmenuItem("Knob mode", knobModes, &settings::knobMode));
+		static const std::vector<int> knobModes = {0, 2, 3};
+		menu->addChild(createSubmenuItem("Knob mode", knobModeLabels[settings::knobMode], [=](ui::Menu* menu) {
+			for (int knobMode : knobModes) {
+				menu->addChild(createCheckMenuItem(knobModeLabels[knobMode],
+					[=]() {return settings::knobMode == knobMode;},
+					[=]() {settings::knobMode = (settings::KnobMode) knobMode;}
+				));
+			}
+		}));
 
 		menu->addChild(createBoolPtrMenuItem("Scroll wheel knob control", &settings::knobScroll));
 
