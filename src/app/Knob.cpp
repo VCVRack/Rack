@@ -1,6 +1,7 @@
 #include <app/Knob.hpp>
 #include <context.hpp>
 #include <app/Scene.hpp>
+#include <app/RackScrollWidget.hpp>
 #include <random.hpp>
 #include <history.hpp>
 #include <settings.hpp>
@@ -226,38 +227,43 @@ void Knob::onDragLeave(const DragLeaveEvent& e) {
 void Knob::onHoverScroll(const HoverScrollEvent& e) {
 	ParamWidget::onHoverScroll(e);
 
-	if (settings::knobScroll) {
-		engine::ParamQuantity* pq = getParamQuantity();
-		if (pq) {
-			float value = pq->getSmoothValue();
+	if (!settings::knobScroll)
+		return;
 
-			float rangeRatio;
-			if (pq->isBounded()) {
-				rangeRatio = pq->getRange();
-			}
-			else {
-				rangeRatio = 1.f;
-			}
+	if (APP->scene->rackScroll->isScrolling())
+		return;
 
-			float delta = e.scrollDelta.y;
-			delta *= settings::knobScrollSensitivity;
-			delta *= getModSpeed();
-			delta *= rangeRatio;
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (!pq)
+		return;
 
-			// Handle value snapping
-			if (pq->snapEnabled) {
-				// Replace delta with an accumulated delta since the last integer knob.
-				internal->snapDelta += delta;
-				delta = std::trunc(internal->snapDelta);
-				internal->snapDelta -= delta;
-			}
+	float value = pq->getSmoothValue();
 
-			value += delta;
-			pq->setSmoothValue(value);
-
-			e.consume(this);
-		}
+	float rangeRatio;
+	if (pq->isBounded()) {
+		rangeRatio = pq->getRange();
 	}
+	else {
+		rangeRatio = 1.f;
+	}
+
+	float delta = e.scrollDelta.y;
+	delta *= settings::knobScrollSensitivity;
+	delta *= getModSpeed();
+	delta *= rangeRatio;
+
+	// Handle value snapping
+	if (pq->snapEnabled) {
+		// Replace delta with an accumulated delta since the last integer knob.
+		internal->snapDelta += delta;
+		delta = std::trunc(internal->snapDelta);
+		internal->snapDelta -= delta;
+	}
+
+	value += delta;
+	pq->setSmoothValue(value);
+
+	e.consume(this);
 }
 
 

@@ -22,6 +22,7 @@ struct ScrollWidget : widget::OpaqueWidget {
 	bool hideScrollbars = false;
 
 	ScrollWidget();
+	~ScrollWidget();
 	void scrollTo(math::Rect r);
 	/** Returns the bound of allowed `offset` values in pixels. */
 	math::Rect getContainerOffsetBound();
@@ -29,8 +30,11 @@ struct ScrollWidget : widget::OpaqueWidget {
 	math::Vec getHandleOffset();
 	/** Returns the handle size relative to the scrollbar. [0, 1]. */
 	math::Vec getHandleSize();
+	/** The user is considered scrolling with the wheel until the mouse is moved. */
+	bool isScrolling();
 	void draw(const DrawArgs& args) override;
 	void step() override;
+	void onHover(const HoverEvent& e) override;
 	void onButton(const ButtonEvent& e) override;
 	void onDragStart(const DragStartEvent& e) override;
 	void onDragMove(const DragMoveEvent& e) override;

@@ -114,10 +114,6 @@ void RackScrollWidget::onHoverKey(const HoverKeyEvent& e) {
 
 
 void RackScrollWidget::onHoverScroll(const HoverScrollEvent& e) {
-	ScrollWidget::onHoverScroll(e);
-	if (e.isConsumed())
-		return;
-
 	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		// Increase zoom
 		float zoomDelta = e.scrollDelta.y / 50 / 4;
@@ -132,6 +128,10 @@ void RackScrollWidget::onHoverScroll(const HoverScrollEvent& e) {
 		internal->zoomPos = e.pos;
 		e.consume(this);
 	}
+
+	if (e.isConsumed())
+		return;
+	ScrollWidget::onHoverScroll(e);
 }
 
 

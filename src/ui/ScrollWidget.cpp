@@ -6,10 +6,14 @@ namespace rack {
 namespace ui {
 
 
-// Internal not currently used
+struct ScrollWidget::Internal {
+	bool scrolling = false;
+};
 
 
 ScrollWidget::ScrollWidget() {
+	internal = new Internal;
+
 	container = new widget::Widget;
 	addChild(container);
 
@@ -22,6 +26,11 @@ ScrollWidget::ScrollWidget() {
 	verticalScrollbar->vertical = true;
 	verticalScrollbar->hide();
 	addChild(verticalScrollbar);
+}
+
+
+ScrollWidget::~ScrollWidget() {
+	delete internal;
 }
 
 
@@ -46,6 +55,11 @@ math::Vec ScrollWidget::getHandleOffset() {
 
 math::Vec ScrollWidget::getHandleSize() {
 	return box.size.div(containerBox.size);
+}
+
+
+bool ScrollWidget::isScrolling() {
+	return internal->scrolling;
 }
 
 
@@ -85,6 +99,15 @@ void ScrollWidget::step() {
 	verticalScrollbar->box.pos.x = inner.x;
 	horizontalScrollbar->box.size.x = verticalScrollbar->isVisible() ? inner.x : box.size.x;
 	verticalScrollbar->box.size.y = horizontalScrollbar->isVisible() ? inner.y : box.size.y;
+}
+
+
+void ScrollWidget::onHover(const HoverEvent& e) {
+	OpaqueWidget::onHover(e);
+
+	if (!e.mouseDelta.isZero()) {
+		internal->scrolling = false;
+	}
 }
 
 
@@ -144,6 +167,7 @@ void ScrollWidget::onHoverScroll(const HoverScrollEvent& e) {
 
 	offset = offset.minus(scrollDelta);
 	e.consume(this);
+	internal->scrolling = true;
 }
 
 
