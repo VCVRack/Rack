@@ -13,7 +13,7 @@ namespace app {
 
 struct Knob::Internal {
 	/** Value of the knob before dragging. */
-	float oldValue = 0.f;
+	float oldValue = NAN;
 	/** Fractional value between the param's value and the dragged knob position.
 	Using a "snapValue" variable and rounding is insufficient because the mouse needs to reach 1.0, not 0.5 to obtain the first increment.
 	*/
@@ -98,7 +98,7 @@ void Knob::onDragEnd(const DragEndEvent& e) {
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
 		float newValue = pq->getSmoothValue();
-		if (internal->oldValue != newValue) {
+		if (!std::isnan(internal->oldValue) && internal->oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange* h = new history::ParamChange;
 			h->name = "move knob";
@@ -111,6 +111,7 @@ void Knob::onDragEnd(const DragEndEvent& e) {
 		// Reset snap delta
 		internal->snapDelta = 0.f;
 	}
+	internal->oldValue = NAN;
 
 	ParamWidget::onDragEnd(e);
 }
@@ -238,6 +239,10 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 		return;
 
 	float value = pq->getSmoothValue();
+	// Set old value if unset
+	if (std::isnan(internal->oldValue)) {
+		internal->oldValue = value;
+	}
 
 	float rangeRatio;
 	if (pq->isBounded()) {
@@ -246,6 +251,7 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 	else {
 		rangeRatio = 1.f;
 	}
+
 
 	float delta = e.scrollDelta.y;
 	delta *= settings::knobScrollSensitivity;
@@ -264,6 +270,32 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 	pq->setSmoothValue(value);
 
 	e.consume(this);
+}
+
+
+void Knob::onLeave(const LeaveEvent& e) {
+	ParamWidget::onLeave(e);
+
+	if (!settings::knobScroll)
+		return;
+
+	engine::ParamQuantity* pq = getParamQuantity();
+	if (pq) {
+		float newValue = pq->getSmoothValue();
+		if (!std::isnan(internal->oldValue) && internal->oldValue != newValue) {
+			// Push ParamChange history action
+			history::ParamChange* h = new history::ParamChange;
+			h->name = "move knob";
+			h->moduleId = module->id;
+			h->paramId = paramId;
+			h->oldValue = internal->oldValue;
+			h->newValue = newValue;
+			APP->history->push(h);
+		}
+		// Reset snap delta
+		internal->snapDelta = 0.f;
+	}
+	internal->oldValue = NAN;
 }
 
 

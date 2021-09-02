@@ -37,6 +37,7 @@ struct Knob : ParamWidget {
 	void onDragMove(const DragMoveEvent& e) override;
 	void onDragLeave(const DragLeaveEvent& e) override;
 	void onHoverScroll(const HoverScrollEvent& e) override;
+	void onLeave(const LeaveEvent& e) override;
 };
 
 
