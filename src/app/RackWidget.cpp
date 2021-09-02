@@ -387,13 +387,6 @@ void RackWidget::fromJson(json_t* rootJ) {
 	}
 }
 
-static void cleanupModuleJson(json_t* moduleJ) {
-	json_object_del(moduleJ, "id");
-	json_object_del(moduleJ, "leftModuleId");
-	json_object_del(moduleJ, "rightModuleId");
-}
-
-
 struct PasteJsonReturn {
 	std::map<int64_t, int64_t> newModuleIds;
 };
@@ -415,7 +408,7 @@ static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 			continue;
 		int64_t id = json_integer_value(idJ);
 
-		cleanupModuleJson(moduleJ);
+		engine::Module::jsonStripIds(moduleJ);
 
 		ModuleWidget* mw;
 		try {
@@ -524,7 +517,7 @@ void RackWidget::pasteJsonAction(json_t* rootJ) {
 }
 
 void RackWidget::pasteModuleJsonAction(json_t* moduleJ) {
-	cleanupModuleJson(moduleJ);
+	engine::Module::jsonStripIds(moduleJ);
 
 	ModuleWidget* mw;
 	try {
@@ -929,7 +922,7 @@ void RackWidget::saveSelection(std::string path) {
 	assert(rootJ);
 	DEFER({json_decref(rootJ);});
 
-	cleanupModuleJson(rootJ);
+	engine::Module::jsonStripIds(rootJ);
 
 	FILE* file = std::fopen(path.c_str(), "w");
 	if (!file) {

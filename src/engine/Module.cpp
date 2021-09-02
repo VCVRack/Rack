@@ -384,5 +384,13 @@ void Module::doProcess(const ProcessArgs& args) {
 }
 
 
+void Module::jsonStripIds(json_t* rootJ) {
+	json_object_del(rootJ, "id");
+	json_object_del(rootJ, "leftModuleId");
+	json_object_del(rootJ, "rightModuleId");
+}
+
+
+
 } // namespace engine
 } // namespace rack

@@ -327,7 +327,7 @@ struct Module {
 	virtual json_t* dataToJson() {
 		return NULL;
 	}
-	virtual void dataFromJson(json_t* root) {}
+	virtual void dataFromJson(json_t* rootJ) {}
 
 	///////////////////////
 	// Events
@@ -433,6 +433,7 @@ struct Module {
 	INTERNAL int meterLength();
 	INTERNAL int meterIndex();
 	INTERNAL void doProcess(const ProcessArgs& args);
+	INTERNAL static void jsonStripIds(json_t* rootJ);
 };
 
 

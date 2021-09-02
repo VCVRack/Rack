@@ -459,12 +459,6 @@ void ModuleWidget::onDragHover(const DragHoverEvent& e) {
 	OpaqueWidget::onDragHover(e);
 }
 
-static void cleanupModuleJson(json_t* moduleJ) {
-	json_object_del(moduleJ, "id");
-	json_object_del(moduleJ, "leftModuleId");
-	json_object_del(moduleJ, "rightModuleId");
-}
-
 json_t* ModuleWidget::toJson() {
 	json_t* moduleJ = APP->engine->moduleToJson(module);
 	return moduleJ;
@@ -475,7 +469,7 @@ void ModuleWidget::fromJson(json_t* moduleJ) {
 }
 
 void ModuleWidget::pasteJsonAction(json_t* moduleJ) {
-	cleanupModuleJson(moduleJ);
+	engine::Module::jsonStripIds(moduleJ);
 
 	json_t* oldModuleJ = toJson();
 
@@ -499,7 +493,7 @@ void ModuleWidget::pasteJsonAction(json_t* moduleJ) {
 
 void ModuleWidget::copyClipboard() {
 	json_t* moduleJ = toJson();
-	cleanupModuleJson(moduleJ);
+	engine::Module::jsonStripIds(moduleJ);
 
 	DEFER({json_decref(moduleJ);});
 	char* json = json_dumps(moduleJ, JSON_INDENT(2));
@@ -539,7 +533,7 @@ void ModuleWidget::load(std::string filename) {
 		throw Exception("File is not a valid patch file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	DEFER({json_decref(moduleJ);});
 
-	cleanupModuleJson(moduleJ);
+	engine::Module::jsonStripIds(moduleJ);
 	fromJson(moduleJ);
 }
 
@@ -613,7 +607,7 @@ void ModuleWidget::save(std::string filename) {
 	assert(moduleJ);
 	DEFER({json_decref(moduleJ);});
 
-	cleanupModuleJson(moduleJ);
+	engine::Module::jsonStripIds(moduleJ);
 
 	FILE* file = std::fopen(filename.c_str(), "w");
 	if (!file) {
@@ -764,7 +758,7 @@ void ModuleWidget::cloneAction() {
 
 	// JSON serialization is the obvious way to do this
 	json_t* moduleJ = toJson();
-	cleanupModuleJson(moduleJ);
+	engine::Module::jsonStripIds(moduleJ);
 
 	// Clone Module
 	engine::Module* clonedModule = model->createModule();
