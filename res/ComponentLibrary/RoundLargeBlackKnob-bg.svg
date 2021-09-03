@@ -7,17 +7,28 @@
 <sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="0" fit-margin-left="0" fit-margin-right="0" fit-margin-top="0" id="base" inkscape:current-layer="layer1" inkscape:cx="-130.49441" inkscape:cy="-43.340255" inkscape:document-units="mm" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="1422" inkscape:window-maximized="0" inkscape:window-width="2560" inkscape:window-x="0" inkscape:window-y="18" inkscape:zoom="2.8" pagecolor="#ffffff" showgrid="false">
 	</sodipodi:namedview>
 <g>
-	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="18" y1="-2.555495e-06" x2="18" y2="36">
-		<stop  offset="0" style="stop-color:#FFFBFD"/>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="18.00001" y1="-0.01729" x2="18.00001" y2="36.01731">
+		<stop  offset="0" style="stop-color:#B0ACAE"/>
 		<stop  offset="1" style="stop-color:#000000"/>
 	</linearGradient>
-	<circle fill="url(#SVGID_1_)" cx="18" cy="18" r="18"/>
+	<ellipse fill="url(#SVGID_1_)" cx="18.00001" cy="18.00001" rx="18" ry="18.0173"/>
+	<path fill="#FFFFFF" d="M17.99705,17.9962L13.33941,0.59696c-1.51908,0.40742-2.97826,1.01242-4.34023,1.79951
+		s-2.615,1.7495-3.72704,2.86261L17.99705,17.9962z"/>
+	<path opacity="0.25" fill="#FFFFFF" d="M18.00004,17.99998l4.03771,15.06896c1.31689-0.35286,2.58186-0.87682,3.76255-1.5585
+		s2.26695-1.51519,3.23098-2.47922L18.00004,17.99998z"/>
 	
-		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="616.45892" y1="-3743.8689" x2="648.35193" y2="-3743.8689" gradientTransform="matrix(0 1 -1 0 -3725.8689 -614.40546)">
-		<stop  offset="0" style="stop-color:#A19EA1"/>
-		<stop  offset="1" style="stop-color:#212121"/>
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="5.48052" y1="-4113.20801" x2="34.95552" y2="-4113.20801" gradientTransform="matrix(6.123234e-17 1 -1 6.123234e-17 -4095.20801 -2.21801)">
+		<stop  offset="0" style="stop-color:#232223"/>
+		<stop  offset="1" style="stop-color:#1F1E1F"/>
 	</linearGradient>
-	<circle fill="url(#SVGID_2_)" cx="17.99998" cy="17.99995" r="15.9465"/>
-	<circle opacity="0.69" fill="#1A1A1A" enable-background="new    " cx="17.99998" cy="17.99995" r="14.87825"/>
+	<ellipse fill="url(#SVGID_2_)" cx="18.00001" cy="18.00001" rx="14.75164" ry="14.7375"/>
+	<path opacity="0.5" d="M17.99712,18.00001l12.76554,7.37727c1.29365-2.24281,1.97484-4.7875,1.97484-7.37727
+		s-0.6812-5.13447-1.97484-7.37727L17.99712,18.00001z"/>
+	<path opacity="0.5" d="M17.99714,18.00001L5.23159,10.62274c-1.29365,2.24281-1.97484,4.7875-1.97484,7.37727
+		c0,2.58977,0.6812,5.13447,1.97484,7.37727L17.99714,18.00001z"/>
+	<path opacity="0.1" fill="#FFFFFF" d="M17.99705,17.99621l3.81368,14.23284c1.24382-0.33328,2.4386-0.82817,3.55378-1.47202
+		c1.11518-0.64385,2.14116-1.43111,3.0517-2.34165L17.99705,17.99621z"/>
+	<path opacity="0.1" fill="#FFFFFF" d="M17.99712,17.9963L14.17695,3.72551c-1.24594,0.33417-2.44276,0.83038-3.55984,1.47595
+		s-2.14481,1.43493-3.0569,2.3479L17.99712,17.9963z"/>
 </g>
 </svg>

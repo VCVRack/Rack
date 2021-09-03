@@ -7,17 +7,28 @@
 <sodipodi:namedview  bordercolor="#666666" borderopacity="1.0" fit-margin-bottom="0" fit-margin-left="0" fit-margin-right="0" fit-margin-top="0" id="base" inkscape:current-layer="layer1" inkscape:cx="-18.065819" inkscape:cy="35.516889" inkscape:document-units="mm" inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:window-height="1422" inkscape:window-maximized="0" inkscape:window-width="2560" inkscape:window-x="0" inkscape:window-y="18" inkscape:zoom="2.8" pagecolor="#ffffff" showgrid="false">
 	</sodipodi:namedview>
 <g>
-	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="26.92966" y1="-0.01113" x2="26.92966" y2="53.84817">
-		<stop  offset="0" style="stop-color:#FFFBFD"/>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="26.92961" y1="0.01122" x2="26.92961" y2="53.84822">
+		<stop  offset="0" style="stop-color:#B0ACAE"/>
 		<stop  offset="1" style="stop-color:#000000"/>
 	</linearGradient>
-	<circle fill="url(#SVGID_1_)" cx="26.92966" cy="26.91852" r="26.92965"/>
+	<circle fill="url(#SVGID_1_)" cx="26.92961" cy="26.92972" r="26.9185"/>
+	<path fill="#FFFFFF" d="M26.92519,26.92403l-6.96537-25.9951c-2.27174,0.60871-4.45391,1.51259-6.49069,2.68853
+		S9.55848,6.23127,7.89545,7.89429L26.92519,26.92403z"/>
+	<path opacity="0.25" fill="#FFFFFF" d="M26.92967,26.92968l6.27582,23.39918c2.04684-0.54792,4.01299-1.36154,5.84813-2.42005
+		s3.52351-2.35279,5.0219-3.84974L26.92967,26.92968z"/>
 	
-		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="616.84369" y1="-3734.79858" x2="665.80438" y2="-3734.79858" gradientTransform="matrix(0 1 -1 0 -3707.8689 -614.40546)">
-		<stop  offset="0" style="stop-color:#A19EA1"/>
-		<stop  offset="1" style="stop-color:#212121"/>
+		<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="5.89048" y1="-4104.1377" x2="52.40498" y2="-4104.1377" gradientTransform="matrix(6.123234e-17 1 -1 6.123234e-17 -4077.20801 -2.21801)">
+		<stop  offset="0" style="stop-color:#232223"/>
+		<stop  offset="1" style="stop-color:#1F1E1F"/>
 	</linearGradient>
-	<circle fill="url(#SVGID_2_)" cx="26.92966" cy="26.91855" r="24.48037"/>
-	<circle opacity="0.69" fill="#1A1A1A" enable-background="new    " cx="26.92966" cy="26.91855" r="23.31788"/>
+	<ellipse fill="url(#SVGID_2_)" cx="26.92961" cy="26.92972" rx="23.30194" ry="23.25725"/>
+	<path opacity="0.5" d="M26.92505,26.92972L47.08972,38.5718c2.04346-3.53938,3.1195-7.55516,3.1195-11.64208
+		s-1.07603-8.1027-3.1195-11.64208L26.92505,26.92972z"/>
+	<path opacity="0.5" d="M26.92508,26.92972L6.76041,15.28764c-2.04347,3.53937-3.1195,7.55516-3.1195,11.64208
+		s1.07603,8.1027,3.1195,11.64208L26.92508,26.92972z"/>
+	<path opacity="0.1" fill="#FFFFFF" d="M26.92494,26.92371l6.02415,22.46084c1.96476-0.52595,3.85206-1.30694,5.61361-2.323
+		c1.76155-1.01606,3.38221-2.25844,4.82052-3.69537L26.92494,26.92371z"/>
+	<path opacity="0.1" fill="#FFFFFF" d="M26.92505,26.92385L20.89064,4.40313c-1.96811,0.52735-3.85862,1.31043-5.62318,2.32919
+		s-3.38797,2.26446-4.82873,3.70522L26.92505,26.92385z"/>
 </g>
 </svg>
