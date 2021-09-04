@@ -73,9 +73,16 @@ Scene::Scene() {
 	addChild(internal->resizeHandle);
 }
 
+
 Scene::~Scene() {
 	delete internal;
 }
+
+
+math::Vec Scene::getMousePos() {
+	return mousePos;
+}
+
 
 void Scene::step() {
 	if (APP->window->isFullScreen()) {
@@ -107,9 +114,11 @@ void Scene::step() {
 	Widget::step();
 }
 
+
 void Scene::draw(const DrawArgs& args) {
 	Widget::draw(args);
 }
+
 
 void Scene::onHover(const HoverEvent& e) {
 	mousePos = e.pos;
@@ -119,10 +128,12 @@ void Scene::onHover(const HoverEvent& e) {
 	OpaqueWidget::onHover(e);
 }
 
+
 void Scene::onDragHover(const DragHoverEvent& e) {
 	mousePos = e.pos;
 	OpaqueWidget::onDragHover(e);
 }
+
 
 void Scene::onHoverKey(const HoverKeyEvent& e) {
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
@@ -297,6 +308,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 		return;
 	OpaqueWidget::onHoverKey(e);
 }
+
 
 void Scene::onPathDrop(const PathDropEvent& e) {
 	if (e.paths.size() >= 1) {

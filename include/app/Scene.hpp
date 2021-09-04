@@ -25,6 +25,7 @@ struct Scene : widget::OpaqueWidget {
 
 	Scene();
 	~Scene();
+	math::Vec getMousePos();
 	void step() override;
 	void draw(const DrawArgs& args) override;
 	void onHover(const HoverEvent& e) override;
