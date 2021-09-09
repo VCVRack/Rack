@@ -90,13 +90,13 @@ static void initUserDir() {
 	wchar_t documentsBufW[MAX_PATH] = L".";
 	HRESULT result = SHGetFolderPathW(NULL, CSIDL_MYDOCUMENTS, NULL, SHGFP_TYPE_CURRENT, documentsBufW);
 	assert(result == S_OK);
-	userDir = system::join(string::UTF16toUTF8(documentsBufW), "Rack");
+	userDir = system::join(string::UTF16toUTF8(documentsBufW), "Rack" + APP_VERSION_MAJOR);
 #endif
 #if defined ARCH_MAC
 	// Get home directory
 	struct passwd* pw = getpwuid(getuid());
 	assert(pw);
-	userDir = system::join(pw->pw_dir, "Documents/Rack");
+	userDir = system::join(pw->pw_dir, "Documents", "Rack" + APP_VERSION_MAJOR);
 #endif
 #if defined ARCH_LIN
 	// Get home directory
@@ -106,7 +106,7 @@ static void initUserDir() {
 		assert(pw);
 		homeBuf = pw->pw_dir;
 	}
-	userDir = system::join(homeBuf, ".Rack");
+	userDir = system::join(homeBuf, ".Rack" + APP_VERSION_MAJOR);
 #endif
 }
 

@@ -218,12 +218,7 @@ void init() {
 	// Load Core
 	loadPlugin("");
 
-	if (settings::devMode) {
-		pluginsPath = asset::user("plugins");
-	}
-	else {
-		pluginsPath = asset::user("plugins-v" + APP_VERSION_MAJOR);
-	}
+	pluginsPath = asset::user("plugins");
 
 	// Get user plugins directory
 	system::createDirectory(pluginsPath);

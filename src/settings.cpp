@@ -78,12 +78,7 @@ ModuleInfo* getModuleInfo(const std::string& pluginSlug, const std::string& modu
 
 
 void init() {
-	if (devMode) {
-		settingsPath = asset::user("settings.json");
-	}
-	else {
-		settingsPath = asset::user("settings-v" + APP_VERSION_MAJOR + ".json");
-	}
+	settingsPath = asset::user("settings.json");
 }
 
 

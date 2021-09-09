@@ -22,14 +22,8 @@ static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 
 
 PatchManager::PatchManager() {
-	if (settings::devMode) {
-		autosavePath = asset::user("autosave");
-		templatePath = asset::user("template.vcv");
-	}
-	else {
-		autosavePath = asset::user("autosave-v" + APP_VERSION_MAJOR);
-		templatePath = asset::user("template-v" + APP_VERSION_MAJOR + ".vcv");
-	}
+	autosavePath = asset::user("autosave");
+	templatePath = asset::user("template.vcv");
 	factoryTemplatePath = asset::system("template.vcv");
 }
 

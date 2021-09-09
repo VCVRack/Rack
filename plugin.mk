@@ -30,19 +30,19 @@ ifdef ARCH_LIN
 	LDFLAGS += -Wl,-rpath=.
 	# Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
 	LDFLAGS += -static-libstdc++
-	RACK_USER_DIR ?= $(HOME)/.Rack
+	RACK_USER_DIR ?= $(HOME)/.Rack2
 endif
 
 ifdef ARCH_MAC
 	TARGET := plugin.dylib
 	LDFLAGS += -undefined dynamic_lookup
-	RACK_USER_DIR ?= $(HOME)/Documents/Rack
+	RACK_USER_DIR ?= $(HOME)/Documents/Rack2
 endif
 
 ifdef ARCH_WIN
 	TARGET := plugin.dll
 	LDFLAGS += -static-libstdc++
-	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack
+	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack2
 endif
 
 
@@ -82,8 +82,8 @@ endif
 	cd dist && tar -c $(SLUG) | zstd -$(ZSTD_COMPRESSION_LEVEL) -o "$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin
 
 install: dist
-	mkdir -p "$(RACK_USER_DIR)"/plugins-v2/
-	cp dist/*.vcvplugin "$(RACK_USER_DIR)"/plugins-v2/
+	mkdir -p "$(RACK_USER_DIR)"/plugins/
+	cp dist/*.vcvplugin "$(RACK_USER_DIR)"/plugins/
 
 .PHONY: clean dist
 .DEFAULT_GOAL := all
