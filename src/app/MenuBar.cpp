@@ -487,7 +487,7 @@ struct EngineButton : MenuButton {
 
 static bool isLoggingIn = false;
 
-struct AccountPasswordField : ui::TextField {
+struct AccountPasswordField : ui::PasswordField {
 	ui::MenuItem* logInItem;
 	void onAction(const ActionEvent& e) override {
 		logInItem->doAction();
