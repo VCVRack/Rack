@@ -30,6 +30,11 @@ void init() {
 }
 
 
+Xoroshiro128Plus& get() {
+	return rng;
+}
+
+
 float normal() {
 	// Box-Muller transform
 	float radius = std::sqrt(-2.f * std::log(1.f - uniform()));

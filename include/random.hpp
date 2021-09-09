@@ -88,24 +88,26 @@ struct Xoroshiro128Plus {
 
 // Easy random API
 
-extern thread_local Xoroshiro128Plus rng;
-
-
 /** Initializes the thread-local RNG state.
 Must call when creating a thread, otherwise random state is undefined (might always return 0).
 */
 void init();
+
+/** Returns the thread-local generator.
+*/
+Xoroshiro128Plus& get();
+
 /** Returns a uniform random uint64_t from 0 to UINT64_MAX */
 inline uint64_t u64() {
-	return rng.u64();
+	return get().u64();
 }
 /** Returns a uniform random uint32_t from 0 to UINT32_MAX */
 inline uint32_t u32() {
-	return rng.u32();
+	return get().u32();
 }
 /** Returns a uniform random float in the interval [0.0, 1.0) */
 inline float uniform() {
-	return rng.f32();
+	return get().f32();
 }
 /** Returns a normal random number with mean 0 and standard deviation 1 */
 float normal();
