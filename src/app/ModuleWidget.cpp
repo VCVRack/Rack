@@ -848,7 +848,9 @@ static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget
 	bool hasPresets = false;
 	// Note: This is not cached, so opening this menu each time might have a bit of latency.
 	if (system::isDirectory(presetDir)) {
-		for (std::string path : system::getEntries(presetDir)) {
+		std::vector<std::string> entries = system::getEntries(presetDir);
+		std::sort(entries.begin(), entries.end());
+		for (std::string path : entries) {
 			std::string name = system::getStem(path);
 			// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
 			std::regex r("^\\d*_");
