@@ -757,7 +757,7 @@ struct HelpButton : MenuButton {
 			APP->scene->addChild(tipWindowCreate());
 		}));
 
-		menu->addChild(createMenuItem("Manual", "F1", [=]() {
+		menu->addChild(createMenuItem("User manual", "F1", [=]() {
 			system::openBrowser("https://vcvrack.com/manual/");
 		}));
 

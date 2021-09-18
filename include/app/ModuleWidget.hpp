@@ -79,9 +79,10 @@ struct ModuleWidget : widget::OpaqueWidget {
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
-	void pasteJsonAction(json_t* rootJ);
+	/** Returns whether paste was successful. */
+	bool pasteJsonAction(json_t* rootJ);
 	void copyClipboard();
-	void pasteClipboardAction();
+	bool pasteClipboardAction();
 	void load(std::string filename);
 	void loadAction(std::string filename);
 	void loadTemplate();

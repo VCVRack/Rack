@@ -312,8 +312,9 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			pasteClipboardAction();
-			e.consume(this);
+			if (pasteClipboardAction()) {
+				e.consume(this);
+			}
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			cloneAction();
@@ -342,7 +343,9 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			return;
 		}
 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			system::openBrowser(model->getManualUrl());
+			std::string manualUrl = model->getManualUrl();
+			if (!manualUrl.empty())
+				system::openBrowser(manualUrl);
 			e.consume(this);
 		}
 	}
@@ -468,7 +471,7 @@ void ModuleWidget::fromJson(json_t* moduleJ) {
 	APP->engine->moduleFromJson(module, moduleJ);
 }
 
-void ModuleWidget::pasteJsonAction(json_t* moduleJ) {
+bool ModuleWidget::pasteJsonAction(json_t* moduleJ) {
 	engine::Module::jsonStripIds(moduleJ);
 
 	json_t* oldModuleJ = toJson();
@@ -479,7 +482,7 @@ void ModuleWidget::pasteJsonAction(json_t* moduleJ) {
 	catch (Exception& e) {
 		WARN("%s", e.what());
 		json_decref(oldModuleJ);
-		return;
+		return false;
 	}
 
 	// history::ModuleChange
@@ -489,6 +492,7 @@ void ModuleWidget::pasteJsonAction(json_t* moduleJ) {
 	h->oldModuleJ = oldModuleJ;
 	h->newModuleJ = moduleJ;
 	APP->history->push(h);
+	return true;
 }
 
 void ModuleWidget::copyClipboard() {
@@ -501,22 +505,22 @@ void ModuleWidget::copyClipboard() {
 	glfwSetClipboardString(APP->window->win, json);
 }
 
-void ModuleWidget::pasteClipboardAction() {
+bool ModuleWidget::pasteClipboardAction() {
 	const char* json = glfwGetClipboardString(APP->window->win);
 	if (!json) {
 		WARN("Could not get text from clipboard.");
-		return;
+		return false;
 	}
 
 	json_error_t error;
 	json_t* moduleJ = json_loads(json, 0, &error);
 	if (!moduleJ) {
 		WARN("JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
-		return;
+		return false;
 	}
 	DEFER({json_decref(moduleJ);});
 
-	pasteJsonAction(moduleJ);
+	return pasteJsonAction(moduleJ);
 }
 
 void ModuleWidget::load(std::string filename) {
@@ -758,6 +762,9 @@ void ModuleWidget::cloneAction() {
 
 	// JSON serialization is the obvious way to do this
 	json_t* moduleJ = toJson();
+	DEFER({
+		json_decref(moduleJ);
+	});
 	engine::Module::jsonStripIds(moduleJ);
 
 	// Clone Module
@@ -769,7 +776,6 @@ void ModuleWidget::cloneAction() {
 	catch (Exception& e) {
 		WARN("%s", e.what());
 	}
-	json_decref(moduleJ);
 	APP->engine->addModule(clonedModule);
 
 	// Clone ModuleWidget

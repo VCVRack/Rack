@@ -454,7 +454,7 @@ static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 		size_t cableIndex;
 		json_t* cableJ;
 		json_array_foreach(cablesJ, cableIndex, cableJ) {
-			json_object_del(cableJ, "id");
+			engine::Cable::jsonStripIds(cableJ);
 
 			// Remap old module IDs to new IDs
 			json_t* inputModuleIdJ = json_object_get(cableJ, "inputModuleId");
@@ -599,6 +599,9 @@ void RackWidget::removeModule(ModuleWidget* m) {
 
 	// Disconnect cables
 	m->disconnect();
+
+	// Deselect module if selected
+	internal->selectedModules.erase(m);
 
 	// Remove module from ModuleContainer
 	internal->moduleContainer->removeChild(m);
@@ -1105,7 +1108,9 @@ void RackWidget::deleteSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
 	complexAction->name = "remove modules";
 
-	for (ModuleWidget* mw : getSelected()) {
+	// Copy selected set since removing ModuleWidgets modifies it.
+	std::set<ModuleWidget*> selectedModules = getSelected();
+	for (ModuleWidget* mw : selectedModules) {
 		mw->appendDisconnectActions(complexAction);
 
 		// history::ModuleRemove

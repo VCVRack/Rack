@@ -136,6 +136,7 @@ void Scene::onDragHover(const DragHoverEvent& e) {
 
 
 void Scene::onHoverKey(const HoverKeyEvent& e) {
+	// Key commands that override children
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
 		// DEBUG("key '%d '%c' scancode %d '%c' keyName '%s'", e.key, e.key, e.scancode, e.scancode, e.keyName.c_str());
 		if (e.keyName == "n" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -193,10 +194,6 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			settings::zoom = 0.f;
 			e.consume(this);
 		}
-		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && (e.mods & RACK_MOD_MASK) == 0) {
-			browser->show();
-			e.consume(this);
-		}
 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {
 			system::openBrowser("https://vcvrack.com/manual/");
 			e.consume(this);
@@ -210,13 +207,6 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			// The MenuBar will be hidden when the mouse moves over the RackScrollWidget.
 			// menuBar->hide();
 			e.consume(this);
-		}
-		// Alternate key command for exiting fullscreen, since F11 doesn't work reliably on Mac due to "Show desktop" OS binding.
-		if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
-			if (APP->window->isFullScreen()) {
-				APP->window->setFullScreen(false);
-				e.consume(this);
-			}
 		}
 
 		// Module selections
@@ -233,10 +223,6 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 				rack->copyClipboardSelection();
 				e.consume(this);
 			}
-		}
-		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			rack->pasteClipboardAction();
-			e.consume(this);
 		}
 		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			if (rack->hasSelection()) {
@@ -307,6 +293,27 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 	if (e.isConsumed())
 		return;
 	OpaqueWidget::onHoverKey(e);
+	if (e.isConsumed())
+		return;
+
+	// Key commands that can be overridden by children
+	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
+		// Alternate key command for exiting fullscreen, since F11 doesn't work reliably on Mac due to "Show desktop" OS binding.
+		if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
+			if (APP->window->isFullScreen()) {
+				APP->window->setFullScreen(false);
+				e.consume(this);
+			}
+		}
+		if (e.keyName == "v" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+			rack->pasteClipboardAction();
+			e.consume(this);
+		}
+		if ((e.key == GLFW_KEY_ENTER || e.key == GLFW_KEY_KP_ENTER) && (e.mods & RACK_MOD_MASK) == 0) {
+			browser->show();
+			e.consume(this);
+		}
+	}
 }
 
 

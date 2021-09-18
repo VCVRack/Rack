@@ -60,5 +60,10 @@ void Cable::fromJson(json_t* rootJ) {
 }
 
 
+void Cable::jsonStripIds(json_t* rootJ) {
+	json_object_del(rootJ, "id");
+}
+
+
 } // namespace engine
 } // namespace rack
