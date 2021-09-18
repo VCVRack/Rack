@@ -57,18 +57,18 @@ struct Widget : WeakBase {
 	*/
 	virtual math::Rect getChildrenBoundingBox();
 	virtual math::Rect getVisibleChildrenBoundingBox();
-	/**  Returns `v` (given in local coordinates) transformed into the coordinate system of `relative`.
+	/**  Returns `v` (given in local coordinates) transformed into the coordinate system of `ancestor`.
 	*/
-	virtual math::Vec getRelativeOffset(math::Vec v, Widget* relative);
+	virtual math::Vec getRelativeOffset(math::Vec v, Widget* ancestor);
 	/** Returns `v` transformed into world/root/global/absolute coordinates.
 	*/
 	math::Vec getAbsoluteOffset(math::Vec v) {
 		return getRelativeOffset(v, NULL);
 	}
-	/** Returns the zoom level in the coordinate system of `relative`.
+	/** Returns the zoom level in the coordinate system of `ancestor`.
 	Only `ZoomWidget` should override this to return value other than 1.
 	*/
-	virtual float getRelativeZoom(Widget* relative);
+	virtual float getRelativeZoom(Widget* ancestor);
 	float getAbsoluteZoom() {
 		return getRelativeZoom(NULL);
 	}

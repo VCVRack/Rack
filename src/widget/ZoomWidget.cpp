@@ -5,15 +5,15 @@ namespace rack {
 namespace widget {
 
 
-math::Vec ZoomWidget::getRelativeOffset(math::Vec v, Widget* relative) {
+math::Vec ZoomWidget::getRelativeOffset(math::Vec v, Widget* ancestor) {
 	// Transform `v` (which is in child coordinates) to local coordinates.
 	v = v.mult(zoom);
-	return Widget::getRelativeOffset(v, relative);
+	return Widget::getRelativeOffset(v, ancestor);
 }
 
 
-float ZoomWidget::getRelativeZoom(Widget* relative) {
-	return zoom * Widget::getRelativeZoom(relative);
+float ZoomWidget::getRelativeZoom(Widget* ancestor) {
+	return zoom * Widget::getRelativeZoom(ancestor);
 }
 
 

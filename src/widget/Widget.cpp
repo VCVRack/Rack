@@ -112,23 +112,23 @@ math::Rect Widget::getVisibleChildrenBoundingBox() {
 }
 
 
-math::Vec Widget::getRelativeOffset(math::Vec v, Widget* relative) {
-	if (this == relative)
+math::Vec Widget::getRelativeOffset(math::Vec v, Widget* ancestor) {
+	if (this == ancestor)
 		return v;
 	// Translate offset
 	v = v.plus(box.pos);
 	if (!parent)
 		return v;
-	return parent->getRelativeOffset(v, relative);
+	return parent->getRelativeOffset(v, ancestor);
 }
 
 
-float Widget::getRelativeZoom(Widget* relative) {
-	if (this == relative)
+float Widget::getRelativeZoom(Widget* ancestor) {
+	if (this == ancestor)
 		return 1.f;
 	if (!parent)
 		return 1.f;
-	return parent->getRelativeZoom(relative);
+	return parent->getRelativeZoom(ancestor);
 }
 
 

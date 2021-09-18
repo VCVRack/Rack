@@ -10,8 +10,8 @@ namespace widget {
 struct ZoomWidget : Widget {
 	float zoom = 1.f;
 
-	math::Vec getRelativeOffset(math::Vec v, Widget* relative) override;
-	float getRelativeZoom(Widget* relative) override;
+	math::Vec getRelativeOffset(math::Vec v, Widget* ancestor) override;
+	float getRelativeZoom(Widget* ancestor) override;
 	math::Rect getViewport(math::Rect r) override;
 	void setZoom(float zoom);
 	float getZoom() {
