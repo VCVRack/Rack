@@ -859,7 +859,7 @@ static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget
 		for (std::string path : entries) {
 			std::string name = system::getStem(path);
 			// Remove "1_", "42_", "001_", etc at the beginning of preset filenames
-			std::regex r("^\\d*_");
+			std::regex r("^\\d+_");
 			name = std::regex_replace(name, r, "");
 
 			if (system::isDirectory(path)) {
