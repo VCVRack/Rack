@@ -73,11 +73,7 @@ else
 	$(STRIP) -s dist/$(SLUG)/$(TARGET)
 endif
 	@# Copy distributables
-ifdef ARCH_MAC
-	rsync -rR $(DISTRIBUTABLES) dist/$(SLUG)/
-else
-	cp -r --parents $(DISTRIBUTABLES) dist/$(SLUG)/
-endif
+	rsync -vrR --ignore-missing-args $(DISTRIBUTABLES) dist/$(SLUG)/
 	@# Create ZIP package
 	cd dist && tar -c $(SLUG) | zstd -$(ZSTD_COMPRESSION_LEVEL) -o "$(SLUG)"-"$(VERSION)"-$(ARCH).vcvplugin
 
