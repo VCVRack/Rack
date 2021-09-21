@@ -29,18 +29,22 @@ struct RtAudioDevice : audio::Device {
 	float sampleRate = 0;
 
 	RtAudioDevice(RtAudio::Api api, int deviceId) {
-		rtAudio = new RtAudio(api);
-		rtAudio->showWarnings(false);
-		if (!rtAudio) {
-			throw Exception("Failed to create RtAudio driver %d", api);
+		// Create RtAudio object
+		try {
+			rtAudio = new RtAudio(api);
 		}
+		catch (RtAudioError& e) {
+			throw Exception("Failed to create RtAudio driver %d: %s", api, e.what());
+		}
+
 		rtAudio->showWarnings(false);
 
+		// Query device ID
 		try {
 			deviceInfo = rtAudio->getDeviceInfo(deviceId);
 		}
 		catch (RtAudioError& e) {
-			throw Exception("Failed to query RtAudio device: %s", e.what());
+			throw Exception("Failed to query RtAudio device %d: %s", deviceId, e.what());
 		}
 
 		this->deviceId = deviceId;
@@ -208,7 +212,13 @@ struct RtAudioDriver : audio::Driver {
 	std::map<int, RtAudioDevice*> devices;
 
 	RtAudioDriver(RtAudio::Api api) {
-		rtAudio = new RtAudio(api);
+		try {
+			rtAudio = new RtAudio(api);
+		}
+		catch (RtAudioError& e) {
+			throw Exception("Failed to create RtAudio driver %d: %s", api, e.what());
+		}
+
 		rtAudio->showWarnings(false);
 	}
 
