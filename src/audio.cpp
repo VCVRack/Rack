@@ -288,7 +288,7 @@ int Port::getNumInputs() {
 	if (!device)
 		return 0;
 	try {
-		return std::min(device->getNumInputs() - inputOffset, maxInputs);
+		return std::min(std::max(device->getNumInputs() - inputOffset, 0), maxInputs);
 	}
 	catch (Exception& e) {
 		WARN("Audio port could not get device number of inputs: %s", e.what());
@@ -300,7 +300,7 @@ int Port::getNumOutputs() {
 	if (!device)
 		return 0;
 	try {
-		return std::min(device->getNumOutputs() - outputOffset, maxOutputs);
+		return std::min(std::max(device->getNumOutputs() - outputOffset, 0), maxOutputs);
 	}
 	catch (Exception& e) {
 		WARN("Audio port could not get device number of outputs: %s", e.what());

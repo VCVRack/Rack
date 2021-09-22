@@ -173,6 +173,7 @@ struct Port {
 	int getBlockSize();
 	void setBlockSize(int blockSize);
 
+	/** Returns the number of active Port inputs, considering inputOffset and maxInputs. */
 	int getNumInputs();
 	int getNumOutputs();
 
