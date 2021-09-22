@@ -156,10 +156,11 @@ libarchive-3.4.3:
 	rm libarchive-3.4.3.tar.gz
 
 $(libarchive): | $(zstd) libarchive-3.4.3
-	cd libarchive-3.4.3 && $(CONFIGURE) --enable-shared=no --enable-static=yes --disable-bsdtar --disable-bsdcat --disable-bsdcpio --disable-posix-regex-lib --disable-xattr --disable-acl --without-zlib --without-bz2lib  --without-libb2 --without-iconv --without-lz4 --without-lzma --without-cng --without-openssl --without-xml2 --without-expat
-# 	cd libarchive-3.4.3 && $(CMAKE) -DENABLE_ACL:BOOL=OFF -DENABLE_BZip2:BOOL=OFF -DENABLE_CAT:BOOL=OFF -DENABLE_CNG:BOOL=OFF -DENABLE_COVERAGE:BOOL=OFF -DENABLE_CPIO:BOOL=OFF -DENABLE_EXPAT:BOOL=OFF -DENABLE_ICONV:BOOL=OFF -DENABLE_LIBB2:BOOL=OFF -DENABLE_LIBXML2:BOOL=OFF -DENABLE_LZ4:BOOL=OFF -DENABLE_LZMA:BOOL=OFF -DENABLE_LZO:BOOL=OFF -DENABLE_MBEDTLS:BOOL=OFF -DENABLE_NETTLE:BOOL=OFF -DENABLE_OPENSSL:BOOL=OFF -DENABLE_TAR:BOOL=OFF -DENABLE_TEST:BOOL=OFF -DENABLE_WERROR:BOOL=OFF -DENABLE_XATTR:BOOL=OFF -DENABLE_ZLIB:BOOL=OFF -DENABLE_ZSTD:BOOL=ON -DZSTD_INCLUDE_DIR:PATH=$(DEP_PATH)/include .
-	$(MAKE) -C libarchive-3.4.3
-	$(MAKE) -C libarchive-3.4.3 install
+	#cd libarchive-3.4.3 && $(CONFIGURE) --enable-shared=no --enable-static=yes --disable-bsdtar --disable-bsdcat --disable-bsdcpio --disable-posix-regex-lib --disable-xattr --disable-acl --without-zlib --without-bz2lib  --without-libb2 --without-iconv --without-lz4 --without-lzma --without-cng --without-openssl --without-xml2 --without-expat
+	cd libarchive-3.4.3 && mkdir -p build
+	cd libarchive-3.4.3/build && $(CMAKE) -DENABLE_ACL:BOOL=OFF -DENABLE_BZip2:BOOL=OFF -DENABLE_CAT:BOOL=OFF -DENABLE_CNG:BOOL=OFF -DENABLE_COVERAGE:BOOL=OFF -DENABLE_CPIO:BOOL=OFF -DENABLE_EXPAT:BOOL=OFF -DENABLE_ICONV:BOOL=OFF -DENABLE_LIBB2:BOOL=OFF -DENABLE_LIBXML2:BOOL=OFF -DENABLE_LZ4:BOOL=OFF -DENABLE_LZMA:BOOL=OFF -DENABLE_LZO:BOOL=OFF -DENABLE_MBEDTLS:BOOL=OFF -DENABLE_NETTLE:BOOL=OFF -DENABLE_OPENSSL:BOOL=OFF -DENABLE_TAR:BOOL=OFF -DENABLE_TEST:BOOL=OFF -DENABLE_WERROR:BOOL=OFF -DENABLE_XATTR:BOOL=OFF -DENABLE_ZLIB:BOOL=OFF -DENABLE_ZSTD:BOOL=ON -DZSTD_INCLUDE_DIR:PATH=$(DEP_PATH)/include -DBUILD_TESTING:BOOL=OFF ..
+	$(MAKE) -C libarchive-3.4.3/build
+	$(MAKE) -C libarchive-3.4.3/build install
 
 speexdsp-SpeexDSP-1.2rc3:
 	$(WGET) "https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz"
