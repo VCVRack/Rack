@@ -18,9 +18,24 @@
 namespace rack {
 
 
+static const std::map<RtAudio::Api, std::string> RTAUDIO_API_NAMES = {
+	{RtAudio::LINUX_ALSA, "ALSA"},
+	{RtAudio::UNIX_JACK, "JACK"},
+	{RtAudio::LINUX_PULSE, "PulseAudio"},
+	{RtAudio::LINUX_OSS, "OSS"},
+	{RtAudio::WINDOWS_WASAPI, "WASAPI"},
+	{RtAudio::WINDOWS_ASIO, "ASIO"},
+	{RtAudio::WINDOWS_DS, "DirectSound"},
+	{RtAudio::MACOSX_CORE, "CoreAudio"},
+	{RtAudio::RTAUDIO_DUMMY, "Dummy"},
+	{RtAudio::UNSPECIFIED, "Unspecified"},
+};
+
+
 struct RtAudioDevice : audio::Device {
-	RtAudio* rtAudio;
+	RtAudio::Api api;
 	int deviceId;
+	RtAudio* rtAudio;
 	RtAudio::DeviceInfo deviceInfo;
 	RtAudio::StreamParameters inputParameters;
 	RtAudio::StreamParameters outputParameters;
@@ -29,12 +44,16 @@ struct RtAudioDevice : audio::Device {
 	float sampleRate = 0;
 
 	RtAudioDevice(RtAudio::Api api, int deviceId) {
+		this->api = api;
+		this->deviceId = deviceId;
+
 		// Create RtAudio object
+		INFO("Creating RtAudio %s context", RTAUDIO_API_NAMES.at(api).c_str());
 		try {
 			rtAudio = new RtAudio(api);
 		}
 		catch (RtAudioError& e) {
-			throw Exception("Failed to create RtAudio driver %d: %s", api, e.what());
+			throw Exception("Failed to create RtAudio %s context: %s", RTAUDIO_API_NAMES.at(api).c_str(), e.what());
 		}
 
 		rtAudio->showWarnings(false);
@@ -44,10 +63,9 @@ struct RtAudioDevice : audio::Device {
 			deviceInfo = rtAudio->getDeviceInfo(deviceId);
 		}
 		catch (RtAudioError& e) {
-			throw Exception("Failed to query RtAudio device %d: %s", deviceId, e.what());
+			throw Exception("Failed to query RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
 		}
 
-		this->deviceId = deviceId;
 		openStream();
 	}
 
@@ -57,7 +75,7 @@ struct RtAudioDevice : audio::Device {
 			delete rtAudio;
 		}
 		catch (Exception& e) {
-			WARN("Failed to destroy RtAudioDevice: %s", e.what());
+			WARN("Failed to destroy RtAudio %s context: %s", RTAUDIO_API_NAMES.at(api).c_str(), e.what());
 			// Ignore exceptions
 		}
 	}
@@ -65,7 +83,7 @@ struct RtAudioDevice : audio::Device {
 	void openStream() {
 		// Open new device
 		if (deviceInfo.outputChannels == 0 && deviceInfo.inputChannels == 0) {
-			throw Exception("RtAudio device %d has 0 inputs and 0 outputs", deviceId);
+			throw Exception("RtAudio %s device %d has 0 inputs and 0 outputs", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		}
 
 		inputParameters = RtAudio::StreamParameters();
@@ -98,7 +116,7 @@ struct RtAudioDevice : audio::Device {
 			blockSize = 256;
 		}
 
-		INFO("Opening audio RtAudio device %d with %d in %d out, %g sample rate %d block size", deviceId, inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
+		INFO("Opening RtAudio %s device %d: %s (%d in, %d out, %g sample rate, %d block size)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
 		try {
 			rtAudio->openStream(
 			  outputParameters.nChannels > 0 ? &outputParameters : NULL,
@@ -107,43 +125,43 @@ struct RtAudioDevice : audio::Device {
 			  &rtAudioCallback, this, &options, NULL);
 		}
 		catch (RtAudioError& e) {
-			throw Exception("Failed to open RtAudio stream: %s", e.what());
+			throw Exception("Failed to open RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
 		}
 
-		INFO("Starting RtAudio stream %d", deviceId);
+		INFO("Starting RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		try {
 			rtAudio->startStream();
 		}
 		catch (RtAudioError& e) {
-			throw Exception("Failed to start RtAudio stream: %s", e.what());
+			throw Exception("Failed to start RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
 		}
 
 		// Update sample rate to actual value
 		sampleRate = rtAudio->getStreamSampleRate();
-		INFO("Opened RtAudio stream");
+		INFO("Opened RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		onStartStream();
 	}
 
 	void closeStream() {
+		INFO("Stopping RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		if (rtAudio->isStreamRunning()) {
-			INFO("Stopping RtAudio stream %d", deviceId);
 			try {
 				rtAudio->stopStream();
 			}
 			catch (RtAudioError& e) {
-				throw Exception("Failed to stop RtAudio stream %s", e.what());
+				throw Exception("Failed to stop RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
 			}
 		}
+		INFO("Closing RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		if (rtAudio->isStreamOpen()) {
-			INFO("Closing RtAudio stream %d", deviceId);
 			try {
 				rtAudio->closeStream();
 			}
 			catch (RtAudioError& e) {
-				throw Exception("Failed to close RtAudio stream %s", e.what());
+				throw Exception("Failed to close RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
 			}
 		}
-		INFO("Closed RtAudio stream");
+		INFO("Closed RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		onStopStream();
 	}
 
@@ -192,6 +210,9 @@ struct RtAudioDevice : audio::Device {
 	}
 
 	static int rtAudioCallback(void* outputBuffer, void* inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
+		// fprintf(stderr, ".");
+		// fflush(stderr);
+
 		RtAudioDevice* device = (RtAudioDevice*) userData;
 		assert(device);
 
@@ -206,73 +227,65 @@ struct RtAudioDevice : audio::Device {
 
 
 struct RtAudioDriver : audio::Driver {
-	// Just for querying device IDs names
-	RtAudio* rtAudio;
+	RtAudio::Api api;
 	// deviceId -> Device
 	std::map<int, RtAudioDevice*> devices;
+	std::vector<RtAudio::DeviceInfo> deviceInfos;
 
 	RtAudioDriver(RtAudio::Api api) {
+		this->api = api;
+
+		INFO("Creating RtAudio %s driver", RTAUDIO_API_NAMES.at(api).c_str());
+		RtAudio* rtAudio;
 		try {
 			rtAudio = new RtAudio(api);
 		}
 		catch (RtAudioError& e) {
-			throw Exception("Failed to create RtAudio driver %d: %s", api, e.what());
+			throw Exception("Failed to create RtAudio %s driver: %s", RTAUDIO_API_NAMES.at(api).c_str(), e.what());
 		}
 
 		rtAudio->showWarnings(false);
+
+		// Cache all DeviceInfos for performance and stability (especially for ASIO).
+		int count = rtAudio->getDeviceCount();
+		for (int deviceId = 0; deviceId < count; deviceId++) {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+			INFO("Found RtAudio %s device %d: %s (%d in, %d out)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
+			deviceInfos.push_back(deviceInfo);
+		}
 	}
 
 	~RtAudioDriver() {
 		assert(devices.empty());
-		delete rtAudio;
 	}
 
 	std::string getName() override {
-		static const std::map<RtAudio::Api, std::string> apiNames = {
-			{RtAudio::LINUX_ALSA, "ALSA"},
-			{RtAudio::UNIX_JACK, "JACK"},
-			{RtAudio::LINUX_PULSE, "PulseAudio"},
-			{RtAudio::LINUX_OSS, "OSS"},
-			{RtAudio::WINDOWS_WASAPI, "WASAPI"},
-			{RtAudio::WINDOWS_ASIO, "ASIO"},
-			{RtAudio::WINDOWS_DS, "DirectSound"},
-			{RtAudio::MACOSX_CORE, "CoreAudio"},
-			{RtAudio::RTAUDIO_DUMMY, "Dummy"},
-			{RtAudio::UNSPECIFIED, "Unspecified"},
-		};
-		return apiNames.at(rtAudio->getCurrentApi());
+		return RTAUDIO_API_NAMES.at(api);
 	}
 
 	std::vector<int> getDeviceIds() override {
-		int count = rtAudio->getDeviceCount();
 		std::vector<int> deviceIds;
-		for (int i = 0; i < count; i++)
+		for (int i = 0; i < (int) deviceInfos.size(); i++)
 			deviceIds.push_back(i);
 		return deviceIds;
 	}
 
 	std::string getDeviceName(int deviceId) override {
-		if (deviceId >= 0) {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
-			return deviceInfo.name;
-		}
-		return "";
+		if (!(0 <= deviceId && deviceId < (int) deviceInfos.size()))
+			return "";
+		return deviceInfos[deviceId].name;
 	}
 
 	int getDeviceNumInputs(int deviceId) override {
-		if (deviceId >= 0) {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
-			return deviceInfo.inputChannels;
-		}
-		return 0;
+		if (!(0 <= deviceId && deviceId < (int) deviceInfos.size()))
+			return 0;
+		return deviceInfos[deviceId].inputChannels;
 	}
 
 	int getDeviceNumOutputs(int deviceId) override {
-		if (deviceId >= 0) {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
-			return deviceInfo.outputChannels;
-		}
-		return 0;
+		if (!(0 <= deviceId && deviceId < (int) deviceInfos.size()))
+			return 0;
+		return deviceInfos[deviceId].outputChannels;
 	}
 
 	audio::Device* subscribe(int deviceId, audio::Port* port) override {
@@ -280,7 +293,7 @@ struct RtAudioDriver : audio::Driver {
 		auto it = devices.find(deviceId);
 		if (it == devices.end()) {
 			// Can throw Exception
-			device = new RtAudioDevice(rtAudio->getCurrentApi(), deviceId);
+			device = new RtAudioDevice(api, deviceId);
 			devices[deviceId] = device;
 		}
 		else {
