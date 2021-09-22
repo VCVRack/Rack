@@ -41,7 +41,7 @@ ifdef ARCH_WIN
 	openssl = lib/libssl.a
 	libcurl = lib/libcurl.a
 	zstd = lib/libzstd.a
-	libarchive = lib/libarchive.a
+	libarchive = lib/libarchive_static.a
 	libspeexdsp = lib/libspeexdsp.a
 	libsamplerate = lib/libsamplerate.a
 	rtmidi = lib/librtmidi.a
