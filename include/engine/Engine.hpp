@@ -30,18 +30,18 @@ struct Engine {
 	void clear();
 	INTERNAL void clear_NoLock();
 	/** Advances the engine by `frames` frames.
-	Only call this method from the primary module.
+	Only call this method from the master module.
 	Read-locks. Also locks so only one stepBlock() can be called simultaneously or recursively.
 	*/
 	void stepBlock(int frames);
 	/** Module does not need to belong to the Engine.
-	However, Engine will unset the primary module when it is removed from the Engine.
-	NULL will unset the primary module.
+	However, Engine will unset the master module when it is removed from the Engine.
+	NULL will unset the master module.
 	Write-locks.
 	*/
-	void setPrimaryModule(Module* module);
-	INTERNAL void setPrimaryModule_NoLock(Module* module);
-	Module* getPrimaryModule();
+	void setMasterModule(Module* module);
+	INTERNAL void setMasterModule_NoLock(Module* module);
+	Module* getMasterModule();
 
 	/** Returns the sample rate used by the engine for stepping each module.
 	*/
@@ -225,7 +225,7 @@ struct Engine {
 	*/
 	void fromJson(json_t* rootJ);
 
-	/** If no primary module is set, the fallback Engine thread will step blocks, using the CPU clock for timing.
+	/** If no master module is set, the fallback Engine thread will step blocks, using the CPU clock for timing.
 	*/
 	void startFallbackThread();
 };

@@ -235,7 +235,7 @@ struct Engine::Internal {
 	std::vector<Module*> modules;
 	std::vector<Cable*> cables;
 	std::set<ParamHandle*> paramHandles;
-	Module* primaryModule = NULL;
+	Module* masterModule = NULL;
 
 	// moduleId
 	std::map<int64_t, Module*> modulesCache;
@@ -631,41 +631,41 @@ void Engine::stepBlock(int frames) {
 }
 
 
-void Engine::setPrimaryModule(Module* module) {
-	if (module == internal->primaryModule)
+void Engine::setMasterModule(Module* module) {
+	if (module == internal->masterModule)
 		return;
 	WriteLock lock(internal->mutex);
-	setPrimaryModule_NoLock(module);
+	setMasterModule_NoLock(module);
 }
 
 
-void Engine::setPrimaryModule_NoLock(Module* module) {
-	if (module == internal->primaryModule)
+void Engine::setMasterModule_NoLock(Module* module) {
+	if (module == internal->masterModule)
 		return;
 
-	if (internal->primaryModule) {
-		// Dispatch UnsetPrimaryEvent
-		Module::UnsetPrimaryEvent e;
-		internal->primaryModule->onUnsetPrimary(e);
+	if (internal->masterModule) {
+		// Dispatch UnsetMasterEvent
+		Module::UnsetMasterEvent e;
+		internal->masterModule->onUnsetMaster(e);
 	}
 
-	internal->primaryModule = module;
+	internal->masterModule = module;
 
-	if (internal->primaryModule) {
-		// Dispatch SetPrimaryEvent
-		Module::SetPrimaryEvent e;
-		internal->primaryModule->onSetPrimary(e);
+	if (internal->masterModule) {
+		// Dispatch SetMasterEvent
+		Module::SetMasterEvent e;
+		internal->masterModule->onSetMaster(e);
 	}
 
-	// Wake up fallback thread if primary module was unset
-	if (!internal->primaryModule) {
+	// Wake up fallback thread if master module was unset
+	if (!internal->masterModule) {
 		internal->fallbackCv.notify_all();
 	}
 }
 
 
-Module* Engine::getPrimaryModule() {
-	return internal->primaryModule;
+Module* Engine::getMasterModule() {
+	return internal->masterModule;
 }
 
 
@@ -833,9 +833,9 @@ void Engine::removeModule_NoLock(Module* module) {
 		if (paramHandle->moduleId == module->id)
 			paramHandle->module = NULL;
 	}
-	// Unset primary module
-	if (getPrimaryModule() == module) {
-		setPrimaryModule_NoLock(NULL);
+	// Unset master module
+	if (getMasterModule() == module) {
+		setMasterModule_NoLock(NULL);
 	}
 	// If a param is being smoothed on this module, stop smoothing it immediately
 	if (module == internal->smoothModule) {
@@ -1225,9 +1225,9 @@ json_t* Engine::toJson() {
 	}
 	json_object_set_new(rootJ, "cables", cablesJ);
 
-	// primaryModule
-	if (internal->primaryModule) {
-		json_object_set_new(rootJ, "primaryModuleId", json_integer(internal->primaryModule->id));
+	// masterModule
+	if (internal->masterModule) {
+		json_object_set_new(rootJ, "masterModuleId", json_integer(internal->masterModule->id));
 	}
 
 	return rootJ;
@@ -1313,11 +1313,11 @@ void Engine::fromJson(json_t* rootJ) {
 		}
 	}
 
-	// primaryModule
-	json_t* primaryModuleIdJ = json_object_get(rootJ, "primaryModuleId");
-	if (primaryModuleIdJ) {
-		Module* primaryModule = getModule(json_integer_value(primaryModuleIdJ));
-		setPrimaryModule(primaryModule);
+	// masterModule
+	json_t* masterModuleIdJ = json_object_get(rootJ, "masterModuleId");
+	if (masterModuleIdJ) {
+		Module* masterModule = getModule(json_integer_value(masterModuleIdJ));
+		setMasterModule(masterModule);
 	}
 }
 
@@ -1344,7 +1344,7 @@ static void Engine_fallbackRun(Engine* that) {
 	contextSet(that->internal->context);
 
 	while (that->internal->fallbackRunning) {
-		if (!that->getPrimaryModule()) {
+		if (!that->getMasterModule()) {
 			// Step blocks and wait
 			double start = system::getTime();
 			int frames = std::floor(that->getSampleRate() / 60);
@@ -1357,10 +1357,10 @@ static void Engine_fallbackRun(Engine* that) {
 			}
 		}
 		else {
-			// Wait for primary module to be unset, or for the request to stop running
+			// Wait for master module to be unset, or for the request to stop running
 			std::unique_lock<std::mutex> lock(that->internal->fallbackMutex);
 			that->internal->fallbackCv.wait(lock, [&]() {
-				return !that->internal->fallbackRunning || !that->getPrimaryModule();
+				return !that->internal->fallbackRunning || !that->getMasterModule();
 			});
 		}
 	}

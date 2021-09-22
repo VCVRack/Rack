@@ -36,24 +36,24 @@ struct AudioInterfacePort : audio::Port {
 		outputSrc.setQuality(6);
 	}
 
-	void setPrimary() {
-		APP->engine->setPrimaryModule(module);
+	void setMaster() {
+		APP->engine->setMasterModule(module);
 	}
 
-	bool isPrimary() {
-		return APP->engine->getPrimaryModule() == module;
+	bool isMaster() {
+		return APP->engine->getMasterModule() == module;
 	}
 
 	void processInput(const float* input, int inputStride, int frames) override {
 		// DEBUG("%p: new device block ____________________________", this);
-		// Claim primary module if there is none
-		if (!APP->engine->getPrimaryModule()) {
-			setPrimary();
+		// Claim master module if there is none
+		if (!APP->engine->getMasterModule()) {
+			setMaster();
 		}
-		bool isPrimaryCached = isPrimary();
+		bool isMasterCached = isMaster();
 
 		// Set sample rate of engine if engine sample rate is "auto".
-		if (isPrimaryCached) {
+		if (isMasterCached) {
 			APP->engine->setSuggestedSampleRate(deviceSampleRate);
 		}
 
@@ -64,15 +64,15 @@ struct AudioInterfacePort : audio::Port {
 
 		// Consider engine buffers "too full" if they contain a bit more than the audio device's number of frames, converted to engine sample rate.
 		int maxEngineFrames = (int) std::ceil(frames * sampleRateRatio * 2.0) - 1;
-		// If the engine output buffer is too full, clear it to keep latency low. No need to clear if primary because it's always cleared below.
-		if (!isPrimaryCached && (int) engineOutputBuffer.size() > maxEngineFrames) {
+		// If the engine output buffer is too full, clear it to keep latency low. No need to clear if master because it's always cleared below.
+		if (!isMasterCached && (int) engineOutputBuffer.size() > maxEngineFrames) {
 			engineOutputBuffer.clear();
 			// DEBUG("%p: clearing engine output", this);
 		}
 
 		if (deviceNumInputs > 0) {
-			// Always clear engine output if primary
-			if (isPrimaryCached) {
+			// Always clear engine output if master
+			if (isMasterCached) {
 				engineOutputBuffer.clear();
 			}
 			// Set up sample rate converter
@@ -102,14 +102,14 @@ struct AudioInterfacePort : audio::Port {
 
 	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) override {
 		// Step engine
-		if (isPrimary() && requestedEngineFrames > 0) {
+		if (isMaster() && requestedEngineFrames > 0) {
 			// DEBUG("%p: %d block, stepping %d", this, frames, requestedEngineFrames);
 			APP->engine->stepBlock(requestedEngineFrames);
 		}
 	}
 
 	void processOutput(float* output, int outputStride, int frames) override {
-		// bool isPrimaryCached = isPrimary();
+		// bool isMasterCached = isMaster();
 		float engineSampleRate = APP->engine->getSampleRate();
 		float sampleRateRatio = engineSampleRate / deviceSampleRate;
 
@@ -148,7 +148,7 @@ struct AudioInterfacePort : audio::Port {
 			// DEBUG("%p: clearing engine input", this);
 		}
 
-		// DEBUG("%p %s:\tframes %d requestedEngineFrames %d\toutputBuffer %d engineInputBuffer %d\t", this, isPrimaryCached ? "primary" : "secondary", frames, requestedEngineFrames, engineOutputBuffer.size(), engineInputBuffer.size());
+		// DEBUG("%p %s:\tframes %d requestedEngineFrames %d\toutputBuffer %d engineInputBuffer %d\t", this, isMasterCached ? "master" : "secondary", frames, requestedEngineFrames, engineOutputBuffer.size(), engineInputBuffer.size());
 	}
 
 	void onStartStream() override {
@@ -388,12 +388,12 @@ struct AudioInterface : Module {
 
 	/** Must be called when the Engine mutex is unlocked.
 	*/
-	void setPrimary() {
-		APP->engine->setPrimaryModule(this);
+	void setMaster() {
+		APP->engine->setMasterModule(this);
 	}
 
-	bool isPrimary() {
-		return APP->engine->getPrimaryModule() == this;
+	bool isMaster() {
+		return APP->engine->getMasterModule() == this;
 	}
 };
 
@@ -561,9 +561,9 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		menu->addChild(createCheckMenuItem("Primary audio module",
-			[=]() {return module->isPrimary();},
-			[=]() {module->setPrimary();}
+		menu->addChild(createCheckMenuItem("Master audio module",
+			[=]() {return module->isMaster();},
+			[=]() {module->setMaster();}
 		));
 
 		menu->addChild(createBoolPtrMenuItem("DC blocker", &module->dcFilterEnabled));

@@ -410,11 +410,11 @@ struct Module {
 	*/
 	virtual void onSave(const SaveEvent& e) {}
 
-	struct SetPrimaryEvent {};
-	virtual void onSetPrimary(const SetPrimaryEvent& e) {}
+	struct SetMasterEvent {};
+	virtual void onSetMaster(const SetMasterEvent& e) {}
 
-	struct UnsetPrimaryEvent {};
-	virtual void onUnsetPrimary(const UnsetPrimaryEvent& e) {}
+	struct UnsetMasterEvent {};
+	virtual void onUnsetMaster(const UnsetMasterEvent& e) {}
 
 	/** DEPRECATED. Override `onAdd(e)` instead. */
 	virtual void onAdd() {}
