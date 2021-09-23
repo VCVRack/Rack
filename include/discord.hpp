@@ -2,6 +2,9 @@
 #include <common.hpp>
 
 namespace rack {
+
+/** Updates Discord "now playing" status with its IPC API
+*/
 namespace discord {
 
 

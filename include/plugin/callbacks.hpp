@@ -5,5 +5,6 @@
 /** Called once to initialize and return the Plugin instance.
 You must implement this in your plugin
 */
-extern "C"
+extern "C" {
 void init(rack::plugin::Plugin* plugin);
+}

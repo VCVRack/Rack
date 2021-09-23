@@ -19,8 +19,9 @@
 namespace rack {
 
 
+/** Returns a Model that constructs a Module and ModuleWidget subclass. */
 template <class TModule, class TModuleWidget>
-plugin::Model* createModel(const std::string& slug) {
+plugin::Model* createModel(std::string slug) {
 	struct TModel : plugin::Model {
 		engine::Module* createModule() override {
 			engine::Module* m = new TModule;
@@ -45,6 +46,7 @@ plugin::Model* createModel(const std::string& slug) {
 }
 
 
+/** Creates a Widget subclass with its top-left at a position. */
 template <class TWidget>
 TWidget* createWidget(math::Vec pos) {
 	TWidget* o = new TWidget;
@@ -53,6 +55,7 @@ TWidget* createWidget(math::Vec pos) {
 }
 
 
+/** Creates a Widget subclass with its center at a position. */
 template <class TWidget>
 TWidget* createWidgetCentered(math::Vec pos) {
 	TWidget* o = createWidget<TWidget>(pos);

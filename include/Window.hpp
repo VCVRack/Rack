@@ -71,6 +71,7 @@ struct Window {
 	Skips screenshot if the file already exists.
 	*/
 	void screenshotModules(const std::string& screenshotsDir, float zoom = 1.f);
+	/** Request Window to be closed after rendering the current frame. */
 	void close();
 	void cursorLock();
 	void cursorUnlock();

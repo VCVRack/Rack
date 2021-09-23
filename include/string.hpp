@@ -14,7 +14,7 @@ namespace string {
 
 
 /** Converts a `printf()` format string and optional arguments into a std::string.
-Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string`s, otherwise you might get binary garbage.
+Remember that "%s" must reference a `char *`, so use `.c_str()` for `std::string`s, otherwise you will get binary garbage.
 */
 __attribute__((format(printf, 1, 2)))
 std::string f(const char* format, ...);
@@ -25,10 +25,13 @@ std::string lowercase(const std::string& s);
 std::string uppercase(const std::string& s);
 /** Removes whitespace from beginning and end of string. */
 std::string trim(const std::string& s);
-/** Truncates and adds "..." to a string, not exceeding `len` characters */
+/** Truncates and adds "..." to the end of a string, not exceeding `len` characters. */
 std::string ellipsize(const std::string& s, size_t len);
+/** Truncates and adds "..." to the beginning of a string, not exceeding `len` characters. */
 std::string ellipsizePrefix(const std::string& s, size_t len);
+/** Returns whether a string starts with the given substring. */
 bool startsWith(const std::string& str, const std::string& prefix);
+/** Returns whether a string ends with the given substring. */
 bool endsWith(const std::string& str, const std::string& suffix);
 
 /** Scores how well a query matches a string.
@@ -79,6 +82,7 @@ Examples:
 */
 std::vector<std::string> split(const std::string& s, const std::string& seperator, size_t maxTokens = 0);
 
+/** Formats a UNIX timestamp with a strftime() string. */
 std::string formatTime(const char* format, double timestamp);
 std::string formatTimeISO(double timestamp);
 

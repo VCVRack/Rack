@@ -25,12 +25,12 @@ struct Quantity {
 		return 0.f;
 	}
 
-	/** Returns the minimum allowed value. */
+	/** Returns the minimum recommended value. */
 	virtual float getMinValue() {
 		return 0.f;
 	}
 
-	/** Returns the maximum allowed value. */
+	/** Returns the maximum recommended value. */
 	virtual float getMaxValue() {
 		return 1.f;
 	}

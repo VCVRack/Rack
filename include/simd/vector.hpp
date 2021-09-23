@@ -14,7 +14,7 @@ namespace simd {
 
 This class is designed to be used just like you use scalars, with extra features for handling bitwise logic, conditions, loading, and storing.
 
-Usage example:
+Example:
 
 	float a[4], b[4];
 	float_4 a = float_4::load(in);

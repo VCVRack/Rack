@@ -16,7 +16,9 @@ namespace plugin {
 
 void init();
 void destroy();
+/** Finds a loaded Plugin by slug. */
 Plugin* getPlugin(const std::string& pluginSlug);
+/** Finds a loaded Model by plugin and model slug. */
 Model* getModel(const std::string& pluginSlug, const std::string& modelSlug);
 /** Creates a Model from a JSON module object.
 Throws an Exception if the model is not found.

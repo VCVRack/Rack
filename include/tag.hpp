@@ -24,6 +24,7 @@ Returns -1 if not found.
 */
 int findId(const std::string& tag);
 
+/** Returns the main tag name by tag ID. */
 std::string getTag(int tagId);
 
 

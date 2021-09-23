@@ -43,6 +43,7 @@ struct Svg {
 	void loadFile(const std::string& filename);
 	/** Loads SVG data from a string. */
 	void loadString(const std::string& str);
+	/** Returns the SVG page size in pixels. */
 	math::Vec getSize();
 	int getNumShapes();
 	int getNumPaths();

@@ -111,6 +111,7 @@ struct PulseGenerator {
 };
 
 
+/** Accumulates a timer when process() is called. */
 struct Timer {
 	float time = 0.f;
 
@@ -126,6 +127,13 @@ struct Timer {
 };
 
 
+/** Counts calls to process(), returning true every `division` calls.
+Example:
+
+	if (divider.process()) {
+		// Runs every `division` calls
+	}
+*/
 struct ClockDivider {
 	uint32_t clock = 0;
 	uint32_t division = 1;
