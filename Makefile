@@ -193,7 +193,7 @@ ifdef ARCH_MAC
 	cp -R $(DIST_RES) dist/"$(DIST_BUNDLE)"/Contents/Resources/
 	cp $(DIST_HTML) dist/"$(DIST_BUNDLE)"/Contents/Resources/
 	cp -R icon.icns dist/"$(DIST_BUNDLE)"/Contents/Resources/
-	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_BUNDLE)"/Fundamental.vcvplugin
+	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_BUNDLE)"/Contents/Resources/Fundamental.vcvplugin
 	# Clean up and sign bundle
 	xattr -cr dist/"$(DIST_BUNDLE)"
 	# This will only work if you have the private key to my certificate
@@ -252,6 +252,9 @@ ifdef ARCH_MAC
 	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_BUNDLE)"
 endif
 
+
+cleandist:
+	rm -rfv dist
 
 # Plugin helpers
 
