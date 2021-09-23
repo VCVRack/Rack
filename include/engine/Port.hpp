@@ -21,7 +21,7 @@ struct Port {
 	};
 	union {
 		/** Number of polyphonic channels
-		Unstable API. Use set/getChannels() instead.
+		DEPRECATED. Unstable API. Use set/getChannels() instead.
 		May be 0 to PORT_MAX_CHANNELS.
 		*/
 		uint8_t channels = 0;

@@ -68,6 +68,7 @@ struct TExponentialFilter {
 		this->lambda = lambda;
 	}
 
+	/** Sets \f$ \lambda = 1 / \tau \f$. */
 	void setTau(T tau) {
 		this->lambda = 1 / tau;
 	}
@@ -127,6 +128,7 @@ struct TPeakFilter {
 typedef TPeakFilter<> PeakFilter;
 
 
+/** Limits the derivative of the output by a rise and fall speed, in units/s. */
 template <typename T = float>
 struct TSlewLimiter {
 	T out = 0.f;
@@ -153,6 +155,7 @@ struct TSlewLimiter {
 typedef TSlewLimiter<> SlewLimiter;
 
 
+/** Behaves like ExponentialFilter but with different lambas when the RHS of the ODE is positive or negative. */
 template <typename T = float>
 struct TExponentialSlewLimiter {
 	T out = 0.f;
@@ -166,6 +169,10 @@ struct TExponentialSlewLimiter {
 	void setRiseFall(T riseLambda, T fallLambda) {
 		this->riseLambda = riseLambda;
 		this->fallLambda = fallLambda;
+	}
+	void setRiseFallTau(T riseTau, T fallTau) {
+		this->riseLambda = 1 / riseTau;
+		this->fallLambda = 1 / fallTau;
 	}
 	T process(T deltaTime, T in) {
 		T lambda = simd::ifelse(in > out, riseLambda, fallLambda);

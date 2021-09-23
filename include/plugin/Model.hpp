@@ -28,6 +28,9 @@ struct Module;
 namespace plugin {
 
 
+/** Type information for a module.
+Factory for Module and ModuleWidget.
+*/
 struct Model {
 	Plugin* plugin = NULL;
 

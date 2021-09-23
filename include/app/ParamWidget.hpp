@@ -37,6 +37,11 @@ struct ParamWidget : widget::OpaqueWidget {
 	void onLeave(const LeaveEvent& e) override;
 
 	void createContextMenu();
+	/** Override to add custom menu items at the bottom of the parameter context menu.
+	It is recommended to add a MenuSeparator before other menu items.
+
+		menu->addChild(new MenuSeparator);
+	*/
 	virtual void appendContextMenu(ui::Menu* menu) {}
 	void resetAction();
 };

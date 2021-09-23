@@ -29,7 +29,6 @@ struct VuMeter {
 	}
 };
 
-
 DEPRECATED typedef VuMeter VUMeter;
 
 

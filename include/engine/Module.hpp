@@ -83,6 +83,10 @@ struct Module {
 		void* producerMessage = NULL;
 		void* consumerMessage = NULL;
 		bool messageFlipRequested = false;
+
+		void requestMessageFlip() {
+			messageFlipRequested = true;
+		}
 	};
 
 	Expander leftExpander;
@@ -280,6 +284,7 @@ struct Module {
 	Expander& getRightExpander() {
 		return rightExpander;
 	}
+	/** Returns the left Expander if `side` is false, andright Expander if `side` is true. */ 
 	Expander& getExpander(bool side) {
 		return side ? rightExpander : leftExpander;
 	}
@@ -327,6 +332,9 @@ struct Module {
 	virtual json_t* dataToJson() {
 		return NULL;
 	}
+	/** Override to load internal data from the "data" property of the module's JSON object.
+	Not called if "data" property is not present.
+	*/
 	virtual void dataFromJson(json_t* rootJ) {}
 
 	///////////////////////
