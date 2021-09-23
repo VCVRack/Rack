@@ -881,10 +881,9 @@ struct MenuBar : widget::OpaqueWidget {
 		helpButton->text = "Help";
 		layout->addChild(helpButton);
 
-		ui::Label* alphaLabel = new ui::Label;
-		alphaLabel->color.a = 0.5;
-		alphaLabel->text = "Pre-alpha build. Not for release.";
-		layout->addChild(alphaLabel);
+		// ui::Label* titleLabel = new ui::Label;
+		// titleLabel->color.a = 0.5;
+		// layout->addChild(titleLabel);
 
 		meterLabel = new MeterLabel;
 		meterLabel->box.pos.y = margin;
