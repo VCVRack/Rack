@@ -26,7 +26,10 @@ struct TintWidget : widget::Widget {
 };
 
 
-struct PlugLight : componentlibrary::TRedGreenBlueLight<componentlibrary::TGrayModuleLightWidget<componentlibrary::MediumLight<app::MultiLightWidget>>> {
+struct PlugLight : componentlibrary::TRedGreenBlueLight<app::MultiLightWidget> {
+	PlugLight() {
+		box.size = math::Vec(9, 9);
+	}
 };
 
 
