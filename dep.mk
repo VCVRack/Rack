@@ -11,7 +11,7 @@ DEP_FLAGS += -g -O3 -march=nocona
 DEP_FLAGS += -fPIC
 
 ifdef ARCH_MAC
-	DEP_MAC_SDK_FLAGS := -mmacosx-version-min=10.7
+	DEP_MAC_SDK_FLAGS := -mmacosx-version-min=10.9
 	DEP_FLAGS += $(DEP_MAC_SDK_FLAGS) -stdlib=libc++
 	DEP_LDFLAGS += $(DEP_MAC_SDK_FLAGS) -stdlib=libc++
 endif
