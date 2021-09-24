@@ -142,7 +142,7 @@ ifdef ARCH_WIN
 endif
 
 DIST_RES := res cacert.pem Core.json template.vcv LICENSE-GPLv3.txt
-DIST_NAME := Rack-$(EDITION)-"$(VERSION)"-$(ARCH)
+DIST_NAME := Rack-$(EDITION)-"$(VERSION)"-$(ARCH_OS_NAME)
 DIST_SDK_DIR := Rack-SDK
 DIST_SDK := Rack-SDK-$(VERSION).zip
 ifdef ARCH_MAC
@@ -236,7 +236,7 @@ endif
 notarize:
 ifdef ARCH_MAC
 	# This will only work if you have my Apple ID password in your keychain
-	xcrun altool --notarize-app -f dist/"$(DIST_BUNDLE)"-"$(VERSION)"-$(ARCH).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/UploadInfo.plist
+	xcrun altool --notarize-app -f dist/"$(DIST_BUNDLE)"-"$(VERSION)"-$(ARCH_OS_NAME).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/UploadInfo.plist
 	# Wait for Apple's servers to approve the app
 	while true; do \
 		echo "Waiting on Apple servers..." ; \
