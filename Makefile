@@ -154,7 +154,7 @@ DIST_MD := $(wildcard *.md)
 DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
 
 
-# This target is not supported for public use
+# Target not supported for public use
 dist: $(TARGET) $(STANDALONE_TARGET) $(DIST_HTML)
 	mkdir -p dist
 	# Copy Rack to dist
@@ -196,8 +196,7 @@ ifdef ARCH_MAC
 	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_BUNDLE)"/Contents/Resources/Fundamental.vcvplugin
 	# Clean up and sign bundle
 	xattr -cr dist/"$(DIST_BUNDLE)"
-	# This will only work if you have the private key to my certificate
-	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --deep dist/"$(DIST_BUNDLE)"
+	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --timestamp --deep dist/"$(DIST_BUNDLE)"/Contents/Resources/$(TARGET) dist/"$(DIST_BUNDLE)"
 	codesign --verify --deep --strict --verbose=2 dist/"$(DIST_BUNDLE)"
 	# Make ZIP
 	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_BUNDLE)"
@@ -233,18 +232,18 @@ endif
 	cd dist && zip -q -9 -r "$(DIST_SDK)" "$(DIST_SDK_DIR)"
 
 
+# Target not supported for public use
 notarize:
 ifdef ARCH_MAC
-	# This will only work if you have my Apple ID password in your keychain
-	xcrun altool --notarize-app -f dist/"$(DIST_BUNDLE)"-"$(VERSION)"-$(ARCH_OS_NAME).zip --primary-bundle-id=com.vcvrack.rack -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/UploadInfo.plist
+	xcrun altool --notarize-app --primary-bundle-id=com.vcvrack.rack --username "andrew@vcvrack.com" --password "@keychain:notarize" --output-format xml --file dist/"$(DIST_NAME)".zip > dist/UploadInfo.plist
 	# Wait for Apple's servers to approve the app
 	while true; do \
 		echo "Waiting on Apple servers..." ; \
-		xcrun altool --notarization-info `/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" dist/UploadInfo.plist` -u "andrewpbelt@gmail.com" -p @keychain:notarize --output-format xml > dist/RequestInfo.plist ; \
+		sleep 10 ; \
+		xcrun altool --notarization-info `/usr/libexec/PlistBuddy -c "Print :notarization-upload:RequestUUID" dist/UploadInfo.plist` -u "andrew@vcvrack.com" -p @keychain:notarize --output-format xml > dist/RequestInfo.plist ; \
 		if [ "`/usr/libexec/PlistBuddy -c "Print :notarization-info:Status" dist/RequestInfo.plist`" != "in progress" ]; then \
 			break ; \
 		fi ; \
-		sleep 10 ; \
 	done
 	# Mark app as notarized, check, and re-zip
 	xcrun stapler staple dist/"$(DIST_BUNDLE)"
