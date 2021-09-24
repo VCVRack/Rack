@@ -12,13 +12,13 @@ static std::string getDetailTemplate(std::string name, int numInputs, int inputO
 	std::string text = name;
 	text += " (";
 	if (numInputs > 0) {
-		text += string::f("%d-%d in", inputOffset + 1, inputOffset + numInputs + 1);
+		text += string::f("%d-%d in", inputOffset + 1, inputOffset + numInputs);
 	}
 	if (numInputs > 0 && numOutputs > 0) {
 		text += ", ";
 	}
 	if (numOutputs > 0) {
-		text += string::f("%d-%d out", outputOffset + 1, outputOffset + numOutputs + 1);
+		text += string::f("%d-%d out", outputOffset + 1, outputOffset + numOutputs);
 	}
 	text += ")";
 	return text;
