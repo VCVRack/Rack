@@ -21,6 +21,7 @@
 	#include <mach/thread_act.h>
 	#include <mach/clock.h>
 	#include <mach/mach.h>
+	#include <sys/sysctl.h>
 #endif
 
 #if defined ARCH_WIN
@@ -39,12 +40,10 @@
 
 /*
 In C++17, this will be `std::filesystem`
-Important: When using `fs::path`, always convert strings to UTF-8 using
+Important: When using `fs::path`, always convert strings to/from UTF-8 using
 
 	fs::path p = fs::u8path(s);
-
-In fact, it's best to work only with strings to avoid forgetting to decode a string as UTF-8.
-The need to do this is a fatal flaw of `fs::path`, but at least `std::filesystem` has some helpful operations.
+	std::string s = p.generic_u8string();
 */
 namespace fs = ghc::filesystem;
 
@@ -723,10 +722,31 @@ double getThreadTime() {
 
 
 std::string getOperatingSystemInfo() {
-#if defined ARCH_LIN || defined ARCH_MAC
+#if defined ARCH_LIN
 	struct utsname u;
 	uname(&u);
 	return string::f("%s %s %s %s", u.sysname, u.release, u.version, u.machine);
+#elif defined ARCH_MAC
+	// From https://opensource.apple.com/source/cctools/cctools-973.0.1/libstuff/macosx_deployment_target.c.auto.html
+	char osversion[32];
+	int osversion_name[2] = {CTL_KERN, KERN_OSRELEASE};
+	size_t osversion_len = sizeof(osversion) - 1;
+	if (sysctl(osversion_name, 2, osversion, &osversion_len, NULL, 0) != 0) return "Mac";
+
+	int major = 0;
+	int minor = 0;
+	if (sscanf(osversion, "%d.%d", &major, &minor) != 2)
+		return "Mac";
+
+	// Try to match version numbers to retail versions
+	if (major >= 20) {
+		major -= 9;
+		return string::f("Mac %d.%d", major, minor);
+	}
+	else {
+		major -= 4;
+		return string::f("Mac 10.%d.%d", major, minor);
+	}
 #elif defined ARCH_WIN
 	OSVERSIONINFOW info;
 	ZeroMemory(&info, sizeof(info));
