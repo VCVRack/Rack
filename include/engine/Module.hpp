@@ -149,6 +149,7 @@ struct Module {
 	template <class TSwitchQuantity = SwitchQuantity>
 	TSwitchQuantity* configButton(int paramId, std::string name = "") {
 		TSwitchQuantity* sq = configParam<TSwitchQuantity>(paramId, 0.f, 1.f, 0.f, name);
+		sq->randomizeEnabled = false;
 		return sq;
 	}
 
