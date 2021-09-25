@@ -673,6 +673,7 @@ static math::Vec eachNearestGridPos(math::Vec pos, std::function<bool(math::Vec 
 
 	// We failed to find a box. This shouldn't happen on an infinite rack.
 	assert(false);
+	return math::Vec();
 }
 
 void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
