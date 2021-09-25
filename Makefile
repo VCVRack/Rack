@@ -3,7 +3,6 @@ VERSION_MAJOR := 2
 VERSION := 2.git.$(shell git rev-parse --short HEAD)
 # VERSION := 2.0.0
 
-FLAGS += -DVERSION=$(VERSION)
 FLAGS += -Iinclude -Idep/include
 
 include arch.mk
@@ -16,6 +15,8 @@ SOURCES += dep/oui-blendish/blendish.c
 SOURCES += dep/pffft/pffft.c dep/pffft/fftpack.c
 SOURCES += $(wildcard src/*.c src/*/*.c)
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
+
+build/src/common.cpp.o: FLAGS += -D_APP_VERSION=$(VERSION)
 
 STANDALONE_SOURCES += adapters/standalone.cpp
 
