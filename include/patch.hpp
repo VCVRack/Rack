@@ -5,6 +5,7 @@
 
 
 namespace rack {
+/** Handles the Rack patch file state */
 namespace patch {
 
 

@@ -5,10 +5,7 @@
 
 
 namespace rack {
-
-
-/** Random number generation
-*/
+/** Random number generation */
 namespace random {
 
 

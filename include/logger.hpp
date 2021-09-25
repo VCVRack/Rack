@@ -16,10 +16,7 @@ will print something like
 
 
 namespace rack {
-
-
-/** Logs messages to a file or the terminal
-*/
+/** Logs messages to a file or the terminal */
 namespace logger {
 
 

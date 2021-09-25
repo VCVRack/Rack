@@ -19,8 +19,7 @@ struct CableWidget;
 } // namespace app
 
 
-/** Action history for UI undo/redo
-*/
+/** Action history for UI undo/redo */
 namespace history {
 
 

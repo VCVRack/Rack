@@ -5,8 +5,7 @@
 
 
 namespace rack {
-/** Tags describing the functions of modules
-*/
+/** Tags describing the function(s) of modules */
 namespace tag {
 
 

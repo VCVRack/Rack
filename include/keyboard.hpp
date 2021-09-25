@@ -4,10 +4,7 @@
 
 
 namespace rack {
-
-
-/** Computer keyboard MIDI driver
-*/
+/** Computer keyboard MIDI driver */
 namespace keyboard {
 
 

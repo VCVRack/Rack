@@ -161,8 +161,7 @@ namespace std {
 #endif
 
 
-/** Root namespace for the Rack API
-*/
+/** Root namespace for the Rack API */
 namespace rack {
 
 

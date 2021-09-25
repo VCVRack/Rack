@@ -8,10 +8,7 @@
 #include <context.hpp>
 
 namespace rack {
-
-
-/** Abstraction for all audio drivers in Rack
-*/
+/** Abstraction for all audio drivers in Rack */
 namespace audio {
 
 

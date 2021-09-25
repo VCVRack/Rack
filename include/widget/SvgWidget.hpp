@@ -6,7 +6,7 @@ namespace rack {
 namespace widget {
 
 
-/** Draws an Svg */
+/** Owns and draws a window::Svg */
 struct SvgWidget : Widget {
 	std::shared_ptr<window::Svg> svg;
 

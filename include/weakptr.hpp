@@ -12,8 +12,7 @@ struct WeakHandle {
 };
 
 
-/** Base class for classes that allow `WeakPtr`s to be used.
-*/
+/** Base class for classes that allow `WeakPtr`s to be used. */
 struct WeakBase {
 	WeakHandle* weakHandle = nullptr;
 

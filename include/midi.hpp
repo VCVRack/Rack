@@ -9,10 +9,7 @@
 
 
 namespace rack {
-
-
-/** Abstraction for all MIDI drivers in Rack
-*/
+/** Abstraction for all MIDI drivers in Rack */
 namespace midi {
 
 

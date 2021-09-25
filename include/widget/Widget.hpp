@@ -10,10 +10,7 @@
 
 
 namespace rack {
-
-
-/** Basic UI widget types
-*/
+/** Base UI widget types */
 namespace widget {
 
 
@@ -469,7 +466,7 @@ struct Widget : WeakBase {
 		recurseEvent(&Widget::onHide, e);
 	}
 
-	/** Occurs after the Window, OpenGL context, and Nanovg are created.
+	/** Occurs after the Window (including OpenGL and NanoVG contexts) are created.
 	Recurses.
 	*/
 	struct ContextCreateEvent : BaseEvent {
@@ -479,7 +476,7 @@ struct Widget : WeakBase {
 		recurseEvent(&Widget::onContextCreate, e);
 	}
 
-	/** Occurs before the Window, OpenGL context, and Nanovg are destroyed.
+	/** Occurs before the Window (including OpenGL and NanoVG contexts) are destroyed.
 	Recurses.
 	*/
 	struct ContextDestroyEvent : BaseEvent {

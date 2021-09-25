@@ -7,10 +7,7 @@
 
 
 namespace rack {
-
-
-/** Networking functions for HTTP requests, downloads, and URLs
-*/
+/** Networking functions for HTTP requests, downloads, and URLs */
 namespace network {
 
 
