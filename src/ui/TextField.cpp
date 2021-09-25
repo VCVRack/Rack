@@ -169,6 +169,14 @@ void TextField::onSelectKey(const SelectKeyEvent& e) {
 			}
 			e.consume(this);
 		}
+		// Up (placeholder)
+		if (e.key == GLFW_KEY_UP) {
+			e.consume(this);
+		}
+		// Down (placeholder)
+		if (e.key == GLFW_KEY_DOWN) {
+			e.consume(this);
+		}
 		// Home
 		if (e.key == GLFW_KEY_HOME && (e.mods & RACK_MOD_MASK) == 0) {
 			selection = cursor = 0;
