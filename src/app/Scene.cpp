@@ -45,6 +45,8 @@ struct ResizeHandle : widget::OpaqueWidget {
 
 struct Scene::Internal {
 	ResizeHandle* resizeHandle;
+
+	bool heldArrowKeys[4] = {};
 };
 
 
@@ -109,6 +111,34 @@ void Scene::step() {
 			APP->patch->saveAutosave();
 			settings::save();
 		}
+	}
+
+	// Scroll RackScrollWidget with arrow keys
+	math::Vec arrowDelta;
+	if (internal->heldArrowKeys[0]) {
+		arrowDelta.x -= 1;
+	}
+	if (internal->heldArrowKeys[1]) {
+		arrowDelta.x += 1;
+	}
+	if (internal->heldArrowKeys[2]) {
+		arrowDelta.y -= 1;
+	}
+	if (internal->heldArrowKeys[3]) {
+		arrowDelta.y += 1;
+	}
+
+	if (!arrowDelta.isZero()) {
+		int mods = APP->window->getMods();
+		float arrowSpeed = 32.f;
+		if ((mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
+			arrowSpeed /= 4.f;
+		if ((mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
+			arrowSpeed *= 4.f;
+		if ((mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
+			arrowSpeed /= 16.f;
+
+		rackScroll->offset += arrowDelta * arrowSpeed;
 	}
 
 	Widget::step();
@@ -263,29 +293,21 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 	}
 
 	// Scroll RackScrollWidget with arrow keys
-	if (e.action == RACK_HELD) {
-		float arrowSpeed = 32.f;
-		if ((e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL)
-			arrowSpeed /= 4.f;
-		if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT)
-			arrowSpeed *= 4.f;
-		if ((e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT))
-			arrowSpeed /= 16.f;
-
+	if (e.action == GLFW_PRESS || e.action == GLFW_RELEASE) {
 		if (e.key == GLFW_KEY_LEFT) {
-			rackScroll->offset.x -= arrowSpeed;
+			internal->heldArrowKeys[0] = (e.action == GLFW_PRESS);
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_RIGHT) {
-			rackScroll->offset.x += arrowSpeed;
+			internal->heldArrowKeys[1] = (e.action == GLFW_PRESS);
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_UP) {
-			rackScroll->offset.y -= arrowSpeed;
+			internal->heldArrowKeys[2] = (e.action == GLFW_PRESS);
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_DOWN) {
-			rackScroll->offset.y += arrowSpeed;
+			internal->heldArrowKeys[3] = (e.action == GLFW_PRESS);
 			e.consume(this);
 		}
 	}
