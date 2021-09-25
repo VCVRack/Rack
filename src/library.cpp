@@ -40,10 +40,10 @@ static void checkUpdatesLoop() {
 
 void init() {
 	if (settings::autoCheckUpdates && !settings::devMode) {
-		std::thread t([&]() {
-			checkAppUpdate();
-		});
-		t.detach();
+		// std::thread t([&]() {
+		// 	checkAppUpdate();
+		// });
+		// t.detach();
 
 		std::thread t2([&] {
 			checkUpdatesLoop();
