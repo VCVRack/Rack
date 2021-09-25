@@ -19,10 +19,12 @@
 
 
 namespace rack {
+namespace window {
 
 
 // Constructing these directly will load from the disk each time. Use the load() functions to load from disk and cache them as long as the shared_ptr is held.
 
+/** Text font loaded in a particular Window context. */
 struct Font {
 	NVGcontext* vg;
 	int handle = -1;
@@ -33,6 +35,8 @@ struct Font {
 	DEPRECATED static std::shared_ptr<Font> load(const std::string& filename);
 };
 
+
+/** Bitmap/raster image loaded in a particular Window context. */
 struct Image {
 	NVGcontext* vg;
 	int handle = -1;
@@ -99,8 +103,9 @@ struct Window {
 };
 
 
-void windowInit();
-void windowDestroy();
+void init();
+void destroy();
 
 
+} // namespace window
 } // namespace rack

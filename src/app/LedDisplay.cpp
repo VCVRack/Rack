@@ -1,6 +1,6 @@
 #include <app/LedDisplay.hpp>
 #include <asset.hpp>
-#include <Window.hpp>
+#include <window.hpp>
 #include <context.hpp>
 
 
@@ -53,7 +53,7 @@ void LedDisplayChoice::draw(const DrawArgs& args) {
 		nvgFill(args.vg);
 	}
 
-	std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+	std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
 	nvgGlobalAlpha(args.vg, 1.0);
 	if (font && font->handle >= 0) {
 		nvgFillColor(args.vg, color);
@@ -98,7 +98,7 @@ void LedDisplayTextField::draw(const DrawArgs& args) {
 	}
 
 	// Text
-	std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+	std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
 	nvgGlobalAlpha(args.vg, 1.0);
 	if (font && font->handle >= 0) {
 		bndSetFont(font->handle);
@@ -120,7 +120,7 @@ void LedDisplayTextField::draw(const DrawArgs& args) {
 
 
 int LedDisplayTextField::getTextPosition(math::Vec mousePos) {
-	std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+	std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
 	if (!font || !font->handle)
 		return 0;
 

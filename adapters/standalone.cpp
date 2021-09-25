@@ -13,7 +13,7 @@
 #include <app/Scene.hpp>
 #include <plugin.hpp>
 #include <context.hpp>
-#include <Window.hpp>
+#include <window.hpp>
 #include <patch.hpp>
 #include <history.hpp>
 #include <ui/common.hpp>
@@ -179,7 +179,7 @@ int main(int argc, char* argv[]) {
 	discord::init();
 	if (!settings::headless) {
 		ui::init();
-		windowInit();
+		window::init();
 	}
 
 	// Initialize context
@@ -192,7 +192,7 @@ int main(int argc, char* argv[]) {
 	APP->event->rootWidget = APP->scene;
 	APP->patch = new PatchManager;
 	if (!settings::headless) {
-		APP->window = new Window;
+		APP->window = new window::Window;
 	}
 
 	// On Mac, use a hacked-in GLFW addition to get the launched path.
@@ -234,7 +234,7 @@ int main(int argc, char* argv[]) {
 		// delete APP->window;
 		// APP->window = NULL;
 		// INFO("Re-creating window");
-		// APP->window = new Window;
+		// APP->window = new window::Window;
 		// APP->window->run();
 	}
 
@@ -252,7 +252,7 @@ int main(int argc, char* argv[]) {
 	// Destroy environment
 	INFO("Destroying environment");
 	if (!settings::headless) {
-		windowDestroy();
+		window::destroy();
 		ui::destroy();
 	}
 	discord::destroy();

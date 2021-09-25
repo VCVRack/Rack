@@ -1,5 +1,5 @@
 #include <context.hpp>
-#include <Window.hpp>
+#include <window.hpp>
 #include <patch.hpp>
 #include <engine/Engine.hpp>
 #include <app/Scene.hpp>

@@ -10,7 +10,7 @@
 #include <stb_image_write.h>
 #include <osdialog.h>
 
-#include <Window.hpp>
+#include <window.hpp>
 #include <asset.hpp>
 #include <widget/Widget.hpp>
 #include <app/Scene.hpp>
@@ -24,6 +24,7 @@
 
 
 namespace rack {
+namespace window {
 
 
 static const math::Vec minWindowSize = math::Vec(640, 480);
@@ -722,7 +723,7 @@ bool& Window::fbDirtyOnSubpixelChange() {
 }
 
 
-void windowInit() {
+void init() {
 	int err;
 
 	// Set up GLFW
@@ -740,9 +741,10 @@ void windowInit() {
 }
 
 
-void windowDestroy() {
+void destroy() {
 	glfwTerminate();
 }
 
 
+} // namespace window
 } // namespace rack

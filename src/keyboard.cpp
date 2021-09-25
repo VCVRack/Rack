@@ -2,7 +2,7 @@
 
 #include <keyboard.hpp>
 #include <midi.hpp>
-#include <Window.hpp>
+#include <window.hpp>
 
 
 namespace rack {

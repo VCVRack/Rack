@@ -15,7 +15,11 @@ struct Engine;
 } // namespace engine
 
 
+namespace window {
 struct Window;
+} // namespace window
+
+
 struct PatchManager;
 
 
@@ -35,7 +39,7 @@ struct Context {
 	widget::EventState* event = NULL;
 	app::Scene* scene = NULL;
 	engine::Engine* engine = NULL;
-	Window* window = NULL;
+	window::Window* window = NULL;
 	history::State* history = NULL;
 	PatchManager* patch = NULL;
 

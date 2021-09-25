@@ -1,7 +1,7 @@
 #include <jansson.h>
 
 #include <settings.hpp>
-#include <Window.hpp>
+#include <window.hpp>
 #include <plugin.hpp>
 #include <app/Scene.hpp>
 #include <engine/Engine.hpp>
