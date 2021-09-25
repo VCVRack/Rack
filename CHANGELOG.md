@@ -8,11 +8,13 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add port tooltips with name, voltage, and list of connected ports.
 - Evaluate mathematical expressions (such as `1+2*3`) in parameter context menu fields.
 - Add multiple module selection by highlighting a rectangle or Shift-clicking on a module panel.
+- Add importing/exporting module selections to new `.vcvs` file format.
 - Add module whitelist to Module Browser which synchronizes individual modules chosen in the VCV Library.
+- Add favorite modules filter to Module Browser.
 - Restructure engine to no longer use an "engine thread".
 	- Improve engine performance and latency by no longer requiring thread synchronization between the engine thread and audio thread. The engine now runs directly on the audio thread.
 	- Add support for multiple simultaneous audio devices.
-	- Add "Primary module" context menu item to VCV Audio modules to select which audio device clocks the engine.
+	- Add "Master module" context menu item to VCV Audio modules to select which audio device clocks the engine.
 	- Allow other modules to be the primary module, such as VCV Recorder for rendering audio faster than real-time.
 	- Remove "Real-time priority" menu item, since the thread priority is now managed elsewhere (RtAudio, etc).
 	- Remove engine pausing as it no longer makes sense with the new engine architecture.
@@ -33,7 +35,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Break Rack executable into libRack shared library and lightweight standalone Rack executable.
 - Add support for 1/2x and 1/4x low-fidelity sample rates to engine and "Engine > Sample rates" menu.
 - Add Escape key command for existing fullscreen, in case F11 doesn't work.
-- Copy cable color when cloning cables with Ctrl+click.
+- Copy cable color when cloning cables with Mod+click.
 - Fix key commands on AZERTY, Dvorak, and all other keyboard layouts.
 - Add Mouse device to Computer keyboard/mouse MIDI driver.
 - Make scrollbar mouse interaction similar to modern OS behavior.
@@ -50,6 +52,9 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add engine CPU meter and framerate meter to menu bar.
 - Allow zooming rack with extra mouse buttons 4 and 5.
 - Add `"pixelRatio"` to settings for forcing the UI pixel scale.
+- If Mod+clicking on any menu item, the menu stays open (except for some menu items like "Delete Module").
+- Add Mod+F1 key command when cursor is hovering a module to open its user manual.
+- Redesign CPU meter with percentage history graph.
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
@@ -91,6 +96,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add `string::join()`, `split()`, `formatTime()`, and `formatTimeISO()`.
 	- Add `random::Xoroshiro128Plus` which can be used like C++ `<random>` classes.
 	- Add `Port::getVoltageRMS()`.
+	- Add setters/getters for nearly every instance variable in Rack's API. Use these for higher likelihood of stability.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
