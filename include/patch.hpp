@@ -8,6 +8,7 @@ namespace rack {
 namespace patch {
 
 
+/** Handles the Rack patch file state. */
 struct Manager {
 	struct Internal;
 	Internal* internal;

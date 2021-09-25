@@ -1,7 +1,6 @@
 #include <app/RailWidget.hpp>
 #include <context.hpp>
 #include <asset.hpp>
-#include <svg.hpp>
 #include <widget/SvgWidget.hpp>
 #include <widget/FramebufferWidget.hpp>
 
@@ -27,7 +26,7 @@ RailWidget::RailWidget() {
 	addChild(internal->railFb);
 
 	internal->railSw = new widget::SvgWidget;
-	internal->railSw->setSvg(Svg::load(asset::system("res/ComponentLibrary/Rail.svg")));
+	internal->railSw->setSvg(window::Svg::load(asset::system("res/ComponentLibrary/Rail.svg")));
 	internal->railFb->addChild(internal->railSw);
 }
 

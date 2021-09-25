@@ -57,14 +57,14 @@ struct PlugWidget : widget::Widget {
 		plugTransform->addChild(plugTint);
 
 		plug = new widget::SvgWidget;
-		plug->setSvg(Svg::load(asset::system("res/ComponentLibrary/Plug.svg")));
+		plug->setSvg(window::Svg::load(asset::system("res/ComponentLibrary/Plug.svg")));
 		plugTint->addChild(plug);
 		plugTransform->setSize(plug->getSize());
 		plugTransform->setPosition(plug->getSize().mult(-0.5));
 		plugTint->setSize(plug->getSize());
 
 		plugPort = new widget::SvgWidget;
-		plugPort->setSvg(Svg::load(asset::system("res/ComponentLibrary/PlugPort.svg")));
+		plugPort->setSvg(window::Svg::load(asset::system("res/ComponentLibrary/PlugPort.svg")));
 		plugPort->setPosition(plugPort->getSize().mult(-0.5));
 		fb->addChild(plugPort);
 

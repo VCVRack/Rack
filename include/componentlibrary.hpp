@@ -21,6 +21,9 @@ See LICENSE.md for legal details about using Rack component graphics in your Rac
 namespace componentlibrary {
 
 
+using namespace window;
+
+
 ////////////////////
 // Color scheme
 ////////////////////

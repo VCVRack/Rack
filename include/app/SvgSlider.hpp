@@ -20,19 +20,19 @@ struct SvgSlider : app::SliderKnob {
 	math::Vec minHandlePos, maxHandlePos;
 
 	SvgSlider();
-	void setBackgroundSvg(std::shared_ptr<Svg> svg);
-	void setHandleSvg(std::shared_ptr<Svg> svg);
+	void setBackgroundSvg(std::shared_ptr<window::Svg> svg);
+	void setHandleSvg(std::shared_ptr<window::Svg> svg);
 	void setHandlePos(math::Vec minHandlePos, math::Vec maxHandlePos);
 	void setHandlePosCentered(math::Vec minHandlePosCentered, math::Vec maxHandlePosCentered);
 	void onChange(const ChangeEvent& e) override;
 
-	DEPRECATED void setBackgroundSVG(std::shared_ptr<Svg> svg) {
+	DEPRECATED void setBackgroundSVG(std::shared_ptr<window::Svg> svg) {
 		setBackgroundSvg(svg);
 	}
-	DEPRECATED void setHandleSVG(std::shared_ptr<Svg> svg) {
+	DEPRECATED void setHandleSVG(std::shared_ptr<window::Svg> svg) {
 		setBackgroundSvg(svg);
 	}
-	DEPRECATED void setSVGs(std::shared_ptr<Svg> backgroundSvg, std::shared_ptr<Svg> handleSvg) {
+	DEPRECATED void setSVGs(std::shared_ptr<window::Svg> backgroundSvg, std::shared_ptr<window::Svg> handleSvg) {
 		setBackgroundSvg(backgroundSvg);
 		setHandleSvg(handleSvg);
 	}

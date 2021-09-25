@@ -19,8 +19,8 @@ struct SvgKnob : Knob {
 	widget::SvgWidget* sw;
 
 	SvgKnob();
-	void setSvg(std::shared_ptr<Svg> svg);
-	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {
+	void setSvg(std::shared_ptr<window::Svg> svg);
+	DEPRECATED void setSVG(std::shared_ptr<window::Svg> svg) {
 		setSvg(svg);
 	}
 	void onChange(const ChangeEvent& e) override;

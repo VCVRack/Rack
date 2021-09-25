@@ -9,6 +9,7 @@
 
 
 namespace rack {
+namespace window {
 
 
 /** Arbitrary DPI, standardized for Rack. */
@@ -60,4 +61,5 @@ DEPRECATED typedef Svg SVG;
 void svgDraw(NVGcontext* vg, NSVGimage* svg);
 
 
+} // namespace window
 } // namespace rack

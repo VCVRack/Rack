@@ -30,7 +30,7 @@ void SvgButton::onButton(const ButtonEvent& e) {
 }
 
 
-void SvgButton::addFrame(std::shared_ptr<Svg> svg) {
+void SvgButton::addFrame(std::shared_ptr<window::Svg> svg) {
 	frames.push_back(svg);
 	// If this is our first frame, automatically set SVG and size
 	if (!sw->svg) {

@@ -1,6 +1,6 @@
 #include <app/LedDisplay.hpp>
 #include <asset.hpp>
-#include <window.hpp>
+#include <window/Window.hpp>
 #include <context.hpp>
 
 
@@ -36,7 +36,7 @@ void LedDisplaySeparator::draw(const DrawArgs& args) {
 
 
 LedDisplayChoice::LedDisplayChoice() {
-	box.size = mm2px(math::Vec(0, 28.0 / 3));
+	box.size = window::mm2px(math::Vec(0, 28.0 / 3));
 	fontPath = asset::system("res/fonts/ShareTechMono-Regular.ttf");
 	textOffset = math::Vec(10, 18);
 	color = nvgRGB(0xff, 0xd7, 0x14);

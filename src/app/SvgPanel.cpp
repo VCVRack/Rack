@@ -37,7 +37,7 @@ void SvgPanel::step() {
 	Widget::step();
 }
 
-void SvgPanel::setBackground(std::shared_ptr<Svg> svg) {
+void SvgPanel::setBackground(std::shared_ptr<window::Svg> svg) {
 	this->svg = svg;
 
 	sw->setSvg(svg);

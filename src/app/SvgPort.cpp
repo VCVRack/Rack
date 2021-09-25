@@ -19,7 +19,7 @@ SvgPort::SvgPort() {
 	fb->addChild(sw);
 }
 
-void SvgPort::setSvg(std::shared_ptr<Svg> svg) {
+void SvgPort::setSvg(std::shared_ptr<window::Svg> svg) {
 	sw->setSvg(svg);
 	fb->box.size = sw->box.size;
 	box.size = sw->box.size;

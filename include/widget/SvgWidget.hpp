@@ -1,6 +1,5 @@
 #pragma once
 #include <widget/Widget.hpp>
-#include <svg.hpp>
 
 
 namespace rack {
@@ -9,14 +8,14 @@ namespace widget {
 
 /** Draws an Svg */
 struct SvgWidget : Widget {
-	std::shared_ptr<Svg> svg;
+	std::shared_ptr<window::Svg> svg;
 
 	/** Sets the box size to the SVG image size */
 	void wrap();
 
 	/** Sets and wraps the SVG */
-	void setSvg(std::shared_ptr<Svg> svg);
-	DEPRECATED void setSVG(std::shared_ptr<Svg> svg) {
+	void setSvg(std::shared_ptr<window::Svg> svg);
+	DEPRECATED void setSVG(std::shared_ptr<window::Svg> svg) {
 		setSvg(svg);
 	}
 

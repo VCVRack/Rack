@@ -3,6 +3,10 @@
 #include <memory>
 #include <map>
 
+#include <common.hpp>
+#include <math.hpp>
+#include <window/Svg.hpp>
+
 #define GLEW_STATIC
 #define GLEW_NO_GLU
 #include <GL/glew.h>
@@ -11,14 +15,11 @@
 #define NANOVG_GL2
 #include <nanovg_gl.h>
 #include <nanovg_gl_utils.h>
-#include <nanosvg.h>
-#include <svg.hpp>
-
-#include <common.hpp>
-#include <math.hpp>
 
 
 namespace rack {
+/** Handles OS windowing, OpenGL, and NanoVG
+*/
 namespace window {
 
 
@@ -48,6 +49,7 @@ struct Image {
 };
 
 
+/** OS window with OpenGL context. */
 struct Window {
 	struct Internal;
 	Internal* internal;
@@ -93,9 +95,7 @@ struct Window {
 
 	std::shared_ptr<Font> loadFont(const std::string& filename);
 	std::shared_ptr<Image> loadImage(const std::string& filename);
-
-	/** Use `Svg::load(filename)` in new code. */
-	DEPRECATED std::shared_ptr<Svg> loadSvg(const std::string& filename) {
+	std::shared_ptr<Svg> loadSvg(const std::string& filename) {
 		return Svg::load(filename);
 	}
 

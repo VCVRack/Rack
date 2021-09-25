@@ -1,7 +1,7 @@
 #include <ui/Scrollbar.hpp>
 #include <ui/ScrollWidget.hpp>
 #include <context.hpp>
-#include <window.hpp>
+#include <window/Window.hpp>
 
 
 namespace rack {

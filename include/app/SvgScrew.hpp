@@ -15,7 +15,7 @@ struct SvgScrew : widget::Widget {
 	widget::SvgWidget* sw;
 
 	SvgScrew();
-	void setSvg(std::shared_ptr<Svg> svg);
+	void setSvg(std::shared_ptr<window::Svg> svg);
 };
 
 

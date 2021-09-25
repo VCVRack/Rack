@@ -14,10 +14,10 @@ struct SvgButton : widget::OpaqueWidget {
 	widget::FramebufferWidget* fb;
 	CircularShadow* shadow;
 	widget::SvgWidget* sw;
-	std::vector<std::shared_ptr<Svg>> frames;
+	std::vector<std::shared_ptr<window::Svg>> frames;
 
 	SvgButton();
-	void addFrame(std::shared_ptr<Svg> svg);
+	void addFrame(std::shared_ptr<window::Svg> svg);
 	void onButton(const ButtonEvent& e) override;
 	void onDragStart(const DragStartEvent& e) override;
 	void onDragEnd(const DragEndEvent& e) override;

@@ -2,8 +2,8 @@
 #include <jansson.h>
 
 #include <common.hpp>
+#include <math.hpp>
 #include <ui/common.hpp>
-#include <svg.hpp> // for mm2px(), etc
 
 
 namespace rack {

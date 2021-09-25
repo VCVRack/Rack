@@ -7,8 +7,9 @@
 namespace rack {
 
 
-/** A controller for manipulating a float value (which subclasses must store somehow) with limits and labels
-Often used as a decorator component for widget::Widgets that read or write a quantity.
+/** A controller for manipulating a float value (which subclasses must store somehow) with limits and labels.
+
+Often used as a decorator component for `widget::Widget`s that read or write a quantity.
 */
 struct Quantity {
 	virtual ~Quantity() {}

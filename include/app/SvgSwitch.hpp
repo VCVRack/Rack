@@ -15,11 +15,11 @@ struct SvgSwitch : Switch {
 	widget::FramebufferWidget* fb;
 	CircularShadow* shadow;
 	widget::SvgWidget* sw;
-	std::vector<std::shared_ptr<Svg>> frames;
+	std::vector<std::shared_ptr<window::Svg>> frames;
 
 	SvgSwitch();
 	/** Adds an SVG file to represent the next switch position */
-	void addFrame(std::shared_ptr<Svg> svg);
+	void addFrame(std::shared_ptr<window::Svg> svg);
 	void onChange(const ChangeEvent& e) override;
 };
 

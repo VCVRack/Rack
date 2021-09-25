@@ -19,7 +19,7 @@ SvgSlider::SvgSlider() {
 }
 
 
-void SvgSlider::setBackgroundSvg(std::shared_ptr<Svg> svg) {
+void SvgSlider::setBackgroundSvg(std::shared_ptr<window::Svg> svg) {
 	background->setSvg(svg);
 	box.size = background->box.size;
 	fb->box.size = background->box.size;
@@ -27,7 +27,7 @@ void SvgSlider::setBackgroundSvg(std::shared_ptr<Svg> svg) {
 }
 
 
-void SvgSlider::setHandleSvg(std::shared_ptr<Svg> svg) {
+void SvgSlider::setHandleSvg(std::shared_ptr<window::Svg> svg) {
 	handle->setSvg(svg);
 	handle->box.pos = minHandlePos;
 	fb->setDirty();

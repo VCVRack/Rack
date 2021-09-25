@@ -98,7 +98,7 @@ void ModuleWidget::setPanel(widget::Widget* panel) {
 	}
 }
 
-void ModuleWidget::setPanel(std::shared_ptr<Svg> svg) {
+void ModuleWidget::setPanel(std::shared_ptr<window::Svg> svg) {
 	// Create SvgPanel
 	SvgPanel* panel = new SvgPanel;
 	panel->setBackground(svg);

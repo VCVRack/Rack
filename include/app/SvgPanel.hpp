@@ -19,11 +19,11 @@ struct SvgPanel : widget::Widget {
 	widget::FramebufferWidget* fb;
 	widget::SvgWidget* sw;
 	PanelBorder* panelBorder;
-	std::shared_ptr<Svg> svg;
+	std::shared_ptr<window::Svg> svg;
 
 	SvgPanel();
 	void step() override;
-	void setBackground(std::shared_ptr<Svg> svg);
+	void setBackground(std::shared_ptr<window::Svg> svg);
 };
 
 

@@ -1,4 +1,4 @@
-#include <svg.hpp>
+#include <window/Svg.hpp>
 #include <map>
 #include <math.hpp>
 #include <string.hpp>
@@ -9,6 +9,7 @@
 
 
 namespace rack {
+namespace window {
 
 
 Svg::~Svg() {
@@ -301,4 +302,5 @@ void svgDraw(NVGcontext* vg, NSVGimage* svg) {
 }
 
 
+} // namespace window
 } // namespace rack

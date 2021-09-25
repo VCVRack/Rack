@@ -3,7 +3,7 @@
 
 #include <common.hpp>
 #include <math.hpp>
-#include <window.hpp>
+#include <window/Window.hpp>
 #include <color.hpp>
 #include <widget/event.hpp>
 #include <weakptr.hpp>

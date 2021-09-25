@@ -15,7 +15,7 @@ void SvgWidget::wrap() {
 	}
 }
 
-void SvgWidget::setSvg(std::shared_ptr<Svg> svg) {
+void SvgWidget::setSvg(std::shared_ptr<window::Svg> svg) {
 	this->svg = svg;
 	wrap();
 }
@@ -24,7 +24,7 @@ void SvgWidget::draw(const DrawArgs& args) {
 	if (!svg)
 		return;
 
-	svgDraw(args.vg, svg->handle);
+	window::svgDraw(args.vg, svg->handle);
 }
 
 

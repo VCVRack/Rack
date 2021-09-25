@@ -1,7 +1,7 @@
 #include <widget/event.hpp>
 #include <widget/Widget.hpp>
 #include <context.hpp>
-#include <window.hpp>
+#include <window/Window.hpp>
 #include <system.hpp>
 
 

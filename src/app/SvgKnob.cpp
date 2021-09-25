@@ -20,7 +20,7 @@ SvgKnob::SvgKnob() {
 	tw->addChild(sw);
 }
 
-void SvgKnob::setSvg(std::shared_ptr<Svg> svg) {
+void SvgKnob::setSvg(std::shared_ptr<window::Svg> svg) {
 	sw->setSvg(svg);
 	tw->box.size = sw->box.size;
 	fb->box.size = sw->box.size;

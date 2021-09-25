@@ -8,7 +8,7 @@
 #include <network.hpp>
 #include <system.hpp>
 #include <context.hpp>
-#include <window.hpp>
+#include <window/Window.hpp>
 #include <asset.hpp>
 #include <settings.hpp>
 #include <plugin.hpp>
