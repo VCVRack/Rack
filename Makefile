@@ -1,8 +1,6 @@
 RACK_DIR ?= .
-EDITION := CE
-EDITION_NAME := Community Edition
 VERSION_MAJOR := 2
-VERSION := 2.dev.$(shell git rev-parse --short HEAD)
+VERSION := 2.git.$(shell git rev-parse --short HEAD)
 # VERSION := 2.0.0
 
 FLAGS += -DVERSION=$(VERSION)
@@ -142,13 +140,13 @@ ifdef ARCH_WIN
 endif
 
 DIST_RES := res cacert.pem Core.json template.vcv LICENSE-GPLv3.txt
-DIST_NAME := Rack-$(EDITION)-"$(VERSION)"-$(ARCH_OS_NAME)
+DIST_NAME := Rack-"$(VERSION)"-$(ARCH_OS_NAME)
 DIST_SDK_DIR := Rack-SDK
 DIST_SDK := Rack-SDK-$(VERSION).zip
 ifdef ARCH_MAC
 	DIST_BUNDLE := VCV Rack $(VERSION_MAJOR).app
 else
-	DIST_DIR := Rack$(EDITION)$(VERSION_MAJOR)
+	DIST_DIR := Rack$(VERSION_MAJOR)
 endif
 DIST_MD := $(wildcard *.md)
 DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
@@ -218,7 +216,7 @@ ifdef ARCH_WIN
 	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_DIR)"
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
-	makensis -DEDITION="$(EDITION)" -DEDITION_NAME="$(EDITION_NAME)" -DVERSION_MAJOR="$(VERSION_MAJOR)" -DVERSION="$(VERSION)" "-XOutFile dist/$(DIST_NAME).exe" installer.nsi
+	makensis -DVERSION_MAJOR="$(VERSION_MAJOR)" -DVERSION="$(VERSION)" "-XOutFile dist/$(DIST_NAME).exe" installer.nsi
 endif
 
 	# Build Rack SDK
