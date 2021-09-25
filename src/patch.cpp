@@ -16,24 +16,25 @@
 
 
 namespace rack {
+namespace patch {
 
 
 static const char PATCH_FILTERS[] = "VCV Rack patch (.vcv):vcv";
 
 
-PatchManager::PatchManager() {
+Manager::Manager() {
 	autosavePath = asset::user("autosave");
 	templatePath = asset::user("template.vcv");
 	factoryTemplatePath = asset::system("template.vcv");
 }
 
 
-PatchManager::~PatchManager() {
+Manager::~Manager() {
 	cleanAutosave();
 }
 
 
-void PatchManager::launch(std::string pathArg) {
+void Manager::launch(std::string pathArg) {
 	// Load the argument if exists
 	if (pathArg != "") {
 		loadAction(pathArg);
@@ -57,7 +58,7 @@ void PatchManager::launch(std::string pathArg) {
 }
 
 
-void PatchManager::clear() {
+void Manager::clear() {
 	path = "";
 	if (APP->scene) {
 		APP->scene->rack->clear();
@@ -79,7 +80,7 @@ static bool promptClear(std::string text) {
 }
 
 
-void PatchManager::save(std::string path) {
+void Manager::save(std::string path) {
 	INFO("Saving patch %s", path.c_str());
 	// Dispatch SaveEvent to modules
 	APP->engine->prepareSave();
@@ -99,7 +100,7 @@ void PatchManager::save(std::string path) {
 }
 
 
-void PatchManager::saveDialog() {
+void Manager::saveDialog() {
 	if (path == "") {
 		saveAsDialog();
 		return;
@@ -119,7 +120,7 @@ void PatchManager::saveDialog() {
 }
 
 
-void PatchManager::saveAsDialog() {
+void Manager::saveAsDialog() {
 	std::string dir;
 	std::string filename;
 	if (this->path == "") {
@@ -164,7 +165,7 @@ void PatchManager::saveAsDialog() {
 }
 
 
-void PatchManager::saveTemplateDialog() {
+void Manager::saveTemplateDialog() {
 	// Even if <user>/template.vcv doesn't exist, this message is still valid because it overrides the <system>/template.vcv patch.
 	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, "Overwrite template patch?"))
 		return;
@@ -180,7 +181,7 @@ void PatchManager::saveTemplateDialog() {
 }
 
 
-void PatchManager::saveAutosave() {
+void Manager::saveAutosave() {
 	std::string patchPath = system::join(autosavePath, "patch.json");
 	INFO("Saving autosave %s", patchPath.c_str());
 	json_t* rootJ = toJson();
@@ -204,7 +205,7 @@ void PatchManager::saveAutosave() {
 }
 
 
-void PatchManager::cleanAutosave() {
+void Manager::cleanAutosave() {
 	// Remove files and directories in the `autosave/modules` directory that doesn't match a module in the rack.
 	std::string modulesDir = system::join(autosavePath, "modules");
 	if (system::isDirectory(modulesDir)) {
@@ -238,7 +239,7 @@ static bool isPatchLegacyV1(std::string path) {
 }
 
 
-void PatchManager::load(std::string path) {
+void Manager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
 	system::removeRecursively(autosavePath);
@@ -260,7 +261,7 @@ void PatchManager::load(std::string path) {
 }
 
 
-void PatchManager::loadTemplate() {
+void Manager::loadTemplate() {
 	try {
 		load(templatePath);
 	}
@@ -282,7 +283,7 @@ void PatchManager::loadTemplate() {
 }
 
 
-void PatchManager::loadTemplateDialog() {
+void Manager::loadTemplateDialog() {
 	if (!promptClear("The current patch is unsaved. Clear it and start a new patch?")) {
 		return;
 	}
@@ -290,7 +291,7 @@ void PatchManager::loadTemplateDialog() {
 }
 
 
-bool PatchManager::hasAutosave() {
+bool Manager::hasAutosave() {
 	std::string patchPath = system::join(autosavePath, "patch.json");
 	INFO("Loading autosave %s", patchPath.c_str());
 	FILE* file = std::fopen(patchPath.c_str(), "r");
@@ -301,7 +302,7 @@ bool PatchManager::hasAutosave() {
 }
 
 
-void PatchManager::loadAutosave() {
+void Manager::loadAutosave() {
 	std::string patchPath = system::join(autosavePath, "patch.json");
 	INFO("Loading autosave %s", patchPath.c_str());
 	FILE* file = std::fopen(patchPath.c_str(), "r");
@@ -319,7 +320,7 @@ void PatchManager::loadAutosave() {
 }
 
 
-void PatchManager::loadAction(std::string path) {
+void Manager::loadAction(std::string path) {
 	try {
 		load(path);
 	}
@@ -335,7 +336,7 @@ void PatchManager::loadAction(std::string path) {
 }
 
 
-void PatchManager::loadDialog() {
+void Manager::loadDialog() {
 	if (!promptClear("The current patch is unsaved. Clear it and open a new patch?"))
 		return;
 
@@ -363,7 +364,7 @@ void PatchManager::loadDialog() {
 }
 
 
-void PatchManager::loadPathDialog(std::string path) {
+void Manager::loadPathDialog(std::string path) {
 	if (!promptClear("The current patch is unsaved. Clear it and open the new patch?"))
 		return;
 
@@ -371,7 +372,7 @@ void PatchManager::loadPathDialog(std::string path) {
 }
 
 
-void PatchManager::revertDialog() {
+void Manager::revertDialog() {
 	if (path == "")
 		return;
 	if (!promptClear("Revert patch to the last saved state?"))
@@ -381,7 +382,7 @@ void PatchManager::revertDialog() {
 }
 
 
-void PatchManager::pushRecentPath(std::string path) {
+void Manager::pushRecentPath(std::string path) {
 	auto& recent = settings::recentPatchPaths;
 	// Remove path from recent patches (if exists)
 	recent.remove(path);
@@ -392,12 +393,12 @@ void PatchManager::pushRecentPath(std::string path) {
 }
 
 
-void PatchManager::disconnectDialog() {
+void Manager::disconnectDialog() {
 	APP->scene->rack->clearCablesAction();
 }
 
 
-json_t* PatchManager::toJson() {
+json_t* Manager::toJson() {
 	// root
 	json_t* rootJ = json_object();
 
@@ -428,7 +429,7 @@ json_t* PatchManager::toJson() {
 }
 
 
-void PatchManager::fromJson(json_t* rootJ) {
+void Manager::fromJson(json_t* rootJ) {
 	clear();
 
 	// version
@@ -473,10 +474,11 @@ void PatchManager::fromJson(json_t* rootJ) {
 }
 
 
-void PatchManager::log(std::string msg) {
+void Manager::log(std::string msg) {
 	warningLog += msg;
 	warningLog += "\n";
 }
 
 
+} // namespace patch
 } // namespace rack

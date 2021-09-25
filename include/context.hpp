@@ -20,7 +20,9 @@ struct Window;
 } // namespace window
 
 
-struct PatchManager;
+namespace patch {
+struct Manager;
+} // namespace patch
 
 
 namespace widget {
@@ -41,7 +43,7 @@ struct Context {
 	engine::Engine* engine = NULL;
 	window::Window* window = NULL;
 	history::State* history = NULL;
-	PatchManager* patch = NULL;
+	patch::Manager* patch = NULL;
 
 	~Context();
 };

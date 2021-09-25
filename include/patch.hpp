@@ -5,9 +5,10 @@
 
 
 namespace rack {
+namespace patch {
 
 
-struct PatchManager {
+struct Manager {
 	struct Internal;
 	Internal* internal;
 
@@ -22,8 +23,8 @@ struct PatchManager {
 	/** Append to this while loading/saving a patch to display messages to the user after success. */
 	std::string warningLog;
 
-	PatchManager();
-	~PatchManager();
+	Manager();
+	~Manager();
 	void launch(std::string pathArg);
 	/** Clears the patch. */
 	void clear();
@@ -59,4 +60,5 @@ struct PatchManager {
 };
 
 
+} // namespace patch
 } // namespace rack

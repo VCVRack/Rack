@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
 	APP->event = new widget::EventState;
 	APP->scene = new app::Scene;
 	APP->event->rootWidget = APP->scene;
-	APP->patch = new PatchManager;
+	APP->patch = new patch::Manager;
 	if (!settings::headless) {
 		APP->window = new window::Window;
 	}
