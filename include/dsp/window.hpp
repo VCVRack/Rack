@@ -1,5 +1,7 @@
 #pragma once
 #include <math.hpp>
+#include <simd/Vector.hpp>
+#include <simd/functions.hpp>
 
 
 namespace rack {

@@ -1,5 +1,5 @@
 #pragma once
-#include <simd/vector.hpp>
+#include <simd/Vector.hpp>
 #include <simd/sse_mathfun_extension.h>
 #include <common.hpp>
 #include <math.hpp>
