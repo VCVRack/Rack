@@ -42,6 +42,7 @@ build/dep/osdialog/osdialog_gtk3.c.o: FLAGS += $(shell pkg-config --cflags gtk+-
 	LDFLAGS += $(shell pkg-config --libs gtk+-3.0)
 
 	STANDALONE_TARGET := Rack
+	STANDALONE_LDFLAGS += -static-libstdc++ -static-libgcc
 	STANDALONE_LDFLAGS += -Wl,-rpath=.
 endif
 
