@@ -8,6 +8,8 @@
 
 
 namespace rack {
+/** High-performance classes handling modules and voltage signals between them
+*/
 namespace engine {
 
 

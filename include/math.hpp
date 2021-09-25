@@ -8,7 +8,7 @@
 namespace rack {
 
 
-/** Supplemental `<cmath>` functions and types
+/** Extends `<cmath>` with extra functions and types
 */
 namespace math {
 

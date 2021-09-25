@@ -29,7 +29,8 @@ struct Scene;
 } // namespace app
 
 
-/** Contains the application state  */
+/** Rack instance state
+*/
 struct Context {
 	widget::EventState* event = NULL;
 	app::Scene* scene = NULL;

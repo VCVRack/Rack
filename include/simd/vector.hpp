@@ -6,7 +6,8 @@
 namespace rack {
 
 
-/** Abstraction of byte-aligned values for SIMD CPU acceleration. */
+/** Abstraction of aligned types for SIMD computation
+*/
 namespace simd {
 
 

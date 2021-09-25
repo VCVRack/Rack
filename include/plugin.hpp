@@ -9,7 +9,7 @@
 namespace rack {
 
 
-/** Loads and manages plugins
+/** Loads and manages Rack plugins
 */
 namespace plugin {
 

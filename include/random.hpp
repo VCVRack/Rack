@@ -7,7 +7,7 @@
 namespace rack {
 
 
-/** Random number generator
+/** Random number generation
 */
 namespace random {
 
@@ -86,7 +86,7 @@ struct Xoroshiro128Plus {
 };
 
 
-// Easy random API
+// Simple random API
 
 /** Initializes the thread-local RNG state.
 Must call when creating a thread, otherwise random state is undefined (might always return 0).

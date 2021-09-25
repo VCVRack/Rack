@@ -3,7 +3,7 @@
 
 namespace rack {
 
-/** Updates Discord "now playing" status with its IPC API
+/** Updates Discord "now playing" status with IPC
 */
 namespace discord {
 

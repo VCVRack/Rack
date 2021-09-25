@@ -16,7 +16,7 @@
 namespace rack {
 
 
-/** General user interface widgets using Blendish
+/** Common graphical user interface widgets
 */
 namespace ui {
 

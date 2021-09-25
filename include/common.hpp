@@ -161,6 +161,8 @@ namespace std {
 #endif
 
 
+/** Root namespace for the Rack API
+*/
 namespace rack {
 
 
@@ -193,8 +195,9 @@ T* construct(F f, V v, Args... args) {
 }
 
 
-/** Defers code until the scope is destructed
-From http://www.gingerbill.org/article/defer-in-cpp.html
+/** Defers running code until the scope is destructed
+
+From http://www.gingerbill.org/article/defer-in-cpp.html.
 Example:
 
 	file = fopen(...);

@@ -9,7 +9,7 @@
 namespace rack {
 
 
-/** Rack-specific GUI widgets and functions that control and offer feedback for the rack state.
+/** Rack's custom UI widgets that control the Rack state and engine.
 */
 namespace app {
 

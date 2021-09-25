@@ -15,6 +15,8 @@ struct Module;
 } // namespace engine
 
 
+/** Handles common path locations.
+*/
 namespace asset {
 
 

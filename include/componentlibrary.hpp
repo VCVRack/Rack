@@ -14,14 +14,9 @@
 
 namespace rack {
 
-/** Component Library by [Grayscale](https://grayscale.info/).
+/** Library of Rack components: knobs, ports, lights, switches, buttons, etc.
 
-Copied from `LICENSE.md`:
-
-The **Component Library graphics** in the `res/ComponentLibrary` directory are copyright © 2019 [Grayscale](http://grayscale.info/) and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
-You may not freely sell plugins using Component Library graphics.
-However, a free commercial license is available for plugins sold through the [VCV Store](https://vcvrack.com/plugins.html).
-Email contact@vcvrack.com for more information about licensing or the VCV Store.
+See LICENSE.md for legal details about using Rack component graphics in your Rack plugin.
 */
 namespace componentlibrary {
 

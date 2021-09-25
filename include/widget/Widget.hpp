@@ -12,7 +12,7 @@
 namespace rack {
 
 
-/** General UI widgets
+/** Basic UI widget types
 */
 namespace widget {
 
@@ -494,7 +494,7 @@ struct Widget : WeakBase {
 } // namespace widget
 
 /** Deprecated Rack v1 event namespace.
-Use `FooEvent` (defined in widget::Widget) instead of `event::Foo` in new code.
+Use events defined in the widget::Widget class instead of this `event::` namespace in new code.
 */
 namespace event {
 using Base = widget::BaseEvent;
@@ -532,5 +532,6 @@ using Remove = widget::Widget::RemoveEvent;
 using Show = widget::Widget::ShowEvent;
 using Hide = widget::Widget::HideEvent;
 }
+
 
 } // namespace rack

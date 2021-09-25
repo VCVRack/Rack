@@ -7,7 +7,7 @@
 namespace rack {
 
 
-/** Cross-platform functions for operating systems routines
+/** Cross-platform functions for operating system, file path, and filesystem routines
 */
 namespace system {
 

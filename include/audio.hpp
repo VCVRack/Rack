@@ -10,7 +10,7 @@
 namespace rack {
 
 
-/** Audio driver
+/** Abstraction for all audio drivers in Rack
 */
 namespace audio {
 

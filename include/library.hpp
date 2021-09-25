@@ -7,7 +7,7 @@
 namespace rack {
 
 
-/** Synchronizes plugins with the VCV Library and updates Rack itself
+/** Synchronizes plugins with the VCV Library and handles VCV accounts with the vcvrack.com API
 */
 namespace library {
 

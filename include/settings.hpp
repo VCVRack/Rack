@@ -15,7 +15,8 @@
 namespace rack {
 
 
-/** Process-level globals. */
+/** Process-scope globals, most of which are persisted to a file
+*/
 namespace settings {
 
 

@@ -7,7 +7,7 @@
 namespace rack {
 
 
-/** Digital signal processing routines
+/** Digital signal processing routines and classes
 */
 namespace dsp {
 
