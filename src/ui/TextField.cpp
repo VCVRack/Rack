@@ -228,11 +228,6 @@ void TextField::onSelectKey(const SelectKeyEvent& e) {
 			}
 			e.consume(this);
 		}
-		// Escape
-		if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
-			APP->event->setSelectedWidget(NULL);
-			e.consume(this);
-		}
 		// Tab
 		if (e.key == GLFW_KEY_TAB && (e.mods & RACK_MOD_MASK) == 0) {
 			if (nextField)
