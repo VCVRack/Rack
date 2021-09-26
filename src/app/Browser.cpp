@@ -445,7 +445,7 @@ struct ZoomButton : ui::ChoiceButton {
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 		menu->box.size.x = box.size.x;
 
-		for (float zoom = 0.f; zoom >= -2.f; zoom -= 0.5f) {
+		for (float zoom = 1.f; zoom >= -2.f; zoom -= 0.5f) {
 			ZoomItem* sortItem = new ZoomItem;
 			sortItem->text = string::f("%.0f%%", std::pow(2.f, zoom) * 100.f);
 			sortItem->zoom = zoom;
