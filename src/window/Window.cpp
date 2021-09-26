@@ -284,7 +284,13 @@ Window::Window() {
 	glfwMakeContextCurrent(win);
 	glfwSwapInterval(1);
 	const GLFWvidmode* monitorMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-	internal->monitorRefreshRate = monitorMode->refreshRate;
+	if (monitorMode->refreshRate > 0) {
+		internal->monitorRefreshRate = monitorMode->refreshRate;
+	}
+	else {
+		// Some monitors report 0Hz refresh rate for some reason, so as a workaround, assume 60Hz.
+		internal->monitorRefreshRate = 60;
+	}
 
 	// Set window callbacks
 	glfwSetWindowPosCallback(win, windowPosCallback);
