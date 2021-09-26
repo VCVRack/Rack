@@ -29,7 +29,7 @@ ifdef ARCH_LIN
 	FLAGS += -fno-gnu-unique
 	LDFLAGS += -Wl,-rpath=.
 	# Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
-	LDFLAGS += -static-libstdc++
+	LDFLAGS += -static-libstdc++ -static-libgcc
 	RACK_USER_DIR ?= $(HOME)/.Rack2
 endif
 
