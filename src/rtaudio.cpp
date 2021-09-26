@@ -230,13 +230,13 @@ struct RtAudioDriver : audio::Driver {
 	RtAudio::Api api;
 	// deviceId -> Device
 	std::map<int, RtAudioDevice*> devices;
+	RtAudio* rtAudio = NULL;
 	std::vector<RtAudio::DeviceInfo> deviceInfos;
 
 	RtAudioDriver(RtAudio::Api api) {
 		this->api = api;
 
 		INFO("Creating RtAudio %s driver", RTAUDIO_API_NAMES.at(api).c_str());
-		RtAudio* rtAudio;
 		try {
 			rtAudio = new RtAudio(api);
 		}
@@ -246,17 +246,25 @@ struct RtAudioDriver : audio::Driver {
 
 		rtAudio->showWarnings(false);
 
-		// Cache all DeviceInfos for performance and stability (especially for ASIO).
-		int count = rtAudio->getDeviceCount();
-		for (int deviceId = 0; deviceId < count; deviceId++) {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
-			INFO("Found RtAudio %s device %d: %s (%d in, %d out)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
-			deviceInfos.push_back(deviceInfo);
+		// Cache DeviceInfos for performance and stability (especially for ASIO).
+		// Cache all audio drivers for now.
+		if (true) {
+			int count = rtAudio->getDeviceCount();
+			for (int deviceId = 0; deviceId < count; deviceId++) {
+				RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+				INFO("Found RtAudio %s device %d: %s (%d in, %d out)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), deviceInfo.inputChannels, deviceInfo.outputChannels);
+				deviceInfos.push_back(deviceInfo);
+			}
+
+			delete rtAudio;
+			rtAudio = NULL;
 		}
 	}
 
 	~RtAudioDriver() {
 		assert(devices.empty());
+		if (rtAudio)
+			delete rtAudio;
 	}
 
 	std::string getName() override {
@@ -264,28 +272,63 @@ struct RtAudioDriver : audio::Driver {
 	}
 
 	std::vector<int> getDeviceIds() override {
+		int count = 0;
+		if (rtAudio) {
+			count = rtAudio->getDeviceCount();
+		}
+		else {
+			count = deviceInfos.size();
+		}
+
 		std::vector<int> deviceIds;
-		for (int i = 0; i < (int) deviceInfos.size(); i++)
+		for (int i = 0; i < count; i++)
 			deviceIds.push_back(i);
 		return deviceIds;
 	}
 
 	std::string getDeviceName(int deviceId) override {
-		if (!(0 <= deviceId && deviceId < (int) deviceInfos.size()))
-			return "";
-		return deviceInfos[deviceId].name;
+		if (rtAudio) {
+			int count = rtAudio->getDeviceCount();
+			if (0 <= deviceId && deviceId < count) {
+				RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+				return deviceInfo.name;
+			}
+		}
+		else {
+			if (0 <= deviceId && deviceId < (int) deviceInfos.size())
+				return deviceInfos[deviceId].name;
+		}
+		return "";
 	}
 
 	int getDeviceNumInputs(int deviceId) override {
-		if (!(0 <= deviceId && deviceId < (int) deviceInfos.size()))
-			return 0;
-		return deviceInfos[deviceId].inputChannels;
+		if (rtAudio) {
+			int count = rtAudio->getDeviceCount();
+			if (0 <= deviceId && deviceId < count) {
+				RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+				return deviceInfo.inputChannels;
+			}
+		}
+		else {
+			if (0 <= deviceId && deviceId < (int) deviceInfos.size())
+				return deviceInfos[deviceId].inputChannels;
+		}
+		return 0;
 	}
 
 	int getDeviceNumOutputs(int deviceId) override {
-		if (!(0 <= deviceId && deviceId < (int) deviceInfos.size()))
-			return 0;
-		return deviceInfos[deviceId].outputChannels;
+		if (rtAudio) {
+			int count = rtAudio->getDeviceCount();
+			if (0 <= deviceId && deviceId < count) {
+				RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+				return deviceInfo.outputChannels;
+			}
+		}
+		else {
+			if (0 <= deviceId && deviceId < (int) deviceInfos.size())
+				return deviceInfos[deviceId].outputChannels;
+		}
+		return 0;
 	}
 
 	audio::Device* subscribe(int deviceId, audio::Port* port) override {
