@@ -266,7 +266,7 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 		rangeRatio = 1.f;
 	}
 
-
+	// Calculate delta value
 	float delta = e.scrollDelta.y;
 	delta *= settings::knobScrollSensitivity;
 	delta *= getModSpeed();

@@ -48,6 +48,7 @@ struct MenuButton : ui::Button {
 	}
 };
 
+
 struct NotificationIcon : widget::Widget {
 	void draw(const DrawArgs& args) override {
 		nvgBeginPath(args.vg);
@@ -60,9 +61,11 @@ struct NotificationIcon : widget::Widget {
 	}
 };
 
+
 ////////////////////
 // File
 ////////////////////
+
 
 struct FileButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
@@ -111,9 +114,11 @@ struct FileButton : MenuButton {
 	}
 };
 
+
 ////////////////////
 // Edit
 ////////////////////
+
 
 struct EditButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
@@ -155,9 +160,11 @@ struct EditButton : MenuButton {
 	}
 };
 
+
 ////////////////////
 // View
 ////////////////////
+
 
 struct ZoomQuantity : Quantity {
 	void setValue(float value) override {
@@ -197,6 +204,7 @@ struct ZoomSlider : ui::Slider {
 	}
 };
 
+
 struct CableOpacityQuantity : Quantity {
 	void setValue(float value) override {
 		settings::cableOpacity = math::clamp(value, getMinValue(), getMaxValue());
@@ -229,6 +237,7 @@ struct CableOpacitySlider : ui::Slider {
 	}
 };
 
+
 struct CableTensionQuantity : Quantity {
 	void setValue(float value) override {
 		settings::cableTension = math::clamp(value, getMinValue(), getMaxValue());
@@ -254,6 +263,7 @@ struct CableTensionSlider : ui::Slider {
 		delete quantity;
 	}
 };
+
 
 struct RackBrightnessQuantity : Quantity {
 	void setValue(float value) override {
@@ -290,6 +300,7 @@ struct RackBrightnessSlider : ui::Slider {
 	}
 };
 
+
 struct HaloBrightnessQuantity : Quantity {
 	void setValue(float value) override {
 		settings::haloBrightness = math::clamp(value, getMinValue(), getMaxValue());
@@ -324,6 +335,47 @@ struct HaloBrightnessSlider : ui::Slider {
 		delete quantity;
 	}
 };
+
+
+struct KnobScrollSensitivityQuantity : Quantity {
+	void setValue(float value) override {
+		value = math::clamp(value, getMinValue(), getMaxValue());
+		settings::knobScrollSensitivity = std::pow(2.f, value);
+	}
+	float getValue() override {
+		return std::log2(settings::knobScrollSensitivity);
+	}
+	float getMinValue() override {
+		return std::log2(1e-4f);
+	}
+	float getMaxValue() override {
+		return std::log2(1e-2f);
+	}
+	float getDefaultValue() override {
+		return std::log2(1e-3f);
+	}
+	float getDisplayValue() override {
+		return std::pow(2.f, getValue() - getDefaultValue());
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(std::log2(displayValue) + getDefaultValue());
+	}
+	std::string getLabel() override {
+		return "Scroll wheel knob sensitivity";
+	}
+	int getDisplayPrecision() override {
+		return 2;
+	}
+};
+struct KnobScrollSensitivitySlider : ui::Slider {
+	KnobScrollSensitivitySlider() {
+		quantity = new KnobScrollSensitivityQuantity;
+	}
+	~KnobScrollSensitivitySlider() {
+		delete quantity;
+	}
+};
+
 
 struct ViewButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
@@ -394,13 +446,19 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(createBoolPtrMenuItem("Scroll wheel knob control", &settings::knobScroll));
 
+		KnobScrollSensitivitySlider* knobScrollSensitivitySlider = new KnobScrollSensitivitySlider;
+		knobScrollSensitivitySlider->box.size.x = 250.0;
+		menu->addChild(knobScrollSensitivitySlider);
+
 		menu->addChild(createBoolPtrMenuItem("Lock module positions", &settings::lockModules));
 	}
 };
 
+
 ////////////////////
 // Engine
 ////////////////////
+
 
 struct SampleRateItem : ui::MenuItem {
 	ui::Menu* createChildMenu() override {
@@ -443,6 +501,7 @@ struct SampleRateItem : ui::MenuItem {
 	}
 };
 
+
 struct EngineButton : MenuButton {
 	void onAction(const ActionEvent& e) override {
 		ui::Menu* menu = createMenu();
@@ -481,11 +540,14 @@ struct EngineButton : MenuButton {
 	}
 };
 
+
 ////////////////////
 // Plugins
 ////////////////////
 
+
 static bool isLoggingIn = false;
+
 
 struct AccountPasswordField : ui::PasswordField {
 	ui::MenuItem* logInItem;
@@ -493,6 +555,7 @@ struct AccountPasswordField : ui::PasswordField {
 		logInItem->doAction();
 	}
 };
+
 
 struct LogInItem : ui::MenuItem {
 	ui::TextField* emailField;
@@ -517,6 +580,7 @@ struct LogInItem : ui::MenuItem {
 		MenuItem::step();
 	}
 };
+
 
 struct SyncUpdatesItem : ui::MenuItem {
 	void step() override {
@@ -545,6 +609,7 @@ struct SyncUpdatesItem : ui::MenuItem {
 		e.unconsume();
 	}
 };
+
 
 struct SyncUpdateItem : ui::MenuItem {
 	std::string slug;
@@ -736,9 +801,11 @@ struct LibraryButton : MenuButton {
 	}
 };
 
+
 ////////////////////
 // Help
 ////////////////////
+
 
 struct HelpButton : MenuButton {
 	NotificationIcon* notification;
@@ -804,9 +871,11 @@ struct HelpButton : MenuButton {
 	}
 };
 
+
 ////////////////////
 // MenuBar
 ////////////////////
+
 
 struct MeterLabel : ui::Label {
 	int frameIndex = 0;
