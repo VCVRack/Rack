@@ -18,6 +18,7 @@ FLAGS += -fPIC
 FLAGS += -I$(RACK_DIR)/include -I$(RACK_DIR)/dep/include
 
 LDFLAGS += -shared
+# Plugins must link to libRack because when Rack is used as a plugin of another application, its symbols are not available to subsequently loaded shared libraries.
 LDFLAGS += -L$(RACK_DIR) -lRack
 
 include $(RACK_DIR)/arch.mk
@@ -28,7 +29,7 @@ ifdef ARCH_LIN
 	# I don't really understand the side effects (see GCC manual), but so far tests are positive.
 	FLAGS += -fno-gnu-unique
 	LDFLAGS += -Wl,-rpath=.
-	# Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
+	# Since the plugin's compiler could be a different version than Rack's compiler, link libstdc++ and libgcc statically to avoid ABI issues.
 	LDFLAGS += -static-libstdc++ -static-libgcc
 	RACK_USER_DIR ?= $(HOME)/.Rack2
 endif
