@@ -75,7 +75,12 @@ struct Model {
 	std::string getUserPresetDirectory();
 	/** Returns the module or plugin manual URL, whichever exists. */
 	std::string getManualUrl();
-	void appendContextMenu(ui::Menu* menu);
+
+	/** Appends items to menu with useful Model information.
+
+	Enable `inBrowser` to show Module Browser key commands.
+	*/
+	void appendContextMenu(ui::Menu* menu, bool inBrowser = false);
 	bool isFavorite();
 	void setFavorite(bool favorite);
 };

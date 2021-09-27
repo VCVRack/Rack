@@ -305,7 +305,7 @@ struct ModelBox : widget::OpaqueWidget {
 
 		menu->addChild(createMenuLabel(model->name));
 		menu->addChild(createMenuLabel(model->plugin->brand));
-		model->appendContextMenu(menu);
+		model->appendContextMenu(menu, true);
 	}
 };
 

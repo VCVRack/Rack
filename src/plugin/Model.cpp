@@ -95,7 +95,7 @@ std::string Model::getManualUrl() {
 }
 
 
-void Model::appendContextMenu(ui::Menu* menu) {
+void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
 	// plugin
 	menu->addChild(createMenuItem("Plugin: " + plugin->name, "", [=]() {
 		system::openBrowser(plugin->pluginUrl);
@@ -181,12 +181,12 @@ void Model::appendContextMenu(ui::Menu* menu) {
 	}
 
 	// Favorite
-	menu->addChild(createBoolMenuItem("Favorite",
+	std::string favoriteRightText = inBrowser ? (RACK_MOD_CTRL_NAME "+click") : "";
+	if (isFavorite())
+		favoriteRightText += " " CHECKMARK_STRING;
+	menu->addChild(createMenuItem("Favorite", favoriteRightText,
 		[=]() {
-			return isFavorite();
-		},
-		[=](bool favorite) {
-			setFavorite(favorite);
+			setFavorite(!isFavorite());
 		}
 	));
 }
