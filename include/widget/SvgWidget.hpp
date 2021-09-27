@@ -10,6 +10,8 @@ namespace widget {
 struct SvgWidget : Widget {
 	std::shared_ptr<window::Svg> svg;
 
+	SvgWidget();
+
 	/** Sets the box size to the SVG image size */
 	void wrap();
 

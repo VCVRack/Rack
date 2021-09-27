@@ -6,6 +6,11 @@ namespace rack {
 namespace widget {
 
 
+SvgWidget::SvgWidget() {
+	box.size = math::Vec();
+}
+
+
 void SvgWidget::wrap() {
 	if (svg) {
 		box.size = svg->getSize();
@@ -15,10 +20,12 @@ void SvgWidget::wrap() {
 	}
 }
 
+
 void SvgWidget::setSvg(std::shared_ptr<window::Svg> svg) {
 	this->svg = svg;
 	wrap();
 }
+
 
 void SvgWidget::draw(const DrawArgs& args) {
 	if (!svg)
