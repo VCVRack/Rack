@@ -317,11 +317,11 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			}
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			cloneAction(false);
+			cloneAction();
 			e.consume(this);
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
-			cloneAction(true);
+			cloneAction(false);
 			e.consume(this);
 		}
 		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -999,14 +999,7 @@ void ModuleWidget::createContextMenu() {
 	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
 		if (!weakThis)
 			return;
-		weakThis->cloneAction(false);
-	}));
-
-	// Duplicate with cables
-	menu->addChild(createMenuItem("Duplicate with cables", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+D", [=]() {
-		if (!weakThis)
-			return;
-		weakThis->cloneAction(true);
+		weakThis->cloneAction();
 	}));
 
 	// Delete

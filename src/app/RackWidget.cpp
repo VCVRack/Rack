@@ -1227,12 +1227,7 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 
 	// Duplicate
 	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
-		cloneSelectionAction(false);
-	}, n == 0));
-
-	// Duplicate with cables
-	menu->addChild(createMenuItem("Duplicate with cables", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+D", [=]() {
-		cloneSelectionAction(true);
+		cloneSelectionAction();
 	}, n == 0));
 
 	// Delete
