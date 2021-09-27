@@ -56,6 +56,11 @@ You must set the context when preparing each thread if the code uses the APP mac
 */
 void contextSet(Context* context);
 
+/** Deprecated. Use contextGet() or the APP macro to get the current Context. */
+DEPRECATED inline Context* appGet() {
+	return contextGet();
+}
+
 /** Accesses the global Context pointer. Just an alias for contextGet(). */
 #define APP rack::contextGet()
 
