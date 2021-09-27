@@ -1025,7 +1025,7 @@ void RackWidget::disconnectSelectionAction() {
 		delete complexAction;
 }
 
-void RackWidget::cloneSelectionAction() {
+void RackWidget::cloneSelectionAction(bool cloneCables) {
 	json_t* rootJ = selectionToJson();
 	DEFER({json_decref(rootJ);});
 
@@ -1041,35 +1041,37 @@ void RackWidget::cloneSelectionAction() {
 	auto p = RackWidget_pasteJson(this, rootJ, complexAction);
 
 	// Clone cables attached to inputs of selected modules but outputs of non-selected modules
-	for (CableWidget* cw : getCompleteCables()) {
-		auto inputIt = p.newModuleIds.find(cw->getCable()->inputModule->id);
-		if (inputIt == p.newModuleIds.end())
-			continue;
+	if (cloneCables) {
+		for (CableWidget* cw : getCompleteCables()) {
+			auto inputIt = p.newModuleIds.find(cw->getCable()->inputModule->id);
+			if (inputIt == p.newModuleIds.end())
+				continue;
 
-		auto outputIt = p.newModuleIds.find(cw->getCable()->outputModule->id);
-		if (outputIt != p.newModuleIds.end())
-			continue;
+			auto outputIt = p.newModuleIds.find(cw->getCable()->outputModule->id);
+			if (outputIt != p.newModuleIds.end())
+				continue;
 
-		int64_t clonedInputModuleId = inputIt->second;
-		engine::Module* clonedInputModule = APP->engine->getModule(clonedInputModuleId);
+			int64_t clonedInputModuleId = inputIt->second;
+			engine::Module* clonedInputModule = APP->engine->getModule(clonedInputModuleId);
 
-		// Create cable attached to cloned ModuleWidget's input
-		engine::Cable* clonedCable = new engine::Cable;
-		clonedCable->inputModule = clonedInputModule;
-		clonedCable->inputId = cw->cable->inputId;
-		clonedCable->outputModule = cw->cable->outputModule;
-		clonedCable->outputId = cw->cable->outputId;
-		APP->engine->addCable(clonedCable);
+			// Create cable attached to cloned ModuleWidget's input
+			engine::Cable* clonedCable = new engine::Cable;
+			clonedCable->inputModule = clonedInputModule;
+			clonedCable->inputId = cw->cable->inputId;
+			clonedCable->outputModule = cw->cable->outputModule;
+			clonedCable->outputId = cw->cable->outputId;
+			APP->engine->addCable(clonedCable);
 
-		app::CableWidget* clonedCw = new app::CableWidget;
-		clonedCw->setCable(clonedCable);
-		clonedCw->color = cw->color;
-		APP->scene->rack->addCable(clonedCw);
+			app::CableWidget* clonedCw = new app::CableWidget;
+			clonedCw->setCable(clonedCable);
+			clonedCw->color = cw->color;
+			APP->scene->rack->addCable(clonedCw);
 
-		// history::CableAdd
-		history::CableAdd* hca = new history::CableAdd;
-		hca->setCable(clonedCw);
-		complexAction->push(hca);
+			// history::CableAdd
+			history::CableAdd* hca = new history::CableAdd;
+			hca->setCable(clonedCw);
+			complexAction->push(hca);
+		}
 	}
 }
 
@@ -1225,7 +1227,12 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 
 	// Duplicate
 	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
-		cloneSelectionAction();
+		cloneSelectionAction(false);
+	}, n == 0));
+
+	// Duplicate with cables
+	menu->addChild(createMenuItem("Duplicate with cables", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+D", [=]() {
+		cloneSelectionAction(true);
 	}, n == 0));
 
 	// Delete

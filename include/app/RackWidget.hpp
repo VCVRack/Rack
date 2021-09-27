@@ -91,7 +91,7 @@ struct RackWidget : widget::OpaqueWidget {
 	void resetSelectionAction();
 	void randomizeSelectionAction();
 	void disconnectSelectionAction();
-	void cloneSelectionAction();
+	void cloneSelectionAction(bool cloneCables);
 	void bypassSelectionAction(bool bypassed);
 	bool isSelectionBypassed();
 	void deleteSelectionAction();

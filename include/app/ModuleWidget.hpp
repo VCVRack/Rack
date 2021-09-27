@@ -110,7 +110,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void randomizeAction();
 	void appendDisconnectActions(history::ComplexAction* complexAction);
 	void disconnectAction();
-	void cloneAction();
+	void cloneAction(bool cloneCables);
 	void bypassAction(bool bypassed);
 	/** Deletes `this` */
 	void removeAction();

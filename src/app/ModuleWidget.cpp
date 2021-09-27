@@ -317,7 +317,11 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 			}
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			cloneAction();
+			cloneAction(false);
+			e.consume(this);
+		}
+		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
+			cloneAction(true);
 			e.consume(this);
 		}
 		if (e.keyName == "i" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
@@ -755,7 +759,7 @@ void ModuleWidget::disconnectAction() {
 		delete complexAction;
 }
 
-void ModuleWidget::cloneAction() {
+void ModuleWidget::cloneAction(bool cloneCables) {
 	// history::ComplexAction
 	history::ComplexAction* h = new history::ComplexAction;
 	h->name = "duplicate module";
@@ -787,30 +791,32 @@ void ModuleWidget::cloneAction() {
 	hma->setModule(clonedModuleWidget);
 	h->push(hma);
 
-	// Clone cables attached to input ports
-	for (PortWidget* pw : getInputs()) {
-		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(pw)) {
-			// Create cable attached to cloned ModuleWidget's input
-			engine::Cable* clonedCable = new engine::Cable;
-			clonedCable->inputModule = clonedModule;
-			clonedCable->inputId = cw->cable->inputId;
-			// If cable is self-patched, attach to cloned module instead
-			if (cw->cable->outputModule == module)
-				clonedCable->outputModule = clonedModule;
-			else
-				clonedCable->outputModule = cw->cable->outputModule;
-			clonedCable->outputId = cw->cable->outputId;
-			APP->engine->addCable(clonedCable);
+	if (cloneCables) {
+		// Clone cables attached to input ports
+		for (PortWidget* pw : getInputs()) {
+			for (CableWidget* cw : APP->scene->rack->getCablesOnPort(pw)) {
+				// Create cable attached to cloned ModuleWidget's input
+				engine::Cable* clonedCable = new engine::Cable;
+				clonedCable->inputModule = clonedModule;
+				clonedCable->inputId = cw->cable->inputId;
+				// If cable is self-patched, attach to cloned module instead
+				if (cw->cable->outputModule == module)
+					clonedCable->outputModule = clonedModule;
+				else
+					clonedCable->outputModule = cw->cable->outputModule;
+				clonedCable->outputId = cw->cable->outputId;
+				APP->engine->addCable(clonedCable);
 
-			app::CableWidget* clonedCw = new app::CableWidget;
-			clonedCw->setCable(clonedCable);
-			clonedCw->color = cw->color;
-			APP->scene->rack->addCable(clonedCw);
+				app::CableWidget* clonedCw = new app::CableWidget;
+				clonedCw->setCable(clonedCable);
+				clonedCw->color = cw->color;
+				APP->scene->rack->addCable(clonedCw);
 
-			// history::CableAdd
-			history::CableAdd* hca = new history::CableAdd;
-			hca->setCable(clonedCw);
-			h->push(hca);
+				// history::CableAdd
+				history::CableAdd* hca = new history::CableAdd;
+				hca->setCable(clonedCw);
+				h->push(hca);
+			}
 		}
 	}
 
@@ -993,7 +999,14 @@ void ModuleWidget::createContextMenu() {
 	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
 		if (!weakThis)
 			return;
-		weakThis->cloneAction();
+		weakThis->cloneAction(false);
+	}));
+
+	// Duplicate with cables
+	menu->addChild(createMenuItem("Duplicate with cables", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+D", [=]() {
+		if (!weakThis)
+			return;
+		weakThis->cloneAction(true);
 	}));
 
 	// Delete
