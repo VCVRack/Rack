@@ -247,8 +247,7 @@ struct RtAudioDriver : audio::Driver {
 		rtAudio->showWarnings(false);
 
 		// Cache DeviceInfos for performance and stability (especially for ASIO).
-		// Cache all audio drivers for now.
-		if (true) {
+		if (api == RtAudio::WINDOWS_WASAPI || api == RtAudio::WINDOWS_ASIO || api == RtAudio::WINDOWS_DS) {
 			int count = rtAudio->getDeviceCount();
 			for (int deviceId = 0; deviceId < count; deviceId++) {
 				RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
