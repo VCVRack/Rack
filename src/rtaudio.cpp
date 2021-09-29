@@ -334,6 +334,10 @@ struct RtAudioDriver : audio::Driver {
 		RtAudioDevice* device;
 		auto it = devices.find(deviceId);
 		if (it == devices.end()) {
+			// ASIO only allows one device to be used simultaneously
+			if (api == RtAudio::WINDOWS_ASIO && devices.size() >= 1)
+				throw Exception("ASIO driver only allows one audio device to be used simultaneously");
+
 			// Can throw Exception
 			device = new RtAudioDevice(api, deviceId);
 			devices[deviceId] = device;
