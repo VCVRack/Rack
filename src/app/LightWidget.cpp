@@ -15,7 +15,7 @@ void LightWidget::draw(const DrawArgs& args) {
 
 	// Dynamic light and halo
 	// Override tint from rack brightness adjustment
-	nvgGlobalAlpha(args.vg, 1.0);
+	nvgGlobalTint(args.vg, color::WHITE);
 	// Use the formula `lightColor * (1 - dest) + dest` for blending
 	nvgGlobalCompositeBlendFunc(args.vg, NVG_ONE_MINUS_DST_COLOR, NVG_ONE);
 	drawLight(args);

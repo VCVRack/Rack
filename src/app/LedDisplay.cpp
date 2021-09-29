@@ -54,7 +54,7 @@ void LedDisplayChoice::draw(const DrawArgs& args) {
 	}
 
 	std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
-	nvgGlobalAlpha(args.vg, 1.0);
+	nvgGlobalTint(args.vg, color::WHITE);
 	if (font && font->handle >= 0) {
 		nvgFillColor(args.vg, color);
 		nvgFontFaceId(args.vg, font->handle);
@@ -99,7 +99,7 @@ void LedDisplayTextField::draw(const DrawArgs& args) {
 
 	// Text
 	std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
-	nvgGlobalAlpha(args.vg, 1.0);
+	nvgGlobalTint(args.vg, color::WHITE);
 	if (font && font->handle >= 0) {
 		bndSetFont(font->handle);
 
