@@ -111,8 +111,8 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 		int numDeviceOutputs = port->getDeviceNumOutputs(deviceId);
 		std::string name = port->getDeviceName(deviceId);
 
-		// Display only 8 channel offsets per device, because some virtual devices (e.g. ALSA) can have thousands of useless channels.
-		for (int i = 0; i < 8; i++) {
+		// Display only 32 channel offsets per device, because some virtual devices (e.g. ALSA) can have thousands of useless channels.
+		for (int i = 0; i < 32; i++) {
 			int inputOffset = i * port->maxInputs;
 			int outputOffset = i * port->maxOutputs;
 			if (inputOffset >= numDeviceInputs && outputOffset >= numDeviceOutputs)
