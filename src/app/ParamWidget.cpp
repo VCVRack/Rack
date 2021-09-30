@@ -274,7 +274,8 @@ void ParamWidget::createContextMenu() {
 	menu->addChild(paramLabel);
 
 	if (switchQuantity) {
-		int index = (int) std::floor(pq->getValue());
+		float minValue = pq->getMinValue();
+		int index = (int) std::floor(pq->getValue() - minValue);
 		int numStates = switchQuantity->labels.size();
 		for (int i = 0; i < numStates; i++) {
 			std::string label = switchQuantity->labels[i];
@@ -282,7 +283,7 @@ void ParamWidget::createContextMenu() {
 			paramValueItem->text = label;
 			paramValueItem->rightText = CHECKMARK(i == index);
 			paramValueItem->paramWidget = this;
-			paramValueItem->value = i;
+			paramValueItem->value = minValue + i;
 			menu->addChild(paramValueItem);
 		}
 		if (numStates > 0) {

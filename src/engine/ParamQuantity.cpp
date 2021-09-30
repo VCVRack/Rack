@@ -177,7 +177,7 @@ void ParamQuantity::fromJson(json_t* rootJ) {
 
 
 std::string SwitchQuantity::getDisplayValueString() {
-	int index = (int) std::floor(getValue());
+	int index = (int) std::floor(getValue() - getMinValue());
 	if (!(0 <= index && index < (int) labels.size()))
 		return "";
 	return labels[index];
@@ -191,7 +191,7 @@ void SwitchQuantity::setDisplayValueString(std::string s) {
 	if (it == labels.end())
 		return;
 	int index = std::distance(labels.begin(), it);
-	setValue(index);
+	setValue(getMinValue() + index);
 }
 
 
