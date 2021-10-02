@@ -285,7 +285,7 @@ struct Module {
 	Expander& getRightExpander() {
 		return rightExpander;
 	}
-	/** Returns the left Expander if `side` is false, andright Expander if `side` is true. */ 
+	/** Returns the left Expander if `side` is false, and the right Expander if `side` is true. */
 	Expander& getExpander(bool side) {
 		return side ? rightExpander : leftExpander;
 	}
@@ -327,8 +327,11 @@ struct Module {
 	Remember to call `Module::fromJson(rootJ)` within your overridden method.
 	*/
 	virtual void fromJson(json_t* rootJ);
+
+	/** Serializes the "params" object. */
 	virtual json_t* paramsToJson();
 	virtual void paramsFromJson(json_t* rootJ);
+
 	/** Override to store extra internal data in the "data" property of the module's JSON object. */
 	virtual json_t* dataToJson() {
 		return NULL;
