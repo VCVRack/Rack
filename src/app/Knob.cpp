@@ -43,7 +43,8 @@ void Knob::initParamQuantity() {
 	if (pq) {
 		if (snap)
 			pq->snapEnabled = true;
-		if (smooth)
+		// Only enable smoothing if snapping is disabled
+		if (smooth && !pq->snapEnabled)
 			pq->smoothEnabled = true;
 	}
 }
