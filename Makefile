@@ -227,10 +227,16 @@ endif
 	cp -R LICENSE* *.mk include helper.py dist/"$(DIST_SDK_DIR)"/
 	mkdir -p dist/"$(DIST_SDK_DIR)"/dep/
 	cp -R dep/include dist/"$(DIST_SDK_DIR)"/dep/
+ifdef ARCH_LIN
+	cp $(TARGET) dist/"$(DIST_SDK_DIR)"/
+	$(STRIP) -s dist/"$(DIST_SDK_DIR)"/$(TARGET)
+endif
+ifdef ARCH_MAC
+	cp $(TARGET) dist/"$(DIST_SDK_DIR)"/
+	$(STRIP) -S dist/"$(DIST_SDK_DIR)"/$(TARGET)
+endif
 ifdef ARCH_WIN
 	cp libRack.dll.a dist/"$(DIST_SDK_DIR)"/
-else
-	cp $(TARGET) dist/"$(DIST_SDK_DIR)"/
 endif
 	cd dist && zip -q -9 -r "$(DIST_SDK)" "$(DIST_SDK_DIR)"
 
