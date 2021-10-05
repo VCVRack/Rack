@@ -81,14 +81,14 @@ void ModuleMove::undo() {
 	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	if (!mw)
 		return;
-	mw->box.pos = oldPos;
+	APP->scene->rack->requestModulePos(mw, oldPos);
 }
 
 void ModuleMove::redo() {
 	app::ModuleWidget* mw = APP->scene->rack->getModule(moduleId);
 	if (!mw)
 		return;
-	mw->box.pos = newPos;
+	APP->scene->rack->requestModulePos(mw, newPos);
 }
 
 
