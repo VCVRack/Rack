@@ -58,7 +58,12 @@ static void* loadLibrary(std::string libraryPath) {
 	// Change it back when we're finished
 	DEFER({system::setWorkingDirectory(cwd);});
 	// Load library with dlopen
-	void* handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+	void* handle = NULL;
+	#if defined ARCH_LIN
+	handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_DEEPBIND);
+	#elif defined ARCH_MAC
+	handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
+	#endif
 	if (!handle)
 		throw Exception("Failed to load library %s: %s", libraryPath.c_str(), dlerror());
 #endif
