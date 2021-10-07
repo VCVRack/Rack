@@ -6,6 +6,8 @@ include $(RACK_DIR)/arch.mk
 
 OBJCOPY ?= objcopy
 STRIP ?= strip
+INSTALL_NAME_TOOL ?= install_name_tool
+OTOOL ?= otool
 
 # Generate dependency files alongside the object files
 FLAGS += -MMD -MP
