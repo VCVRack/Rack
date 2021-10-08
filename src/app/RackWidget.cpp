@@ -40,18 +40,13 @@ static ModuleWidget* moduleWidgetFromJson(json_t* moduleJ) {
 
 struct ModuleContainer : widget::Widget {
 	void draw(const DrawArgs& args) override {
-		// Draw shadows behind each ModuleWidget first, so the shadow doesn't overlap the front of other ModuleWidgets.
-		for (widget::Widget* child : children) {
-			ModuleWidget* w = dynamic_cast<ModuleWidget*>(child);
-			assert(w);
-
-			nvgSave(args.vg);
-			nvgTranslate(args.vg, child->box.pos.x, child->box.pos.y);
-			w->drawShadow(args);
-			nvgRestore(args.vg);
-		}
+		// Draw ModuleWidget shadows
+		Widget::drawLayer(args, -1);
 
 		Widget::draw(args);
+
+		// Draw lights and light halos
+		Widget::drawLayer(args, 1);
 	}
 };
 

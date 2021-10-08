@@ -284,17 +284,22 @@ void ModuleWidget::draw(const DrawArgs& args) {
 	nvgResetScissor(args.vg);
 }
 
-void ModuleWidget::drawShadow(const DrawArgs& args) {
-	nvgBeginPath(args.vg);
-	float r = 20; // Blur radius
-	float c = 20; // Corner radius
-	math::Rect shadowBox = box.zeroPos().grow(math::Vec(10, -30));
-	math::Rect shadowOutsideBox = shadowBox.grow(math::Vec(r, r));
-	nvgRect(args.vg, RECT_ARGS(shadowOutsideBox));
-	NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
-	NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
-	nvgFillPaint(args.vg, nvgBoxGradient(args.vg, RECT_ARGS(shadowBox), c, r, shadowColor, transparentColor));
-	nvgFill(args.vg);
+void ModuleWidget::drawLayer(const DrawArgs& args, int layer) {
+	if (layer == -1) {
+		nvgBeginPath(args.vg);
+		float r = 20; // Blur radius
+		float c = 20; // Corner radius
+		math::Rect shadowBox = box.zeroPos().grow(math::Vec(10, -30));
+		math::Rect shadowOutsideBox = shadowBox.grow(math::Vec(r, r));
+		nvgRect(args.vg, RECT_ARGS(shadowOutsideBox));
+		NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.2);
+		NVGcolor transparentColor = nvgRGBAf(0, 0, 0, 0);
+		nvgFillPaint(args.vg, nvgBoxGradient(args.vg, RECT_ARGS(shadowBox), c, r, shadowColor, transparentColor));
+		nvgFill(args.vg);
+	}
+	else {
+		Widget::drawLayer(args, layer);
+	}
 }
 
 void ModuleWidget::onHover(const HoverEvent& e) {

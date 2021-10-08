@@ -62,7 +62,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	std::vector<PortWidget*> getOutputs();
 
 	void draw(const DrawArgs& args) override;
-	void drawShadow(const DrawArgs& args);
+	void drawLayer(const DrawArgs& args, int layer) override;
 
 	/** Override to add context menu entries to your subclass.
 	It is recommended to add a blank `ui::MenuSeparator` first for spacing.

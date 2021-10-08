@@ -128,7 +128,10 @@ struct Widget : WeakBase {
 		NVGLUframebuffer* fb = NULL;
 	};
 
-	/** Draws the widget to the NanoVG context */
+	/** Draws the widget to the NanoVG context.
+
+	When overriding, call the superclass draw() to recurse to children.
+	*/
 	virtual void draw(const DrawArgs& args);
 	/** Override draw(const DrawArgs &args) instead */
 	DEPRECATED virtual void draw(NVGcontext* vg) {}
@@ -138,6 +141,7 @@ struct Widget : WeakBase {
 	Custom widgets may draw its children multiple times on different layers, passing an arbitrary layer number each time.
 	Layer 0 calls children's draw().
 	When overriding, always wrap draw commands in `if (layer == ...) {}` to avoid drawing on all layers.
+	When overriding, call the superclass drawLayer() to recurse to children.
 	*/
 	virtual void drawLayer(const DrawArgs& args, int layer);
 

@@ -350,6 +350,8 @@ void CableWidget::drawLayer(const DrawArgs& args, int layer) {
 		nvgStrokeWidth(args.vg, thickness - 1.0);
 		nvgStroke(args.vg);
 	}
+
+	Widget::drawLayer(args, layer);
 }
 
 
