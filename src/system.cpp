@@ -33,6 +33,9 @@
 
 #include <archive.h>
 #include <archive_entry.h>
+#if defined ARCH_MAC
+	#include <locale.h>
+#endif
 
 #include <system.hpp>
 #include <string.hpp>
@@ -457,11 +460,24 @@ static la_ssize_t archiveReadVectorCallback(struct archive *a, void* client_data
 }
 
 static void unarchiveToDirectory(const std::string& archivePath, const std::vector<uint8_t>* archiveData, const std::string& dirPath) {
+#if defined ARCH_MAC
+	// libarchive depends on locale so set thread
+	// If locale is not found, returns NULL which resets thread to global locale
+	locale_t loc = newlocale(LC_CTYPE_MASK, "en_US.UTF-8", NULL);
+	locale_t oldLoc = uselocale(loc);
+	freelocale(loc);
+	DEFER({
+		uselocale(oldLoc);
+	});
+#endif
+
 	// Based on minitar.c extract() in libarchive examples
 	int r;
 
 	// Open archive for reading
 	struct archive* a = archive_read_new();
+	if (!a)
+		throw Exception("Unarchiver could not be created");
 	DEFER({archive_read_free(a);});
 	archive_read_support_filter_zstd(a);
 	// archive_read_support_filter_all(a);
@@ -505,6 +521,7 @@ static void unarchiveToDirectory(const std::string& archivePath, const std::vect
 
 		// Convert relative pathname to absolute based on dirPath
 		std::string entryPath = archive_entry_pathname(entry);
+		DEBUG("entryPath: %s", entryPath.c_str());
 		if (!fs::u8path(entryPath).is_relative())
 			throw Exception("Unarchiver does not support absolute tar paths: %s", entryPath.c_str());
 		entryPath = (fs::u8path(dirPath) / fs::u8path(entryPath)).generic_u8string();
