@@ -273,7 +273,22 @@ void Widget::draw(const DrawArgs& args) {
 }
 
 
-void Widget::drawChild(Widget* child, const DrawArgs& args) {
+void Widget::drawLayer(const DrawArgs& args, int layer) {
+	// Iterate children
+	for (Widget* child : children) {
+		// Don't draw if invisible
+		if (!child->isVisible())
+			continue;
+		// Don't draw if child is outside clip box
+		if (!args.clipBox.intersects(child->box))
+			continue;
+
+		drawChild(child, args, layer);
+	}
+}
+
+
+void Widget::drawChild(Widget* child, const DrawArgs& args, int layer) {
 	DrawArgs childArgs = args;
 	// Intersect child clip box with self
 	childArgs.clipBox = childArgs.clipBox.intersect(child->box);
@@ -283,13 +298,17 @@ void Widget::drawChild(Widget* child, const DrawArgs& args) {
 	nvgSave(args.vg);
 	nvgTranslate(args.vg, child->box.pos.x, child->box.pos.y);
 
-	child->draw(childArgs);
-
+	if (layer == 0) {
+		child->draw(childArgs);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-	// Call deprecated draw function, which does nothing by default
-	child->draw(args.vg);
+		// Call deprecated draw function, which does nothing by default
+		child->draw(args.vg);
 #pragma GCC diagnostic pop
+	}
+	else {
+		child->drawLayer(childArgs, layer);
+	}
 
 	nvgRestore(args.vg);
 }

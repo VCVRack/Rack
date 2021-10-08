@@ -46,6 +46,7 @@ struct CableWidget : widget::Widget {
 	void fromJson(json_t* rootJ);
 	void step() override;
 	void draw(const DrawArgs& args) override;
+	void drawLayer(const DrawArgs& args, int layer) override;
 	engine::Cable* releaseCable();
 };
 

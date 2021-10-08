@@ -62,14 +62,10 @@ struct CableContainer : widget::TransparentWidget {
 		Widget::draw(args);
 
 		// Draw cable shadows
-		DrawArgs args1 = args;
-		args1.layer = 1;
-		Widget::draw(args1);
+		Widget::drawLayer(args, 1);
 
 		// Draw cables
-		DrawArgs args2 = args;
-		args2.layer = 2;
-		Widget::draw(args2);
+		Widget::drawLayer(args, 2);
 	}
 };
 

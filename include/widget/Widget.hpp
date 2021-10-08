@@ -126,8 +126,6 @@ struct Widget : WeakBase {
 		/** Local box representing the visible viewport. */
 		math::Rect clipBox;
 		NVGLUframebuffer* fb = NULL;
-		/** Custom widgets may draw children multiple times, passing a different layer number each time. */
-		int layer = 0;
 	};
 
 	/** Draws the widget to the NanoVG context */
@@ -135,8 +133,16 @@ struct Widget : WeakBase {
 	/** Override draw(const DrawArgs &args) instead */
 	DEPRECATED virtual void draw(NVGcontext* vg) {}
 
+	/** Draw additional layers.
+
+	Custom widgets may draw its children multiple times on different layers, passing an arbitrary layer number each time.
+	Layer 0 calls children's draw().
+	When overriding, always wrap draw commands in `if (layer == ...) {}` to avoid drawing on all layers.
+	*/
+	virtual void drawLayer(const DrawArgs& args, int layer);
+
 	/** Draws a particular child. */
-	void drawChild(Widget* child, const DrawArgs& args);
+	void drawChild(Widget* child, const DrawArgs& args, int layer = 0);
 
 	// Events
 

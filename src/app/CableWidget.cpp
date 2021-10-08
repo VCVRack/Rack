@@ -131,10 +131,12 @@ CableWidget::CableWidget() {
 	addChild(outputPlug);
 }
 
+
 CableWidget::~CableWidget() {
 	setCable(NULL);
 	delete internal;
 }
+
 
 void CableWidget::setNextCableColor() {
 	if (!settings::cableColors.empty()) {
@@ -144,9 +146,11 @@ void CableWidget::setNextCableColor() {
 	}
 }
 
+
 bool CableWidget::isComplete() {
 	return outputPort && inputPort;
 }
+
 
 void CableWidget::updateCable() {
 	if (cable) {
@@ -163,6 +167,7 @@ void CableWidget::updateCable() {
 		APP->engine->addCable(cable);
 	}
 }
+
 
 void CableWidget::setCable(engine::Cable* cable) {
 	if (this->cable) {
@@ -188,9 +193,11 @@ void CableWidget::setCable(engine::Cable* cable) {
 	}
 }
 
+
 engine::Cable* CableWidget::getCable() {
 	return cable;
 }
+
 
 math::Vec CableWidget::getInputPos() {
 	if (inputPort) {
@@ -204,6 +211,7 @@ math::Vec CableWidget::getInputPos() {
 	}
 }
 
+
 math::Vec CableWidget::getOutputPos() {
 	if (outputPort) {
 		return outputPort->getRelativeOffset(outputPort->box.zeroPos().getCenter(), APP->scene->rack);
@@ -216,10 +224,12 @@ math::Vec CableWidget::getOutputPos() {
 	}
 }
 
+
 void CableWidget::mergeJson(json_t* rootJ) {
 	std::string s = color::toHexString(color);
 	json_object_set_new(rootJ, "color", json_string(s.c_str()));
 }
+
 
 void CableWidget::fromJson(json_t* rootJ) {
 	json_t* colorJ = json_object_get(rootJ, "color");
@@ -230,6 +240,7 @@ void CableWidget::fromJson(json_t* rootJ) {
 	}
 }
 
+
 static math::Vec getSlumpPos(math::Vec pos1, math::Vec pos2) {
 	float dist = pos1.minus(pos2).norm();
 	math::Vec avg = pos1.plus(pos2).div(2);
@@ -237,6 +248,7 @@ static math::Vec getSlumpPos(math::Vec pos1, math::Vec pos2) {
 	avg.y += (1.0 - settings::cableTension) * (150.0 + 1.0 * dist);
 	return avg;
 }
+
 
 void CableWidget::step() {
 	math::Vec outputPos = getOutputPos();
@@ -262,13 +274,13 @@ void CableWidget::step() {
 	Widget::step();
 }
 
-void CableWidget::draw(const DrawArgs& args) {
-	if (args.layer == 0) {
-		// Draw PlugWidgets
-		Widget::draw(args);
-		return;
-	}
 
+void CableWidget::draw(const DrawArgs& args) {
+	Widget::draw(args);
+}
+
+
+void CableWidget::drawLayer(const DrawArgs& args, int layer) {
 	float opacity = settings::cableOpacity;
 	bool thick = false;
 
@@ -312,7 +324,7 @@ void CableWidget::draw(const DrawArgs& args) {
 	// Avoids glitches when cable is bent
 	nvgLineJoin(args.vg, NVG_ROUND);
 
-	if (args.layer == 1) {
+	if (layer == 1) {
 		// Draw cable shadow
 		math::Vec shadowSlump = slump.plus(math::Vec(0, 30));
 		nvgBeginPath(args.vg);
@@ -323,7 +335,7 @@ void CableWidget::draw(const DrawArgs& args) {
 		nvgStrokeWidth(args.vg, thickness - 1.0);
 		nvgStroke(args.vg);
 	}
-	else if (args.layer == 2) {
+	else if (layer == 2) {
 		// Draw cable outline
 		nvgBeginPath(args.vg);
 		nvgMoveTo(args.vg, VEC_ARGS(outputPos));
@@ -339,6 +351,7 @@ void CableWidget::draw(const DrawArgs& args) {
 		nvgStroke(args.vg);
 	}
 }
+
 
 engine::Cable* CableWidget::releaseCable() {
 	engine::Cable* cable = this->cable;
