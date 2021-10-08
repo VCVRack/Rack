@@ -26,6 +26,7 @@ struct LedDisplayChoice : widget::OpaqueWidget {
 	NVGcolor bgColor;
 	LedDisplayChoice();
 	void draw(const DrawArgs& args) override;
+	void drawLayer(const DrawArgs& args, int layer) override;
 	void onButton(const ButtonEvent& e) override;
 };
 
@@ -36,6 +37,7 @@ struct LedDisplayTextField : ui::TextField {
 	NVGcolor bgColor;
 	LedDisplayTextField();
 	void draw(const DrawArgs& args) override;
+	void drawLayer(const DrawArgs& args, int layer) override;
 	int getTextPosition(math::Vec mousePos) override;
 };
 

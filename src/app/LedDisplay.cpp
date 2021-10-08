@@ -45,7 +45,6 @@ LedDisplayChoice::LedDisplayChoice() {
 
 
 void LedDisplayChoice::draw(const DrawArgs& args) {
-	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 	if (bgColor.a > 0.0) {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0, 0, box.size.x, box.size.y);
@@ -53,16 +52,26 @@ void LedDisplayChoice::draw(const DrawArgs& args) {
 		nvgFill(args.vg);
 	}
 
-	std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
-	nvgGlobalTint(args.vg, color::WHITE);
-	if (font && font->handle >= 0) {
-		nvgFillColor(args.vg, color);
-		nvgFontFaceId(args.vg, font->handle);
-		nvgTextLetterSpacing(args.vg, 0.0);
+	Widget::draw(args);
+}
 
-		nvgFontSize(args.vg, 12);
-		nvgText(args.vg, textOffset.x, textOffset.y, text.c_str(), NULL);
+
+void LedDisplayChoice::drawLayer(const DrawArgs& args, int layer) {
+	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+
+	if (layer == 1) {
+		std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
+		if (font && font->handle >= 0) {
+			nvgFillColor(args.vg, color);
+			nvgFontFaceId(args.vg, font->handle);
+			nvgTextLetterSpacing(args.vg, 0.0);
+
+			nvgFontSize(args.vg, 12);
+			nvgText(args.vg, textOffset.x, textOffset.y, text.c_str(), NULL);
+		}
 	}
+
+	Widget::drawLayer(args, layer);
 	nvgResetScissor(args.vg);
 }
 
@@ -87,8 +96,6 @@ LedDisplayTextField::LedDisplayTextField() {
 
 
 void LedDisplayTextField::draw(const DrawArgs& args) {
-	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
-
 	// Background
 	if (bgColor.a > 0.0) {
 		nvgBeginPath(args.vg);
@@ -97,24 +104,33 @@ void LedDisplayTextField::draw(const DrawArgs& args) {
 		nvgFill(args.vg);
 	}
 
-	// Text
-	std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
-	nvgGlobalTint(args.vg, color::WHITE);
-	if (font && font->handle >= 0) {
-		bndSetFont(font->handle);
+	Widget::draw(args);
+}
 
-		NVGcolor highlightColor = color;
-		highlightColor.a = 0.5;
-		int begin = std::min(cursor, selection);
-		int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
-		bndIconLabelCaret(args.vg,
-			textOffset.x, textOffset.y,
-			box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
-			-1, color, 12, text.c_str(), highlightColor, begin, end);
 
-		bndSetFont(APP->window->uiFont->handle);
+void LedDisplayTextField::drawLayer(const DrawArgs& args, int layer) {
+	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+
+	if (layer == 1) {
+		// Text
+		std::shared_ptr<window::Font> font = APP->window->loadFont(fontPath);
+		if (font && font->handle >= 0) {
+			bndSetFont(font->handle);
+
+			NVGcolor highlightColor = color;
+			highlightColor.a = 0.5;
+			int begin = std::min(cursor, selection);
+			int end = (this == APP->event->selectedWidget) ? std::max(cursor, selection) : -1;
+			bndIconLabelCaret(args.vg,
+				textOffset.x, textOffset.y,
+				box.size.x - 2 * textOffset.x, box.size.y - 2 * textOffset.y,
+				-1, color, 12, text.c_str(), highlightColor, begin, end);
+
+			bndSetFont(APP->window->uiFont->handle);
+		}
 	}
 
+	Widget::drawLayer(args, layer);
 	nvgResetScissor(args.vg);
 }
 

@@ -44,24 +44,39 @@ struct ModuleContainer : widget::Widget {
 		Widget::drawLayer(args, -1);
 
 		Widget::draw(args);
+	}
 
-		// Draw lights and light halos
-		nvgGlobalTint(args.vg, color::WHITE);
-		Widget::drawLayer(args, 1);
+	void drawLayer(const DrawArgs& args, int layer) override {
+		// Draw lights after translucent rectangle
+		if (layer == 1) {
+			Widget::drawLayer(args, 1);
+		}
 	}
 };
 
 
 struct CableContainer : widget::TransparentWidget {
 	void draw(const DrawArgs& args) override {
-		// Draw Plugs
-		Widget::draw(args);
+		// Don't draw on layer 0
+	}
 
-		// Draw cable shadows
-		Widget::drawLayer(args, 1);
+	void drawLayer(const DrawArgs& args, int layer) override {
+		if (layer == 2) {
+			// Draw Plugs
+			Widget::draw(args);
 
-		// Draw cables
-		Widget::drawLayer(args, 2);
+			// Draw cable lights
+			nvgSave(args.vg);
+			nvgGlobalTint(args.vg, color::WHITE);
+			Widget::drawLayer(args, 1);
+			nvgRestore(args.vg);
+
+			// Draw cable shadows
+			Widget::drawLayer(args, 2);
+
+			// Draw cables
+			Widget::drawLayer(args, 3);
+		}
 	}
 };
 
@@ -103,11 +118,27 @@ void RackWidget::step() {
 }
 
 void RackWidget::draw(const DrawArgs& args) {
-	// Darken all children by user setting
 	float b = settings::rackBrightness;
+
+	// Draw rack rails and modules
+	Widget::draw(args);
+
+	// Draw translucent dark rectangle
+	if (b < 1.f) {
+		nvgBeginPath(args.vg);
+		nvgRect(args.vg, 0.0, 0.0, VEC_ARGS(box.size));
+		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 1.f - b));
+		nvgFill(args.vg);
+	}
+
+	// Draw lights and halos
+	Widget::drawLayer(args, 1);
+
+	// Tint all draws after this point
 	nvgGlobalTint(args.vg, nvgRGBAf(b, b, b, 1));
 
-	Widget::draw(args);
+	// Draw cables
+	Widget::drawLayer(args, 2);
 
 	// Draw selection rectangle
 	if (internal->selecting) {

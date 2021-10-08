@@ -276,79 +276,83 @@ void CableWidget::step() {
 
 
 void CableWidget::draw(const DrawArgs& args) {
+	// Draw plugs
 	Widget::draw(args);
 }
 
 
 void CableWidget::drawLayer(const DrawArgs& args, int layer) {
-	float opacity = settings::cableOpacity;
-	bool thick = false;
+	// Cable shadow and cable
+	if (layer == 2 || layer == 3) {
+		float opacity = settings::cableOpacity;
+		bool thick = false;
 
-	if (isComplete()) {
-		engine::Output* output = &cable->outputModule->outputs[cable->outputId];
-		// Increase thickness if output port is polyphonic
-		if (output->isPolyphonic()) {
-			thick = true;
+		if (isComplete()) {
+			engine::Output* output = &cable->outputModule->outputs[cable->outputId];
+			// Increase thickness if output port is polyphonic
+			if (output->isPolyphonic()) {
+				thick = true;
+			}
+
+			// Draw opaque if mouse is hovering over a connected port
+			Widget* hoveredWidget = APP->event->hoveredWidget;
+			if (outputPort == hoveredWidget || inputPort == hoveredWidget) {
+				opacity = 1.0;
+			}
+			// Draw translucent cable if not active (i.e. 0 channels)
+			else if (output->getChannels() == 0) {
+				opacity *= 0.5;
+			}
 		}
-
-		// Draw opaque if mouse is hovering over a connected port
-		Widget* hoveredWidget = APP->event->hoveredWidget;
-		if (outputPort == hoveredWidget || inputPort == hoveredWidget) {
+		else {
+			// Draw opaque if the cable is incomplete
 			opacity = 1.0;
 		}
-		// Draw translucent cable if not active (i.e. 0 channels)
-		else if (output->getChannels() == 0) {
-			opacity *= 0.5;
+
+		if (opacity <= 0.0)
+			return;
+		nvgAlpha(args.vg, std::pow(opacity, 1.5));
+
+		math::Vec outputPos = getOutputPos();
+		math::Vec inputPos = getInputPos();
+
+		float thickness = thick ? 9.0 : 6.0;
+
+		// The endpoints are off-center
+		math::Vec slump = getSlumpPos(outputPos, inputPos);
+		outputPos = outputPos.plus(slump.minus(outputPos).normalize().mult(13.0));
+		inputPos = inputPos.plus(slump.minus(inputPos).normalize().mult(13.0));
+
+		nvgLineCap(args.vg, NVG_ROUND);
+		// Avoids glitches when cable is bent
+		nvgLineJoin(args.vg, NVG_ROUND);
+
+		if (layer == 2) {
+			// Draw cable shadow
+			math::Vec shadowSlump = slump.plus(math::Vec(0, 30));
+			nvgBeginPath(args.vg);
+			nvgMoveTo(args.vg, VEC_ARGS(outputPos));
+			nvgQuadTo(args.vg, VEC_ARGS(shadowSlump), VEC_ARGS(inputPos));
+			NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.10);
+			nvgStrokeColor(args.vg, shadowColor);
+			nvgStrokeWidth(args.vg, thickness - 1.0);
+			nvgStroke(args.vg);
 		}
-	}
-	else {
-		// Draw opaque if the cable is incomplete
-		opacity = 1.0;
-	}
+		else if (layer == 3) {
+			// Draw cable outline
+			nvgBeginPath(args.vg);
+			nvgMoveTo(args.vg, VEC_ARGS(outputPos));
+			nvgQuadTo(args.vg, VEC_ARGS(slump), VEC_ARGS(inputPos));
+			// nvgStrokePaint(args.vg, nvgLinearGradient(args.vg, VEC_ARGS(outputPos), VEC_ARGS(inputPos), color::mult(color, 0.5), color));
+			nvgStrokeColor(args.vg, color::mult(color, 0.8));
+			nvgStrokeWidth(args.vg, thickness);
+			nvgStroke(args.vg);
 
-	if (opacity <= 0.0)
-		return;
-	nvgAlpha(args.vg, std::pow(opacity, 1.5));
-
-	math::Vec outputPos = getOutputPos();
-	math::Vec inputPos = getInputPos();
-
-	float thickness = thick ? 9.0 : 6.0;
-
-	// The endpoints are off-center
-	math::Vec slump = getSlumpPos(outputPos, inputPos);
-	outputPos = outputPos.plus(slump.minus(outputPos).normalize().mult(13.0));
-	inputPos = inputPos.plus(slump.minus(inputPos).normalize().mult(13.0));
-
-	nvgLineCap(args.vg, NVG_ROUND);
-	// Avoids glitches when cable is bent
-	nvgLineJoin(args.vg, NVG_ROUND);
-
-	if (layer == 1) {
-		// Draw cable shadow
-		math::Vec shadowSlump = slump.plus(math::Vec(0, 30));
-		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, VEC_ARGS(outputPos));
-		nvgQuadTo(args.vg, VEC_ARGS(shadowSlump), VEC_ARGS(inputPos));
-		NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.10);
-		nvgStrokeColor(args.vg, shadowColor);
-		nvgStrokeWidth(args.vg, thickness - 1.0);
-		nvgStroke(args.vg);
-	}
-	else if (layer == 2) {
-		// Draw cable outline
-		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, VEC_ARGS(outputPos));
-		nvgQuadTo(args.vg, VEC_ARGS(slump), VEC_ARGS(inputPos));
-		// nvgStrokePaint(args.vg, nvgLinearGradient(args.vg, VEC_ARGS(outputPos), VEC_ARGS(inputPos), color::mult(color, 0.5), color));
-		nvgStrokeColor(args.vg, color::mult(color, 0.8));
-		nvgStrokeWidth(args.vg, thickness);
-		nvgStroke(args.vg);
-
-		// Draw cable
-		nvgStrokeColor(args.vg, color::mult(color, 0.95));
-		nvgStrokeWidth(args.vg, thickness - 1.0);
-		nvgStroke(args.vg);
+			// Draw cable
+			nvgStrokeColor(args.vg, color::mult(color, 0.95));
+			nvgStrokeWidth(args.vg, thickness - 1.0);
+			nvgStroke(args.vg);
+		}
 	}
 
 	Widget::drawLayer(args, layer);
