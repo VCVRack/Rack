@@ -46,6 +46,7 @@ struct ModuleContainer : widget::Widget {
 		Widget::draw(args);
 
 		// Draw lights and light halos
+		nvgGlobalTint(args.vg, color::WHITE);
 		Widget::drawLayer(args, 1);
 	}
 };

@@ -12,14 +12,18 @@ void LightWidget::draw(const DrawArgs& args) {
 
 	// Child widgets
 	Widget::draw(args);
+}
 
-	// Dynamic light and halo
-	// Override tint from rack brightness adjustment
-	nvgGlobalTint(args.vg, color::WHITE);
-	// Use the formula `lightColor * (1 - dest) + dest` for blending
-	nvgGlobalCompositeBlendFunc(args.vg, NVG_ONE_MINUS_DST_COLOR, NVG_ONE);
-	drawLight(args);
-	drawHalo(args);
+
+void LightWidget::drawLayer(const DrawArgs& args, int layer) {
+	if (layer == 1) {
+		// Use the formula `lightColor * (1 - dest) + dest` for blending
+		nvgGlobalCompositeBlendFunc(args.vg, NVG_ONE_MINUS_DST_COLOR, NVG_ONE);
+		drawLight(args);
+		drawHalo(args);
+	}
+
+	Widget::drawLayer(args, layer);
 }
 
 
