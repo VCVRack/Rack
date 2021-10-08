@@ -127,7 +127,9 @@ void RackWidget::draw(const DrawArgs& args) {
 	if (b < 1.f) {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0.0, 0.0, VEC_ARGS(box.size));
-		nvgFillColor(args.vg, nvgRGBAf(0, 0, 0, 1.f - b));
+		const float radius = 300.0;
+		const float brightness = 0.2f;
+		nvgFillPaint(args.vg, nvgRadialGradient(args.vg, VEC_ARGS(internal->mousePos), 0.0, radius, nvgRGBAf(0, 0, 0, 1.f - b - brightness), nvgRGBAf(0, 0, 0, 1.f - b)));
 		nvgFill(args.vg);
 	}
 
