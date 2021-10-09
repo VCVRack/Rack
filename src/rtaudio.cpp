@@ -372,8 +372,8 @@ void rtaudioInit() {
 	// I don't like the order returned by getCompiledApi(), so reorder it here.
 	std::vector<RtAudio::Api> orderedApis = {
 		RtAudio::LINUX_ALSA,
-		RtAudio::UNIX_JACK,
 		RtAudio::LINUX_PULSE,
+		RtAudio::UNIX_JACK,
 		RtAudio::LINUX_OSS,
 		RtAudio::WINDOWS_WASAPI,
 		RtAudio::WINDOWS_ASIO,
