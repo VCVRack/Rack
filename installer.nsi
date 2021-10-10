@@ -7,6 +7,7 @@
 !define UNINSTALL_REG "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCVRack${VERSION_MAJOR}"
 
 Name "${NAME_FULL}"
+Unicode True
 SetCompressor /solid "lzma"
 SetCompressorDictSize 8
 CRCCheck On
@@ -73,7 +74,7 @@ FunctionEnd
 
 ; Sections
 
-Section "Install" INSTALL_SECTION
+Section "${NAME}" INSTALL_SECTION
 	SectionIn RO
 	SetOutPath "$INSTDIR"
 
