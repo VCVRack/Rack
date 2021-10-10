@@ -561,12 +561,12 @@ struct AudioInterfaceWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		menu->addChild(createCheckMenuItem("Master audio module",
+		menu->addChild(createCheckMenuItem("Master audio module", "",
 			[=]() {return module->isMaster();},
 			[=]() {module->setMaster();}
 		));
 
-		menu->addChild(createBoolPtrMenuItem("DC blocker", &module->dcFilterEnabled));
+		menu->addChild(createBoolPtrMenuItem("DC blocker", "", &module->dcFilterEnabled));
 	}
 };
 

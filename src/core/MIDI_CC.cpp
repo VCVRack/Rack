@@ -251,11 +251,11 @@ struct MIDI_CCWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		menu->addChild(createBoolPtrMenuItem("Smooth CC", &module->smooth));
+		menu->addChild(createBoolPtrMenuItem("Smooth CC", "", &module->smooth));
 
-		menu->addChild(createBoolPtrMenuItem("MPE mode", &module->mpeMode));
+		menu->addChild(createBoolPtrMenuItem("MPE mode", "", &module->mpeMode));
 
-		menu->addChild(createBoolPtrMenuItem("CC 0-31 controls are 14-bit", &module->lsbMode));
+		menu->addChild(createBoolPtrMenuItem("CC 0-31 controls are 14-bit", "", &module->lsbMode));
 	}
 };
 

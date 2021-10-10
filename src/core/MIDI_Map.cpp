@@ -492,7 +492,7 @@ struct MIDI_MapWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		menu->addChild(createBoolPtrMenuItem("Smooth CC", &module->smooth));
+		menu->addChild(createBoolPtrMenuItem("Smooth CC", "", &module->smooth));
 	}
 };
 

@@ -219,9 +219,9 @@ struct MIDI_GateWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		menu->addChild(createBoolPtrMenuItem("Velocity mode", &module->velocityMode));
+		menu->addChild(createBoolPtrMenuItem("Velocity mode", "", &module->velocityMode));
 
-		menu->addChild(createBoolPtrMenuItem("MPE mode", &module->mpeMode));
+		menu->addChild(createBoolPtrMenuItem("MPE mode", "", &module->mpeMode));
 
 		menu->addChild(createMenuItem("Panic", "",
 			[=]() {module->panic();}

@@ -202,7 +202,7 @@ struct CV_GateWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		menu->addChild(createBoolPtrMenuItem("Velocity mode", &module->velocityMode));
+		menu->addChild(createBoolPtrMenuItem("Velocity mode", "", &module->velocityMode));
 
 		menu->addChild(createMenuItem("Panic", "",
 			[=]() {module->midiOutput.panic();}

@@ -383,7 +383,7 @@ struct ViewButton : MenuButton {
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
-		menu->addChild(createBoolPtrMenuItem("Show tooltips", &settings::tooltips));
+		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
 
 		ZoomSlider* zoomSlider = new ZoomSlider;
 		zoomSlider->box.size.x = 250.0;
@@ -409,7 +409,7 @@ struct ViewButton : MenuButton {
 		menu->addChild(createSubmenuItem("Frame rate", string::f("%.0f Hz", frameRate), [=](ui::Menu* menu) {
 			for (int i = 1; i <= 6; i++) {
 				double frameRate = APP->window->getMonitorRefreshRate() / i;
-				menu->addChild(createCheckMenuItem(string::f("%.0f Hz", frameRate),
+				menu->addChild(createCheckMenuItem(string::f("%.0f Hz", frameRate), "",
 					[=]() {return settings::frameSwapInterval == i;},
 					[=]() {settings::frameSwapInterval = i;}
 				));
@@ -426,7 +426,7 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 
-		menu->addChild(createBoolPtrMenuItem("Hide cursor while dragging", &settings::allowCursorLock));
+		menu->addChild(createBoolPtrMenuItem("Hide cursor while dragging", "", &settings::allowCursorLock));
 
 		static const std::vector<std::string> knobModeLabels = {
 			"Linear",
@@ -437,20 +437,20 @@ struct ViewButton : MenuButton {
 		static const std::vector<int> knobModes = {0, 2, 3};
 		menu->addChild(createSubmenuItem("Knob mode", knobModeLabels[settings::knobMode], [=](ui::Menu* menu) {
 			for (int knobMode : knobModes) {
-				menu->addChild(createCheckMenuItem(knobModeLabels[knobMode],
+				menu->addChild(createCheckMenuItem(knobModeLabels[knobMode], "",
 					[=]() {return settings::knobMode == knobMode;},
 					[=]() {settings::knobMode = (settings::KnobMode) knobMode;}
 				));
 			}
 		}));
 
-		menu->addChild(createBoolPtrMenuItem("Scroll wheel knob control", &settings::knobScroll));
+		menu->addChild(createBoolPtrMenuItem("Scroll wheel knob control", "", &settings::knobScroll));
 
 		KnobScrollSensitivitySlider* knobScrollSensitivitySlider = new KnobScrollSensitivitySlider;
 		knobScrollSensitivitySlider->box.size.x = 250.0;
 		menu->addChild(knobScrollSensitivitySlider);
 
-		menu->addChild(createBoolPtrMenuItem("Lock module positions", &settings::lockModules));
+		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
 	}
 };
 

@@ -506,7 +506,7 @@ struct MIDI_CVWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		menu->addChild(createBoolPtrMenuItem("Smooth pitch/mod wheel", &module->smooth));
+		menu->addChild(createBoolPtrMenuItem("Smooth pitch/mod wheel", "", &module->smooth));
 
 		static const std::vector<int> clockDivisions = {24 * 4, 24 * 2, 24, 24 / 2, 24 / 4, 24 / 8, 2, 1};
 		static const std::vector<std::string> clockDivisionLabels = {"Whole", "Half", "Quarter", "8th", "16th", "32nd", "12 PPQN", "24 PPQN"};
@@ -515,7 +515,7 @@ struct MIDI_CVWidget : ModuleWidget {
 			Menu* createChildMenu() override {
 				Menu* menu = new Menu;
 				for (size_t i = 0; i < clockDivisions.size(); i++) {
-					menu->addChild(createCheckMenuItem(clockDivisionLabels[i],
+					menu->addChild(createCheckMenuItem(clockDivisionLabels[i], "",
 						[=]() {return module->clockDivision == clockDivisions[i];},
 						[=]() {module->clockDivision = clockDivisions[i];}
 					));
@@ -534,7 +534,7 @@ struct MIDI_CVWidget : ModuleWidget {
 			Menu* createChildMenu() override {
 				Menu* menu = new Menu;
 				for (int c = 1; c <= 16; c++) {
-					menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c),
+					menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c), "",
 						[=]() {return module->channels == c;},
 						[=]() {module->setChannels(c);}
 					));

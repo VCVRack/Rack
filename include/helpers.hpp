@@ -239,14 +239,20 @@ Example:
 	));
 */
 template <class TMenuItem = ui::MenuItem>
-ui::MenuItem* createCheckMenuItem(std::string text, std::function<bool()> checked, std::function<void()> action, bool disabled = false, bool alwaysConsume = false) {
+ui::MenuItem* createCheckMenuItem(std::string text, std::string rightText, std::function<bool()> checked, std::function<void()> action, bool disabled = false, bool alwaysConsume = false) {
 	struct Item : TMenuItem {
+		std::string rightTextPrefix;
 		std::function<bool()> checked;
 		std::function<void()> action;
 		bool alwaysConsume;
 
 		void step() override {
-			this->rightText = CHECKMARK(checked());
+			this->rightText = rightTextPrefix;
+			if (checked()) {
+				if (!rightTextPrefix.empty())
+					this->rightText += "  ";
+				this->rightText += CHECKMARK_STRING;
+			}
 			TMenuItem::step();
 		}
 		void onAction(const event::Action& e) override {
@@ -257,6 +263,7 @@ ui::MenuItem* createCheckMenuItem(std::string text, std::function<bool()> checke
 	};
 
 	Item* item = createMenuItem<Item>(text);
+	item->rightTextPrefix = rightText;
 	item->checked = checked;
 	item->action = action;
 	item->disabled = disabled;
@@ -278,14 +285,20 @@ Example:
 	));
 */
 template <class TMenuItem = ui::MenuItem>
-ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> getter, std::function<void(bool state)> setter, bool disabled = false, bool alwaysConsume = false) {
+ui::MenuItem* createBoolMenuItem(std::string text, std::string rightText, std::function<bool()> getter, std::function<void(bool state)> setter, bool disabled = false, bool alwaysConsume = false) {
 	struct Item : TMenuItem {
+		std::string rightTextPrefix;
 		std::function<bool()> getter;
 		std::function<void(size_t)> setter;
 		bool alwaysConsume;
 
 		void step() override {
-			this->rightText = CHECKMARK(getter());
+			this->rightText = rightTextPrefix;
+			if (getter()) {
+				if (!rightTextPrefix.empty())
+					this->rightText += "  ";
+				this->rightText += CHECKMARK_STRING;
+			}
 			TMenuItem::step();
 		}
 		void onAction(const event::Action& e) override {
@@ -296,6 +309,7 @@ ui::MenuItem* createBoolMenuItem(std::string text, std::function<bool()> getter,
 	};
 
 	Item* item = createMenuItem<Item>(text);
+	item->rightTextPrefix = rightText;
 	item->getter = getter;
 	item->setter = setter;
 	item->disabled = disabled;
@@ -310,8 +324,8 @@ Example:
 	menu->addChild(createBoolPtrMenuItem("Loop", &module->loop));
 */
 template <typename T>
-ui::MenuItem* createBoolPtrMenuItem(std::string text, T* ptr) {
-	return createBoolMenuItem(text,
+ui::MenuItem* createBoolPtrMenuItem(std::string text, std::string rightText, T* ptr) {
+	return createBoolMenuItem(text, rightText,
 		[=]() {return *ptr;},
 		[=](T val) {*ptr = val;}
 	);
