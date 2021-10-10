@@ -225,7 +225,13 @@ std::vector<int> Input::getDeviceIds() {
 int Input::getDefaultDeviceId() {
 	if (!driver)
 		return -1;
-	return driver->getDefaultInputDeviceId();
+	try {
+		return driver->getDefaultInputDeviceId();
+	}
+	catch (Exception& e) {
+		WARN("MIDI port get default input device ID: %s", e.what());
+		return -1;
+	}
 }
 
 void Input::setDeviceId(int deviceId) {
@@ -311,6 +317,7 @@ InputQueue::~InputQueue() {
 }
 
 void InputQueue::onMessage(const Message& message) {
+	// Reject MIDI message if queue is full
 	if (internal->queue.size() >= InputQueue_maxSize)
 		return;
 	// Push to queue
@@ -318,20 +325,21 @@ void InputQueue::onMessage(const Message& message) {
 }
 
 bool InputQueue::tryPop(Message* messageOut, int64_t maxFrame) {
-	if (!internal->queue.empty()) {
-		const Message& msg = internal->queue.top();
-		if (msg.getFrame() <= maxFrame) {
-			*messageOut = msg;
-			internal->queue.pop();
-			return true;
-		}
+	if (internal->queue.empty())
+		return false;
 
-		// If next MIDI message is too far in the future, clear the queue.
-		// This solves the issue of unconsumed messages getting stuck in the future when a DAW rewinds the engine frame.
-		int futureFrames = 2 * APP->engine->getBlockFrames();
-		if (msg.getFrame() - maxFrame > futureFrames) {
-			internal->queue.clear();
-		}
+	const Message& msg = internal->queue.top();
+	if (msg.getFrame() <= maxFrame) {
+		*messageOut = msg;
+		internal->queue.pop();
+		return true;
+	}
+
+	// If next MIDI message is too far in the future, clear the queue.
+	// This solves the issue of unconsumed messages getting stuck in the future when a DAW rewinds the engine frame.
+	int futureFrames = 2 * APP->engine->getBlockFrames();
+	if (msg.getFrame() - maxFrame > futureFrames) {
+		internal->queue.clear();
 	}
 	return false;
 }
@@ -400,7 +408,13 @@ void Output::setDeviceId(int deviceId) {
 int Output::getDefaultDeviceId() {
 	if (!driver)
 		return -1;
-	return driver->getDefaultOutputDeviceId();
+	try {
+		return driver->getDefaultOutputDeviceId();
+	}
+	catch (Exception& e) {
+		WARN("MIDI port get default output device ID: %s", e.what());
+		return -1;
+	}
 }
 
 std::string Output::getDeviceName(int deviceId) {
