@@ -109,9 +109,14 @@ void Port::setDriverId(int driverId) {
 	}
 
 	// Set default device if exists
-	int defaultDeviceId = driver->getDefaultDeviceId();
-	if (defaultDeviceId >= 0)
-		setDeviceId(defaultDeviceId);
+	try {
+		int defaultDeviceId = driver->getDefaultDeviceId();
+		if (defaultDeviceId >= 0)
+			setDeviceId(defaultDeviceId);
+	}
+	catch (Exception& e) {
+		WARN("Audio port could not get default device ID: %s", e.what());
+	}
 }
 
 std::string Port::getDriverName() {
@@ -314,8 +319,13 @@ json_t* Port::toJson() {
 	json_object_set_new(rootJ, "driver", json_integer(getDriverId()));
 
 	if (device) {
-		std::string deviceName = device->getName();
-		json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+		try {
+			std::string deviceName = device->getName();
+			json_object_set_new(rootJ, "deviceName", json_string(deviceName.c_str()));
+		}
+		catch (Exception& e) {
+			WARN("Audio port could not get device name: %s", e.what());
+		}
 	}
 
 	json_object_set_new(rootJ, "sampleRate", json_real(getSampleRate()));
