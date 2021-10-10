@@ -390,33 +390,10 @@ static const std::string sortNames[] = {
 };
 
 
-struct SortItem : ui::MenuItem {
-	Browser* browser;
-	settings::BrowserSort sort;
-	void onAction(const ActionEvent& e) override;
-	void step() override {
-		rightText = CHECKMARK(settings::browserSort == sort);
-		MenuItem::step();
-	}
-};
-
-
 struct SortButton : ui::ChoiceButton {
 	Browser* browser;
 
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-		for (int sortId = 0; sortId <= settings::BROWSER_SORT_RANDOM; sortId++) {
-			SortItem* sortItem = new SortItem;
-			sortItem->text = sortNames[sortId];
-			sortItem->sort = (settings::BrowserSort) sortId;
-			sortItem->browser = browser;
-			menu->addChild(sortItem);
-		}
-	}
+	void onAction(const ActionEvent& e) override;
 
 	void step() override {
 		text = "Sort: ";
@@ -426,33 +403,10 @@ struct SortButton : ui::ChoiceButton {
 };
 
 
-struct ZoomItem : ui::MenuItem {
-	Browser* browser;
-	float zoom;
-	void onAction(const ActionEvent& e) override;
-	void step() override {
-		rightText = CHECKMARK(settings::browserZoom == zoom);
-		MenuItem::step();
-	}
-};
-
-
 struct ZoomButton : ui::ChoiceButton {
 	Browser* browser;
 
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
-		menu->box.size.x = box.size.x;
-
-		for (float zoom = 1.f; zoom >= -2.f; zoom -= 0.5f) {
-			ZoomItem* sortItem = new ZoomItem;
-			sortItem->text = string::f("%.0f%%", std::pow(2.f, zoom) * 100.f);
-			sortItem->zoom = zoom;
-			sortItem->browser = browser;
-			menu->addChild(sortItem);
-		}
-	}
+	void onAction(const ActionEvent& e) override;
 
 	void step() override {
 		text = "Zoom: ";
@@ -994,15 +948,37 @@ inline void TagButton::step() {
 	ChoiceButton::step();
 }
 
-inline void SortItem::onAction(const ActionEvent& e) {
-	settings::browserSort = sort;
-	browser->refresh();
+inline void SortButton::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+	menu->box.size.x = box.size.x;
+
+	for (int sortId = 0; sortId <= settings::BROWSER_SORT_RANDOM; sortId++) {
+		menu->addChild(createCheckMenuItem(sortNames[sortId], "",
+			[=]() {return settings::browserSort == sortId;},
+			[=]() {
+				settings::browserSort = (settings::BrowserSort) sortId;
+				browser->refresh();
+			}
+		));
+	}
 }
 
-inline void ZoomItem::onAction(const ActionEvent& e) {
-	if (zoom != settings::browserZoom) {
-		settings::browserZoom = zoom;
-		browser->updateZoom();
+inline void ZoomButton::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+	menu->box.size.x = box.size.x;
+
+	for (float zoom = 1.f; zoom >= -2.f; zoom -= 0.5f) {
+		menu->addChild(createCheckMenuItem(string::f("%.0f%%", std::pow(2.f, zoom) * 100.f), "",
+			[=]() {return settings::browserZoom == zoom;},
+			[=]() {
+				if (zoom == settings::browserZoom)
+					return;
+				settings::browserZoom = zoom;
+				browser->updateZoom();
+			}
+		));
 	}
 }
 

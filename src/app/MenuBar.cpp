@@ -469,11 +469,11 @@ struct SampleRateItem : ui::MenuItem {
 		if (settings::sampleRate == 0) {
 			float sampleRate = APP->engine->getSampleRate();
 			rightText += string::f("(%g kHz) ", sampleRate / 1000.f);
-			rightText += CHECKMARK_STRING;
 		}
-		menu->addChild(createMenuItem("Auto", rightText, [=]() {
-			settings::sampleRate = 0;
-		}));
+		menu->addChild(createCheckMenuItem("Auto", rightText,
+			[=]() {return settings::sampleRate == 0;},
+			[=]() {settings::sampleRate = 0;}
+		));
 
 		// Power-of-2 oversample times 44.1kHz or 48kHz
 		for (int i = -2; i <= 4; i++) {
@@ -490,11 +490,10 @@ struct SampleRateItem : ui::MenuItem {
 				else if (oversample < 1.f) {
 					rightText += string::f("(1/%.0fx)", 1.f / oversample);
 				}
-				rightText += " ";
-				rightText += CHECKMARK(settings::sampleRate == sampleRate);
-				menu->addChild(createMenuItem(text, rightText, [=]() {
-					settings::sampleRate = sampleRate;
-				}));
+				menu->addChild(createCheckMenuItem(text, rightText,
+					[=]() {return settings::sampleRate == sampleRate;},
+					[=]() {settings::sampleRate = sampleRate;}
+				));
 			}
 		}
 		return menu;
@@ -515,10 +514,7 @@ struct EngineButton : MenuButton {
 			settings::cpuMeter ^= true;
 		}));
 
-		SampleRateItem* sampleRateItem = new SampleRateItem;
-		sampleRateItem->text = "Sample rate";
-		sampleRateItem->rightText = RIGHT_ARROW;
-		menu->addChild(sampleRateItem);
+		menu->addChild(createMenuItem<SampleRateItem>("Sample rate", RIGHT_ARROW));
 
 		menu->addChild(createSubmenuItem("Threads", string::f("%d", settings::threadCount), [=](ui::Menu* menu) {
 			// BUG This assumes SMT is enabled.
@@ -530,11 +526,10 @@ struct EngineButton : MenuButton {
 					rightText += "(most modules)";
 				else if (i == 1)
 					rightText += "(lowest CPU usage)";
-				if (settings::threadCount == i)
-					rightText += " " CHECKMARK_STRING;
-				menu->addChild(createMenuItem(string::f("%d", i), rightText, [=]() {
-					settings::threadCount = i;
-				}));
+				menu->addChild(createCheckMenuItem(string::f("%d", i), rightText,
+					[=]() {return settings::threadCount == i;},
+					[=]() {settings::threadCount = i;}
+				));
 			}
 		}));
 	}
