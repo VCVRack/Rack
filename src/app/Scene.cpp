@@ -348,8 +348,15 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 void Scene::onPathDrop(const PathDropEvent& e) {
 	if (e.paths.size() >= 1) {
 		const std::string& path = e.paths[0];
-		if (system::getExtension(path) == ".vcv") {
+		std::string extension = system::getExtension(path);
+
+		if (extension == ".vcv") {
 			APP->patch->loadPathDialog(path);
+			e.consume(this);
+			return;
+		}
+		if (extension == ".vcvs") {
+			APP->scene->rack->loadSelection(path);
 			e.consume(this);
 			return;
 		}
