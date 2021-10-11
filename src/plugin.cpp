@@ -247,8 +247,22 @@ void init() {
 
 void destroy() {
 	for (Plugin* plugin : plugins) {
-		// We must delete the plugin *before* freeing the library, because the vtable of Model subclasses are static in the plugin, and we need it for the virtual destructor.
 		void* handle = plugin->handle;
+
+		// Call destroy() if defined in the plugin library
+		typedef void (*DestroyCallback)();
+		DestroyCallback destroyCallback = NULL;
+		if (handle) {
+#if defined ARCH_WIN
+			destroyCallback = (DestroyCallback) GetProcAddress((HMODULE) handle, "destroy");
+#else
+			destroyCallback = (DestroyCallback) dlsym(handle, "destroy");
+#endif
+		}
+		if (destroyCallback)
+			destroyCallback();
+
+		// We must delete the Plugin instance *before* freeing the library, because the vtables of Model subclasses are defined in the library, which are needed in the Plugin destructor.
 		delete plugin;
 
 		// Free library handle
