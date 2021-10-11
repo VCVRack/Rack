@@ -32,6 +32,7 @@
 #include <tag.hpp>
 #include <helpers.hpp>
 #include <FuzzySearchDatabase.hpp>
+#include <componentlibrary.hpp>
 
 
 namespace rack {
@@ -190,16 +191,13 @@ struct ModelBox : widget::OpaqueWidget {
 		// Lazily create preview when drawn
 		createPreview();
 
-		const settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
-
 		// Draw shadow
 		nvgBeginPath(args.vg);
 		float r = 10; // Blur radius
 		float c = 5; // Corner radius
-		nvgRect(args.vg, -r, -r, box.size.x + 2 * r, box.size.y + 2 * r);
+		math::Rect shadowBox = box.zeroPos().grow(math::Vec(r, r));
+		nvgRect(args.vg, RECT_ARGS(shadowBox));
 		NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.5);
-		if (mi && mi->favorite)
-			shadowColor = nvgRGBAf(2, 2, 2, 1.0);
 		nvgFillPaint(args.vg, nvgBoxGradient(args.vg, 0, 0, box.size.x, box.size.y, c, r, shadowColor, color::BLACK_TRANSPARENT));
 		nvgFill(args.vg);
 
@@ -208,6 +206,17 @@ struct ModelBox : widget::OpaqueWidget {
 		nvgGlobalTint(args.vg, nvgRGBAf(b, b, b, 1));
 
 		OpaqueWidget::draw(args);
+
+		// Draw favorite border
+		const settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
+		if (mi && mi->favorite) {
+			nvgBeginPath(args.vg);
+			math::Rect borderBox = box.zeroPos().shrink(math::Vec(1, 1));
+			nvgRect(args.vg, RECT_ARGS(borderBox));
+			nvgStrokeWidth(args.vg, 2);
+			nvgStrokeColor(args.vg, componentlibrary::SCHEME_YELLOW);
+			nvgStroke(args.vg);
+		}
 	}
 
 	void step() override {
