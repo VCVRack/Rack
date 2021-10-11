@@ -413,13 +413,18 @@ struct Rect {
 	Rect zeroPos() const {
 		return Rect(Vec(), size);
 	}
-	/** Expands each corner.
-	Use a negative delta to shrink.
-	*/
+	/** Expands each corner. */
 	Rect grow(Vec delta) const {
 		Rect r;
 		r.pos = pos.minus(delta);
 		r.size = size.plus(delta.mult(2.f));
+		return r;
+	}
+	/** Contracts each corner. */
+	Rect shrink(Vec delta) const {
+		Rect r;
+		r.pos = pos.plus(delta);
+		r.size = size.minus(delta.mult(2.f));
 		return r;
 	}
 
