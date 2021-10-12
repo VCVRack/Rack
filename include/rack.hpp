@@ -1,6 +1,10 @@
 #pragma once
 
-// The following headers are the "public" API of Rack.
+/*
+The following headers are the "public" API of Rack.
+
+Directly including Rack headers other than rack.hpp in your plugin is unsupported/unstable, since filenames and locations of symbols may change in any Rack version.
+*/
 
 #include <common.hpp>
 #include <math.hpp>
