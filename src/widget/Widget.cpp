@@ -112,6 +112,15 @@ math::Rect Widget::getVisibleChildrenBoundingBox() {
 }
 
 
+bool Widget::isDescendantOf(Widget* ancestor) {
+	if (!parent)
+		return false;
+	if (parent == ancestor)
+		return true;
+	return parent->isDescendantOf(ancestor);
+}
+
+
 math::Vec Widget::getRelativeOffset(math::Vec v, Widget* ancestor) {
 	if (this == ancestor)
 		return v;

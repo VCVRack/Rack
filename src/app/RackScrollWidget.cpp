@@ -98,7 +98,8 @@ void RackScrollWidget::step() {
 	// Scroll rack if dragging cable near the edge of the screen
 	math::Vec pos = APP->scene->mousePos;
 	math::Rect viewport = getViewport(box.zeroPos());
-	if (APP->event->getDraggedWidget()) {
+	widget::Widget* draggedWidget = APP->event->getDraggedWidget();
+	if (draggedWidget && draggedWidget->isDescendantOf(container) && APP->event->dragButton == GLFW_MOUSE_BUTTON_LEFT) {
 		float margin = 20.0;
 		float speed = 15.0;
 		if (pos.x <= viewport.pos.x + margin)

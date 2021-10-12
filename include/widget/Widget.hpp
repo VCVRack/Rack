@@ -54,6 +54,9 @@ struct Widget : WeakBase {
 	*/
 	virtual math::Rect getChildrenBoundingBox();
 	virtual math::Rect getVisibleChildrenBoundingBox();
+	/** Returns whether `ancestor` is a parent or distant parent of this widget.
+	*/
+	bool isDescendantOf(Widget* ancestor);
 	/**  Returns `v` (given in local coordinates) transformed into the coordinate system of `ancestor`.
 	*/
 	virtual math::Vec getRelativeOffset(math::Vec v, Widget* ancestor);
