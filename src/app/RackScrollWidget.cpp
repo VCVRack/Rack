@@ -1,5 +1,8 @@
 #include <app/RackScrollWidget.hpp>
 #include <app/Scene.hpp>
+#include <app/RackWidget.hpp>
+#include <app/ModuleWidget.hpp>
+#include <app/PortWidget.hpp>
 #include <window/Window.hpp>
 #include <context.hpp>
 #include <settings.hpp>
@@ -95,11 +98,12 @@ void RackScrollWidget::step() {
 	zoomWidget->box = scrollBox;
 	rackWidget->box.pos = scrollBox.pos.div(zoom).neg();
 
-	// Scroll rack if dragging cable near the edge of the screen
+	// Scroll rack if dragging certain widgets near the edge of the screen
 	math::Vec pos = APP->scene->mousePos;
 	math::Rect viewport = getViewport(box.zeroPos());
-	widget::Widget* draggedWidget = APP->event->getDraggedWidget();
-	if (draggedWidget && draggedWidget->isDescendantOf(container) && APP->event->dragButton == GLFW_MOUSE_BUTTON_LEFT) {
+	widget::Widget* dw = APP->event->getDraggedWidget();
+	if (dw && APP->event->dragButton == GLFW_MOUSE_BUTTON_LEFT &&
+		(dynamic_cast<RackWidget*>(dw) || dynamic_cast<ModuleWidget*>(dw) || dynamic_cast<PortWidget*>(dw))) {
 		float margin = 20.0;
 		float speed = 15.0;
 		if (pos.x <= viewport.pos.x + margin)
