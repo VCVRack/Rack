@@ -168,16 +168,16 @@ struct EditButton : MenuButton {
 
 struct ZoomQuantity : Quantity {
 	void setValue(float value) override {
-		settings::zoom = math::clamp(value, getMinValue(), getMaxValue());
+		APP->scene->rackScroll->setZoom(std::pow(2.f, value));
 	}
 	float getValue() override {
-		return settings::zoom;
+		return std::log2(APP->scene->rackScroll->getZoom());
 	}
 	float getMinValue() override {
-		return settings::zoomMin;
+		return -2.f;
 	}
 	float getMaxValue() override {
-		return settings::zoomMax;
+		return 2.f;
 	}
 	float getDefaultValue() override {
 		return 0.0;

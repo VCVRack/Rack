@@ -23,7 +23,6 @@ std::string token;
 bool windowMaximized = false;
 math::Vec windowSize = math::Vec(1024, 768);
 math::Vec windowPos = math::Vec(NAN, NAN);
-float zoom = 0.0;
 bool invertZoom = false;
 float pixelRatio = 0.0;
 float cableOpacity = 0.5;
@@ -94,8 +93,6 @@ json_t* toJson() {
 
 	json_t* windowPosJ = json_pack("[f, f]", windowPos.x, windowPos.y);
 	json_object_set_new(rootJ, "windowPos", windowPosJ);
-
-	json_object_set_new(rootJ, "zoom", json_real(zoom));
 
 	json_object_set_new(rootJ, "invertZoom", json_boolean(invertZoom));
 
@@ -216,10 +213,6 @@ void fromJson(json_t* rootJ) {
 		json_unpack(windowPosJ, "[F, F]", &x, &y);
 		windowPos = math::Vec(x, y);
 	}
-
-	json_t* zoomJ = json_object_get(rootJ, "zoom");
-	if (zoomJ)
-		zoom = json_number_value(zoomJ);
 
 	json_t* invertZoomJ = json_object_get(rootJ, "invertZoom");
 	if (invertZoomJ)

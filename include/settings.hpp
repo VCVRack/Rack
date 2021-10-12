@@ -35,10 +35,6 @@ extern bool windowMaximized;
 extern math::Vec windowSize;
 /** Position in window in pixels */
 extern math::Vec windowPos;
-/** Rack zoom level, log2. E.g. 100% = 0, 200% = 1, 50% = -1. */
-extern float zoom;
-static const float zoomMax = 2.f;
-static const float zoomMin = -2.f;
 /** Reverse the zoom scroll direction */
 extern bool invertZoom;
 /** Ratio between UI pixel and physical screen pixel.

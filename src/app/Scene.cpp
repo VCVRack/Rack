@@ -202,26 +202,24 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 			e.consume(this);
 		}
 		if (e.keyName == "-" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			float zoom = settings::zoom;
+			float zoom = std::log2(APP->scene->rackScroll->getZoom());
 			zoom *= 2;
 			zoom = std::ceil(zoom - 0.01f) - 1;
 			zoom /= 2;
-			settings::zoom = zoom;
-			settings::zoom = std::fmax(settings::zoom, settings::zoomMin);
+			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
 			e.consume(this);
 		}
 		// Numpad has a "+" key, but the main keyboard section hides it under "="
 		if ((e.keyName == "=" || e.keyName == "+") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			float zoom = settings::zoom;
+			float zoom = std::log2(APP->scene->rackScroll->getZoom());
 			zoom *= 2;
 			zoom = std::floor(zoom + 0.01f) + 1;
 			zoom /= 2;
-			settings::zoom = zoom;
-			settings::zoom = std::fmin(settings::zoom, settings::zoomMax);
+			APP->scene->rackScroll->setZoom(std::pow(2.f, zoom));
 			e.consume(this);
 		}
 		if ((e.keyName == "0") && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
-			settings::zoom = 0.f;
+			APP->scene->rackScroll->setZoom(1.f);
 			e.consume(this);
 		}
 		if (e.key == GLFW_KEY_F1 && (e.mods & RACK_MOD_MASK) == 0) {

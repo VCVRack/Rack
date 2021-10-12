@@ -416,11 +416,18 @@ json_t* Manager::toJson() {
 	if (!APP->history->isSaved())
 		json_object_set_new(rootJ, "unsaved", json_boolean(true));
 
-	// Merge with rootJ
+	// zoom
+	if (APP->scene) {
+		float zoom = APP->scene->rackScroll->getZoom();
+		json_object_set_new(rootJ, "zoom", json_real(zoom));
+	}
+
+	// Merge with Engine JSON
 	json_t* engineJ = APP->engine->toJson();
 	json_object_update(rootJ, engineJ);
 	json_decref(engineJ);
 
+	// Merge with RackWidget JSON
 	if (APP->scene) {
 		APP->scene->rack->mergeJson(rootJ);
 	}
@@ -453,6 +460,14 @@ void Manager::fromJson(json_t* rootJ) {
 	if (!unsavedJ)
 		APP->history->setSaved();
 
+	// zoom
+	if (APP->scene) {
+		json_t* zoomJ = json_object_get(rootJ, "zoom");
+		if (zoomJ)
+			APP->scene->rackScroll->setZoom(json_number_value(zoomJ));
+	}
+
+	// Pass JSON to Engine and RackWidget
 	try {
 		APP->engine->fromJson(rootJ);
 		if (APP->scene) {

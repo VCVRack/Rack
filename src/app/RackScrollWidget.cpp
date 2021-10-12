@@ -10,8 +10,6 @@ namespace app {
 
 
 struct RackScrollWidget::Internal {
-	/** The pivot point for zooming */
-	math::Vec zoomPos;
 	/** For viewport expanding */
 	float oldZoom = 0.f;
 	math::Vec oldOffset;
@@ -43,28 +41,47 @@ void RackScrollWidget::reset() {
 }
 
 
-void RackScrollWidget::step() {
-	// Compute zoom from exponential zoom
-	float zoom = std::pow(2.f, settings::zoom);
-	if (zoom != zoomWidget->zoom) {
-		// Set offset based on zoomPos
-		offset = offset.plus(internal->zoomPos).div(zoomWidget->zoom).mult(zoom).minus(internal->zoomPos);
-		// Set zoom
-		zoomWidget->setZoom(zoom);
-	}
+math::Vec RackScrollWidget::getGridOffset() {
+	return offset.minus(RACK_OFFSET).div(RACK_GRID_SIZE);
+}
 
-	internal->zoomPos = box.size.div(2);
+
+void RackScrollWidget::setGridOffset(math::Vec gridOffset) {
+	offset = gridOffset.mult(RACK_GRID_SIZE).plus(RACK_OFFSET);
+}
+
+
+float RackScrollWidget::getZoom() {
+	return zoomWidget->getZoom();
+}
+
+
+void RackScrollWidget::setZoom(float zoom) {
+	setZoom(zoom, getSize().div(2));
+}
+
+
+void RackScrollWidget::setZoom(float zoom, math::Vec pivot) {
+	zoom = math::clamp(zoom, std::pow(2.f, -2), std::pow(2.f, 2));
+
+	offset = offset.plus(pivot).mult(zoom / zoomWidget->getZoom()).minus(pivot);
+	zoomWidget->setZoom(zoom);
+}
+
+
+void RackScrollWidget::step() {
+	float zoom = getZoom();
 
 	// Compute module bounding box
 	math::Rect moduleBox = rackWidget->getModuleContainer()->getChildrenBoundingBox();
 	if (!moduleBox.size.isFinite())
 		moduleBox = math::Rect(RACK_OFFSET, math::Vec(0, 0));
 
-	// Expand moduleBox by half a screen size
+	// Expand moduleBox by a screen size
 	math::Rect scrollBox = moduleBox;
 	scrollBox.pos = scrollBox.pos.mult(zoom);
 	scrollBox.size = scrollBox.size.mult(zoom);
-	scrollBox = scrollBox.grow(box.size.mult(0.6666));
+	scrollBox = scrollBox.grow(box.size.mult(0.9));
 
 	// Expand to the current viewport box so that moving modules (and thus changing the module bounding box) doesn't clamp the scroll offset.
 	if (zoom == internal->oldZoom) {
@@ -81,7 +98,7 @@ void RackScrollWidget::step() {
 	// Scroll rack if dragging cable near the edge of the screen
 	math::Vec pos = APP->scene->mousePos;
 	math::Rect viewport = getViewport(box.zeroPos());
-	if (rackWidget->incompleteCable) {
+	if (APP->event->getDraggedWidget()) {
 		float margin = 20.0;
 		float speed = 15.0;
 		if (pos.x <= viewport.pos.x + margin)
@@ -98,6 +115,7 @@ void RackScrollWidget::step() {
 	hideScrollbars = APP->window->isFullScreen();
 
 	ScrollWidget::step();
+
 	internal->oldOffset = offset;
 	internal->oldZoom = zoom;
 }
@@ -119,13 +137,8 @@ void RackScrollWidget::onHoverScroll(const HoverScrollEvent& e) {
 		float zoomDelta = e.scrollDelta.y / 50 / 4;
 		if (settings::invertZoom)
 			zoomDelta *= -1;
-		settings::zoom += zoomDelta;
-		// Limit min/max depending on the direction of zooming
-		if (zoomDelta > 0.f)
-			settings::zoom = std::fmin(settings::zoom, settings::zoomMax);
-		else
-			settings::zoom = std::fmax(settings::zoom, settings::zoomMin);
-		internal->zoomPos = e.pos;
+		float zoom = getZoom() * std::pow(2.f, zoomDelta);
+		setZoom(zoom, e.pos);
 		e.consume(this);
 	}
 
@@ -153,13 +166,13 @@ void RackScrollWidget::onButton(const ButtonEvent& e) {
 	// Zoom in/out with extra mouse buttons
 	if (e.action == GLFW_PRESS) {
 		if (e.button == GLFW_MOUSE_BUTTON_4) {
-			settings::zoom -= 0.5f;
-			settings::zoom = std::fmax(settings::zoom, settings::zoomMin);
+			float zoom = getZoom() * std::pow(2.f, -0.5f);
+			setZoom(zoom, e.pos);
 			e.consume(this);
 		}
 		if (e.button == GLFW_MOUSE_BUTTON_5) {
-			settings::zoom += 0.5f;
-			settings::zoom = std::fmin(settings::zoom, settings::zoomMax);
+			float zoom = getZoom() * std::pow(2.f, 0.5f);
+			setZoom(zoom, e.pos);
 			e.consume(this);
 		}
 	}
