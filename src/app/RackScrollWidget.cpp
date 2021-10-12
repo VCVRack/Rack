@@ -39,18 +39,17 @@ RackScrollWidget::~RackScrollWidget() {
 
 
 void RackScrollWidget::reset() {
-	offset = RACK_OFFSET.mult(zoomWidget->zoom);
-	offset = offset.minus(math::Vec(30, 30));
+	offset = RACK_OFFSET * zoomWidget->getZoom() - math::Vec(30, 30);
 }
 
 
 math::Vec RackScrollWidget::getGridOffset() {
-	return offset.minus(RACK_OFFSET).div(RACK_GRID_SIZE);
+	return (offset / zoomWidget->getZoom() - RACK_OFFSET) / RACK_GRID_SIZE;
 }
 
 
 void RackScrollWidget::setGridOffset(math::Vec gridOffset) {
-	offset = gridOffset.mult(RACK_GRID_SIZE).plus(RACK_OFFSET);
+	offset = (gridOffset * RACK_GRID_SIZE + RACK_OFFSET) * zoomWidget->getZoom();
 }
 
 
@@ -67,7 +66,7 @@ void RackScrollWidget::setZoom(float zoom) {
 void RackScrollWidget::setZoom(float zoom, math::Vec pivot) {
 	zoom = math::clamp(zoom, std::pow(2.f, -2), std::pow(2.f, 2));
 
-	offset = offset.plus(pivot).mult(zoom / zoomWidget->getZoom()).minus(pivot);
+	offset = (offset + pivot) * (zoom / zoomWidget->getZoom()) - pivot;
 	zoomWidget->setZoom(zoom);
 }
 

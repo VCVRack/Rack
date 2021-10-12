@@ -416,10 +416,15 @@ json_t* Manager::toJson() {
 	if (!APP->history->isSaved())
 		json_object_set_new(rootJ, "unsaved", json_boolean(true));
 
-	// zoom
 	if (APP->scene) {
+		// zoom
 		float zoom = APP->scene->rackScroll->getZoom();
 		json_object_set_new(rootJ, "zoom", json_real(zoom));
+
+		// gridOffset
+		math::Vec gridOffset = APP->scene->rackScroll->getGridOffset();
+		json_t* gridOffsetJ = json_pack("[f, f]", gridOffset.x, gridOffset.y);
+		json_object_set_new(rootJ, "gridOffset", gridOffsetJ);
 	}
 
 	// Merge with Engine JSON
@@ -460,11 +465,19 @@ void Manager::fromJson(json_t* rootJ) {
 	if (!unsavedJ)
 		APP->history->setSaved();
 
-	// zoom
 	if (APP->scene) {
+		// zoom
 		json_t* zoomJ = json_object_get(rootJ, "zoom");
 		if (zoomJ)
 			APP->scene->rackScroll->setZoom(json_number_value(zoomJ));
+
+		// gridOffset
+		json_t* gridOffsetJ = json_object_get(rootJ, "gridOffset");
+		if (gridOffsetJ) {
+			double x, y;
+			json_unpack(gridOffsetJ, "[F, F]", &x, &y);
+			APP->scene->rackScroll->setGridOffset(math::Vec(x, y));
+		}
 	}
 
 	// Pass JSON to Engine and RackWidget
