@@ -27,7 +27,7 @@ namespace rack {
 namespace window {
 
 
-static const math::Vec minWindowSize = math::Vec(640, 480);
+static const math::Vec WINDOW_SIZE_MIN = math::Vec(480, 320);
 
 
 void Font::loadFile(const std::string& filename, NVGcontext* vg) {
@@ -268,7 +268,7 @@ Window::Window() {
 	glfwGetWindowContentScale(win, &contentScale, NULL);
 	INFO("Window content scale: %f", contentScale);
 
-	glfwSetWindowSizeLimits(win, minWindowSize.x, minWindowSize.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits(win, WINDOW_SIZE_MIN.x, WINDOW_SIZE_MIN.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
 	glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
 	if (settings::windowPos.isFinite()) {
 		glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
@@ -382,7 +382,7 @@ math::Vec Window::getSize() {
 
 
 void Window::setSize(math::Vec size) {
-	size = size.max(minWindowSize);
+	size = size.max(WINDOW_SIZE_MIN);
 	glfwSetWindowSize(win, size.x, size.y);
 }
 
