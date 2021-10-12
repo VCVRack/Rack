@@ -130,6 +130,14 @@ struct BrowserOverlay : ui::MenuOverlay {
 };
 
 
+struct ModuleWidgetContainer : widget::Widget {
+	void draw(const DrawArgs& args) override {
+		Widget::draw(args);
+		Widget::drawLayer(args, 1);
+	}
+};
+
+
 struct ModelBox : widget::OpaqueWidget {
 	plugin::Model* model;
 	ui::Tooltip* tooltip = NULL;
@@ -137,6 +145,7 @@ struct ModelBox : widget::OpaqueWidget {
 	widget::Widget* previewWidget = NULL;
 	widget::ZoomWidget* zoomWidget = NULL;
 	widget::FramebufferWidget* fb = NULL;
+	ModuleWidgetContainer* mwc = NULL;
 	ModuleWidget* moduleWidget = NULL;
 
 	ModelBox() {
@@ -181,8 +190,12 @@ struct ModelBox : widget::OpaqueWidget {
 		}
 		zoomWidget->addChild(fb);
 
+		mwc = new ModuleWidgetContainer;
+		fb->addChild(mwc);
+
 		moduleWidget = model->createModuleWidget(NULL);
-		fb->addChild(moduleWidget);
+		mwc->addChild(moduleWidget);
+		mwc->box.size = moduleWidget->box.size;
 
 		updateZoom();
 	}

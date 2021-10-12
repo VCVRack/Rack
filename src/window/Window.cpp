@@ -567,9 +567,19 @@ void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
 			widget::FramebufferWidget* fbw = new widget::FramebufferWidget;
 			fbw->oversample = 2;
 
+			struct ModuleWidgetContainer : widget::Widget {
+				void draw(const DrawArgs& args) override {
+					Widget::draw(args);
+					Widget::drawLayer(args, 1);
+				}
+			};
+			ModuleWidgetContainer* mwc = new ModuleWidgetContainer;
+			fbw->addChild(mwc);
+
 			app::ModuleWidget* mw = model->createModuleWidget(NULL);
-			fbw->addChild(mw);
+			mwc->box.size = mw->box.size;
 			fbw->box.size = mw->box.size;
+			mwc->addChild(mw);
 
 			// Step to allow the ModuleWidget state to set its default appearance.
 			fbw->step();
