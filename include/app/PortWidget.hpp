@@ -25,6 +25,9 @@ struct PortWidget : widget::OpaqueWidget {
 	engine::PortInfo* getPortInfo();
 	void createTooltip();
 	void destroyTooltip();
+	void createContextMenu();
+	virtual void appendContextMenu(ui::Menu* menu) {}
+	void deleteTopCableAction();
 
 	void step() override;
 	void draw(const DrawArgs& args) override;

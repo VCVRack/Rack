@@ -5,6 +5,7 @@
 #include <history.hpp>
 #include <engine/Engine.hpp>
 #include <settings.hpp>
+#include <helpers.hpp>
 
 
 namespace rack {
@@ -71,6 +72,7 @@ PortWidget::PortWidget() {
 	internal = new Internal;
 }
 
+
 PortWidget::~PortWidget() {
 	// The port shouldn't have any cables when destroyed, but just to make sure.
 	if (module)
@@ -79,6 +81,7 @@ PortWidget::~PortWidget() {
 	destroyTooltip();
 	delete internal;
 }
+
 
 engine::Port* PortWidget::getPort() {
 	if (!module)
@@ -89,6 +92,7 @@ engine::Port* PortWidget::getPort() {
 		return &module->outputs[portId];
 }
 
+
 engine::PortInfo* PortWidget::getPortInfo() {
 	if (!module)
 		return NULL;
@@ -97,6 +101,7 @@ engine::PortInfo* PortWidget::getPortInfo() {
 	else
 		return module->outputInfos[portId];
 }
+
 
 void PortWidget::createTooltip() {
 	if (!settings::tooltips)
@@ -111,6 +116,7 @@ void PortWidget::createTooltip() {
 	internal->tooltip = tooltip;
 }
 
+
 void PortWidget::destroyTooltip() {
 	if (!internal->tooltip)
 		return;
@@ -119,9 +125,42 @@ void PortWidget::destroyTooltip() {
 	internal->tooltip = NULL;
 }
 
+
+void PortWidget::createContextMenu() {
+	ui::Menu* menu = createMenu();
+	WeakPtr<PortWidget> weakThis = this;
+
+	menu->addChild(createMenuItem("Delete top cable", "",
+		[=]() {
+			if (!weakThis)
+				return;
+			weakThis->deleteTopCableAction();
+		}
+	));
+
+	// TODO
+}
+
+
+void PortWidget::deleteTopCableAction() {
+	CableWidget* cw = APP->scene->rack->getTopCable(this);
+	if (!cw)
+		return;
+
+	// history::CableRemove
+	history::CableRemove* h = new history::CableRemove;
+	h->setCable(cw);
+	APP->history->push(h);
+
+	APP->scene->rack->removeCable(cw);
+	delete cw;
+}
+
+
 void PortWidget::step() {
 	Widget::step();
 }
+
 
 void PortWidget::draw(const DrawArgs& args) {
 	CableWidget* cw = APP->scene->rack->incompleteCable;
@@ -134,32 +173,26 @@ void PortWidget::draw(const DrawArgs& args) {
 	Widget::draw(args);
 }
 
+
 void PortWidget::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		CableWidget* cw = APP->scene->rack->getTopCable(this);
-		if (cw) {
-			// history::CableRemove
-			history::CableRemove* h = new history::CableRemove;
-			h->setCable(cw);
-			APP->history->push(h);
-
-			APP->scene->rack->removeCable(cw);
-			delete cw;
-		}
-
+		createContextMenu();
 		e.consume(this);
 	}
 }
+
 
 void PortWidget::onEnter(const EnterEvent& e) {
 	createTooltip();
 }
 
+
 void PortWidget::onLeave(const LeaveEvent& e) {
 	destroyTooltip();
 }
+
 
 void PortWidget::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
@@ -216,6 +249,7 @@ void PortWidget::onDragStart(const DragStartEvent& e) {
 	APP->scene->rack->setIncompleteCable(cw);
 }
 
+
 void PortWidget::onDragEnd(const DragEndEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
@@ -236,6 +270,7 @@ void PortWidget::onDragEnd(const DragEndEvent& e) {
 		delete cw;
 	}
 }
+
 
 void PortWidget::onDragDrop(const DragDropEvent& e) {
 	// HACK: Only delete tooltip if we're not (normal) dragging it.
@@ -262,6 +297,7 @@ void PortWidget::onDragDrop(const DragDropEvent& e) {
 	}
 }
 
+
 void PortWidget::onDragEnter(const DragEnterEvent& e) {
 	PortWidget* pw = dynamic_cast<PortWidget*>(e.origin);
 	if (pw) {
@@ -285,6 +321,7 @@ void PortWidget::onDragEnter(const DragEnterEvent& e) {
 			cw->hoveredInputPort = this;
 	}
 }
+
 
 void PortWidget::onDragLeave(const DragLeaveEvent& e) {
 	destroyTooltip();
