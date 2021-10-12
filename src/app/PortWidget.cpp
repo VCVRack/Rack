@@ -130,12 +130,15 @@ void PortWidget::createContextMenu() {
 	ui::Menu* menu = createMenu();
 	WeakPtr<PortWidget> weakThis = this;
 
-	menu->addChild(createMenuItem("Delete top cable", "",
+	CableWidget* cw = APP->scene->rack->getTopCable(this);
+
+	menu->addChild(createMenuItem("Delete top cable", RACK_MOD_SHIFT_NAME "+click",
 		[=]() {
 			if (!weakThis)
 				return;
 			weakThis->deleteTopCableAction();
-		}
+		},
+		!cw
 	));
 
 	// TODO
@@ -180,6 +183,14 @@ void PortWidget::onButton(const ButtonEvent& e) {
 	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 		createContextMenu();
 		e.consume(this);
+		return;
+	}
+
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+		deleteTopCableAction();
+		// Consume null so onDragStart isn't triggered
+		e.consume(NULL);
+		return;
 	}
 }
 
