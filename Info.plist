@@ -2,36 +2,21 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleName</key>
-	<string>Rack</string>
-	<key>CFBundleDisplayName</key>
-	<string>Rack</string>
-	<key>CFBundleIdentifier</key>
-	<string>com.vcvrack.rack</string>
-	<key>CFBundleVersion</key>
-	<string>{VERSION}</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>RACK</string>
-	<key>CFBundleExecutable</key>
-	<string>Rack</string>
-	<key>CFBundleIconFile</key>
-	<string>icon</string>
-	<key>CFBundleShortVersionString</key>
-	<string>{VERSION}</string>
-	<key>NSHumanReadableCopyright</key>
-	<string>Copyright © VCV</string>
-	<key>NSPrincipalClass</key>
-	<string>NSApplication</string>
-	<key>NSHighResolutionCapable</key>
-	<string>YES</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>This is required for using line input from audio interfaces.</string>
+	<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
+	<key>CFBundleDevelopmentRegion</key><string>English</string>
+	<key>CFBundleName</key><string>VCV Rack 2</string>
+	<key>CFBundleDisplayName</key><string>VCV Rack 2</string>
+	<key>CFBundleIdentifier</key><string>com.vcvrack.rack</string>
+	<key>CFBundleVersion</key><string>{VERSION}</string>
+	<key>CFBundlePackageType</key><string>APPL</string>
+	<key>CFBundleSignature</key><string>RACK</string>
+	<key>CFBundleExecutable</key><string>Rack</string>
+	<key>CFBundleIconFile</key><string>icon</string>
+	<key>CFBundleShortVersionString</key><string>{VERSION}</string>
+	<key>NSHumanReadableCopyright</key><string>Copyright © VCV</string>
+	<key>NSPrincipalClass</key><string>NSApplication</string>
+	<key>NSHighResolutionCapable</key><string>YES</string>
+	<key>NSMicrophoneUsageDescription</key><string>This is required for using line input from audio interfaces.</string>
 
 	<key>CFBundleDocumentTypes</key>
 	<array>
@@ -40,16 +25,13 @@
 		<array>
 			<string>vcv</string>
 		</array>
-		<key>CFBundleTypeIconFile</key>
-		<string>icon.icns</string>
-		<key>CFBundleTypeName</key>
-		<string>VCV Rack Patch</string>
+		<key>CFBundleTypeIconFile</key><string>icon.icns</string>
+		<key>CFBundleTypeName</key><string>VCV Rack Patch</string>
 		<key>CFBundleTypeOSTypes</key>
 		<array>
 			<string>RACK</string>
 		</array>
-		<key>CFBundleTypeRole</key>
-		<string>Editor</string>
+		<key>CFBundleTypeRole</key><string>Editor</string>
 		</dict>
 	</array>
 </dict>
