@@ -278,13 +278,13 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 			if (rack->hasSelection()) {
-				rack->cloneSelectionAction();
+				rack->cloneSelectionAction(false);
 				e.consume(this);
 			}
 		}
 		if (e.keyName == "d" && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT)) {
 			if (rack->hasSelection()) {
-				rack->cloneSelectionAction(false);
+				rack->cloneSelectionAction(true);
 				e.consume(this);
 			}
 		}

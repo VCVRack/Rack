@@ -863,7 +863,7 @@ bool RackWidget::isSelected(ModuleWidget* mw) {
 	return (it != internal->selectedModules.end());
 }
 
-json_t* RackWidget::selectionToJson() {
+json_t* RackWidget::selectionToJson(bool cables) {
 	json_t* rootJ = json_object();
 
 	std::set<engine::Module*> modules;
@@ -884,26 +884,28 @@ json_t* RackWidget::selectionToJson() {
 	}
 	json_object_set_new(rootJ, "modules", modulesJ);
 
-	// cables
-	json_t* cablesJ = json_array();
-	for (CableWidget* cw : getCompleteCables()) {
-		// Only add cables attached on both ends to selected modules
-		engine::Cable* cable = cw->getCable();
-		if (!cable || !cable->inputModule || !cable->outputModule)
-			continue;
-		const auto inputIt = modules.find(cable->inputModule);
-		if (inputIt == modules.end())
-			continue;
-		const auto outputIt = modules.find(cable->outputModule);
-		if (outputIt == modules.end())
-			continue;
+	if (cables) {
+		// cables
+		json_t* cablesJ = json_array();
+		for (CableWidget* cw : getCompleteCables()) {
+			// Only add cables attached on both ends to selected modules
+			engine::Cable* cable = cw->getCable();
+			if (!cable || !cable->inputModule || !cable->outputModule)
+				continue;
+			const auto inputIt = modules.find(cable->inputModule);
+			if (inputIt == modules.end())
+				continue;
+			const auto outputIt = modules.find(cable->outputModule);
+			if (outputIt == modules.end())
+				continue;
 
-		json_t* cableJ = cable->toJson();
-		cw->mergeJson(cableJ);
+			json_t* cableJ = cable->toJson();
+			cw->mergeJson(cableJ);
 
-		json_array_append_new(cablesJ, cableJ);
+			json_array_append_new(cablesJ, cableJ);
+		}
+		json_object_set_new(rootJ, "cables", cablesJ);
 	}
-	json_object_set_new(rootJ, "cables", cablesJ);
 
 	return rootJ;
 }
@@ -1056,7 +1058,7 @@ void RackWidget::disconnectSelectionAction() {
 }
 
 void RackWidget::cloneSelectionAction(bool cloneCables) {
-	json_t* rootJ = selectionToJson();
+	json_t* rootJ = selectionToJson(cloneCables);
 	DEFER({json_decref(rootJ);});
 
 	history::ComplexAction* complexAction = new history::ComplexAction;
@@ -1257,7 +1259,12 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 
 	// Duplicate
 	menu->addChild(createMenuItem("Duplicate", RACK_MOD_CTRL_NAME "+D", [=]() {
-		cloneSelectionAction();
+		cloneSelectionAction(false);
+	}, n == 0));
+
+	// Duplicate with cables
+	menu->addChild(createMenuItem("└ with cables", RACK_MOD_SHIFT_NAME "+" RACK_MOD_CTRL_NAME "+D", [=]() {
+		cloneSelectionAction(true);
 	}, n == 0));
 
 	// Delete

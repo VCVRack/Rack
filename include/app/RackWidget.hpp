@@ -82,7 +82,7 @@ struct RackWidget : widget::OpaqueWidget {
 	bool hasSelection();
 	const std::set<ModuleWidget*>& getSelected();
 	bool isSelected(ModuleWidget* mw);
-	json_t* selectionToJson();
+	json_t* selectionToJson(bool cables = true);
 	void loadSelection(std::string path);
 	void loadSelectionDialog();
 	void saveSelection(std::string path);
