@@ -521,7 +521,7 @@ static void unarchiveToDirectory(const std::string& archivePath, const std::vect
 
 		// Convert relative pathname to absolute based on dirPath
 		std::string entryPath = archive_entry_pathname(entry);
-		DEBUG("entryPath: %s", entryPath.c_str());
+		// DEBUG("entryPath: %s", entryPath.c_str());
 		if (!fs::u8path(entryPath).is_relative())
 			throw Exception("Unarchiver does not support absolute tar paths: %s", entryPath.c_str());
 		entryPath = (fs::u8path(dirPath) / fs::u8path(entryPath)).generic_u8string();
