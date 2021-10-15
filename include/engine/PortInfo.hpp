@@ -28,6 +28,8 @@ struct PortInfo {
 
 	virtual ~PortInfo() {}
 	virtual std::string getName();
+	/** Returns name with "input" or "output" appended. */
+	std::string getFullName();
 	virtual std::string getDescription();
 };
 

@@ -20,9 +20,7 @@ struct PortTooltip : ui::Tooltip {
 			engine::Port* port = portWidget->getPort();
 			engine::PortInfo* portInfo = portWidget->getPortInfo();
 			// Label
-			text = portInfo->getName();
-			text += " ";
-			text += (portWidget->type == engine::Port::INPUT) ? "input" : "output";
+			text = portInfo->getFullName();
 			// Description
 			std::string description = portInfo->getDescription();
 			if (description != "") {
@@ -130,8 +128,11 @@ void PortWidget::createContextMenu() {
 	ui::Menu* menu = createMenu();
 	WeakPtr<PortWidget> weakThis = this;
 
-	CableWidget* cw = APP->scene->rack->getTopCable(this);
+	engine::PortInfo* portInfo = getPortInfo();
+	assert(portInfo);
+	menu->addChild(createMenuLabel(portInfo->getFullName()));
 
+	CableWidget* cw = APP->scene->rack->getTopCable(this);
 	menu->addChild(createMenuItem("Delete top cable", RACK_MOD_SHIFT_NAME "+click",
 		[=]() {
 			if (!weakThis)
@@ -140,6 +141,14 @@ void PortWidget::createContextMenu() {
 		},
 		!cw
 	));
+
+	// TODO
+	if (type == engine::Port::INPUT) {
+		menu->addChild(createMenuItem("Duplicate cable", RACK_MOD_CTRL_NAME "+drag", NULL, true));
+	}
+	else {
+		menu->addChild(createMenuItem("Create new cable", RACK_MOD_CTRL_NAME "+drag", NULL, true));
+	}
 
 	// TODO
 }
