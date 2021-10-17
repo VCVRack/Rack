@@ -19,7 +19,7 @@ If you wish to release a proprietary commercial plugin, email support@vcvrack.co
 
 ---
 
-Licenses of **third-party libraries** are listed in [LICENSE-dist](LICENSE-dist.md) ([HTML](LICENSE-dist.html)).
+Licenses of **third-party libraries** are listed in [LICENSE-dist](https://github.com/VCVRack/Rack/blob/v2/LICENSE-dist.md) ([HTML](LICENSE-dist.html)).
 
 The **Component Library graphics** for Rack are copyright © 2016-2021 [VCV](https://vcvrack.com/) and licensed under [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/).
 Non-commercial use is allowed with appropriate credit and indication of the original license.
