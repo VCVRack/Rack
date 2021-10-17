@@ -157,6 +157,7 @@ DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
 
 # Target not supported for public use
 dist: $(TARGET) $(STANDALONE_TARGET) $(DIST_HTML)
+	rm -rf dist
 	mkdir -p dist
 	# Copy Rack to dist
 ifdef ARCH_LIN
@@ -199,8 +200,14 @@ ifdef ARCH_MAC
 	xattr -cr dist/"$(DIST_BUNDLE)"
 	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --timestamp --deep dist/"$(DIST_BUNDLE)"/Contents/Resources/$(TARGET) dist/"$(DIST_BUNDLE)"
 	codesign --verify --deep --strict --verbose=2 dist/"$(DIST_BUNDLE)"
-	# Make ZIP
-	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_BUNDLE)"
+	# Make standalone PKG
+	mkdir -p dist/Component
+	cp -R dist/"$(DIST_BUNDLE)" dist/Component/
+	pkgbuild --identifier com.vcvrack.rack --component-plist Component.plist --root dist/Component --install-location /Applications dist/Component.pkg
+	# Make PKG
+	productbuild --distribution Distribution.xml --package-path dist dist/"$(DIST_NAME)".pkg
+	productsign --sign "Developer ID Installer: Andrew Belt (V8SW9J626X)" dist/"$(DIST_NAME)".pkg dist/"$(DIST_NAME)"-signed.pkg
+	mv dist/"$(DIST_NAME)"-signed.pkg dist/"$(DIST_NAME)".pkg
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/"$(DIST_DIR)"
@@ -244,7 +251,7 @@ endif
 # Target not supported for public use
 notarize:
 ifdef ARCH_MAC
-	xcrun altool --notarize-app --primary-bundle-id=com.vcvrack.rack --username "andrew@vcvrack.com" --password "@keychain:notarize" --output-format xml --file dist/"$(DIST_NAME)".zip > dist/UploadInfo.plist
+	xcrun altool --notarize-app --primary-bundle-id "com.vcvrack.rack" --username "andrew@vcvrack.com" --password @keychain:notarize --output-format xml --file dist/"$(DIST_NAME)".pkg > dist/UploadInfo.plist
 	# Wait for Apple's servers to approve the app
 	while true; do \
 		echo "Waiting on Apple servers..." ; \
@@ -254,10 +261,11 @@ ifdef ARCH_MAC
 			break ; \
 		fi ; \
 	done
-	# Mark app as notarized, check, and re-zip
-	xcrun stapler staple dist/"$(DIST_BUNDLE)"
+	# Mark app as notarized
+	xcrun stapler staple dist/"$(DIST_NAME)".pkg
+	# Check notarization
+	stapler validate --verbose dist/"$(DIST_NAME)".pkg
 	spctl --assess --type execute --ignore-cache --no-cache -vv dist/"$(DIST_BUNDLE)"
-	cd dist && zip -q -9 -r "$(DIST_NAME)".zip "$(DIST_BUNDLE)"
 endif
 
 
