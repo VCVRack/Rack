@@ -276,8 +276,10 @@ def panel_to_components(tree):
 
 	# Get components layer
 	group = root.find(".//svg:g[@inkscape:label='components']", ns)
-	# Illustrator uses `id` for the group name.
+	# Illustrator uses `data-name` (in Unique object ID mode) or `id` (in Layer Names object ID mode) for the group name.
 	# Don't test with `not group` since Elements with no subelements are falsy.
+	if group is None:
+		group = root.find(".//svg:g[@data-name='components']", ns)
 	if group is None:
 		group = root.find(".//svg:g[@id='components']", ns)
 	if group is None:
@@ -295,10 +297,18 @@ def panel_to_components(tree):
 
 		# Get name
 		name = el.get('{' + ns['inkscape'] + '}label')
+		# Illustrator names
+		if not name:
+			name = el.get('data-name')
 		if not name:
 			name = el.get('id')
 		if not name:
 			name = ""
+		# Split name and component class name
+		names = name.split('#', 1)
+		name = names[0]
+		if len(names) >= 2:
+			c['cls'] = names[1]
 		name = str_to_identifier(name).upper()
 		c['name'] = name
 
@@ -324,27 +334,33 @@ def panel_to_components(tree):
 			continue
 
 		# Get color
+		color = None
+		# Get color from fill attribute
 		fill = el.get('fill')
-		style = el.get('style')
 		if fill:
-			color_match = re.search(r'#(.{6})', fill)
-			color = color_match.group(1).lower()
-		elif style:
-			color_match = re.search(r'fill:\S*#(.{6});', style)
-			color = color_match.group(1).lower()
-		else:
+			color = fill
+		# Get color from CSS fill style
+		if not color:
+			style = el.get('style')
+			if style:
+				color_match = re.search(r'fill:\S*(#.{6});', style)
+				color = color_match.group(1)
+		if not color:
 			print(f"Cannot get color of component: {el}")
 			continue
 
-		if color == 'ff0000':
+		print(color)
+		color = color.lower()
+
+		if color == '#ff0000' or color == '#f00' or color == 'red':
 			components['params'].append(c)
-		if color == '00ff00':
+		if color == '#00ff00' or color == '#0f0' or color == 'lime':
 			components['inputs'].append(c)
-		if color == '0000ff':
+		if color == '#0000ff' or color == '#00f' or color == 'blue':
 			components['outputs'].append(c)
-		if color == 'ff00ff':
+		if color == '#ff00ff' or color == '#f0f' or color == 'magenta':
 			components['lights'].append(c)
-		if color == 'ffff00':
+		if color == '#ffff00' or color == '#ff0' or color == 'yellow':
 			components['widgets'].append(c)
 
 	# Sort components
@@ -453,10 +469,10 @@ struct {identifier}Widget : ModuleWidget {{
 	for c in components['params']:
 		if 'x' in c:
 			source += f"""
-		addParam(createParam<RoundBlackKnob>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_PARAM));"""
+		addParam(createParam<{c.get('cls', 'RoundBlackKnob')}>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_PARAM));"""
 		else:
 			source += f"""
-		addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_PARAM));"""
+		addParam(createParamCentered<{c.get('cls', 'RoundBlackKnob')}>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_PARAM));"""
 
 	# Inputs
 	if len(components['inputs']) > 0:
@@ -464,10 +480,10 @@ struct {identifier}Widget : ModuleWidget {{
 	for c in components['inputs']:
 		if 'x' in c:
 			source += f"""
-		addInput(createInput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_INPUT));"""
+		addInput(createInput<{c.get('cls', 'PJ301MPort')}>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_INPUT));"""
 		else:
 			source += f"""
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_INPUT));"""
+		addInput(createInputCentered<{c.get('cls', 'PJ301MPort')}>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_INPUT));"""
 
 	# Outputs
 	if len(components['outputs']) > 0:
@@ -475,10 +491,10 @@ struct {identifier}Widget : ModuleWidget {{
 	for c in components['outputs']:
 		if 'x' in c:
 			source += f"""
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_OUTPUT));"""
+		addOutput(createOutput<{c.get('cls', 'PJ301MPort')}>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_OUTPUT));"""
 		else:
 			source += f"""
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_OUTPUT));"""
+		addOutput(createOutputCentered<{c.get('cls', 'PJ301MPort')}>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_OUTPUT));"""
 
 	# Lights
 	if len(components['lights']) > 0:
@@ -486,10 +502,10 @@ struct {identifier}Widget : ModuleWidget {{
 	for c in components['lights']:
 		if 'x' in c:
 			source += f"""
-		addChild(createLight<MediumLight<RedLight>>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_LIGHT));"""
+		addChild(createLight<{c.get('cls', 'MediumLight<RedLight>')}>(mm2px(Vec({c['x']}, {c['y']})), module, {identifier}::{c['name']}_LIGHT));"""
 		else:
 			source += f"""
-		addChild(createLightCentered<MediumLight<RedLight>>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_LIGHT));"""
+		addChild(createLightCentered<{c.get('cls', 'MediumLight<RedLight>')}>(mm2px(Vec({c['cx']}, {c['cy']})), module, {identifier}::{c['name']}_LIGHT));"""
 
 	# Widgets
 	if len(components['widgets']) > 0:
@@ -498,10 +514,10 @@ struct {identifier}Widget : ModuleWidget {{
 		if 'x' in c:
 			source += f"""
 		// mm2px(Vec({c['width']}, {c['height']}))
-		addChild(createWidget<Widget>(mm2px(Vec({c['x']}, {c['y']}))));"""
+		addChild(createWidget<{c.get('cls', 'Widget')}>(mm2px(Vec({c['x']}, {c['y']}))));"""
 		else:
 			source += f"""
-		addChild(createWidgetCentered<Widget>(mm2px(Vec({c['cx']}, {c['cy']}))));"""
+		addChild(createWidgetCentered<{c.get('cls', 'Widget')}>(mm2px(Vec({c['cx']}, {c['cy']}))));"""
 
 	source += f"""
 	}}
