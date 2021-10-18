@@ -280,6 +280,8 @@ void destroy() {
 
 // To request fallback slugs to be added to this list, open a GitHub issue.
 static const std::map<std::string, std::string> pluginSlugFallbacks = {
+	{"VultModulesFree", "VultModules"},
+	{"VultModules", "VultModulesFree"},
 	// {"", ""},
 };
 
