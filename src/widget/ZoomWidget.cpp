@@ -50,5 +50,15 @@ void ZoomWidget::draw(const DrawArgs& args) {
 }
 
 
+void ZoomWidget::drawLayer(const DrawArgs& args, int layer) {
+	DrawArgs zoomCtx = args;
+	zoomCtx.clipBox.pos = zoomCtx.clipBox.pos.div(zoom);
+	zoomCtx.clipBox.size = zoomCtx.clipBox.size.div(zoom);
+	// No need to save the state because that is done in the parent
+	nvgScale(args.vg, zoom, zoom);
+	Widget::drawLayer(zoomCtx, layer);
+}
+
+
 } // namespace widget
 } // namespace rack

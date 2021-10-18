@@ -18,6 +18,7 @@ struct ZoomWidget : Widget {
 		return zoom;
 	}
 	void draw(const DrawArgs& args) override;
+	void drawLayer(const DrawArgs& args, int layer) override;
 
 	void onHover(const HoverEvent& e) override {
 		HoverEvent e2 = e;

@@ -48,6 +48,12 @@ struct TransformWidget : Widget {
 		nvgTransform(args.vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
 		Widget::draw(args);
 	}
+
+	void drawLayer(const DrawArgs& args, int layer) override {
+		// No need to save the state because that is done in the parent
+		nvgTransform(args.vg, transform[0], transform[1], transform[2], transform[3], transform[4], transform[5]);
+		Widget::drawLayer(args, layer);
+	}
 };
 
 
