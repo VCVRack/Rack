@@ -284,19 +284,27 @@ static const std::map<std::string, std::string> pluginSlugFallbacks = {
 };
 
 
-Plugin* getPlugin(const std::string& pluginSlug) {
+static Plugin* getPluginSimple(const std::string& pluginSlug) {
 	if (pluginSlug.empty())
 		return NULL;
-	for (Plugin* plugin : plugins) {
-		if (plugin->slug == pluginSlug) {
-			return plugin;
-		}
-	}
+	auto it = std::find_if(plugins.begin(), plugins.end(), [=](Plugin* p) {
+		return p->slug == pluginSlug;
+	});
+	if (it != plugins.end())
+		return *it;
+	return NULL;
+}
+
+
+Plugin* getPlugin(const std::string& pluginSlug) {
+	Plugin* p = getPluginSimple(pluginSlug);
+	if (p)
+		return p;
+
 	// Use fallback plugin slug
 	auto it = pluginSlugFallbacks.find(pluginSlug);
-	if (it != pluginSlugFallbacks.end()) {
-		return getPlugin(it->second);
-	}
+	if (it != pluginSlugFallbacks.end())
+		return getPluginSimple(it->second);
 	return NULL;
 }
 
@@ -310,19 +318,28 @@ static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = 
 };
 
 
-Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
+static Model* getModelSimple(const std::string& pluginSlug, const std::string& modelSlug) {
 	if (pluginSlug.empty() || modelSlug.empty())
 		return NULL;
-	Plugin* plugin = getPlugin(pluginSlug);
-	if (plugin) {
-		Model* model = plugin->getModel(modelSlug);
+	Plugin* p = getPlugin(pluginSlug);
+	if (p) {
+		Model* model = p->getModel(modelSlug);
 		if (model)
 			return model;
 	}
+	return NULL;
+}
+
+
+Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
+	Model* m = getModelSimple(pluginSlug, modelSlug);
+	if (m)
+		return m;
+
 	// Use fallback (module slug, plugin slug)
 	auto it = moduleSlugFallbacks.find(std::make_tuple(pluginSlug, modelSlug));
 	if (it != moduleSlugFallbacks.end()) {
-		return getModel(std::get<0>(it->second), std::get<1>(it->second));
+		return getModelSimple(std::get<0>(it->second), std::get<1>(it->second));
 	}
 	return NULL;
 }
