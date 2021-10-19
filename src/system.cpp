@@ -136,7 +136,7 @@ bool rename(const std::string& srcPath, const std::string& destPath) {
 
 bool copy(const std::string& srcPath, const std::string& destPath) {
 	try {
-		fs::copy(fs::u8path(srcPath), fs::u8path(destPath), fs::copy_options::recursive);
+		fs::copy(fs::u8path(srcPath), fs::u8path(destPath), fs::copy_options::recursive | fs::copy_options::overwrite_existing);
 		return true;
 	}
 	catch (fs::filesystem_error& e) {

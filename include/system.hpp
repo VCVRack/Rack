@@ -36,6 +36,7 @@ Returns whether the rename was successful.
 */
 bool rename(const std::string& srcPath, const std::string& destPath);
 /** Copies a file or directory recursively.
+Overwrites destination if already exists.
 Returns whether the copy was successful.
 */
 bool copy(const std::string& srcPath, const std::string& destPath);
