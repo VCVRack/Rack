@@ -112,19 +112,22 @@ struct PulseGenerator {
 
 
 /** Accumulates a timer when process() is called. */
-struct Timer {
-	float time = 0.f;
+template <typename T = float>
+struct TTimer {
+	T time = 0.f;
 
 	void reset() {
 		time = 0.f;
 	}
 
 	/** Returns the time since last reset or initialization. */
-	float process(float deltaTime) {
+	T process(T deltaTime) {
 		time += deltaTime;
 		return time;
 	}
 };
+
+typedef TTimer<> Timer;
 
 
 /** Counts calls to process(), returning true every `division` calls.
