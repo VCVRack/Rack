@@ -9,11 +9,56 @@ namespace app {
 
 
 void LedDisplay::draw(const DrawArgs& args) {
+	math::Rect r = box.zeroPos();
+
+	// Black background
 	nvgBeginPath(args.vg);
-	nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5.0);
-	nvgFillColor(args.vg, nvgRGB(0x00, 0x00, 0x00));
+	nvgRect(args.vg, RECT_ARGS(r));
+	NVGcolor topColor = nvgRGB(0x22, 0x22, 0x22);
+	NVGcolor bottomColor = nvgRGB(0x12, 0x12, 0x12);
+	nvgFillPaint(args.vg, nvgLinearGradient(args.vg, 0.0, 0.0, 0.0, 25.0, topColor, bottomColor));
+	// nvgFillColor(args.vg, bottomColor);
 	nvgFill(args.vg);
 
+	// Outer strokes
+	nvgBeginPath(args.vg);
+	nvgMoveTo(args.vg, 0.0, -0.5);
+	nvgLineTo(args.vg, box.size.x, -0.5);
+	nvgStrokeColor(args.vg, nvgRGBAf(0, 0, 0, 0.24));
+	nvgStrokeWidth(args.vg, 1.0);
+	nvgStroke(args.vg);
+
+	nvgBeginPath(args.vg);
+	nvgMoveTo(args.vg, 0.0, box.size.y + 0.5);
+	nvgLineTo(args.vg, box.size.x, box.size.y + 0.5);
+	nvgStrokeColor(args.vg, nvgRGBAf(1, 1, 1, 0.30));
+	nvgStrokeWidth(args.vg, 1.0);
+	nvgStroke(args.vg);
+
+	// Inner strokes
+	nvgBeginPath(args.vg);
+	nvgMoveTo(args.vg, 0.0, 2.5);
+	nvgLineTo(args.vg, box.size.x, 2.5);
+	nvgStrokeColor(args.vg, nvgRGBAf(1, 1, 1, 0.20));
+	nvgStrokeWidth(args.vg, 1.0);
+	nvgStroke(args.vg);
+
+	nvgBeginPath(args.vg);
+	nvgMoveTo(args.vg, 0.0, box.size.y - 2.5);
+	nvgLineTo(args.vg, box.size.x, box.size.y - 2.5);
+	nvgStrokeColor(args.vg, nvgRGBAf(1, 1, 1, 0.20));
+	nvgStrokeWidth(args.vg, 1.0);
+	nvgStroke(args.vg);
+
+	// Black border
+	math::Rect rBorder = r.shrink(math::Vec(1, 1));
+	nvgBeginPath(args.vg);
+	nvgRect(args.vg, RECT_ARGS(rBorder));
+	nvgStrokeColor(args.vg, bottomColor);
+	nvgStrokeWidth(args.vg, 2.0);
+	nvgStroke(args.vg);
+
+	// Draw children inside box
 	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
 	Widget::draw(args);
 	nvgResetScissor(args.vg);
