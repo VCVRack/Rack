@@ -250,7 +250,7 @@ T pow(T a, int b) {
 
 using math::clamp;
 
-inline float_4 clamp(float_4 x, float_4 a, float_4 b) {
+inline float_4 clamp(float_4 x, float_4 a = 0.f, float_4 b = 1.f) {
 	return fmin(fmax(x, a), b);
 }
 
