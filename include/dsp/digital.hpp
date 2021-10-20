@@ -125,6 +125,10 @@ struct TTimer {
 		time += deltaTime;
 		return time;
 	}
+
+	T getTime() {
+		return time;
+	}
 };
 
 typedef TTimer<> Timer;
