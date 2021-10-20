@@ -267,12 +267,14 @@ def panel_to_components(tree):
 	}
 
 	root = tree.getroot()
-	# Get SVG scale
+	# Get SVG scale relative to mm
 	root_width = root.get('width')
-	svg_dpi = 75
-	scale = 1
-	if re.match('\d+px', root_width):
-		scale = 25.4 / svg_dpi
+	if re.match('\d+mm', root_width):
+		scale = 1
+	else:
+		svg_dpi = 75
+		mm_per_in = 25.4
+		scale = mm_per_in / svg_dpi
 
 	# Get components layer
 	group = root.find(".//svg:g[@inkscape:label='components']", ns)
