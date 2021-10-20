@@ -9,7 +9,7 @@ namespace rack {
 namespace app {
 
 
-struct LedDisplay : widget::OpaqueWidget {
+struct LedDisplay : widget::Widget {
 	void draw(const DrawArgs& args) override;
 };
 
