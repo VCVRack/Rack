@@ -30,6 +30,8 @@ Manager::Manager() {
 
 
 Manager::~Manager() {
+	// Dispatch onSave to all Modules so they save their patch storage, etc.
+	APP->engine->prepareSave();
 	cleanAutosave();
 }
 
