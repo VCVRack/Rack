@@ -32,6 +32,10 @@ Manager::Manager() {
 Manager::~Manager() {
 	// Dispatch onSave to all Modules so they save their patch storage, etc.
 	APP->engine->prepareSave();
+	// Save autosave if not headless
+	if (!settings::headless) {
+		APP->patch->saveAutosave();
+	}
 	cleanAutosave();
 }
 

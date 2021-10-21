@@ -239,9 +239,6 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Destroy context
-	if (!settings::headless) {
-		APP->patch->saveAutosave();
-	}
 	INFO("Destroying context");
 	delete APP;
 	contextSet(NULL);
