@@ -19,6 +19,8 @@ FLAGS += -O3 -march=nocona -funsafe-math-optimizations
 FLAGS += -Wall -Wextra -Wno-unused-parameter
 # C++ standard
 CXXFLAGS += -std=c++11
+# C standard
+CFLAGS += -std=c11
 
 # Architecture-independent flags
 ifdef ARCH_LIN
