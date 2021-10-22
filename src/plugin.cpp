@@ -316,6 +316,8 @@ using PluginModuleSlug = std::tuple<std::string, std::string>;
 static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
 	{{"AudibleInstrumentsPreview", "Plaits"}, {"AudibleInstruments", "Plaits"}},
 	{{"AudibleInstrumentsPreview", "Marbles"}, {"AudibleInstruments", "Marbles"}},
+	{{"MindMeld-ShapeMasterPro", "ShapeMasterPro"}, {"MindMeldModular", "ShapeMaster"}},
+	{{"MindMeldModular", "ShapeMaster"}, {"MindMeld-ShapeMasterPro", "ShapeMasterPro"}},
 	// {{"", ""}, {"", ""}},
 };
 
