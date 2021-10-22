@@ -15,6 +15,10 @@ class UserException(Exception):
     pass
 
 
+def eprint(*args, **kwargs):
+	print(*args, file=sys.stderr, **kwargs)
+
+
 def find(f, array):
 	for a in array:
 		if f(a):
@@ -144,9 +148,9 @@ void init(Plugin* p) {
 	with open(os.path.join(plugin_dir, ".gitignore"), "w") as f:
 		f.write(git_ignore)
 
-	print(f"Created template plugin in {plugin_dir}")
+	eprint(f"Created template plugin in {plugin_dir}")
 	os.system(f"cd {plugin_dir} && git init")
-	print(f"You may use `make`, `make clean`, `make dist`, `make install`, etc in the {plugin_dir} directory.")
+	eprint(f"You may use `make`, `make clean`, `make dist`, `make install`, etc in the {plugin_dir} directory.")
 
 
 def create_manifest(slug, plugin_dir="."):
@@ -183,8 +187,8 @@ def create_manifest(slug, plugin_dir="."):
 	# Dump JSON
 	with open(manifest_filename, "w") as f:
 		json.dump(manifest, f, indent="  ")
-	print("")
-	print(f"Manifest written to {manifest_filename}")
+	eprint("")
+	eprint(f"Manifest written to {manifest_filename}")
 
 
 def create_module(slug, panel_filename=None, source_filename=None):
@@ -200,7 +204,7 @@ def create_module(slug, panel_filename=None, source_filename=None):
 	# Check if module manifest exists
 	module_manifest = find(lambda m: m['slug'] == slug, manifest['modules'])
 	if module_manifest:
-		print(f"Module {slug} already exists in plugin.json. Edit this file to modify the module manifest.")
+		eprint(f"Module {slug} already exists in plugin.json. Edit this file to modify the module manifest.")
 
 	else:
 		# Add module to manifest
@@ -221,14 +225,14 @@ def create_module(slug, panel_filename=None, source_filename=None):
 		with open(manifest_filename, "w") as f:
 			json.dump(manifest, f, indent="  ")
 
-		print(f"Added {slug} to {manifest_filename}")
+		eprint(f"Added {slug} to {manifest_filename}")
 
 	# Check filenames
-	if panel_filename and source_filename:
+	if panel_filename:
 		if not os.path.exists(panel_filename):
 			raise UserException(f"Panel not found at {panel_filename}.")
 
-		if os.path.exists(source_filename):
+		if source_filename and os.path.exists(source_filename):
 			if input_default(f"{source_filename} already exists. Overwrite? (y/n)", "n").lower() != "y":
 				return
 
@@ -237,18 +241,9 @@ def create_module(slug, panel_filename=None, source_filename=None):
 
 		components = panel_to_components(tree)
 
-		# Write source
-		source = components_to_source(components, slug)
-
-		with open(source_filename, "w") as f:
-			f.write(source)
-		print(f"Source file generated at {source_filename}")
-
-		# Append model to plugin.hpp
-		identifier = str_to_identifier(slug)
-
 		# Tell user to add model to plugin.hpp and plugin.cpp
-		print(f"""
+		identifier = str_to_identifier(slug)
+		eprint(f"""
 To enable the module, add
 
 	extern Model* model{identifier};
@@ -258,6 +253,16 @@ to plugin.hpp, and add
 	p->addModel(model{identifier});
 
 to the init() function in plugin.cpp.""")
+
+		# Write source
+		source = components_to_source(components, slug)
+
+		if source_filename:
+			with open(source_filename, "w") as f:
+				f.write(source)
+			eprint(f"Source file generated at {source_filename}")
+		else:
+			print(source)
 
 
 def panel_to_components(tree):
@@ -332,7 +337,7 @@ def panel_to_components(tree):
 			c['cx'] = round(cx, 3)
 			c['cy'] = round(cy, 3)
 		else:
-			print(f"Element in components layer is not rect, circle, or ellipse: {el}")
+			eprint(f"Element in components layer is not rect, circle, or ellipse: {el}")
 			continue
 
 		# Get color
@@ -348,7 +353,7 @@ def panel_to_components(tree):
 				color_match = re.search(r'fill:\S*(#[0-9a-fA-F]{6})', style)
 				color = color_match.group(1)
 		if not color:
-			print(f"Cannot get color of component: {el}")
+			eprint(f"Cannot get color of component: {el}")
 			continue
 
 		color = color.lower()
@@ -372,7 +377,7 @@ def panel_to_components(tree):
 	components['lights'] = sorted(components['lights'], key=top_left_sort)
 	components['widgets'] = sorted(components['widgets'], key=top_left_sort)
 
-	print(f"Found {len(components['params'])} params, {len(components['inputs'])} inputs, {len(components['outputs'])} outputs, {len(components['lights'])} lights, and {len(components['widgets'])} custom widgets in \"components\" layer.")
+	eprint(f"Found {len(components['params'])} params, {len(components['inputs'])} inputs, {len(components['outputs'])} outputs, {len(components['lights'])} lights, and {len(components['widgets'])} custom widgets in \"components\" layer.")
 	return components
 
 
@@ -555,7 +560,7 @@ createmodule <module slug> [panel file] [source file]
 
 	See https://vcvrack.com/manual/PanelTutorial.html for creating SVG panel files.
 """
-	print(text)
+	eprint(text)
 
 
 def parse_args(args):
@@ -572,7 +577,7 @@ def parse_args(args):
 	elif cmd == 'createmanifest':
 		create_manifest(*args)
 	else:
-		print(f"Command not found: {cmd}")
+		eprint(f"Command not found: {cmd}")
 
 
 if __name__ == "__main__":
@@ -581,5 +586,5 @@ if __name__ == "__main__":
 	except KeyboardInterrupt:
 		pass
 	except UserException as e:
-		print(e)
+		eprint(e)
 		sys.exit(1)
