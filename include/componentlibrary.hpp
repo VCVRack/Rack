@@ -770,6 +770,14 @@ struct CKSSThree : app::SvgSwitch {
 	}
 };
 
+struct CKSSThreeHorizontal : app::SvgSwitch {
+	CKSSThreeHorizontal() {
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThreeHorizontal_0.svg")));
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThreeHorizontal_1.svg")));
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThreeHorizontal_2.svg")));
+	}
+};
+
 struct CKD6 : app::SvgSwitch {
 	CKD6() {
 		momentary = true;
