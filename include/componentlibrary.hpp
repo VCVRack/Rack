@@ -91,6 +91,14 @@ struct TGrayModuleLightWidget : TBase {
 typedef TGrayModuleLightWidget<> GrayModuleLightWidget;
 
 template <typename TBase = GrayModuleLightWidget>
+struct TWhiteLight : TBase {
+	TWhiteLight() {
+		this->addBaseColor(SCHEME_WHITE);
+	}
+};
+typedef TWhiteLight<> WhiteLight;
+
+template <typename TBase = GrayModuleLightWidget>
 struct TRedLight : TBase {
 	TRedLight() {
 		this->addBaseColor(SCHEME_RED);
@@ -107,14 +115,6 @@ struct TGreenLight : TBase {
 typedef TGreenLight<> GreenLight;
 
 template <typename TBase = GrayModuleLightWidget>
-struct TYellowLight : TBase {
-	TYellowLight() {
-		this->addBaseColor(SCHEME_YELLOW);
-	}
-};
-typedef TYellowLight<> YellowLight;
-
-template <typename TBase = GrayModuleLightWidget>
 struct TBlueLight : TBase {
 	TBlueLight() {
 		this->addBaseColor(SCHEME_BLUE);
@@ -123,12 +123,12 @@ struct TBlueLight : TBase {
 typedef TBlueLight<> BlueLight;
 
 template <typename TBase = GrayModuleLightWidget>
-struct TWhiteLight : TBase {
-	TWhiteLight() {
-		this->addBaseColor(SCHEME_WHITE);
+struct TYellowLight : TBase {
+	TYellowLight() {
+		this->addBaseColor(SCHEME_YELLOW);
 	}
 };
-typedef TWhiteLight<> WhiteLight;
+typedef TYellowLight<> YellowLight;
 
 /** Reads two adjacent lightIds, so `lightId` and `lightId + 1` must be defined */
 template <typename TBase = GrayModuleLightWidget>
@@ -182,6 +182,38 @@ struct TinyLight : TSvgLight<TBase> {
 	}
 };
 
+/** Based on the size of 5mm LEDs */
+template <typename TBase = GrayModuleLightWidget>
+struct LargeSimpleLight : TBase {
+	LargeSimpleLight() {
+		this->box.size = mm2px(math::Vec(5, 5));
+	}
+};
+
+/** Based on the size of 3mm LEDs */
+template <typename TBase = GrayModuleLightWidget>
+struct MediumSimpleLight : TBase {
+	MediumSimpleLight() {
+		this->box.size = mm2px(math::Vec(3, 3));
+	}
+};
+
+/** Based on the size of 2mm LEDs */
+template <typename TBase = GrayModuleLightWidget>
+struct SmallSimpleLight : TBase {
+	SmallSimpleLight() {
+		this->box.size = mm2px(math::Vec(2, 2));
+	}
+};
+
+/** Based on the size of 1mm LEDs */
+template <typename TBase = GrayModuleLightWidget>
+struct TinySimpleLight : TBase {
+	TinySimpleLight() {
+		this->box.size = mm2px(math::Vec(1, 1));
+	}
+};
+
 template <typename TBase>
 struct RectangleLight : TBase {
 	void drawBackground(const widget::Widget::DrawArgs& args) override {
@@ -229,7 +261,6 @@ struct LEDBezelLight : TBase {
 };
 
 /** A light to displayed over PB61303. Must add a color by subclassing or templating.
-Don't add this as a child of the PB61303 itself. Instead, just place it over it as a sibling in the scene graph, offset by mm2px(math::Vec(0.5, 0.5)).
 */
 template <typename TBase>
 struct PB61303Light : TBase {
@@ -668,6 +699,10 @@ struct LightSlider : TBase {
 		this->addChild(light);
 	}
 
+	app::ModuleLightWidget* getLight() {
+		return light;
+	}
+
 	void step() override {
 		TBase::step();
 		// Move center of light to center of handle
@@ -801,6 +836,22 @@ struct LEDButton : app::SvgSwitch {
 	}
 };
 
+template <typename TLight>
+struct LEDLightButton : LEDButton {
+	app::ModuleLightWidget* light;
+
+	LEDLightButton() {
+		light = new TLight;
+		// Move center of light to center of box
+		light->box.pos = box.size.div(2).minus(light->box.size.div(2));
+		addChild(light);
+	}
+
+	app::ModuleLightWidget* getLight() {
+		return light;
+	}
+};
+
 struct BefacoSwitch : app::SvgSwitch {
 	BefacoSwitch() {
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/BefacoSwitch_0.svg")));
@@ -833,6 +884,10 @@ struct LEDLightBezel : LEDBezel {
 		// Move center of light to center of box
 		light->box.pos = box.size.div(2).minus(light->box.size.div(2));
 		addChild(light);
+	}
+
+	app::ModuleLightWidget* getLight() {
+		return light;
 	}
 };
 

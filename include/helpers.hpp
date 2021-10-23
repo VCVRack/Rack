@@ -152,8 +152,8 @@ Requires ParamWidget to have a `light` member.
 template <class TParamWidget>
 TParamWidget* createLightParam(math::Vec pos, engine::Module* module, int paramId, int firstLightId) {
 	TParamWidget* o = createParam<TParamWidget>(pos, module, paramId);
-	o->light->module = module;
-	o->light->firstLightId = firstLightId;
+	o->getLight()->module = module;
+	o->getLight()->firstLightId = firstLightId;
 	return o;
 }
 
