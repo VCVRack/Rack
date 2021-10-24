@@ -230,7 +230,7 @@ TMenuItem* createMenuItem(std::string text, std::string rightText, std::function
 /** Creates a MenuItem with a check mark set by a lambda function.
 Example:
 
-	menu->addChild(createCheckMenuItem("Loop",
+	menu->addChild(createCheckMenuItem("Loop", "",
 		[=]() {
 			return module->isLoop();
 		},
@@ -276,7 +276,7 @@ ui::MenuItem* createCheckMenuItem(std::string text, std::string rightText, std::
 /** Creates a MenuItem that controls a boolean value with a check mark.
 Example:
 
-	menu->addChild(createBoolMenuItem("Loop",
+	menu->addChild(createBoolMenuItem("Loop", "",
 		[=]() {
 			return module->isLoop();
 		},
@@ -322,7 +322,7 @@ ui::MenuItem* createBoolMenuItem(std::string text, std::string rightText, std::f
 /** Easy wrapper for createBoolMenuItem() to modify a bool pointer.
 Example:
 
-	menu->addChild(createBoolPtrMenuItem("Loop", &module->loop));
+	menu->addChild(createBoolPtrMenuItem("Loop", "", &module->loop));
 */
 template <typename T>
 ui::MenuItem* createBoolPtrMenuItem(std::string text, std::string rightText, T* ptr) {
