@@ -833,6 +833,7 @@ struct LEDButton : app::SvgSwitch {
 	LEDButton() {
 		momentary = true;
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDButton.svg")));
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDButton_1.svg")));
 	}
 };
 
