@@ -18,52 +18,37 @@ namespace rack {
 namespace library {
 
 
-static std::mutex updatesLoopMutex;
-static std::condition_variable updatesLoopCv;
-static bool updatesLoopRunning = false;
-
-
-static void checkUpdatesLoop() {
-	updatesLoopRunning = true;
-	while (updatesLoopRunning) {
-		checkUpdates();
-
-		// Sleep a few seconds, or wake up when destroy() is called
-		std::unique_lock<std::mutex> lock(updatesLoopMutex);
-		auto duration = std::chrono::seconds(60);
-		if (!updatesLoopRunning)
-			break;
-		updatesLoopCv.wait_for(lock, duration, []() {return !updatesLoopRunning;});
-	}
-}
+static std::mutex appUpdateMutex;
+static std::mutex updateMutex;
 
 
 void init() {
 	if (settings::autoCheckUpdates && !settings::devMode) {
-		// std::thread t([&]() {
-		// 	checkAppUpdate();
-		// });
-		// t.detach();
-
-		std::thread t2([&] {
-			checkUpdatesLoop();
+		std::thread t([&]() {
+			// checkAppUpdate();
+			checkUpdates();
 		});
-		t2.detach();
+		t.detach();
 	}
 }
 
 
 void destroy() {
-	// Stop checkUpdatesLoop thread if it's running
+	// Wait until all library threads are finished
 	{
-		std::lock_guard<std::mutex> lock(updatesLoopMutex);
-		updatesLoopRunning = false;
-		updatesLoopCv.notify_all();
+		std::lock_guard<std::mutex> lock(appUpdateMutex);
+	}
+	{
+		std::lock_guard<std::mutex> lock(updateMutex);
 	}
 }
 
 
 void checkAppUpdate() {
+	if (!appUpdateMutex.try_lock())
+		return;
+	DEFER({appUpdateMutex.unlock();});
+
 	std::string versionUrl = API_URL + "/version";
 	json_t* reqJ = json_object();
 	json_object_set(reqJ, "edition", json_string(APP_EDITION.c_str()));
@@ -104,6 +89,10 @@ bool isLoggedIn() {
 
 
 void logIn(const std::string& email, const std::string& password) {
+	if (!updateMutex.try_lock())
+		return;
+	DEFER({updateMutex.unlock();});
+
 	loginStatus = "Logging in...";
 	json_t* reqJ = json_object();
 	json_object_set(reqJ, "email", json_string(email.c_str()));
@@ -151,6 +140,10 @@ static network::CookieMap getTokenCookies() {
 }
 
 void checkUpdates() {
+	if (!updateMutex.try_lock())
+		return;
+	DEFER({updateMutex.unlock();});
+
 	if (settings::token.empty())
 		return;
 
@@ -294,6 +287,10 @@ bool hasUpdates() {
 
 
 void syncUpdate(const std::string& slug) {
+	if (!updateMutex.try_lock())
+		return;
+	DEFER({updateMutex.unlock();});
+
 	if (settings::token.empty())
 		return;
 
