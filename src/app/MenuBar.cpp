@@ -541,9 +541,6 @@ struct EngineButton : MenuButton {
 ////////////////////
 
 
-static bool isLoggingIn = false;
-
-
 struct AccountPasswordField : ui::PasswordField {
 	ui::MenuItem* logInItem;
 	void onAction(const ActionEvent& e) override {
@@ -557,19 +554,17 @@ struct LogInItem : ui::MenuItem {
 	ui::TextField* passwordField;
 
 	void onAction(const ActionEvent& e) override {
-		isLoggingIn = true;
 		std::string email = emailField->text;
 		std::string password = passwordField->text;
 		std::thread t([=] {
 			library::logIn(email, password);
-			isLoggingIn = false;
+			library::checkUpdates();
 		});
 		t.detach();
 		e.unconsume();
 	}
 
 	void step() override {
-		disabled = isLoggingIn;
 		text = "Log in";
 		rightText = library::loginStatus;
 		MenuItem::step();
@@ -677,16 +672,16 @@ struct SyncUpdateItem : ui::MenuItem {
 
 
 struct LibraryMenu : ui::Menu {
-	bool loggedIn = false;
-
 	LibraryMenu() {
 		refresh();
 	}
 
 	void step() override {
 		// Refresh menu when appropriate
-		if (!loggedIn && library::isLoggedIn())
+		if (library::refreshRequested) {
+			library::refreshRequested = false;
 			refresh();
+		}
 		Menu::step();
 	}
 
@@ -721,8 +716,6 @@ struct LibraryMenu : ui::Menu {
 			addChild(logInItem);
 		}
 		else {
-			loggedIn = true;
-
 			addChild(createMenuItem("Log out", "", [=]() {
 				library::logOut();
 			}));
@@ -737,29 +730,13 @@ struct LibraryMenu : ui::Menu {
 
 			if (!library::updateInfos.empty()) {
 				addChild(new ui::MenuSeparator);
-
-				ui::MenuLabel* updatesLabel = new ui::MenuLabel;
-				updatesLabel->text = "Updates";
-				addChild(updatesLabel);
+				addChild(createMenuLabel("Updates"));
 
 				for (auto& pair : library::updateInfos) {
 					SyncUpdateItem* updateItem = new SyncUpdateItem;
 					updateItem->setUpdate(pair.first);
 					addChild(updateItem);
 				}
-			}
-			else if (!settings::autoCheckUpdates) {
-				struct CheckUpdatesItem : ui::MenuItem {
-					void onAction(const ActionEvent& e) override {
-						std::thread t([&] {
-							library::checkUpdates();
-						});
-						t.detach();
-					}
-				};
-				CheckUpdatesItem* checkUpdatesItem = new CheckUpdatesItem;
-				checkUpdatesItem->text = "Check for updates";
-				addChild(checkUpdatesItem);
 			}
 		}
 	}
@@ -778,6 +755,12 @@ struct LibraryButton : MenuButton {
 		ui::Menu* menu = createMenu<LibraryMenu>();
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+		// Check for updates when menu is opened
+		std::thread t([&]() {
+			system::setThreadName("Library");
+			library::checkUpdates();
+		});
+		t.detach();
 	}
 
 	void step() override {

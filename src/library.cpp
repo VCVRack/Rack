@@ -25,6 +25,7 @@ static std::mutex updateMutex;
 void init() {
 	if (settings::autoCheckUpdates && !settings::devMode) {
 		std::thread t([&]() {
+			system::setThreadName("Library");
 			// checkAppUpdate();
 			checkUpdates();
 		});
@@ -88,7 +89,7 @@ bool isLoggedIn() {
 }
 
 
-void logIn(const std::string& email, const std::string& password) {
+void logIn(std::string email, std::string password) {
 	if (!updateMutex.try_lock())
 		return;
 	DEFER({updateMutex.unlock();});
@@ -123,7 +124,7 @@ void logIn(const std::string& email, const std::string& password) {
 	const char* tokenStr = json_string_value(tokenJ);
 	settings::token = tokenStr;
 	loginStatus = "";
-	checkUpdates();
+	refreshRequested = true;
 }
 
 
@@ -218,9 +219,9 @@ void checkUpdates() {
 		}
 		update.version = json_string_value(versionJ);
 		// Reject plugins with ABI mismatch
-		if (!string::startsWith(update.version, APP_VERSION_MAJOR + ".")) {
-			continue;
-		}
+		// if (!string::startsWith(update.version, APP_VERSION_MAJOR + ".")) {
+		// 	continue;
+		// }
 
 		// Check if update is needed
 		plugin::Plugin* p = plugin::getPlugin(slug);
@@ -274,6 +275,7 @@ void checkUpdates() {
 	// }
 
 	updateStatus = "";
+	refreshRequested = true;
 }
 
 
@@ -286,7 +288,7 @@ bool hasUpdates() {
 }
 
 
-void syncUpdate(const std::string& slug) {
+void syncUpdate(std::string slug) {
 	if (!updateMutex.try_lock())
 		return;
 	DEFER({updateMutex.unlock();});
@@ -360,6 +362,7 @@ std::string updateSlug;
 float updateProgress = 0.f;
 bool isSyncing = false;
 bool restartRequested = false;
+bool refreshRequested = false;
 
 
 } // namespace library
