@@ -95,6 +95,9 @@ void ModuleWidget::setPanel(widget::Widget* panel) {
 		addChildBottom(panel);
 		internal->panel = panel;
 		box.size.x = std::round(panel->box.size.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+		// If width is zero, set it to 12HP for sanity
+		if (box.size.x == 0.0)
+			box.size.x = 12 * RACK_GRID_WIDTH;
 	}
 }
 
