@@ -22,7 +22,8 @@ struct BooleanTrigger {
 };
 
 
-/** Turns HIGH when value reaches 1.f, turns LOW when value reaches 0.f. */
+/** Turns HIGH when value reaches a threshold (default 0.f), turns LOW when value reaches a threshold (default 1.f).
+*/
 template <typename T = float>
 struct TSchmittTrigger {
 	T state;
@@ -32,12 +33,15 @@ struct TSchmittTrigger {
 	void reset() {
 		state = T::mask();
 	}
-	T process(T in) {
-		T on = (in >= 1.f);
-		T off = (in <= 0.f);
+	T process(T in, T offThreshold = 0.f, T onThreshold = 1.f) {
+		T on = (in >= onThreshold);
+		T off = (in <= offThreshold);
 		T triggered = ~state & on;
 		state = on | (state & ~off);
 		return triggered;
+	}
+	T isHigh() {
+		return state;
 	}
 };
 
@@ -54,20 +58,20 @@ struct TSchmittTrigger<float> {
 	Returns true if triggered, i.e. the value increases from 0 to 1.
 	If different trigger thresholds are needed, use
 
-		process(rescale(in, low, high, 0.f, 1.f))
+		process(in, 0.1f, 2.f)
 
 	for example.
 	*/
-	bool process(float in) {
+	bool process(float in, float offThreshold = 0.f, float onThreshold = 1.f) {
 		if (state) {
 			// HIGH to LOW
-			if (in <= 0.f) {
+			if (in <= offThreshold) {
 				state = false;
 			}
 		}
 		else {
 			// LOW to HIGH
-			if (in >= 1.f) {
+			if (in >= onThreshold) {
 				state = true;
 				return true;
 			}
