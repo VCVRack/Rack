@@ -156,21 +156,21 @@ struct CV_MIDIWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, 64)), module, CV_MIDI::PITCH_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 64)), module, CV_MIDI::GATE_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32, 64)), module, CV_MIDI::VEL_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, 80)), module, CV_MIDI::AFT_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 80)), module, CV_MIDI::PW_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32, 80)), module, CV_MIDI::MW_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, 96)), module, CV_MIDI::CLK_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 96)), module, CV_MIDI::VOL_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32, 96)), module, CV_MIDI::PAN_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9, 112)), module, CV_MIDI::START_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 112)), module, CV_MIDI::STOP_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32, 112)), module, CV_MIDI::CONTINUE_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.906, 64.347)), module, CV_MIDI::PITCH_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.249, 64.347)), module, CV_MIDI::GATE_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.591, 64.347)), module, CV_MIDI::VEL_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.906, 80.603)), module, CV_MIDI::AFT_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.249, 80.603)), module, CV_MIDI::PW_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.591, 80.603)), module, CV_MIDI::MW_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.906, 96.859)), module, CV_MIDI::CLK_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.249, 96.707)), module, CV_MIDI::VOL_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.591, 96.859)), module, CV_MIDI::PAN_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.906, 113.115)), module, CV_MIDI::START_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.591, 112.975)), module, CV_MIDI::CONTINUE_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.249, 113.115)), module, CV_MIDI::STOP_INPUT));
 
-		MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(3.41891, 14.8373)));
-		midiWidget->box.size = mm2px(Vec(33.840, 28));
+		MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(0.0, 13.039)));
+		midiWidget->box.size = mm2px(Vec(40.64, 29.021));
 		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		addChild(midiWidget);
 	}
