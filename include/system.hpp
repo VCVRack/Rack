@@ -124,6 +124,10 @@ void writeFile(const std::string& path, const std::vector<uint8_t>& data);
 Uses the Unix Standard TAR + Zstandard format (.tar.zst).
 An equivalent shell command is
 
+	tar -c -C dirPath . | zstd -1 -o archivePath
+
+or
+
 	ZSTD_CLEVEL=1 tar -cf archivePath --zstd -C dirPath .
 
 Throws on error.
@@ -133,6 +137,10 @@ std::vector<uint8_t> archiveDirectory(const std::string& dirPath, int compressio
 
 /** Extracts an archive into a directory.
 An equivalent shell command is
+
+	zstd -d < archivePath | tar -x -C dirPath
+
+or
 
 	tar -xf archivePath --zstd -C dirPath
 
