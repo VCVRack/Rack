@@ -60,7 +60,7 @@ static void* loadLibrary(std::string libraryPath) {
 	// Load library with dlopen
 	void* handle = NULL;
 	#if defined ARCH_LIN
-	handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_DEEPBIND);
+	handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	#elif defined ARCH_MAC
 	handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	#endif
