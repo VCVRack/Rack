@@ -154,6 +154,15 @@ void checkUpdates() {
 
 	updateStatus = "Querying for updates...";
 
+	// Check user token
+	std::string userUrl = API_URL + "/user";
+	json_t* userResJ = network::requestJson(network::METHOD_GET, userUrl, NULL, getTokenCookies());
+	if (!userResJ) {
+		DEBUG("User failed");
+		return;
+	}
+	DEFER({json_decref(userResJ);});
+
 	// Get user's plugins list
 	std::string pluginsUrl = API_URL + "/plugins";
 	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, NULL, getTokenCookies());
@@ -219,9 +228,9 @@ void checkUpdates() {
 		}
 		update.version = json_string_value(versionJ);
 		// Reject plugins with ABI mismatch
-		// if (!string::startsWith(update.version, APP_VERSION_MAJOR + ".")) {
-		// 	continue;
-		// }
+		if (!string::startsWith(update.version, APP_VERSION_MAJOR + ".")) {
+			continue;
+		}
 
 		// Check if update is needed
 		plugin::Plugin* p = plugin::getPlugin(slug);
