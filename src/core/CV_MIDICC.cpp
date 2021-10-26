@@ -39,7 +39,7 @@ struct CCMidiOutput : midi::Output {
 };
 
 
-struct CV_CC : Module {
+struct CV_MIDICC : Module {
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -59,7 +59,7 @@ struct CV_CC : Module {
 	int learningId = -1;
 	int learnedCcs[16] = {};
 
-	CV_CC() {
+	CV_MIDICC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 16; i++)
 			configInput(CC_INPUTS + i, string::f("Cell %d", i + 1));
@@ -122,36 +122,36 @@ struct CV_CC : Module {
 };
 
 
-struct CV_CCWidget : ModuleWidget {
-	CV_CCWidget(CV_CC* module) {
+struct CV_MIDICCWidget : ModuleWidget {
+	CV_MIDICCWidget(CV_MIDICC* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/CV-CC.svg")));
+		setPanel(Svg::load(asset::system("res/Core/CV_MIDICC.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8, 77)), module, CV_CC::CC_INPUTS + 0));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 77)), module, CV_CC::CC_INPUTS + 1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31, 77)), module, CV_CC::CC_INPUTS + 2));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43, 77)), module, CV_CC::CC_INPUTS + 3));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8, 89)), module, CV_CC::CC_INPUTS + 4));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 89)), module, CV_CC::CC_INPUTS + 5));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31, 89)), module, CV_CC::CC_INPUTS + 6));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43, 89)), module, CV_CC::CC_INPUTS + 7));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8, 101)), module, CV_CC::CC_INPUTS + 8));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 101)), module, CV_CC::CC_INPUTS + 9));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31, 101)), module, CV_CC::CC_INPUTS + 10));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43, 101)), module, CV_CC::CC_INPUTS + 11));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8, 112)), module, CV_CC::CC_INPUTS + 12));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20, 112)), module, CV_CC::CC_INPUTS + 13));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31, 112)), module, CV_CC::CC_INPUTS + 14));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43, 112)), module, CV_CC::CC_INPUTS + 15));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 78.431)), module, CV_MIDICC::CC_INPUTS + 0));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 78.431)), module, CV_MIDICC::CC_INPUTS + 1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 78.431)), module, CV_MIDICC::CC_INPUTS + 2));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 78.431)), module, CV_MIDICC::CC_INPUTS + 3));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 89.946)), module, CV_MIDICC::CC_INPUTS + 4));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 89.946)), module, CV_MIDICC::CC_INPUTS + 5));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 89.946)), module, CV_MIDICC::CC_INPUTS + 6));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 89.946)), module, CV_MIDICC::CC_INPUTS + 7));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 101.466)), module, CV_MIDICC::CC_INPUTS + 8));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 101.466)), module, CV_MIDICC::CC_INPUTS + 9));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 101.466)), module, CV_MIDICC::CC_INPUTS + 10));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 101.466)), module, CV_MIDICC::CC_INPUTS + 11));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 112.998)), module, CV_MIDICC::CC_INPUTS + 12));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 112.984)), module, CV_MIDICC::CC_INPUTS + 13));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 112.984)), module, CV_MIDICC::CC_INPUTS + 14));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 112.984)), module, CV_MIDICC::CC_INPUTS + 15));
 
-		typedef Grid16MidiWidget<CcChoice<CV_CC>> TMidiWidget;
-		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
-		midiWidget->box.size = mm2px(Vec(44, 54.667));
+		typedef Grid16MidiWidget<CcChoice<CV_MIDICC>> TMidiWidget;
+		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(0.0, 13.039)));
+		midiWidget->box.size = mm2px(Vec(50.8, 55.88));
 		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
@@ -159,7 +159,7 @@ struct CV_CCWidget : ModuleWidget {
 };
 
 
-Model* modelCV_CC = createModel<CV_CC, CV_CCWidget>("CV-CC");
+Model* modelCV_MIDICC = createModel<CV_MIDICC, CV_MIDICCWidget>("CV-CC");
 
 
 } // namespace core
