@@ -217,13 +217,13 @@ void Manager::cleanAutosave() {
 	if (system::isDirectory(modulesDir)) {
 		for (const std::string& entry : system::getEntries(modulesDir)) {
 			try {
-				int64_t moduleId = std::stol(system::getFilename(entry));
+				int64_t moduleId = std::stoll(system::getFilename(entry));
 				// Ignore modules that exist in the rack
 				if (APP->engine->getModule(moduleId))
 					continue;
 			}
-			catch (std::invalid_argument& e) {
-			}
+			catch (std::invalid_argument& e) {}
+			catch (std::out_of_range& e) {}
 			// Remove the entry.
 			system::removeRecursively(entry);
 		}
