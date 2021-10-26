@@ -5,7 +5,7 @@ namespace rack {
 namespace core {
 
 
-struct MIDI_CC : Module {
+struct MIDICC_CV : Module {
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -36,7 +36,7 @@ struct MIDI_CC : Module {
 	bool mpeMode;
 	bool lsbMode;
 
-	MIDI_CC() {
+	MIDICC_CV() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int i = 0; i < 16; i++)
 			configOutput(CC_OUTPUT + i, string::f("Cell %d", i + 1));
@@ -211,43 +211,43 @@ struct MIDI_CC : Module {
 };
 
 
-struct MIDI_CCWidget : ModuleWidget {
-	MIDI_CCWidget(MIDI_CC* module) {
+struct MIDICC_CVWidget : ModuleWidget {
+	MIDICC_CVWidget(MIDICC_CV* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/MIDI-CC.svg")));
+		setPanel(Svg::load(asset::system("res/Core/MIDICC_CV.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.894335, 73.344704)), module, MIDI_CC::CC_OUTPUT + 0));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.494659, 73.344704)), module, MIDI_CC::CC_OUTPUT + 1));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.094982, 73.344704)), module, MIDI_CC::CC_OUTPUT + 2));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 73.344704)), module, MIDI_CC::CC_OUTPUT + 3));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.8943355, 84.945023)), module, MIDI_CC::CC_OUTPUT + 4));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.49466, 84.945023)), module, MIDI_CC::CC_OUTPUT + 5));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.094982, 84.945023)), module, MIDI_CC::CC_OUTPUT + 6));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 84.945023)), module, MIDI_CC::CC_OUTPUT + 7));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.8943343, 96.543976)), module, MIDI_CC::CC_OUTPUT + 8));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.494659, 96.543976)), module, MIDI_CC::CC_OUTPUT + 9));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 96.543976)), module, MIDI_CC::CC_OUTPUT + 10));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 96.543976)), module, MIDI_CC::CC_OUTPUT + 11));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(3.894335, 108.14429)), module, MIDI_CC::CC_OUTPUT + 12));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(15.49466, 108.14429)), module, MIDI_CC::CC_OUTPUT + 13));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(27.09498, 108.14429)), module, MIDI_CC::CC_OUTPUT + 14));
-		addOutput(createOutput<PJ301MPort>(mm2px(Vec(38.693932, 108.14429)), module, MIDI_CC::CC_OUTPUT + 15));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.189, 78.431)), module, MIDICC_CV::CC_OUTPUT + 0));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.739, 78.431)), module, MIDICC_CV::CC_OUTPUT + 1));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(31.289, 78.431)), module, MIDICC_CV::CC_OUTPUT + 2));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.838, 78.431)), module, MIDICC_CV::CC_OUTPUT + 3));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.189, 89.946)), module, MIDICC_CV::CC_OUTPUT + 4));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.739, 89.946)), module, MIDICC_CV::CC_OUTPUT + 5));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(31.289, 89.946)), module, MIDICC_CV::CC_OUTPUT + 6));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.838, 89.946)), module, MIDICC_CV::CC_OUTPUT + 7));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.189, 101.466)), module, MIDICC_CV::CC_OUTPUT + 8));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.739, 101.466)), module, MIDICC_CV::CC_OUTPUT + 9));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(31.289, 101.466)), module, MIDICC_CV::CC_OUTPUT + 10));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.838, 101.466)), module, MIDICC_CV::CC_OUTPUT + 11));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.19, 112.998)), module, MIDICC_CV::CC_OUTPUT + 12));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.739, 112.984)), module, MIDICC_CV::CC_OUTPUT + 13));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(31.289, 112.984)), module, MIDICC_CV::CC_OUTPUT + 14));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.839, 112.984)), module, MIDICC_CV::CC_OUTPUT + 15));
 
-		typedef Grid16MidiWidget<CcChoice<MIDI_CC>> TMidiWidget;
-		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(3.399621, 14.837339)));
-		midiWidget->box.size = mm2px(Vec(44, 54.667));
+		typedef Grid16MidiWidget<CcChoice<MIDICC_CV>> TMidiWidget;
+		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(0.0, 13.039)));
+		midiWidget->box.size = mm2px(Vec(50.8, 55.88));
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
 
 	void appendContextMenu(Menu* menu) override {
-		MIDI_CC* module = dynamic_cast<MIDI_CC*>(this->module);
+		MIDICC_CV* module = dynamic_cast<MIDICC_CV*>(this->module);
 
 		menu->addChild(new MenuSeparator);
 
@@ -261,7 +261,7 @@ struct MIDI_CCWidget : ModuleWidget {
 
 
 // Use legacy slug for compatibility
-Model* modelMIDI_CC = createModel<MIDI_CC, MIDI_CCWidget>("MIDICCToCVInterface");
+Model* modelMIDICC_CV = createModel<MIDICC_CV, MIDICC_CVWidget>("MIDICCToCVInterface");
 
 
 } // namespace core

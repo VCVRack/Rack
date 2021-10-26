@@ -6,16 +6,16 @@ namespace core {
 
 
 void init(rack::Plugin* p) {
-	p->addModel(modelAudioInterface2);
-	p->addModel(modelAudioInterface);
-	p->addModel(modelAudioInterface16);
+	p->addModel(modelAudio2);
+	p->addModel(modelAudio8);
+	p->addModel(modelAudio16);
 	p->addModel(modelMIDI_CV);
-	p->addModel(modelMIDI_CC);
+	p->addModel(modelMIDICC_CV);
 	p->addModel(modelMIDI_Gate);
-	p->addModel(modelMIDI_Map);
+	p->addModel(modelMIDIMap);
 	p->addModel(modelCV_MIDI);
-	p->addModel(modelCV_CC);
-	p->addModel(modelCV_Gate);
+	p->addModel(modelCV_MIDICC);
+	p->addModel(modelGate_MIDI);
 	p->addModel(modelBlank);
 	p->addModel(modelNotes);
 }

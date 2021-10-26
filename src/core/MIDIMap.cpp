@@ -8,7 +8,7 @@ namespace core {
 static const int MAX_CHANNELS = 128;
 
 
-struct MIDI_Map : Module {
+struct MIDIMap : Module {
 	enum ParamIds {
 		NUM_PARAMS
 	};
@@ -46,7 +46,7 @@ struct MIDI_Map : Module {
 	bool filterInitialized[MAX_CHANNELS] = {};
 	dsp::ClockDivider divider;
 
-	MIDI_Map() {
+	MIDIMap() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 		for (int id = 0; id < MAX_CHANNELS; id++) {
 			paramHandles[id].color = nvgRGB(0xff, 0xff, 0x40);
@@ -59,7 +59,7 @@ struct MIDI_Map : Module {
 		onReset();
 	}
 
-	~MIDI_Map() {
+	~MIDIMap() {
 		for (int id = 0; id < MAX_CHANNELS; id++) {
 			APP->engine->removeParamHandle(&paramHandles[id]);
 		}
@@ -288,12 +288,12 @@ struct MIDI_Map : Module {
 };
 
 
-struct MIDI_MapChoice : LedDisplayChoice {
-	MIDI_Map* module;
+struct MIDIMapChoice : LedDisplayChoice {
+	MIDIMap* module;
 	int id;
 	int disableLearnFrames = -1;
 
-	void setModule(MIDI_Map* module) {
+	void setModule(MIDIMap* module) {
 		this->module = module;
 	}
 
@@ -416,13 +416,13 @@ struct MIDI_MapChoice : LedDisplayChoice {
 };
 
 
-struct MIDI_MapDisplay : MidiWidget {
-	MIDI_Map* module;
+struct MIDIMapDisplay : MidiWidget {
+	MIDIMap* module;
 	ScrollWidget* scroll;
-	MIDI_MapChoice* choices[MAX_CHANNELS];
+	MIDIMapChoice* choices[MAX_CHANNELS];
 	LedDisplaySeparator* separators[MAX_CHANNELS];
 
-	void setModule(MIDI_Map* module) {
+	void setModule(MIDIMap* module) {
 		this->module = module;
 
 		scroll = new ScrollWidget;
@@ -445,7 +445,7 @@ struct MIDI_MapDisplay : MidiWidget {
 				separators[id] = separator;
 			}
 
-			MIDI_MapChoice* choice = createWidget<MIDI_MapChoice>(pos);
+			MIDIMapChoice* choice = createWidget<MIDIMapChoice>(pos);
 			choice->box.size.x = box.size.x;
 			choice->id = id;
 			choice->setModule(module);
@@ -470,25 +470,25 @@ struct MIDI_MapDisplay : MidiWidget {
 };
 
 
-struct MIDI_MapWidget : ModuleWidget {
-	MIDI_MapWidget(MIDI_Map* module) {
+struct MIDIMapWidget : ModuleWidget {
+	MIDIMapWidget(MIDIMap* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/MIDI-Map.svg")));
+		setPanel(Svg::load(asset::system("res/Core/MIDIMap.svg")));
 
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		MIDI_MapDisplay* midiWidget = createWidget<MIDI_MapDisplay>(mm2px(Vec(3.41891, 14.8373)));
-		midiWidget->box.size = mm2px(Vec(43.999, 102.664));
+		MIDIMapDisplay* midiWidget = createWidget<MIDIMapDisplay>(mm2px(Vec(0.0, 12.869)));
+		midiWidget->box.size = mm2px(Vec(50.8, 105.567));
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);
 	}
 
 	void appendContextMenu(Menu* menu) override {
-		MIDI_Map* module = dynamic_cast<MIDI_Map*>(this->module);
+		MIDIMap* module = dynamic_cast<MIDIMap*>(this->module);
 
 		menu->addChild(new MenuSeparator);
 
@@ -497,7 +497,7 @@ struct MIDI_MapWidget : ModuleWidget {
 };
 
 
-Model* modelMIDI_Map = createModel<MIDI_Map, MIDI_MapWidget>("MIDI-Map");
+Model* modelMIDIMap = createModel<MIDIMap, MIDIMapWidget>("MIDI-Map");
 
 
 } // namespace core

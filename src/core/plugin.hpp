@@ -5,16 +5,16 @@ namespace rack {
 namespace core {
 
 
-extern Model* modelAudioInterface2;
-extern Model* modelAudioInterface;
-extern Model* modelAudioInterface16;
+extern Model* modelAudio2;
+extern Model* modelAudio8;
+extern Model* modelAudio16;
 extern Model* modelMIDI_CV;
-extern Model* modelMIDI_CC;
+extern Model* modelMIDICC_CV;
 extern Model* modelMIDI_Gate;
-extern Model* modelMIDI_Map;
+extern Model* modelMIDIMap;
 extern Model* modelCV_MIDI;
-extern Model* modelCV_CC;
-extern Model* modelCV_Gate;
+extern Model* modelCV_MIDICC;
+extern Model* modelGate_MIDI;
 extern Model* modelBlank;
 extern Model* modelNotes;
 
