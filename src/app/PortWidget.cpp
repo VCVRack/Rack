@@ -1,5 +1,7 @@
 #include <app/PortWidget.hpp>
 #include <app/Scene.hpp>
+#include <ui/MenuItem.hpp>
+#include <ui/MenuSeparator.hpp>
 #include <window/Window.hpp>
 #include <context.hpp>
 #include <history.hpp>
@@ -58,6 +60,33 @@ struct PortTooltip : ui::Tooltip {
 		assert(parent);
 		box = box.nudge(parent->box.zeroPos());
 	}
+};
+
+
+struct ColorMenuItem : ui::MenuItem {
+	NVGcolor color;
+
+	void draw(const DrawArgs& args) override {
+		MenuItem::draw(args);
+
+		// Color circle
+		nvgBeginPath(args.vg);
+		float radius = 6.0;
+		nvgCircle(args.vg, 8.0 + radius, box.size.y / 2, radius);
+		nvgFillColor(args.vg, color);
+		nvgFill(args.vg);
+		nvgStrokeWidth(args.vg, 1.0);
+		nvgStrokeColor(args.vg, color::mult(color, 0.5));
+		nvgStroke(args.vg);
+	}
+};
+
+
+struct PortCableItem : ColorMenuItem {
+};
+
+
+struct PortCreateCableItem : ColorMenuItem {
 };
 
 
@@ -132,25 +161,45 @@ void PortWidget::createContextMenu() {
 	assert(portInfo);
 	menu->addChild(createMenuLabel(portInfo->getFullName()));
 
-	CableWidget* cw = APP->scene->rack->getTopCable(this);
+	std::vector<CableWidget*> cws = APP->scene->rack->getCablesOnPort(this);
+	CableWidget* topCw = cws.empty() ? NULL : cws.back();
+
 	menu->addChild(createMenuItem("Delete top cable", RACK_MOD_SHIFT_NAME "+click",
 		[=]() {
 			if (!weakThis)
 				return;
 			weakThis->deleteTopCableAction();
 		},
-		!cw
+		!topCw
 	));
 
 	// TODO
 	if (type == engine::Port::INPUT) {
-		menu->addChild(createMenuItem("Duplicate cable", RACK_MOD_CTRL_NAME "+drag", NULL, true));
+		menu->addChild(createMenuItem("Duplicate top cable", RACK_MOD_CTRL_NAME "+drag", NULL, true));
 	}
 	else {
-		menu->addChild(createMenuItem("Create new cable", RACK_MOD_CTRL_NAME "+drag", NULL, true));
 	}
 
-	// TODO
+	// Create cable items
+	bool createCableDisabled = (type == engine::Port::INPUT) && topCw;
+	for (NVGcolor color : settings::cableColors) {
+		// Include extra leading spaces for the color circle
+		PortCreateCableItem* item = createMenuItem<PortCreateCableItem>("     New cable", "Click+drag");
+		item->disabled = createCableDisabled;
+		item->color = color;
+		menu->addChild(item);
+	}
+
+	// Cable items
+	if (!cws.empty()) {
+		menu->addChild(new ui::MenuSeparator);
+
+		for (CableWidget* cw : cws) {
+			PortCableItem* item = createMenuItem<PortCableItem>("     XXXX", "Click+drag");
+			item->color = nvgRGBf(1, 0, 0);
+			menu->addChild(item);
+		}
+	}
 }
 
 
