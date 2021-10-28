@@ -169,31 +169,31 @@ TParamWidget* createLightParamCentered(math::Vec pos, engine::Module* module, in
 
 template <class TMenu = ui::Menu>
 TMenu* createMenu() {
-	TMenu* o = new TMenu;
-	o->box.pos = APP->scene->mousePos;
+	TMenu* menu = new TMenu;
+	menu->box.pos = APP->scene->mousePos;
 
 	ui::MenuOverlay* menuOverlay = new ui::MenuOverlay;
-	menuOverlay->addChild(o);
+	menuOverlay->addChild(menu);
 
 	APP->scene->addChild(menuOverlay);
-	return o;
+	return menu;
 }
 
 
 template <class TMenuLabel = ui::MenuLabel>
 TMenuLabel* createMenuLabel(std::string text) {
-	TMenuLabel* o = new TMenuLabel;
-	o->text = text;
-	return o;
+	TMenuLabel* label = new TMenuLabel;
+	label->text = text;
+	return label;
 }
 
 
 template <class TMenuItem = ui::MenuItem>
 TMenuItem* createMenuItem(std::string text, std::string rightText = "") {
-	TMenuItem* o = new TMenuItem;
-	o->text = text;
-	o->rightText = rightText;
-	return o;
+	TMenuItem* item = new TMenuItem;
+	item->text = text;
+	item->rightText = rightText;
+	return item;
 }
 
 
@@ -327,8 +327,13 @@ Example:
 template <typename T>
 ui::MenuItem* createBoolPtrMenuItem(std::string text, std::string rightText, T* ptr) {
 	return createBoolMenuItem(text, rightText,
-		[=]() {return *ptr;},
-		[=](T val) {*ptr = val;}
+		[=]() {
+			return ptr ? *ptr : false;
+		},
+		[=](T val) {
+			if (ptr)
+				*ptr = val;
+		}
 	);
 }
 
@@ -442,8 +447,13 @@ Example:
 template <typename T>
 ui::MenuItem* createIndexPtrSubmenuItem(std::string text, std::vector<std::string> labels, T* ptr) {
 	return createIndexSubmenuItem(text, labels,
-		[=]() {return *ptr;},
-		[=](size_t index) {*ptr = T(index);}
+		[=]() {
+			return ptr ? *ptr : 0;
+		},
+		[=](size_t index) {
+			if (ptr)
+				*ptr = T(index);
+		}
 	);
 }
 
