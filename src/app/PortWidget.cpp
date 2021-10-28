@@ -180,6 +180,8 @@ void PortWidget::createContextMenu() {
 	else {
 	}
 
+	menu->addChild(new ui::MenuSeparator);
+
 	// Create cable items
 	bool createCableDisabled = (type == engine::Port::INPUT) && topCw;
 	for (NVGcolor color : settings::cableColors) {
@@ -194,9 +196,13 @@ void PortWidget::createContextMenu() {
 	if (!cws.empty()) {
 		menu->addChild(new ui::MenuSeparator);
 
-		for (CableWidget* cw : cws) {
-			PortCableItem* item = createMenuItem<PortCableItem>("     XXXX", "Click+drag");
-			item->color = nvgRGBf(1, 0, 0);
+		for (auto it = cws.rbegin(); it != cws.rend(); it++) {
+			CableWidget* cw = *it;
+			PortWidget* pw = (type == engine::Port::INPUT) ? cw->outputPort : cw->inputPort;
+			engine::PortInfo* portInfo = pw->getPortInfo();
+
+			PortCableItem* item = createMenuItem<PortCableItem>("     " + portInfo->module->model->name + ": " + portInfo->getName());
+			item->color = cw->color;
 			menu->addChild(item);
 		}
 	}
