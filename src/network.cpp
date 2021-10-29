@@ -1,5 +1,6 @@
 #include <vector>
 
+#include <openssl/crypto.h>
 #define CURL_STATICLIB
 #include <curl/curl.h>
 
@@ -54,9 +55,17 @@ static std::string getCookieString(const CookieMap& cookies) {
 
 
 void init() {
+	// Because OpenSSL is compiled with no-pinshared, we need to initialize without defining atexit(), since we want to destroy it when libRack is unloaded.
+	OPENSSL_init_crypto(OPENSSL_INIT_NO_ATEXIT, NULL);
 	// curl_easy_init() calls this automatically, but it's good to make sure this is done on the main thread before other threads are spawned.
 	// https://curl.haxx.se/libcurl/c/curl_easy_init.html
 	curl_global_init(CURL_GLOBAL_ALL);
+}
+
+
+void destroy() {
+	curl_global_cleanup();
+	OPENSSL_cleanup();
 }
 
 

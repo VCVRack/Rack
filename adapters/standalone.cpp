@@ -257,6 +257,7 @@ int main(int argc, char* argv[]) {
 	midi::destroy();
 	audio::destroy();
 	plugin::destroy();
+	network::destroy();
 	INFO("Destroying logger");
 	logger::destroy();
 

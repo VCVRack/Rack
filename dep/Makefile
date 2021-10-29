@@ -111,32 +111,34 @@ $(jansson): | jansson-2.12
 	$(MAKE) -C jansson-2.12
 	$(MAKE) -C jansson-2.12 install
 
-openssl-1.1.1d:
-	$(WGET) "https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
-	$(SHA256) openssl-1.1.1d.tar.gz 1e3a91bc1f9dfce01af26026f856e064eab4c8ee0a8f457b5ae30b40b8b711f2
-	$(UNTAR) openssl-1.1.1d.tar.gz
-	rm openssl-1.1.1d.tar.gz
+openssl-1.1.1l:
+	$(WGET) "https://www.openssl.org/source/openssl-1.1.1l.tar.gz"
+	$(SHA256) openssl-1.1.1l.tar.gz 0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1
+	$(UNTAR) openssl-1.1.1l.tar.gz
+	rm openssl-1.1.1l.tar.gz
 
-$(openssl): | openssl-1.1.1d
-	@# ./config ignores CFLAGS, so hack it in with CC
-	cd openssl-1.1.1d && CC="$(CC) $(CFLAGS)" ./config --prefix="$(DEP_PATH)"
-	$(MAKE) -C openssl-1.1.1d
-	$(MAKE) -C openssl-1.1.1d install_sw
+$(openssl): | openssl-1.1.1l
+	# The CFLAGS environment variable is ignored, so pass CFLAGS to their custom ./config script, which passes them to the compiler.
+	# Set no-pinshared so OpenSSL doesn't call GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, ...) on initialization on Windows. This prevents libRack from being unloaded on Windows with FreeLibrary().
+	cd openssl-1.1.1l && ./config --prefix="$(DEP_PATH)" no-shared no-hw no-threads no-zlib no-capieng no-pinshared $(CFLAGS)
+	$(MAKE) -C openssl-1.1.1l
+	$(MAKE) -C openssl-1.1.1l install_sw
 
-curl-7.66.0:
-	$(WGET) "https://curl.haxx.se/download/curl-7.66.0.tar.gz"
-	$(SHA256) curl-7.66.0.tar.gz d0393da38ac74ffac67313072d7fe75b1fa1010eb5987f63f349b024a36b7ffb
-	$(UNTAR) curl-7.66.0.tar.gz
-	rm curl-7.66.0.tar.gz
+curl-7.79.1:
+	$(WGET) "https://curl.se/download/curl-7.79.1.tar.gz"
+	$(SHA256) curl-7.79.1.tar.gz 370b11201349816287fb0ccc995e420277fbfcaf76206e309b3f60f0eda090c2
+	$(UNTAR) curl-7.79.1.tar.gz
+	rm curl-7.79.1.tar.gz
 
-CURL_FLAGS += --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --enable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-manual --disable-shared --disable-symbol-hiding
-CURL_FLAGS += --without-zlib --without-libpsl --without-libmetalink --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-brotli
+CURL_FLAGS += --enable-symbol-hiding --enable-shared=no
+CURL_FLAGS += --enable-http --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --enable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-mqtt --disable-manual --disable-threaded-resolver --disable-pthreads --disable-verbose --disable-sspi --disable-ntlm --disable-ntlm-wb --disable-tls-srp --disable-unix-sockets --disable-doh --disable-mime --disable-dateparse --disable-netrc --disable-progress-meter --disable-alt-svc
+CURL_FLAGS += --without-hyper --without-zlib --without-brotli --without-zstd --without-libpsl --without-libgsasl --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-ngtcp2 --without-nghttp3 --without-quiche
 CURL_FLAGS += --with-ssl="$(DEP_PATH)"
 
-$(libcurl): | $(openssl) curl-7.66.0
-	cd curl-7.66.0 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
-	$(MAKE) -C curl-7.66.0
-	$(MAKE) -C curl-7.66.0 install
+$(libcurl): | $(openssl) curl-7.79.1
+	cd curl-7.79.1 && PKG_CONFIG_PATH= $(CONFIGURE) $(CURL_FLAGS)
+	$(MAKE) -C curl-7.79.1
+	$(MAKE) -C curl-7.79.1 install
 
 zstd-1.4.5:
 	$(WGET) "https://github.com/facebook/zstd/releases/download/v1.4.5/zstd-1.4.5.tar.gz"
@@ -260,7 +262,7 @@ $(ghcfilesystem): filesystem/include/ghc
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1d curl-7.66.0 zstd-1.4.5 libarchive-3.4.3 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog
+src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1l curl-7.79.1 zstd-1.4.5 libarchive-3.4.3 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog
 
 clean:
 	git clean -fdx
