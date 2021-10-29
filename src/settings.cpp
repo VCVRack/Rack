@@ -63,6 +63,7 @@ bool discordUpdateActivity = true;
 BrowserSort browserSort = BROWSER_SORT_UPDATED;
 float browserZoom = -1.f;
 std::map<std::string, std::map<std::string, ModuleInfo>> moduleInfos;
+std::map<std::string, std::set<std::string>> moduleWhitelist;
 
 
 ModuleInfo* getModuleInfo(const std::string& pluginSlug, const std::string& moduleSlug) {
@@ -73,6 +74,18 @@ ModuleInfo* getModuleInfo(const std::string& pluginSlug, const std::string& modu
 	if (moduleIt == pluginIt->second.end())
 		return NULL;
 	return &moduleIt->second;
+}
+
+
+bool isModuleWhitelisted(const std::string& pluginSlug, const std::string& moduleSlug) {
+	auto pluginIt = moduleWhitelist.find(pluginSlug);
+	// All modules in a plugin are visible if plugin set is empty.
+	if (pluginIt == moduleWhitelist.end())
+		return true;
+	auto moduleIt = pluginIt->second.find(moduleSlug);
+	if (moduleIt == pluginIt->second.end())
+		return false;
+	return true;
 }
 
 
@@ -159,6 +172,7 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "browserZoom", json_real(browserZoom));
 
+	// moduleInfos
 	json_t* moduleInfosJ = json_object();
 	for (const auto& pluginPair : moduleInfos) {
 		json_t* pluginJ = json_object();
@@ -187,6 +201,17 @@ json_t* toJson() {
 			json_decref(pluginJ);
 	}
 	json_object_set_new(rootJ, "moduleInfos", moduleInfosJ);
+
+	// moduleWhitelist
+	json_t* moduleWhitelistJ = json_object();
+	for (const auto& pluginPair : moduleWhitelist) {
+		json_t* pluginJ = json_array();
+		for (const std::string& moduleSlug : pluginPair.second) {
+			json_array_append_new(pluginJ, json_stringn(moduleSlug.c_str(), moduleSlug.size()));
+		}
+		json_object_set_new(moduleWhitelistJ, pluginPair.first.c_str(), pluginJ);
+	}
+	json_object_set_new(rootJ, "moduleWhitelist", moduleWhitelistJ);
 
 	return rootJ;
 }
@@ -364,6 +389,21 @@ void fromJson(json_t* rootJ) {
 					m.lastAdded = json_number_value(lastAddedJ);
 
 				moduleInfos[pluginSlug][moduleSlug] = m;
+			}
+		}
+	}
+
+	moduleWhitelist.clear();
+	json_t* moduleWhitelistJ = json_object_get(rootJ, "moduleWhitelist");
+	if (moduleWhitelistJ) {
+		const char* pluginSlug;
+		json_t* pluginJ;
+		json_object_foreach(moduleWhitelistJ, pluginSlug, pluginJ) {
+			size_t moduleIndex;
+			json_t* moduleJ;
+			json_array_foreach(pluginJ, moduleIndex, moduleJ) {
+				std::string moduleSlug = json_string_value(moduleJ);
+				moduleWhitelist[pluginSlug].insert(moduleSlug);
 			}
 		}
 	}

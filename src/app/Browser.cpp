@@ -609,8 +609,13 @@ struct Browser : widget::OpaqueWidget {
 		if (model->hidden)
 			return false;
 
+		// Filter moduleInfo setting if enabled is false
 		settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
 		if (mi && !mi->enabled)
+			return false;
+
+		// Filter if not whitelisted by library
+		if (!settings::isModuleWhitelisted(model->plugin->slug, model->slug))
 			return false;
 
 		// Filter favorites

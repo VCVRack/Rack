@@ -163,12 +163,25 @@ void checkUpdates() {
 	}
 	DEFER({json_decref(userResJ);});
 
+	// Get library manifests
+	std::string manifestsUrl = API_URL + "/library/manifests";
+	json_t* manifestsReq = json_object();
+	json_object_set(manifestsReq, "version", json_string(APP_VERSION_MAJOR.c_str()));
+	json_t* manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, manifestsReq);
+	json_decref(manifestsReq);
+	if (!manifestsResJ) {
+		WARN("Request for library manifests failed");
+		updateStatus = "Could not query plugin manifests";
+		return;
+	}
+	DEFER({json_decref(manifestsResJ);});
+
 	// Get user's plugins list
 	std::string pluginsUrl = API_URL + "/plugins";
 	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, NULL, getTokenCookies());
 	if (!pluginsResJ) {
 		WARN("Request for user's plugins failed");
-		updateStatus = "Could not query plugins";
+		updateStatus = "Could not query user's plugins";
 		return;
 	}
 	DEFER({json_decref(pluginsResJ);});
@@ -179,19 +192,6 @@ void checkUpdates() {
 		updateStatus = "Could not query plugins";
 		return;
 	}
-
-	// Get library manifests
-	std::string manifestsUrl = API_URL + "/library/manifests";
-	json_t* manifestsReq = json_object();
-	json_object_set(manifestsReq, "version", json_string(APP_VERSION_MAJOR.c_str()));
-	json_t* manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, manifestsReq);
-	json_decref(manifestsReq);
-	if (!manifestsResJ) {
-		WARN("Request for library manifests failed");
-		updateStatus = "Could not query updates";
-		return;
-	}
-	DEFER({json_decref(manifestsResJ);});
 
 	json_t* manifestsJ = json_object_get(manifestsResJ, "manifests");
 	json_t* pluginsJ = json_object_get(pluginsResJ, "plugins");
@@ -252,36 +252,42 @@ void checkUpdates() {
 	}
 
 	// Get module whitelist
-	// TODO
-	// {
-	// 	std::string whitelistUrl = API_URL + "/modules";
-	// 	json_t* whitelistResJ = network::requestJson(network::METHOD_GET, whitelistUrl, NULL, getTokenCookies());
-	// 	if (!whitelistResJ) {
-	// 		WARN("Request for module whitelist failed");
-	// 		updateStatus = "Could not query updates";
-	// 		return;
-	// 	}
-	// 	DEFER({json_decref(whitelistResJ);});
+	{
+		std::string whitelistUrl = API_URL + "/modules";
+		json_t* whitelistResJ = network::requestJson(network::METHOD_GET, whitelistUrl, NULL, getTokenCookies());
+		if (!whitelistResJ) {
+			WARN("Request for module whitelist failed");
+			updateStatus = "Could not query user's modules";
+			return;
+		}
+		DEFER({json_decref(whitelistResJ);});
 
-	// 	std::map<std::string, std::set<std::string>> moduleWhitelist;
-	// 	json_t* pluginsJ = json_object_get(whitelistResJ, "plugins");
+		// Clone plugin slugs from settings to temporary whitelist.
+		// This makes plugins entirely hidden if removed.
+		std::map<std::string, std::set<std::string>> moduleWhitelist;
+		for (const auto& pluginPair : settings::moduleWhitelist) {
+			// Create an empty set
+			moduleWhitelist[pluginPair.first];
+		}
 
-	// 	// Iterate plugins
-	// 	const char* pluginSlug;
-	// 	json_t* modulesJ;
-	// 	json_object_foreach(pluginsJ, pluginSlug, modulesJ) {
-	// 		// Iterate modules in plugin
-	// 		size_t moduleIndex;
-	// 		json_t* moduleSlugJ;
-	// 		json_array_foreach(modulesJ, moduleIndex, moduleSlugJ) {
-	// 			std::string moduleSlug = json_string_value(moduleSlugJ);
-	// 			// Insert module in whitelist
-	// 			moduleWhitelist[pluginSlug].insert(moduleSlug);
-	// 		}
-	// 	}
+		// Iterate plugins
+		json_t* pluginsJ = json_object_get(whitelistResJ, "plugins");
+		const char* pluginSlug;
+		json_t* modulesJ;
+		json_object_foreach(pluginsJ, pluginSlug, modulesJ) {
+			// Iterate modules in plugin
+			size_t moduleIndex;
+			json_t* moduleSlugJ;
+			json_array_foreach(modulesJ, moduleIndex, moduleSlugJ) {
+				std::string moduleSlug = json_string_value(moduleSlugJ);
+				// Insert module in whitelist
+				DEBUG("plugin %s module %s", pluginSlug, moduleSlug.c_str());
+				moduleWhitelist[pluginSlug].insert(moduleSlug);
+			}
+		}
 
-	// 	settings::moduleWhitelist = moduleWhitelist;
-	// }
+		settings::moduleWhitelist = moduleWhitelist;
+	}
 
 	updateStatus = "";
 	refreshRequested = true;

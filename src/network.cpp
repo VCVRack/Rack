@@ -138,8 +138,6 @@ json_t* requestJson(Method method, const std::string& url, json_t* dataJ, const 
 	curl_easy_cleanup(curl);
 	curl_slist_free_all(headers);
 
-	DEBUG("response: %s", resText.c_str());
-
 	if (res != CURLE_OK) {
 		WARN("Could not request %s: %s", urlS.c_str(), curl_easy_strerror(res));
 		return NULL;

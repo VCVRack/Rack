@@ -90,11 +90,16 @@ struct ModuleInfo {
 	int added = 0;
 	double lastAdded = NAN;
 };
-// pluginSlug -> (moduleSlug -> ModuleInfo)
+/** pluginSlug -> (moduleSlug -> ModuleInfo) */
 extern std::map<std::string, std::map<std::string, ModuleInfo>> moduleInfos;
 /** Returns a ModuleInfo if exists for the given slugs.
 */
 ModuleInfo* getModuleInfo(const std::string& pluginSlug, const std::string& moduleSlug);
+
+/** pluginSlug -> {moduleSlug} */
+extern std::map<std::string, std::set<std::string>> moduleWhitelist;
+
+bool isModuleWhitelisted(const std::string& pluginSlug, const std::string& moduleSlug);
 
 void init();
 json_t* toJson();
