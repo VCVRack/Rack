@@ -65,6 +65,14 @@ void LedDisplay::draw(const DrawArgs& args) {
 }
 
 
+void LedDisplay::drawLayer(const DrawArgs& args, int layer) {
+	// Draw children inside box
+	nvgScissor(args.vg, RECT_ARGS(args.clipBox));
+	Widget::drawLayer(args, layer);
+	nvgResetScissor(args.vg);
+}
+
+
 LedDisplaySeparator::LedDisplaySeparator() {
 	box.size = math::Vec();
 }

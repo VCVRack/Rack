@@ -11,6 +11,7 @@ namespace app {
 
 struct LedDisplay : widget::Widget {
 	void draw(const DrawArgs& args) override;
+	void drawLayer(const DrawArgs& args, int layer) override;
 };
 
 struct LedDisplaySeparator : widget::Widget {
