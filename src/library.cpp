@@ -158,10 +158,21 @@ void checkUpdates() {
 	std::string userUrl = API_URL + "/user";
 	json_t* userResJ = network::requestJson(network::METHOD_GET, userUrl, NULL, getTokenCookies());
 	if (!userResJ) {
-		DEBUG("User failed");
+		WARN("Request for user account failed");
+		updateStatus = "Could not query user account";
 		return;
 	}
 	DEFER({json_decref(userResJ);});
+
+	json_t* userErrorJ = json_object_get(userResJ, "error");
+	if (userErrorJ) {
+		std::string userError = json_string_value(userErrorJ);
+		WARN("Request for user account error: %s", userError.c_str());
+		// Unset token
+		settings::token = "";
+		refreshRequested = true;
+		return;
+	}
 
 	// Get library manifests
 	std::string manifestsUrl = API_URL + "/library/manifests";
