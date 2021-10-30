@@ -399,11 +399,15 @@ void fromJson(json_t* rootJ) {
 		const char* pluginSlug;
 		json_t* pluginJ;
 		json_object_foreach(moduleWhitelistJ, pluginSlug, pluginJ) {
+			// Create an empty modules set, even if there are no modules in the whitelist.
+			// An empty set means no modules will be displayed in the Browser.
+			auto& modules = moduleWhitelist[pluginSlug];
+
 			size_t moduleIndex;
 			json_t* moduleJ;
 			json_array_foreach(pluginJ, moduleIndex, moduleJ) {
 				std::string moduleSlug = json_string_value(moduleJ);
-				moduleWhitelist[pluginSlug].insert(moduleSlug);
+				modules.insert(moduleSlug);
 			}
 		}
 	}

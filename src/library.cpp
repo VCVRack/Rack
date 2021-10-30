@@ -267,7 +267,8 @@ void checkUpdates() {
 		std::map<std::string, std::set<std::string>> moduleWhitelist;
 		for (const auto& pluginPair : settings::moduleWhitelist) {
 			// Create an empty set
-			moduleWhitelist[pluginPair.first];
+			std::string pluginSlug = pluginPair.first;
+			moduleWhitelist[pluginSlug];
 		}
 
 		// Iterate plugins
@@ -281,7 +282,6 @@ void checkUpdates() {
 			json_array_foreach(modulesJ, moduleIndex, moduleSlugJ) {
 				std::string moduleSlug = json_string_value(moduleSlugJ);
 				// Insert module in whitelist
-				DEBUG("plugin %s module %s", pluginSlug, moduleSlug.c_str());
 				moduleWhitelist[pluginSlug].insert(moduleSlug);
 			}
 		}
