@@ -94,6 +94,7 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 #include <plugin/Model.hpp>
 #include <plugin/callbacks.hpp>
 
+#include <dsp/common.hpp>
 #include <dsp/window.hpp>
 #include <dsp/ode.hpp>
 #include <dsp/minblep.hpp>
@@ -106,7 +107,7 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 #include <dsp/vumeter.hpp>
 #include <dsp/filter.hpp>
 #include <dsp/digital.hpp>
-#include <dsp/common.hpp>
+#include <dsp/convert.hpp>
 
 #include <simd/Vector.hpp>
 #include <simd/functions.hpp>
