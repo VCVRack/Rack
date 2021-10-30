@@ -16,14 +16,11 @@ struct __attribute__((packed)) int24_t {
 static_assert(sizeof(int24_t) == 3, "int24_t type must be 3 bytes");
 
 
-/** Converts between normalized types */
+/** Converts between normalized types.
+Default implementation is the default cast.
+*/
 template <typename To, typename From>
-To convert(From x);
-
-
-/** Trivial conversion */
-template <typename To>
-To convert(To x) {return x;}
+To convert(From x) {return x;}
 
 
 /** Integer to float */
