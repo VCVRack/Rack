@@ -36,8 +36,15 @@ struct AudioPort : audio::Port {
 		outputSrc.setQuality(6);
 	}
 
-	void setMaster() {
-		APP->engine->setMasterModule(module);
+	void setMaster(bool master = true) {
+		if (master) {
+			APP->engine->setMasterModule(module);
+		}
+		else {
+			// Unset master only if module is currently master
+			if (isMaster())
+				APP->engine->setMasterModule(NULL);
+		}
 	}
 
 	bool isMaster() {
@@ -166,6 +173,7 @@ struct AudioPort : audio::Port {
 		deviceSampleRate = 0.f;
 		engineInputBuffer.clear();
 		engineOutputBuffer.clear();
+		setMaster(false);
 		// DEBUG("onStopStream");
 	}
 };
@@ -385,16 +393,6 @@ struct Audio : Module {
 		if (dcFilterJ)
 			dcFilterEnabled = json_boolean_value(dcFilterJ);
 	}
-
-	/** Must be called when the Engine mutex is unlocked.
-	*/
-	void setMaster() {
-		APP->engine->setMasterModule(this);
-	}
-
-	bool isMaster() {
-		return APP->engine->getMasterModule() == this;
-	}
 };
 
 
@@ -550,9 +548,9 @@ struct AudioWidget : ModuleWidget {
 
 		menu->addChild(new MenuSeparator);
 
-		menu->addChild(createCheckMenuItem("Master audio module", "",
-			[=]() {return module->isMaster();},
-			[=]() {module->setMaster();}
+		menu->addChild(createBoolMenuItem("Master audio module", "",
+			[=]() {return module->port.isMaster();},
+			[=](bool master) {module->port.setMaster(master);}
 		));
 
 		menu->addChild(createBoolPtrMenuItem("DC blocker", "", &module->dcFilterEnabled));
