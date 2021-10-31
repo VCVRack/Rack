@@ -8,11 +8,12 @@ namespace dsp {
 
 
 /** 24-bit integer, using int32_t for conversions. */
-struct __attribute__((packed)) int24_t {
+struct int24_t {
 	int32_t i : 24;
+	int24_t() {}
 	int24_t(int32_t i) : i(i) {}
 	operator int32_t() {return i;}
-};
+} __attribute__((packed, aligned(1), gcc_struct));
 static_assert(sizeof(int24_t) == 3, "int24_t type must be 3 bytes");
 
 
