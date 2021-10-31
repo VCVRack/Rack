@@ -8,13 +8,19 @@ namespace dsp {
 
 
 /** 24-bit integer, using int32_t for conversions. */
-struct int24_t {
+struct
+#ifdef __clang__
+__attribute__((packed, aligned(1)))
+#else
+__attribute__((packed, aligned(1), gcc_struct))
+#endif
+Int24 {
 	int32_t i : 24;
-	int24_t() {}
-	int24_t(int32_t i) : i(i) {}
+	Int24() {}
+	Int24(int32_t i) : i(i) {}
 	operator int32_t() {return i;}
-} __attribute__((packed, aligned(1), gcc_struct));
-static_assert(sizeof(int24_t) == 3, "int24_t type must be 3 bytes");
+};
+static_assert(sizeof(Int24) == 3, "Int24 type must be 3 bytes");
 
 
 /** Converts between normalized types.
@@ -30,7 +36,7 @@ inline float convert(int8_t x) {return x / 128.f;}
 template <>
 inline float convert(int16_t x) {return x / 32768.f;}
 template <>
-inline float convert(int24_t x) {return x / 8388608.f;}
+inline float convert(Int24 x) {return x / 8388608.f;}
 template <>
 inline float convert(int32_t x) {return x / 2147483648.f;}
 template <>
@@ -43,7 +49,7 @@ inline int8_t convert(float x) {return std::min(std::llround(x * 128.f), 127LL);
 template <>
 inline int16_t convert(float x) {return std::min(std::llround(x * 32768.f), 32767LL);}
 template <>
-inline int24_t convert(float x) {return std::min(std::llround(x * 8388608.f), 8388607LL);}
+inline Int24 convert(float x) {return std::min(std::llround(x * 8388608.f), 8388607LL);}
 template <>
 inline int32_t convert(float x) {return std::min(std::llround(x * 2147483648.f), 2147483647LL);}
 template <>
