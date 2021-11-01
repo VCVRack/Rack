@@ -52,6 +52,10 @@ struct AudioPort : audio::Port {
 	}
 
 	void processInput(const float* input, int inputStride, int frames) override {
+		deviceNumInputs = std::min(getNumInputs(), NUM_AUDIO_OUTPUTS);
+		deviceNumOutputs = std::min(getNumOutputs(), NUM_AUDIO_INPUTS);
+		deviceSampleRate = getSampleRate();
+
 		// DEBUG("%p: new device block ____________________________", this);
 		// Claim master module if there is none
 		if (!APP->engine->getMasterModule()) {
@@ -159,12 +163,9 @@ struct AudioPort : audio::Port {
 	}
 
 	void onStartStream() override {
-		deviceNumInputs = std::min(getNumInputs(), NUM_AUDIO_OUTPUTS);
-		deviceNumOutputs = std::min(getNumOutputs(), NUM_AUDIO_INPUTS);
-		deviceSampleRate = getSampleRate();
 		engineInputBuffer.clear();
 		engineOutputBuffer.clear();
-		// DEBUG("onStartStream %d %d %f", deviceNumInputs, deviceNumOutputs, deviceSampleRate);
+		// DEBUG("onStartStream");
 	}
 
 	void onStopStream() override {
