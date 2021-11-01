@@ -10,7 +10,7 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 #error "Plugins must only include rack.hpp. Including other Rack headers is unsupported."
 #endif
 
-/** Functions and symbols with the PRIVATE attribute should not be called/used by plugins.
+/** Functions with the PRIVATE attribute should not be called by plugins.
 */
 #define PRIVATE __attribute__((error("Using internal Rack function or symbol")))
 

@@ -27,8 +27,8 @@ E.g.
 	#define DEPRECATED __declspec(deprecated)
 #endif
 
-/** Attribute for private functions and symbols not intended to be used by plugins.
-When #including rack.hpp, attempting to call PRIVATE functions or access variables will result in a compile-time error.
+/** Attribute for private functions not intended to be called by plugins.
+When #including rack.hpp, attempting to call PRIVATE functions will result in a compile-time error.
 */
 #ifndef PRIVATE
 #define PRIVATE
