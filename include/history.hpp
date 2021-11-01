@@ -158,6 +158,9 @@ struct CableRemove : InverseAction<CableAdd> {
 
 
 struct State {
+	struct Internal;
+	Internal* internal;
+
 	std::deque<Action*> actions;
 	int actionIndex;
 	/** Action index of saved patch state. */
