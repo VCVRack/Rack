@@ -792,6 +792,7 @@ struct NKK : app::SvgSwitch {
 
 struct CKSS : app::SvgSwitch {
 	CKSS() {
+		shadow->opacity = 0.0;
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSS_0.svg")));
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSS_1.svg")));
 	}
@@ -799,6 +800,7 @@ struct CKSS : app::SvgSwitch {
 
 struct CKSSThree : app::SvgSwitch {
 	CKSSThree() {
+		shadow->opacity = 0.0;
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThree_0.svg")));
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThree_1.svg")));
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThree_2.svg")));
@@ -807,6 +809,7 @@ struct CKSSThree : app::SvgSwitch {
 
 struct CKSSThreeHorizontal : app::SvgSwitch {
 	CKSSThreeHorizontal() {
+		shadow->opacity = 0.0;
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThreeHorizontal_0.svg")));
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThreeHorizontal_1.svg")));
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/CKSSThreeHorizontal_2.svg")));
