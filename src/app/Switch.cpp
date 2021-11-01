@@ -10,8 +10,9 @@ namespace app {
 
 
 struct Switch::Internal {
-	/** Hysteresis state for momentary switch */
+	/** Whether momentary switch was pressed this frame. */
 	bool momentaryPressed = false;
+	/** Whether momentary switch was released this frame. */
 	bool momentaryReleased = false;
 };
 

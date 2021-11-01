@@ -6,6 +6,7 @@
 #include <app/SvgPort.hpp>
 #include <app/ModuleLightWidget.hpp>
 #include <app/SvgSwitch.hpp>
+#include <app/SvgLatch.hpp>
 #include <app/SvgScrew.hpp>
 #include <app/AudioWidget.hpp>
 #include <app/MidiWidget.hpp>
@@ -840,11 +841,34 @@ struct LEDButton : app::SvgSwitch {
 	}
 };
 
+struct LEDLatch : app::SvgLatch {
+	LEDLatch() {
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDButton.svg")));
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDButton_1.svg")));
+	}
+};
+
 template <typename TLight>
 struct LEDLightButton : LEDButton {
 	app::ModuleLightWidget* light;
 
 	LEDLightButton() {
+		light = new TLight;
+		// Move center of light to center of box
+		light->box.pos = box.size.div(2).minus(light->box.size.div(2));
+		addChild(light);
+	}
+
+	app::ModuleLightWidget* getLight() {
+		return light;
+	}
+};
+
+template <typename TLight>
+struct LEDLightLatch : LEDLatch {
+	app::ModuleLightWidget* light;
+
+	LEDLightLatch() {
 		light = new TLight;
 		// Move center of light to center of box
 		light->box.pos = box.size.div(2).minus(light->box.size.div(2));

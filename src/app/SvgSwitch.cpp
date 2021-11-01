@@ -36,7 +36,7 @@ void SvgSwitch::onChange(const ChangeEvent& e) {
 		int index = (int) std::round(pq->getValue() - pq->getMinValue());
 		index = math::clamp(index, 0, (int) frames.size() - 1);
 		sw->setSvg(frames[index]);
-		fb->dirty = true;
+		fb->setDirty();
 	}
 	ParamWidget::onChange(e);
 }
