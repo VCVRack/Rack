@@ -49,11 +49,12 @@ float autosaveInterval = 15.0;
 bool skipLoadOnLaunch = false;
 std::list<std::string> recentPatchPaths;
 std::vector<NVGcolor> cableColors = {
-	color::fromHexString("#FFB634"), // yellow
-	color::fromHexString("#26AD6F"), // green
-	color::fromHexString("#F3344A"), // red
-	color::fromHexString("#3396F0"), // blue
-	color::fromHexString("#9B6FDE"), // purple
+	color::fromHexString("#fc2d5aff"), // red
+	color::fromHexString("#f9b130ff"), // orange
+	// color::fromHexString("#f7da31ff"), // yellow
+	color::fromHexString("#67c12dff"), // green
+	color::fromHexString("#0f8df4ff"), // blue
+	color::fromHexString("#8c1889ff"), // purple
 };
 bool autoCheckUpdates = true;
 bool showTipsOnLaunch = true;
