@@ -288,8 +288,8 @@ struct Output : Port {
 };
 
 
-void init();
-void destroy();
+PRIVATE void init();
+PRIVATE void destroy();
 /** Registers a new MIDI driver. Takes pointer ownership. */
 void addDriver(int driverId, Driver* driver);
 std::vector<int> getDriverIds();

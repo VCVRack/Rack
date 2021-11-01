@@ -20,7 +20,7 @@ struct Cable {
 
 	json_t* toJson();
 	void fromJson(json_t* rootJ);
-	INTERNAL static void jsonStripIds(json_t* rootJ);
+	PRIVATE static void jsonStripIds(json_t* rootJ);
 };
 
 

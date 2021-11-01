@@ -16,8 +16,8 @@ struct RackScrollWidget : ui::ScrollWidget {
 	widget::ZoomWidget* zoomWidget;
 	RackWidget* rackWidget;
 
-	RackScrollWidget();
-	~RackScrollWidget();
+	PRIVATE RackScrollWidget();
+	PRIVATE ~RackScrollWidget();
 
 	void reset();
 	/** Gets the top-left scroll offset in grid coordinates.

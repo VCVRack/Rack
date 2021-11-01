@@ -19,7 +19,7 @@ struct Module;
 namespace asset {
 
 
-void init();
+PRIVATE void init();
 
 /** Returns the path of a system asset. Read-only files. */
 std::string system(std::string filename = "");
@@ -37,10 +37,10 @@ std::string plugin(plugin::Plugin* plugin, std::string filename = "");
 
 
 // Set these before calling init() to override the default paths
-extern std::string systemDir;
-extern std::string userDir;
+PRIVATE extern std::string systemDir;
+PRIVATE extern std::string userDir;
 // Only defined on Mac
-extern std::string bundlePath;
+PRIVATE extern std::string bundlePath;
 
 
 } // namespace asset

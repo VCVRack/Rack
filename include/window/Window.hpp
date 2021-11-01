@@ -65,19 +65,19 @@ struct Window {
 	float windowRatio = 1.f;
 	std::shared_ptr<Font> uiFont;
 
-	Window();
-	~Window();
+	PRIVATE Window();
+	PRIVATE ~Window();
 	math::Vec getSize();
 	void setSize(math::Vec size);
-	void run();
-	void step();
+	PRIVATE void run();
+	PRIVATE void step();
 	void activateContext();
 	/** Takes a screenshot of the screen and saves it to a PNG file. */
-	void screenshot(const std::string& screenshotPath);
+	PRIVATE void screenshot(const std::string& screenshotPath);
 	/** Saves a PNG image of all modules to `screenshotsDir/<plugin slug>/<module slug>.png`.
 	Skips screenshot if the file already exists.
 	*/
-	void screenshotModules(const std::string& screenshotsDir, float zoom = 1.f);
+	PRIVATE void screenshotModules(const std::string& screenshotsDir, float zoom = 1.f);
 	/** Request Window to be closed after rendering the current frame. */
 	void close();
 	void cursorLock();
@@ -100,12 +100,12 @@ struct Window {
 		return Svg::load(filename);
 	}
 
-	INTERNAL bool& fbDirtyOnSubpixelChange();
+	PRIVATE bool& fbDirtyOnSubpixelChange();
 };
 
 
-void init();
-void destroy();
+PRIVATE void init();
+PRIVATE void destroy();
 
 
 } // namespace window

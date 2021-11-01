@@ -7,8 +7,8 @@ namespace rack {
 namespace discord {
 
 
-void init();
-void destroy();
+PRIVATE void init();
+PRIVATE void destroy();
 
 
 } // namespace discord

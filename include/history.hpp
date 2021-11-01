@@ -166,9 +166,9 @@ struct State {
 	/** Action index of saved patch state. */
 	int savedIndex;
 
-	State();
-	~State();
-	void clear();
+	PRIVATE State();
+	PRIVATE ~State();
+	PRIVATE void clear();
 	void push(Action* action);
 	void undo();
 	void redo();

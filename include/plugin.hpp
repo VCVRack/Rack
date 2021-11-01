@@ -11,8 +11,8 @@ namespace rack {
 namespace plugin {
 
 
-void init();
-void destroy();
+PRIVATE void init();
+PRIVATE void destroy();
 /** Finds a loaded Plugin by slug. */
 Plugin* getPlugin(const std::string& pluginSlug);
 /** Finds a loaded Model by plugin and model slug. */

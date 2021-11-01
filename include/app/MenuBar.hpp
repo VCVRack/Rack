@@ -7,7 +7,7 @@ namespace rack {
 namespace app {
 
 
-widget::Widget* createMenuBar();
+PRIVATE widget::Widget* createMenuBar();
 
 
 } // namespace app

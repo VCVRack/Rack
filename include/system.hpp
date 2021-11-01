@@ -189,7 +189,7 @@ The launched process will continue running if the current process is closed.
 */
 void runProcessDetached(const std::string& path);
 
-void init();
+PRIVATE void init();
 
 
 } // namespace system

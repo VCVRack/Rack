@@ -26,8 +26,8 @@ struct RackWidget : widget::OpaqueWidget {
 	ParamWidget* touchedParam = NULL;
 	int nextCableColorId = 0;
 
-	RackWidget();
-	~RackWidget();
+	PRIVATE RackWidget();
+	PRIVATE ~RackWidget();
 
 	void step() override;
 	void draw(const DrawArgs& args) override;

@@ -6,6 +6,15 @@ The following headers are the "public" API of Rack.
 Directly including Rack headers other than rack.hpp in your plugin is unsupported/unstable, since filenames and locations of symbols may change in any Rack version.
 */
 
+#ifdef PRIVATE
+#error "Plugins must only include rack.hpp. Including other Rack headers is unsupported."
+#endif
+
+/** Functions and symbols with the PRIVATE attribute should not be called/used by plugins.
+*/
+#define PRIVATE __attribute__((error("Using internal Rack function or symbol")))
+
+
 #include <common.hpp>
 #include <math.hpp>
 #include <string.hpp>
@@ -111,14 +120,6 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 
 #include <simd/Vector.hpp>
 #include <simd/functions.hpp>
-
-
-#undef INTERNAL
-#if defined ARCH_WIN
-	#define INTERNAL __attribute__((error("Using internal Rack function or symbol")))
-#else
-	#define INTERNAL __attribute__((visibility("hidden"))) __attribute__((error("Using internal Rack function or symbol")))
-#endif
 
 
 namespace rack {

@@ -25,9 +25,9 @@ struct Manager {
 	/** Append to this while loading/saving a patch to display messages to the user after success. */
 	std::string warningLog;
 
-	Manager();
-	~Manager();
-	void launch(std::string pathArg);
+	PRIVATE Manager();
+	PRIVATE ~Manager();
+	PRIVATE void launch(std::string pathArg);
 	/** Clears the patch. */
 	void clear();
 	/** Saves the patch and nothing else. */

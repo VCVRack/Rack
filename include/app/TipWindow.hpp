@@ -7,7 +7,7 @@ namespace rack {
 namespace app {
 
 
-widget::Widget* tipWindowCreate();
+PRIVATE widget::Widget* tipWindowCreate();
 
 
 } // namespace app

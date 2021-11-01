@@ -116,10 +116,10 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void removeAction();
 	void createContextMenu();
 
-	INTERNAL math::Vec& dragOffset();
-	INTERNAL bool& dragEnabled();
-	INTERNAL math::Vec& oldPos();
-	INTERNAL engine::Module* releaseModule();
+	PRIVATE math::Vec& dragOffset();
+	PRIVATE bool& dragEnabled();
+	PRIVATE math::Vec& oldPos();
+	PRIVATE engine::Module* releaseModule();
 };
 
 

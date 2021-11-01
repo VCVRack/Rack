@@ -21,8 +21,8 @@ namespace rack {
 namespace ui {
 
 
-void init();
-void destroy();
+PRIVATE void init();
+PRIVATE void destroy();
 void setTheme(NVGcolor bg, NVGcolor fg);
 
 

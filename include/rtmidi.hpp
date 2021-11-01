@@ -5,7 +5,7 @@
 namespace rack {
 
 
-void rtmidiInit();
+PRIVATE void rtmidiInit();
 
 
 } // namespace rack

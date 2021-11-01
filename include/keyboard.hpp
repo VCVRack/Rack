@@ -8,7 +8,7 @@ namespace rack {
 namespace keyboard {
 
 
-void init();
+PRIVATE void init();
 void press(int key);
 void release(int key);
 /** pos is in the unit box. */

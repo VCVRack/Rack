@@ -7,8 +7,8 @@ namespace rack {
 namespace gamepad {
 
 
-void init();
-void step();
+PRIVATE void init();
+PRIVATE void step();
 
 
 } // namespace gamepad

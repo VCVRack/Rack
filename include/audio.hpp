@@ -194,8 +194,8 @@ struct Port {
 };
 
 
-void init();
-void destroy();
+PRIVATE void init();
+PRIVATE void destroy();
 /** Registers a new audio driver. Takes pointer ownership.
 Driver ID is stored in patches and must be unique. -1 is reserved.
 */

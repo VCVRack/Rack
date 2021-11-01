@@ -23,8 +23,8 @@ struct Scene : widget::OpaqueWidget {
 	/** The last mouse position in the Scene */
 	math::Vec mousePos;
 
-	Scene();
-	~Scene();
+	PRIVATE Scene();
+	PRIVATE ~Scene();
 	math::Vec getMousePos();
 	void step() override;
 	void draw(const DrawArgs& args) override;

@@ -5,7 +5,7 @@
 namespace rack {
 
 
-void rtaudioInit();
+PRIVATE void rtaudioInit();
 
 
 } // namespace rack

@@ -15,8 +15,6 @@
 #include <string>
 #include <stdexcept>
 
-#include <logger.hpp>
-
 
 /** Attribute for deprecated functions and symbols.
 E.g.
@@ -30,12 +28,10 @@ E.g.
 #endif
 
 /** Attribute for private functions and symbols not intended to be used by plugins.
-When #including rack.hpp, using an INTERNAL function prints a compile-time warning and will not link.
+When #including rack.hpp, attempting to call PRIVATE functions or access variables will result in a compile-time error.
 */
-#if defined ARCH_WIN
-	#define INTERNAL
-#else
-	#define INTERNAL __attribute__((visibility("hidden")))
+#ifndef PRIVATE
+#define PRIVATE
 #endif
 
 
@@ -271,3 +267,7 @@ extern const std::string API_URL;
 
 
 } // namespace rack
+
+
+// Logger depends on common.hpp, but it is handy to include it along with common.hpp.
+#include <logger.hpp>
