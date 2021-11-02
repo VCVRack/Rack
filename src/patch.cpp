@@ -279,6 +279,9 @@ void Manager::loadTemplate() {
 		catch (Exception& e) {
 			std::string message = string::f("Could not load system template patch, clearing rack: %s", e.what());
 			osdialog_message(OSDIALOG_INFO, OSDIALOG_OK, message.c_str());
+
+			system::removeRecursively(autosavePath);
+			system::createDirectories(autosavePath);
 			clear();
 		}
 	}
