@@ -123,29 +123,6 @@ struct ParamLabel : ui::MenuLabel {
 };
 
 
-struct ParamResetItem : ui::MenuItem {
-	ParamWidget* paramWidget;
-	void onAction(const ActionEvent& e) override {
-		paramWidget->resetAction();
-	}
-};
-
-
-struct ParamFineItem : ui::MenuItem {
-};
-
-
-struct ParamUnmapItem : ui::MenuItem {
-	ParamWidget* paramWidget;
-	void onAction(const ActionEvent& e) override {
-		engine::ParamHandle* paramHandle = APP->engine->getParamHandle(paramWidget->module->id, paramWidget->paramId);
-		if (paramHandle) {
-			APP->engine->updateParamHandle(paramHandle, -1, 0);
-		}
-	}
-};
-
-
 engine::ParamQuantity* ParamWidget::getParamQuantity() {
 	if (!module)
 		return NULL;
@@ -279,9 +256,7 @@ void ParamWidget::createContextMenu() {
 		int numStates = switchQuantity->labels.size();
 		for (int i = 0; i < numStates; i++) {
 			std::string label = switchQuantity->labels[i];
-			ParamValueItem* paramValueItem = new ParamValueItem;
-			paramValueItem->text = label;
-			paramValueItem->rightText = CHECKMARK(i == index);
+			ParamValueItem* paramValueItem = createMenuItem<ParamValueItem>(label, CHECKMARK(i == index));
 			paramValueItem->paramWidget = this;
 			paramValueItem->value = minValue + i;
 			menu->addChild(paramValueItem);
@@ -297,27 +272,24 @@ void ParamWidget::createContextMenu() {
 		menu->addChild(paramField);
 	}
 
+	// Initialize
 	if (pq && pq->resetEnabled && pq->isBounded()) {
-		ParamResetItem* resetItem = new ParamResetItem;
-		resetItem->text = "Initialize";
-		resetItem->rightText = "Double-click";
-		resetItem->paramWidget = this;
-		menu->addChild(resetItem);
+		menu->addChild(createMenuItem("Initialize", switchQuantity ? "" : "Double-click", [=]() {
+			this->resetAction();
+		}));
 	}
 
-	// ParamFineItem *fineItem = new ParamFineItem;
-	// fineItem->text = "Fine adjust";
-	// fineItem->rightText = RACK_MOD_CTRL_NAME "+drag";
-	// fineItem->disabled = true;
-	// menu->addChild(fineItem);
+	// Fine
+	if (!switchQuantity) {
+		menu->addChild(createMenuItem("Fine adjust", RACK_MOD_CTRL_NAME "+drag", NULL, true));
+	}
 
+	// Unmap
 	engine::ParamHandle* paramHandle = module ? APP->engine->getParamHandle(module->id, paramId) : NULL;
 	if (paramHandle) {
-		ParamUnmapItem* unmapItem = new ParamUnmapItem;
-		unmapItem->text = "Unmap";
-		unmapItem->rightText = paramHandle->text;
-		unmapItem->paramWidget = this;
-		menu->addChild(unmapItem);
+		menu->addChild(createMenuItem("Unmap", paramHandle->text, [=]() {
+			APP->engine->updateParamHandle(paramHandle, -1, 0);
+		}));
 	}
 
 	appendContextMenu(menu);
