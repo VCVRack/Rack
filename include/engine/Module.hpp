@@ -119,16 +119,16 @@ struct Module {
 			delete paramQuantities[paramId];
 
 		TParamQuantity* q = new TParamQuantity;
-		q->module = this;
-		q->paramId = paramId;
-		q->minValue = minValue;
-		q->maxValue = maxValue;
-		q->defaultValue = defaultValue;
-		q->name = name;
-		q->unit = unit;
-		q->displayBase = displayBase;
-		q->displayMultiplier = displayMultiplier;
-		q->displayOffset = displayOffset;
+		q->ParamQuantity::module = this;
+		q->ParamQuantity::paramId = paramId;
+		q->ParamQuantity::minValue = minValue;
+		q->ParamQuantity::maxValue = maxValue;
+		q->ParamQuantity::defaultValue = defaultValue;
+		q->ParamQuantity::name = name;
+		q->ParamQuantity::unit = unit;
+		q->ParamQuantity::displayBase = displayBase;
+		q->ParamQuantity::displayMultiplier = displayMultiplier;
+		q->ParamQuantity::displayOffset = displayOffset;
 		paramQuantities[paramId] = q;
 
 		Param* p = &params[paramId];
@@ -163,10 +163,10 @@ struct Module {
 			delete inputInfos[portId];
 
 		TPortInfo* info = new TPortInfo;
-		info->module = this;
-		info->type = Port::INPUT;
-		info->portId = portId;
-		info->name = name;
+		info->PortInfo::module = this;
+		info->PortInfo::type = Port::INPUT;
+		info->PortInfo::portId = portId;
+		info->PortInfo::name = name;
 		inputInfos[portId] = info;
 		return info;
 	}
@@ -181,10 +181,10 @@ struct Module {
 			delete outputInfos[portId];
 
 		TPortInfo* info = new TPortInfo;
-		info->module = this;
-		info->type = Port::OUTPUT;
-		info->portId = portId;
-		info->name = name;
+		info->PortInfo::module = this;
+		info->PortInfo::type = Port::OUTPUT;
+		info->PortInfo::portId = portId;
+		info->PortInfo::name = name;
 		outputInfos[portId] = info;
 		return info;
 	}
@@ -200,9 +200,9 @@ struct Module {
 			delete lightInfos[lightId];
 
 		TLightInfo* info = new TLightInfo;
-		info->module = this;
-		info->lightId = lightId;
-		info->name = name;
+		info->LightInfo::module = this;
+		info->LightInfo::lightId = lightId;
+		info->LightInfo::name = name;
 		lightInfos[lightId] = info;
 		return info;
 	}
