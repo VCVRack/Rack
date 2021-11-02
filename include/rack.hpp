@@ -12,7 +12,11 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 
 /** Functions with the PRIVATE attribute should not be called by plugins.
 */
+#ifdef __clang__
+#define PRIVATE __attribute__((deprecated("Using internal Rack function or symbol")))
+#else
 #define PRIVATE __attribute__((error("Using internal Rack function or symbol")))
+#endif
 
 
 #include <common.hpp>
