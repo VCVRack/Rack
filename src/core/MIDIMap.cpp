@@ -70,7 +70,9 @@ struct MIDIMap : Module {
 		learningId = -1;
 		learnedCc = false;
 		learnedParam = false;
-		clearMaps();
+		// Use NoLock because we're already in an Engine write-lock if Engine::resetModule().
+		// We also might be in the MIDIMap() constructor, which could cause problems, but when constructing, all ParamHandles will point to no Modules anyway.
+		clearMaps_NoLock();
 		mapLen = 1;
 		for (int i = 0; i < 128; i++) {
 			values[i] = -1;
@@ -159,13 +161,13 @@ struct MIDIMap : Module {
 	void clearMap(int id) {
 		learningId = -1;
 		ccs[id] = -1;
-		APP->engine->updateParamHandle_NoLock(&paramHandles[id], -1, 0, true);
+		APP->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
 		valueFilters[id].reset();
 		updateMapLen();
 		refreshParamHandleText(id);
 	}
 
-	void clearMaps() {
+	void clearMaps_NoLock() {
 		learningId = -1;
 		for (int id = 0; id < MAX_CHANNELS; id++) {
 			ccs[id] = -1;
@@ -256,7 +258,9 @@ struct MIDIMap : Module {
 	}
 
 	void dataFromJson(json_t* rootJ) override {
-		clearMaps();
+		// Use NoLock because we're already in an Engine write-lock.
+		clearMaps_NoLock();
+
 		json_t* mapsJ = json_object_get(rootJ, "maps");
 		if (mapsJ) {
 			json_t* mapJ;
@@ -270,7 +274,7 @@ struct MIDIMap : Module {
 				if (mapIndex >= MAX_CHANNELS)
 					continue;
 				ccs[mapIndex] = json_integer_value(ccJ);
-				APP->engine->updateParamHandle(&paramHandles[mapIndex], json_integer_value(moduleIdJ), json_integer_value(paramIdJ), false);
+				APP->engine->updateParamHandle_NoLock(&paramHandles[mapIndex], json_integer_value(moduleIdJ), json_integer_value(paramIdJ), false);
 				refreshParamHandleText(mapIndex);
 			}
 		}
