@@ -21,11 +21,7 @@ E.g.
 
 	DEPRECATED void foo();
 */
-#if defined __GNUC__ || defined __clang__
-	#define DEPRECATED __attribute__((deprecated))
-#elif defined _MSC_VER
-	#define DEPRECATED __declspec(deprecated)
-#endif
+#define DEPRECATED __attribute__((deprecated))
 
 /** Attribute for private functions not intended to be called by plugins.
 When #including rack.hpp, attempting to call PRIVATE functions will result in a compile-time error.
