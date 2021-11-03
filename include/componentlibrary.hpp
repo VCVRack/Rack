@@ -57,7 +57,7 @@ E.g. `RectangleLight<RedLight>`
 Although this paradigm might seem confusing at first, it ends up being extremely simple in your plugin code and perfect for "decorating" your classes with appearance traits and behavioral properties.
 For example, need a slider with a green LED? Just use
 
-	createLightParamCentered<LEDLightSlider<GreenLight>>(...)
+	createLightParamCentered<VCVLightSlider<GreenLight>>(...)
 */
 
 template <typename TBase = app::ModuleLightWidget>
@@ -79,7 +79,7 @@ struct TSvgLight : TBase {
 		this->box.size = sw->box.size;
 	}
 };
-typedef TSvgLight<> SvgLight;
+using SvgLight = TSvgLight<>;
 
 template <typename TBase = app::ModuleLightWidget>
 struct TGrayModuleLightWidget : TBase {
@@ -88,7 +88,7 @@ struct TGrayModuleLightWidget : TBase {
 		this->borderColor = nvgRGBA(0, 0, 0, 53);
 	}
 };
-typedef TGrayModuleLightWidget<> GrayModuleLightWidget;
+using GrayModuleLightWidget = TGrayModuleLightWidget<>;
 
 template <typename TBase = GrayModuleLightWidget>
 struct TWhiteLight : TBase {
@@ -96,7 +96,7 @@ struct TWhiteLight : TBase {
 		this->addBaseColor(SCHEME_WHITE);
 	}
 };
-typedef TWhiteLight<> WhiteLight;
+using WhiteLight = TWhiteLight<>;
 
 template <typename TBase = GrayModuleLightWidget>
 struct TRedLight : TBase {
@@ -104,7 +104,7 @@ struct TRedLight : TBase {
 		this->addBaseColor(SCHEME_RED);
 	}
 };
-typedef TRedLight<> RedLight;
+using RedLight = TRedLight<>;
 
 template <typename TBase = GrayModuleLightWidget>
 struct TGreenLight : TBase {
@@ -112,7 +112,7 @@ struct TGreenLight : TBase {
 		this->addBaseColor(SCHEME_GREEN);
 	}
 };
-typedef TGreenLight<> GreenLight;
+using GreenLight = TGreenLight<>;
 
 template <typename TBase = GrayModuleLightWidget>
 struct TBlueLight : TBase {
@@ -120,7 +120,7 @@ struct TBlueLight : TBase {
 		this->addBaseColor(SCHEME_BLUE);
 	}
 };
-typedef TBlueLight<> BlueLight;
+using BlueLight = TBlueLight<>;
 
 template <typename TBase = GrayModuleLightWidget>
 struct TYellowLight : TBase {
@@ -128,7 +128,7 @@ struct TYellowLight : TBase {
 		this->addBaseColor(SCHEME_YELLOW);
 	}
 };
-typedef TYellowLight<> YellowLight;
+using YellowLight = TYellowLight<>;
 
 /** Reads two adjacent lightIds, so `lightId` and `lightId + 1` must be defined */
 template <typename TBase = GrayModuleLightWidget>
@@ -138,7 +138,7 @@ struct TGreenRedLight : TBase {
 		this->addBaseColor(SCHEME_RED);
 	}
 };
-typedef TGreenRedLight<> GreenRedLight;
+using GreenRedLight = TGreenRedLight<>;
 
 template <typename TBase = GrayModuleLightWidget>
 struct TRedGreenBlueLight : TBase {
@@ -148,7 +148,7 @@ struct TRedGreenBlueLight : TBase {
 		this->addBaseColor(SCHEME_BLUE);
 	}
 };
-typedef TRedGreenBlueLight<> RedGreenBlueLight;
+using RedGreenBlueLight = TRedGreenBlueLight<>;
 
 /** Based on the size of 5mm LEDs */
 template <typename TBase>
@@ -250,15 +250,17 @@ struct RectangleLight : TBase {
 	}
 };
 
-/** A light for displaying on top of PB61303. Must add a color by subclassing or templating. */
+/** A light for displaying on top of VCVBezel. Must add a color by subclassing or templating. */
 template <typename TBase>
-struct LEDBezelLight : TBase {
-	LEDBezelLight() {
+struct VCVBezelLight : TBase {
+	VCVBezelLight() {
 		this->borderColor = color::BLACK_TRANSPARENT;
 		this->bgColor = color::BLACK_TRANSPARENT;
 		this->box.size = math::Vec(17.545, 17.545);
 	}
 };
+template <typename TBase>
+using LEDBezelLight = VCVBezelLight<TBase>;
 
 /** A light to displayed over PB61303. Must add a color by subclassing or templating.
 */
@@ -669,27 +671,33 @@ struct BefacoSlidePot : app::SvgSlider {
 	}
 };
 
-struct LEDSlider : app::SvgSlider {
-	LEDSlider() {
-		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSlider.svg")));
-		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHandle.svg")));
+struct VCVSlider : app::SvgSlider {
+	VCVSlider() {
+		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/VCVSlider.svg")));
+		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/VCVSliderHandle.svg")));
 		setHandlePosCentered(
 			math::Vec(19.84260/2, 76.53517 - 11.74218/2),
 			math::Vec(19.84260/2, 0.0 + 11.74218/2)
 		);
 	}
 };
+using LEDSlider = VCVSlider;
 
-// TODO Modernize
-struct LEDSliderHorizontal : app::SvgSlider {
-	LEDSliderHorizontal() {
+struct VCVSliderHorizontal : app::SvgSlider {
+	VCVSliderHorizontal() {
 		horizontal = true;
+		// TODO Fix positions
 		maxHandlePos = mm2px(math::Vec(22.078, 0.738).plus(math::Vec(0, 2)));
 		minHandlePos = mm2px(math::Vec(0.738, 0.738).plus(math::Vec(0, 2)));
-		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHorizontal.svg")));
+		// TODO Fix SVG
+		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/VCVSliderHorizontal.svg")));
 	}
 };
+using LEDSliderHorizontal = VCVSliderHorizontal;
 
+/** An SvgSlider with an attached light.
+Construct with createLightParamCentered() helper function.
+*/
 template <typename TBase, typename TLightBase = RedLight>
 struct LightSlider : TBase {
 	app::ModuleLightWidget* light;
@@ -713,32 +721,39 @@ struct LightSlider : TBase {
 };
 
 template <typename TBase>
-struct LEDSliderLight : RectangleLight<TSvgLight<TBase>> {
-	LEDSliderLight() {
-		this->setSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderLight.svg")));
+struct VCVSliderLight : RectangleLight<TSvgLight<TBase>> {
+	VCVSliderLight() {
+		this->setSvg(Svg::load(asset::system("res/ComponentLibrary/VCVSliderLight.svg")));
 	}
 };
+template <typename TBase>
+using LEDSliderLight = VCVSliderLight<TBase>;
 
 template <typename TLightBase = RedLight>
-struct LEDLightSlider : LightSlider<LEDSlider, LEDSliderLight<TLightBase>> {
-	LEDLightSlider() {}
+struct VCVLightSlider : LightSlider<VCVSlider, VCVSliderLight<TLightBase>> {
+	VCVLightSlider() {}
 };
-
-/** Deprecated. Use LEDSliderLight with your preferred LightWidget. */
-struct LEDSliderGreen : LEDLightSlider<GreenLight> {};
-struct LEDSliderRed : LEDLightSlider<RedLight> {};
-struct LEDSliderYellow : LEDLightSlider<YellowLight> {};
-struct LEDSliderBlue : LEDLightSlider<BlueLight> {};
-struct LEDSliderWhite : LEDLightSlider<WhiteLight> {};
-
-// TODO Modernize
 template <typename TLightBase = RedLight>
-struct LEDLightSliderHorizontal : LightSlider<LEDSliderHorizontal, TLightBase> {
-	LEDLightSliderHorizontal() {
-		this->setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/LEDSliderHorizontalHandle.svg")));
+using LEDLightSlider = VCVLightSlider<TLightBase>;
+
+/** Deprecated. Use VCVSliderLight with your preferred LightWidget. */
+struct LEDSliderGreen : VCVLightSlider<GreenLight> {};
+struct LEDSliderRed : VCVLightSlider<RedLight> {};
+struct LEDSliderYellow : VCVLightSlider<YellowLight> {};
+struct LEDSliderBlue : VCVLightSlider<BlueLight> {};
+struct LEDSliderWhite : VCVLightSlider<WhiteLight> {};
+
+template <typename TLightBase = RedLight>
+struct VCVLightSliderHorizontal : LightSlider<VCVSliderHorizontal, TLightBase> {
+	VCVLightSliderHorizontal() {
+		// TODO Fix positions
 		this->light->box.size = mm2px(math::Vec(3.276, 1.524));
+		// TODO Fix SVG
+		this->setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/VCVSliderHorizontalHandle.svg")));
 	}
 };
+template <typename TLightBase = RedLight>
+using LEDLightSliderHorizontal = VCVLightSliderHorizontal<TLightBase>;
 
 
 ////////////////////
@@ -825,26 +840,27 @@ struct TL1105 : app::SvgSwitch {
 	}
 };
 
-struct LEDButton : app::SvgSwitch {
-	LEDButton() {
+struct VCVButton : app::SvgSwitch {
+	VCVButton() {
 		momentary = true;
-		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDButton.svg")));
-		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDButton_1.svg")));
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/VCVButton_0.svg")));
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/VCVButton_1.svg")));
 	}
 };
+using LEDButton = VCVButton;
 
-struct LEDLatch : LEDButton {
-	LEDLatch() {
+struct VCVLatch : VCVButton {
+	VCVLatch() {
 		momentary = false;
 		latch = true;
 	}
 };
 
 template <typename TLight>
-struct LEDLightButton : LEDButton {
+struct VCVLightButton : VCVButton {
 	app::ModuleLightWidget* light;
 
-	LEDLightButton() {
+	VCVLightButton() {
 		light = new TLight;
 		// Move center of light to center of box
 		light->box.pos = box.size.div(2).minus(light->box.size.div(2));
@@ -855,10 +871,12 @@ struct LEDLightButton : LEDButton {
 		return light;
 	}
 };
+template <typename TLight>
+using LEDLightButton = VCVLightButton<TLight>;
 
 template <typename TLight>
-struct LEDLightLatch : LEDLightButton<TLight> {
-	LEDLightLatch() {
+struct VCVLightLatch : VCVLightButton<TLight> {
+	VCVLightLatch() {
 		this->momentary = false;
 		this->latch = true;
 	}
@@ -880,19 +898,20 @@ struct BefacoPush : app::SvgSwitch {
 	}
 };
 
-struct LEDBezel : app::SvgSwitch {
-	LEDBezel() {
+struct VCVBezel : app::SvgSwitch {
+	VCVBezel() {
 		momentary = true;
-		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDBezel.svg")));
+		addFrame(Svg::load(asset::system("res/ComponentLibrary/VCVBezel.svg")));
 	}
 };
+using LEDBezel = VCVBezel;
 
 template <typename TLightBase = WhiteLight>
-struct LEDLightBezel : LEDBezel {
+struct VCVLightBezel : VCVBezel {
 	app::ModuleLightWidget* light;
 
-	LEDLightBezel() {
-		light = new LEDBezelLight<TLightBase>;
+	VCVLightBezel() {
+		light = new VCVBezelLight<TLightBase>;
 		// Move center of light to center of box
 		light->box.pos = box.size.div(2).minus(light->box.size.div(2));
 		addChild(light);
@@ -902,6 +921,8 @@ struct LEDLightBezel : LEDBezel {
 		return light;
 	}
 };
+template <typename TLightBase = WhiteLight>
+using LEDLightBezel = VCVLightBezel<TLightBase>;
 
 struct PB61303 : app::SvgSwitch {
 	PB61303() {
