@@ -48,7 +48,7 @@ struct CV_MIDI : Module {
 
 	CV_MIDI() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		configInput(PITCH_INPUT, "Pitch (1V/oct)");
+		configInput(PITCH_INPUT, "1V/octave pitch");
 		configInput(GATE_INPUT, "Gate");
 		configInput(VEL_INPUT, "Velocity");
 		configInput(AFT_INPUT, "Aftertouch");
