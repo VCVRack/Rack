@@ -149,14 +149,6 @@ LedDisplayTextField::LedDisplayTextField() {
 
 
 void LedDisplayTextField::draw(const DrawArgs& args) {
-	// Background
-	if (bgColor.a > 0.0) {
-		nvgBeginPath(args.vg);
-		nvgRoundedRect(args.vg, 0, 0, box.size.x, box.size.y, 5.0);
-		nvgFillColor(args.vg, nvgRGB(0x00, 0x00, 0x00));
-		nvgFill(args.vg);
-	}
-
 	Widget::draw(args);
 }
 

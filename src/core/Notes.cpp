@@ -14,9 +14,9 @@ struct NotesModule : Module {
 		dirty = true;
 	}
 
-	/** Legacy for <=v1 patches */
 	void fromJson(json_t* rootJ) override {
 		Module::fromJson(rootJ);
+		// In <1.0, module used "text" property at root level.
 		json_t* textJ = json_object_get(rootJ, "text");
 		if (textJ)
 			text = json_string_value(textJ);
@@ -42,22 +42,32 @@ struct NotesTextField : LedDisplayTextField {
 	NotesModule* module;
 
 	void step() override {
-		TextField::step();
+		LedDisplayTextField::step();
 		if (module && module->dirty) {
 			setText(module->text);
 			module->dirty = false;
 		}
 	}
+
 	void onChange(const ChangeEvent& e) override {
 		if (module)
-			module->text = text;
+			module->text = getText();
+	}
+};
+
+
+struct NotesDisplay : LedDisplay {
+	void setModule(NotesModule* module) {
+		NotesTextField* textField = createWidget<NotesTextField>(Vec(0, 0));
+		textField->box.size = box.size;
+		textField->multiline = true;
+		textField->module = module;
+		addChild(textField);
 	}
 };
 
 
 struct NotesWidget : ModuleWidget {
-	NotesTextField* textField;
-
 	NotesWidget(NotesModule* module) {
 		setModule(module);
 		setPanel(Svg::load(asset::system("res/Core/Notes.svg")));
@@ -67,11 +77,10 @@ struct NotesWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		textField = createWidget<NotesTextField>(mm2px(Vec(3.39962, 14.8373)));
-		textField->box.size = mm2px(Vec(74.480, 102.753));
-		textField->multiline = true;
-		textField->module = dynamic_cast<NotesModule*>(module);
-		addChild(textField);
+		NotesDisplay* notesDisplay = createWidget<NotesDisplay>(mm2px(Vec(0.0, 12.869)));
+		notesDisplay->box.size = mm2px(Vec(81.28, 105.567));
+		notesDisplay->setModule(module);
+		addChild(notesDisplay);
 	}
 };
 
