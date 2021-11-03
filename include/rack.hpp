@@ -91,7 +91,6 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 #include <app/ModuleWidget.hpp>
 #include <app/SvgSlider.hpp>
 #include <app/SvgButton.hpp>
-#include <app/SvgLatch.hpp>
 
 #include <engine/Param.hpp>
 #include <engine/ParamHandle.hpp>

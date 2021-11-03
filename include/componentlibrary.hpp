@@ -6,7 +6,6 @@
 #include <app/SvgPort.hpp>
 #include <app/ModuleLightWidget.hpp>
 #include <app/SvgSwitch.hpp>
-#include <app/SvgLatch.hpp>
 #include <app/SvgScrew.hpp>
 #include <app/AudioWidget.hpp>
 #include <app/MidiWidget.hpp>
@@ -770,13 +769,6 @@ struct CL1362Port : app::SvgPort {
 ////////////////////
 
 template <typename TSwitch>
-struct LatchingSwitch : TSwitch {
-	LatchingSwitch() {
-		this->momentary = false;
-	}
-};
-
-template <typename TSwitch>
 struct MomentarySwitch : TSwitch {
 	MomentarySwitch() {
 		this->momentary = true;
@@ -841,10 +833,10 @@ struct LEDButton : app::SvgSwitch {
 	}
 };
 
-struct LEDLatch : app::SvgLatch {
+struct LEDLatch : LEDButton {
 	LEDLatch() {
-		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDButton.svg")));
-		addFrame(Svg::load(asset::system("res/ComponentLibrary/LEDButton_1.svg")));
+		momentary = false;
+		latch = true;
 	}
 };
 
@@ -865,18 +857,10 @@ struct LEDLightButton : LEDButton {
 };
 
 template <typename TLight>
-struct LEDLightLatch : LEDLatch {
-	app::ModuleLightWidget* light;
-
+struct LEDLightLatch : LEDLightButton<TLight> {
 	LEDLightLatch() {
-		light = new TLight;
-		// Move center of light to center of box
-		light->box.pos = box.size.div(2).minus(light->box.size.div(2));
-		addChild(light);
-	}
-
-	app::ModuleLightWidget* getLight() {
-		return light;
+		this->momentary = false;
+		this->latch = true;
 	}
 };
 
