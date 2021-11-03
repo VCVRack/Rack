@@ -856,6 +856,8 @@ struct VCVLatch : VCVButton {
 	}
 };
 
+/** Looks best with MediumSimpleLight<WhiteLight> or a color of your choice.
+*/
 template <typename TLight>
 struct VCVLightButton : VCVButton {
 	app::ModuleLightWidget* light;
@@ -906,6 +908,13 @@ struct VCVBezel : app::SvgSwitch {
 };
 using LEDBezel = VCVBezel;
 
+struct VCVBezelLatch : VCVBezel {
+	VCVBezelLatch() {
+		momentary = false;
+		latch = true;
+	}
+};
+
 template <typename TLightBase = WhiteLight>
 struct VCVLightBezel : VCVBezel {
 	app::ModuleLightWidget* light;
@@ -923,6 +932,14 @@ struct VCVLightBezel : VCVBezel {
 };
 template <typename TLightBase = WhiteLight>
 using LEDLightBezel = VCVLightBezel<TLightBase>;
+
+template <typename TLightBase = WhiteLight>
+struct VCVLightBezelLatch : VCVLightBezel<TLightBase> {
+	VCVLightBezelLatch() {
+		this->momentary = false;
+		this->latch = true;
+	}
+};
 
 struct PB61303 : app::SvgSwitch {
 	PB61303() {
