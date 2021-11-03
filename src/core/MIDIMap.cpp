@@ -159,7 +159,7 @@ struct MIDIMap : Module {
 	void clearMap(int id) {
 		learningId = -1;
 		ccs[id] = -1;
-		APP->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
+		APP->engine->updateParamHandle_NoLock(&paramHandles[id], -1, 0, true);
 		valueFilters[id].reset();
 		updateMapLen();
 		refreshParamHandleText(id);
@@ -169,7 +169,7 @@ struct MIDIMap : Module {
 		learningId = -1;
 		for (int id = 0; id < MAX_CHANNELS; id++) {
 			ccs[id] = -1;
-			APP->engine->updateParamHandle(&paramHandles[id], -1, 0, true);
+			APP->engine->updateParamHandle_NoLock(&paramHandles[id], -1, 0, true);
 			valueFilters[id].reset();
 			refreshParamHandleText(id);
 		}

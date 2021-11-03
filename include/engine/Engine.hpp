@@ -125,6 +125,7 @@ struct Engine {
 	Read-locks.
 	*/
 	Module* getModule(int64_t moduleId);
+	Module* getModule_NoLock(int64_t moduleId);
 	/** Triggers a ResetEvent for the given Module.
 	Write-locks.
 	*/
@@ -208,15 +209,17 @@ struct Engine {
 	Read-locks.
 	*/
 	ParamHandle* getParamHandle(int64_t moduleId, int paramId);
+	ParamHandle* getParamHandle_NoLock(int64_t moduleId, int paramId);
 	/** Use getParamHandle(moduleId, paramId) instead.
 	Read-locks.
 	*/
 	DEPRECATED ParamHandle* getParamHandle(Module* module, int paramId);
 	/** Sets the ParamHandle IDs and module pointer.
 	If `overwrite` is true and another ParamHandle points to the same param, unsets that one and replaces it with the given handle.
-	Read-locks.
+	Write-locks.
 	*/
 	void updateParamHandle(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite = true);
+	void updateParamHandle_NoLock(ParamHandle* paramHandle, int64_t moduleId, int paramId, bool overwrite = true);
 
 	/** Serializes the rack.
 	Read-locks.
