@@ -172,22 +172,22 @@ struct Gate_MIDIWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.137, 78.431)), module, Gate_MIDI::GATE_INPUTS + 0));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.686, 78.431)), module, Gate_MIDI::GATE_INPUTS + 1));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.236, 78.431)), module, Gate_MIDI::GATE_INPUTS + 2));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.786, 78.431)), module, Gate_MIDI::GATE_INPUTS + 3));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.137, 89.946)), module, Gate_MIDI::GATE_INPUTS + 4));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.686, 89.946)), module, Gate_MIDI::GATE_INPUTS + 5));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.236, 89.946)), module, Gate_MIDI::GATE_INPUTS + 6));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.786, 89.946)), module, Gate_MIDI::GATE_INPUTS + 7));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.137, 101.466)), module, Gate_MIDI::GATE_INPUTS + 8));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.686, 101.466)), module, Gate_MIDI::GATE_INPUTS + 9));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.236, 101.466)), module, Gate_MIDI::GATE_INPUTS + 10));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.786, 101.466)), module, Gate_MIDI::GATE_INPUTS + 11));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(9.137, 112.998)), module, Gate_MIDI::GATE_INPUTS + 12));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.686, 112.984)), module, Gate_MIDI::GATE_INPUTS + 13));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.236, 112.984)), module, Gate_MIDI::GATE_INPUTS + 14));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(43.786, 112.984)), module, Gate_MIDI::GATE_INPUTS + 15));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 78.431)), module, Gate_MIDI::GATE_INPUTS + 0));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 78.431)), module, Gate_MIDI::GATE_INPUTS + 1));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 78.431)), module, Gate_MIDI::GATE_INPUTS + 2));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 78.431)), module, Gate_MIDI::GATE_INPUTS + 3));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 89.946)), module, Gate_MIDI::GATE_INPUTS + 4));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 89.946)), module, Gate_MIDI::GATE_INPUTS + 5));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 89.946)), module, Gate_MIDI::GATE_INPUTS + 6));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 89.946)), module, Gate_MIDI::GATE_INPUTS + 7));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 101.466)), module, Gate_MIDI::GATE_INPUTS + 8));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 101.466)), module, Gate_MIDI::GATE_INPUTS + 9));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 101.466)), module, Gate_MIDI::GATE_INPUTS + 10));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 101.466)), module, Gate_MIDI::GATE_INPUTS + 11));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 112.998)), module, Gate_MIDI::GATE_INPUTS + 12));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 112.984)), module, Gate_MIDI::GATE_INPUTS + 13));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 112.984)), module, Gate_MIDI::GATE_INPUTS + 14));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 112.984)), module, Gate_MIDI::GATE_INPUTS + 15));
 
 		typedef Grid16MidiWidget<NoteChoice<Gate_MIDI>> TMidiWidget;
 		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(0.0, 13.039)));
