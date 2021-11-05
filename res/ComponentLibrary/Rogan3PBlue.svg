@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 25.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!-- Generator: Adobe Illustrator 25.2.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
 <svg version="1.0"
 	 id="svg15246" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:svg="http://www.w3.org/2000/svg"
 	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="41.76172px"
@@ -129,11 +129,11 @@
 			c0.71582-1.96008,1.12634-4.06714,1.12634-6.27502C39.22587,18.54729,38.81285,16.43388,38.09282,14.46855z"/>
 	</g>
 	<g>
-		<rect x="17.56754" y="3.82154" fill="#384CCF" width="6.62647" height="12.72794"/>
-		<path opacity="0.58" fill="#384CCF" d="M24.66616,0.88709c0.06962-0.26793-0.10286-0.54542-0.37565-0.59252
+		<rect x="17.56754" y="3.82154" fill="#005FCF" width="6.62647" height="12.72794"/>
+		<path opacity="0.58" fill="#005FCF" d="M24.66616,0.88709c0.06962-0.26793-0.10286-0.54542-0.37565-0.59252
 			C23.18218,0.10321,22.04378,0,20.88081,0c-1.16297,0-2.3013,0.10321-3.40961,0.29457
 			c-0.27279,0.0471-0.44527,0.32459-0.37566,0.59252l0.47206,1.81683V2.69924l6.6265,0.00001v0.00467L24.66616,0.88709z"/>
-		<rect x="17.56755" y="2.70398" opacity="0.58" fill="#586FD1" width="6.62647" height="1.11756"/>
+		<rect x="17.56755" y="2.70398" opacity="0.48" fill="#1D6FCF" width="6.62647" height="1.11756"/>
 	</g>
 </g>
 </svg>
