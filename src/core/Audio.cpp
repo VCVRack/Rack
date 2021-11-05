@@ -526,6 +526,19 @@ struct AudioWidget : ModuleWidget {
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.285, 113.115)), module, TAudio::AUDIO_OUTPUTS + 0));
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.122, 113.115)), module, TAudio::AUDIO_OUTPUTS + 1));
 
+			addChild(createLightCentered<SmallSimpleLight<RedLight>>(mm2px(Vec(6.691, 28.899)), module, TAudio::VU_LIGHTS + 6 * 0 + 0));
+			addChild(createLightCentered<SmallSimpleLight<RedLight>>(mm2px(Vec(18.709, 28.899)), module, TAudio::VU_LIGHTS + 6 * 1 + 0));
+			addChild(createLightCentered<SmallSimpleLight<YellowLight>>(mm2px(Vec(6.691, 34.196)), module, TAudio::VU_LIGHTS + 6 * 0 + 1));
+			addChild(createLightCentered<SmallSimpleLight<YellowLight>>(mm2px(Vec(18.709, 34.196)), module, TAudio::VU_LIGHTS + 6 * 1 + 1));
+			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(6.691, 39.494)), module, TAudio::VU_LIGHTS + 6 * 0 + 2));
+			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(18.709, 39.494)), module, TAudio::VU_LIGHTS + 6 * 1 + 2));
+			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(6.691, 44.791)), module, TAudio::VU_LIGHTS + 6 * 0 + 3));
+			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(18.709, 44.791)), module, TAudio::VU_LIGHTS + 6 * 1 + 3));
+			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(6.691, 50.089)), module, TAudio::VU_LIGHTS + 6 * 0 + 4));
+			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(18.709, 50.089)), module, TAudio::VU_LIGHTS + 6 * 1 + 4));
+			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(6.691, 55.386)), module, TAudio::VU_LIGHTS + 6 * 0 + 5));
+			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(18.709, 55.386)), module, TAudio::VU_LIGHTS + 6 * 1 + 5));
+
 			app::AudioDeviceWidget* audioWidget = createWidget<app::AudioDeviceWidget>(mm2px(Vec(0.0, 13.039)));
 			audioWidget->box.size = mm2px(Vec(25.4, 47.726));
 			audioWidget->setAudioPort(module ? &module->port : NULL);
