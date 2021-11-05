@@ -27,6 +27,11 @@ static CURL* createCurl() {
 	// 15 second timeout for requests
 	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15);
 
+	// If curl can't resolve a DNS entry, it sends a signal to interrupt the process.
+	// However, since we use curl on non-main thread, this crashes the application.
+	// So tell curl not to signal.
+	curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1);
+
 	std::string caPath = asset::system("cacert.pem");
 	curl_easy_setopt(curl, CURLOPT_CAINFO, caPath.c_str());
 
