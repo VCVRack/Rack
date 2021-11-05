@@ -609,16 +609,21 @@ struct Rogan1PWhite : Rogan {
 
 
 struct SynthTechAlco : app::SvgKnob {
+	widget::SvgWidget* bg;
+	widget::SvgWidget* fg;
+
 	SynthTechAlco() {
+		bg = new widget::SvgWidget;
+		fb->addChildBelow(bg, tw);
+
+		fg = new widget::SvgWidget;
+		fb->addChildAbove(fg, tw);
+
 		minAngle = -0.82 * M_PI;
 		maxAngle = 0.82 * M_PI;
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/SynthTechAlco.svg")));
-		// Add cap
-		widget::FramebufferWidget* capFb = new widget::FramebufferWidget;
-		widget::SvgWidget* cap = new widget::SvgWidget;
-		cap->setSvg(Svg::load(asset::system("res/ComponentLibrary/SynthTechAlco_cap.svg")));
-		capFb->addChild(cap);
-		addChild(capFb);
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/SynthTechAlco-bg.svg")));
+		fg->setSvg(Svg::load(asset::system("res/ComponentLibrary/SynthTechAlco-fg.svg")));
 	}
 };
 
