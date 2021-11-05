@@ -34,21 +34,21 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="716"
-     inkscape:window-height="480"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
      id="namedview36"
      showgrid="false"
      inkscape:zoom="0.62105263"
      inkscape:cx="120"
      inkscape:cy="190"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
      inkscape:current-layer="svg34" />
   <defs
      id="defs7">
     <linearGradient
-       id="a90e154b-8548-4d2f-b9ad-36b9909f4122"
+       id="a2d41a32-129a-467c-88bb-0081d4967003"
        x1="120"
        x2="120"
        y2="380"
@@ -64,43 +64,43 @@
     </linearGradient>
   </defs>
   <g
-     id="ba145140-ce77-4bb3-9030-17e43bdd6a03"
+     id="ff212d66-6d77-44f8-85c7-307f2d84ecf1"
      data-name="FND BG">
     <rect
        width="240"
        height="380"
-       fill="url(#a90e154b-8548-4d2f-b9ad-36b9909f4122)"
+       fill="url(#a2d41a32-129a-467c-88bb-0081d4967003)"
        id="rect9" />
   </g>
   <g
-     id="e2d20ba7-6100-4846-a507-c4a3f2a3c137"
+     id="b4dd66e7-8e7e-494a-8612-34274361d97e"
      data-name="FND GRAPH">
     <g
        id="g16">
       <path
-         id="e0ca7dab-2c85-4822-aaf4-39d470af4021"
+         id="b4cb817a-ff42-4dfc-8866-e3d83608b518"
          data-name="path6935"
          d="M111.8588,359.76681a.90968.90968,0,0,1-.815-.50533l-2.96266-5.92926a.91122.91122,0,0,1,1.63-.815l2.14759,4.29517,2.15167-4.29517a.91122.91122,0,1,1,1.63.815l-2.96663,5.92926a.91016.91016,0,0,1-.81508.50533"
          fill="#1f1f1f" />
       <path
-         id="f62823e1-4a85-4ce9-8fd1-15a61a4491b7"
+         id="a58877fa-d57b-4d74-bbda-a883bf30a365"
          data-name="path6937"
          d="M128.13889,359.76681a.91459.91459,0,0,1-.81508-.50533l-2.96255-5.92926a.91122.91122,0,1,1,1.63-.815l2.14758,4.29517,2.15167-4.29517a.91122.91122,0,0,1,1.63005.815l-2.96256,5.92926a.91635.91635,0,0,1-.81914.50533"
          fill="#1f1f1f" />
       <path
-         id="adb69cb6-76c4-4c27-99f6-d75d78c1c665"
+         id="aa48af94-af91-4b1f-b663-ef6af4b5cf3b"
          data-name="path6939"
          d="M120.441,359.76681a3.87747,3.87747,0,1,1,2.32692-6.98067.91239.91239,0,1,1-1.09622,1.45879,2.05219,2.05219,0,1,0-1.23068,3.69616,2.02393,2.02393,0,0,0,1.23068-.41157.9124.9124,0,1,1,1.09622,1.45883,3.82664,3.82664,0,0,1-2.32692.77837"
          fill="#1f1f1f" />
       <path
-         id="ec986fea-06d7-4525-8ce3-271ae520a51b"
+         id="a3b43b3b-5987-49ba-834a-210c6d95bb7d"
          data-name="path6941"
          d="M121.688,355.84246a1.18584,1.18584,0,1,1-1.18583-1.18588,1.18437,1.18437,0,0,1,1.18583,1.18588"
          fill="#1f1f1f" />
     </g>
   </g>
   <g
-     id="b04dd9aa-fb1f-45f0-8948-883dcd223ffe"
+     id="be2da85e-1478-4d1b-867a-5b13dcd701fb"
      data-name="FND TXT">
     <g
        id="g29">
@@ -127,16 +127,16 @@
     </g>
   </g>
   <g
-     id="b3dd6515-ba5c-43bf-91e6-f54e41ad2342"
+     id="b660f694-0f3e-42b6-93f7-7ede9c067179"
      data-name="components"
      inkscape:groupmode="layer"
      style="display:none">
     <rect
-       id="e18c885a-5554-4474-8863-d5fc32e3f96f"
+       id="abeeb0d9-2e17-439a-8711-ace9121243e1"
        data-name="Screen"
        y="38"
        width="240"
-       height="311.71326"
+       height="310.21326"
        x="0"
        style="fill:#ffff00" />
   </g>

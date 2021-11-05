@@ -485,7 +485,7 @@ struct MIDIMapWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		MIDIMapDisplay* midiWidget = createWidget<MIDIMapDisplay>(mm2px(Vec(0.0, 12.869)));
-		midiWidget->box.size = mm2px(Vec(50.8, 105.567));
+		midiWidget->box.size = mm2px(Vec(50.8, 105.059));
 		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
 		midiWidget->setModule(module);
 		addChild(midiWidget);

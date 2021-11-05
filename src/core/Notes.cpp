@@ -78,7 +78,7 @@ struct NotesWidget : ModuleWidget {
 		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		NotesDisplay* notesDisplay = createWidget<NotesDisplay>(mm2px(Vec(0.0, 12.869)));
-		notesDisplay->box.size = mm2px(Vec(81.28, 105.567));
+		notesDisplay->box.size = mm2px(Vec(81.28, 105.059));
 		notesDisplay->setModule(module);
 		addChild(notesDisplay);
 	}
