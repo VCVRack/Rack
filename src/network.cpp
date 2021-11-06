@@ -22,10 +22,10 @@ static CURL* createCurl() {
 	CURL* curl = curl_easy_init();
 	assert(curl);
 
-	curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
 	// 15 second timeout for requests
-	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 15);
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
 
 	// If curl can't resolve a DNS entry, it sends a signal to interrupt the process.
 	// However, since we use curl on non-main thread, this crashes the application.
