@@ -55,7 +55,10 @@ struct PortTooltip : ui::Tooltip {
 				if (!otherPw)
 					continue;
 				text += "\n";
-				text += "Connected to ";
+				if (portWidget->type == engine::Port::INPUT)
+					text += "From ";
+				else
+					text += "To ";
 				text += otherPw->module->model->getFullName();
 				text += ": ";
 				text += otherPw->getPortInfo()->getName();
