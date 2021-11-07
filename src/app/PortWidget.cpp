@@ -18,6 +18,7 @@ struct PortWidget::Internal {
 	ui::Tooltip* tooltip = NULL;
 	/** For overriding onDragStart behavior by menu items. */
 	CableWidget* overrideCw = NULL;
+	CableWidget* overrideCloneCw = NULL;
 	bool overrideCreateCable = false;
 	NVGcolor overrideColor = color::BLACK_TRANSPARENT;
 };
@@ -87,6 +88,27 @@ struct ColorMenuItem : ui::MenuItem {
 		nvgStrokeWidth(args.vg, 1.0);
 		nvgStrokeColor(args.vg, color::mult(color, 0.5));
 		nvgStroke(args.vg);
+	}
+};
+
+
+struct PortCloneCableItem : ui::MenuItem {
+	PortWidget* pw;
+	CableWidget* cw;
+
+	void onButton(const ButtonEvent& e) override {
+		OpaqueWidget::onButton(e);
+		if (disabled)
+			return;
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+			// Set PortWidget::onDragStart overrides
+			pw->internal->overrideCloneCw = cw;
+
+			// Pretend the PortWidget was clicked
+			e.consume(pw);
+			// Deletes `this`
+			doAction();
+		}
 	}
 };
 
@@ -211,11 +233,12 @@ void PortWidget::createContextMenu() {
 		!topCw
 	));
 
-	// TODO
 	if (type == engine::Port::INPUT) {
-		menu->addChild(createMenuItem("Duplicate top cable", RACK_MOD_CTRL_NAME "+drag", NULL, true));
-	}
-	else {
+		PortCloneCableItem* item = createMenuItem<PortCloneCableItem>("Duplicate top cable", RACK_MOD_CTRL_NAME "+drag");
+		item->disabled = !topCw;
+		item->pw = this;
+		item->cw = topCw;
+		menu->addChild(item);
 	}
 
 	menu->addChild(new ui::MenuSeparator);
@@ -317,6 +340,7 @@ void PortWidget::onDragStart(const DragStartEvent& e) {
 	DEFER({
 		// Reset overrides
 		internal->overrideCw = NULL;
+		internal->overrideCloneCw = NULL;
 		internal->overrideCreateCable = false;
 		internal->overrideColor = color::BLACK_TRANSPARENT;
 	});
@@ -325,18 +349,23 @@ void PortWidget::onDragStart(const DragStartEvent& e) {
 	if (internal->overrideCreateCable) {
 		// Keep cable NULL. Will be created below
 	}
-	else if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+	else if (internal->overrideCloneCw || (APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		if (type == engine::Port::OUTPUT) {
 			// Ctrl-clicking an output creates a new cable.
 			// Keep cable NULL. Will be created below
 		}
 		else {
 			// Ctrl-clicking an input clones the cable already patched to it.
-			CableWidget* topCw = APP->scene->rack->getTopCable(this);
-			if (topCw) {
+			CableWidget* cloneCw;
+			if (internal->overrideCloneCw)
+				cloneCw = internal->overrideCloneCw;
+			else
+				cloneCw = APP->scene->rack->getTopCable(this);
+
+			if (cloneCw) {
 				cw = new CableWidget;
-				cw->color = topCw->color;
-				cw->outputPort = topCw->outputPort;
+				cw->color = cloneCw->color;
+				cw->outputPort = cloneCw->outputPort;
 				cw->updateCable();
 			}
 		}
