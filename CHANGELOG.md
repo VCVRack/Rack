@@ -4,8 +4,9 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
 ### 2.0.0 (in development)
 - Redesign Module Browser with compact layout, adjustable zoom levels, sorting options, intelligent searching, and multiple tag selection.
-- Redesign component graphics by [Pyer](https://www.pyer.be/).
+- Redesign component graphics and Core panels by [Pyer](https://www.pyer.be/).
 - Add port tooltips with name, voltage, and list of connected ports.
+- Add port context menu with ability to create cables with a particular color, drag any cable from the stack, or delete the top cable.
 - Evaluate mathematical expressions (such as `1+2*3`) in parameter context menu fields.
 - Add multiple module selection by highlighting a rectangle or Shift-clicking on a module panel.
 - Add importing/exporting module selections to new `.vcvs` file format.
@@ -47,7 +48,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Check for Library updates every few seconds to avoid needing to restart Rack to check for updates.
 - When clicking on a module in the Module Browser and immediately releasing, place the module in the last cursor position in the rack, rather than the current cursor position.
 - When clicking and dragging a module from the Module Browser, fix the mouse handle offset to the center of the module.
-- Allow adjusting rack brightness for "Lights Off" mode.
+- Allow darkening rack brightness.
+- Draw spotlight near cursor when rack brightness is lowered.
 - Improve light rendering with a more physical blending algorithm.
 - Add engine CPU meter and framerate meter to menu bar.
 - Allow zooming rack with extra mouse buttons 4 and 5.
@@ -55,6 +57,9 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - If Mod+clicking on any menu item, the menu stays open (except for some menu items like "Delete Module").
 - Add Mod+F1 key command when cursor is hovering a module to open its user manual.
 - Redesign CPU meter with percentage history graph.
+- Add PulseAudio driver on Linux.
+- Distribute .pkg installer on Mac.
+- Check for VCV Library updates when Library menu is opened, rather than at time intervals.
 
 - Core
 	- Add Audio-2 module with stereo input/output, a level knob, and VU meters.
@@ -68,6 +73,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add several module presets for many Core modules.
 
 - API
+	- Add setters/getters for nearly every instance variable in Rack's API. Use these for higher likelihood of stability.
+	- Compile Rack and plugins with `-march=nehalem`, enabling (and requiring) up to SSE4.2 and POPCNT instruction sets.
 	- Add `Module::configInput()` and `Module::configOutput()` for adding names to ports.
 	- Replace `ParamWidget::paramQuantity` with `ParamWidget::getParamQuantity()`.
 	- Add `.modules[].manualUrl` to plugin manifest schema.
@@ -96,7 +103,10 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add `string::join()`, `split()`, `formatTime()`, and `formatTimeISO()`.
 	- Add `random::Xoroshiro128Plus` which can be used like C++ `<random>` classes.
 	- Add `Port::getVoltageRMS()`.
-	- Add setters/getters for nearly every instance variable in Rack's API. Use these for higher likelihood of stability.
+	- Add `Widget::drawLayer()` for handling multiple draw passes.
+	- Add on/off threshold values to `dsp::SchmittTrigger`.
+	- Add `dsp::convert()` template functions for converting audio between normalized floats and integers.
+	- Add `bool app::SvgSwitch::latch` setting for latching button switches.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
