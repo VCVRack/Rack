@@ -85,6 +85,7 @@ struct RackWidget::Internal {
 	RailWidget* rail = NULL;
 	widget::Widget* moduleContainer = NULL;
 	widget::Widget* cableContainer = NULL;
+	int nextCableColorId = 0;
 	/** The last mouse position in the RackWidget */
 	math::Vec mousePos;
 
@@ -411,7 +412,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 		cw->fromJson(cableJ);
 		// In <=v1, cable colors were not serialized, so choose one from the available colors.
 		if (cw->color.a == 0.f) {
-			cw->setNextCableColor();
+			cw->color = getNextCableColor();
 		}
 		addCable(cw);
 	}
@@ -1391,6 +1392,17 @@ std::vector<CableWidget*> RackWidget::getCablesOnPort(PortWidget* port) {
 	}
 	return cws;
 }
+
+
+NVGcolor RackWidget::getNextCableColor() {
+	if (settings::cableColors.empty())
+		return color::WHITE;
+
+	int id = internal->nextCableColorId++;
+	internal->nextCableColorId %= settings::cableColors.size();
+	return settings::cableColors[id];
+}
+
 
 
 } // namespace app

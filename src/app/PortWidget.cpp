@@ -14,6 +14,15 @@ namespace rack {
 namespace app {
 
 
+struct PortWidget::Internal {
+	ui::Tooltip* tooltip = NULL;
+	/** For overriding onDragStart behavior by menu items. */
+	CableWidget* overrideCw = NULL;
+	bool overrideCreateCable = false;
+	NVGcolor overrideColor = color::BLACK_TRANSPARENT;
+};
+
+
 struct PortTooltip : ui::Tooltip {
 	PortWidget* portWidget;
 
@@ -83,15 +92,44 @@ struct ColorMenuItem : ui::MenuItem {
 
 
 struct PortCableItem : ColorMenuItem {
+	PortWidget* pw;
+	CableWidget* cw;
+
+	void onButton(const ButtonEvent& e) override {
+		OpaqueWidget::onButton(e);
+		if (disabled)
+			return;
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+			// Set PortWidget::onDragStart overrides
+			pw->internal->overrideCw = cw;
+
+			// Pretend the PortWidget was clicked
+			e.consume(pw);
+			// Deletes `this`
+			doAction();
+		}
+	}
 };
 
 
 struct PortCreateCableItem : ColorMenuItem {
-};
+	PortWidget* pw;
 
+	void onButton(const ButtonEvent& e) override {
+		OpaqueWidget::onButton(e);
+		if (disabled)
+			return;
+		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == 0) {
+			// Set PortWidget::onDragStart overrides
+			pw->internal->overrideCreateCable = true;
+			pw->internal->overrideColor = color;
 
-struct PortWidget::Internal {
-	ui::Tooltip* tooltip = NULL;
+			// Pretend the PortWidget was clicked
+			e.consume(pw);
+			// Deletes `this`
+			doAction();
+		}
+	}
 };
 
 
@@ -182,29 +220,32 @@ void PortWidget::createContextMenu() {
 
 	menu->addChild(new ui::MenuSeparator);
 
-	// Create cable items
+	// New cable items
 	bool createCableDisabled = (type == engine::Port::INPUT) && topCw;
 	for (NVGcolor color : settings::cableColors) {
 		// Include extra leading spaces for the color circle
 		PortCreateCableItem* item = createMenuItem<PortCreateCableItem>("     New cable", "Click+drag");
 		item->disabled = createCableDisabled;
+		item->pw = this;
 		item->color = color;
 		menu->addChild(item);
 	}
 
-	// Cable items
 	if (!cws.empty()) {
 		menu->addChild(new ui::MenuSeparator);
+	}
 
-		for (auto it = cws.rbegin(); it != cws.rend(); it++) {
-			CableWidget* cw = *it;
-			PortWidget* pw = (type == engine::Port::INPUT) ? cw->outputPort : cw->inputPort;
-			engine::PortInfo* portInfo = pw->getPortInfo();
+	// Cable items
+	for (auto it = cws.rbegin(); it != cws.rend(); it++) {
+		CableWidget* cw = *it;
+		PortWidget* pw = (type == engine::Port::INPUT) ? cw->outputPort : cw->inputPort;
+		engine::PortInfo* portInfo = pw->getPortInfo();
 
-			PortCableItem* item = createMenuItem<PortCableItem>("     " + portInfo->module->model->name + ": " + portInfo->getName());
-			item->color = cw->color;
-			menu->addChild(item);
-		}
+		PortCableItem* item = createMenuItem<PortCableItem>("     " + portInfo->module->model->name + ": " + portInfo->getName());
+		item->color = cw->color;
+		item->pw = this;
+		item->cw = cw;
+		menu->addChild(item);
 	}
 }
 
@@ -273,8 +314,18 @@ void PortWidget::onDragStart(const DragStartEvent& e) {
 	if (e.button != GLFW_MOUSE_BUTTON_LEFT)
 		return;
 
+	DEFER({
+		// Reset overrides
+		internal->overrideCw = NULL;
+		internal->overrideCreateCable = false;
+		internal->overrideColor = color::BLACK_TRANSPARENT;
+	});
+
 	CableWidget* cw = NULL;
-	if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
+	if (internal->overrideCreateCable) {
+		// Keep cable NULL. Will be created below
+	}
+	else if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL) {
 		if (type == engine::Port::OUTPUT) {
 			// Ctrl-clicking an output creates a new cable.
 			// Keep cable NULL. Will be created below
@@ -292,7 +343,10 @@ void PortWidget::onDragStart(const DragStartEvent& e) {
 	}
 	else {
 		// Grab cable on top of stack
-		cw = APP->scene->rack->getTopCable(this);
+		if (internal->overrideCw)
+			cw = internal->overrideCw;
+		else
+			cw = APP->scene->rack->getTopCable(this);
 
 		if (cw) {
 			// history::CableRemove
@@ -311,9 +365,23 @@ void PortWidget::onDragStart(const DragStartEvent& e) {
 	}
 
 	if (!cw) {
+		// Check that inputs don't already have a cable
+		if (type == engine::Port::INPUT) {
+			CableWidget* topCw = APP->scene->rack->getTopCable(this);
+			if (topCw)
+				return;
+		}
+
 		// Create a new cable
 		cw = new CableWidget;
-		cw->setNextCableColor();
+
+		// Set color
+		if (internal->overrideColor.a > 0.f)
+			cw->color = internal->overrideColor;
+		else
+			cw->color = APP->scene->rack->getNextCableColor();
+
+		// Set port
 		if (type == engine::Port::OUTPUT)
 			cw->outputPort = this;
 		else

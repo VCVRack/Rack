@@ -24,7 +24,6 @@ struct RackWidget : widget::OpaqueWidget {
 
 	CableWidget* incompleteCable = NULL;
 	ParamWidget* touchedParam = NULL;
-	int nextCableColorId = 0;
 
 	PRIVATE RackWidget();
 	PRIVATE ~RackWidget();
@@ -120,6 +119,7 @@ struct RackWidget : widget::OpaqueWidget {
 	std::vector<CableWidget*> getCompleteCables();
 	/** Returns all cables attached to port, complete or not. */
 	std::vector<CableWidget*> getCablesOnPort(PortWidget* port);
+	NVGcolor getNextCableColor();
 };
 
 

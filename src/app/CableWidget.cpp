@@ -138,15 +138,6 @@ CableWidget::~CableWidget() {
 }
 
 
-void CableWidget::setNextCableColor() {
-	if (!settings::cableColors.empty()) {
-		int id = APP->scene->rack->nextCableColorId++;
-		APP->scene->rack->nextCableColorId %= settings::cableColors.size();
-		color = settings::cableColors[id];
-	}
-}
-
-
 bool CableWidget::isComplete() {
 	return outputPort && inputPort;
 }
