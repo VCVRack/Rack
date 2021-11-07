@@ -73,9 +73,6 @@ Methods throw `rack::Exception` if the driver API has an exception.
 struct Device {
 	std::set<Port*> subscribed;
 	virtual ~Device() {}
-	// Called by Driver::subscribe().
-	void subscribe(Port* port);
-	void unsubscribe(Port* port);
 
 	virtual std::string getName() {
 		return "";
@@ -112,6 +109,10 @@ struct Device {
 	}
 	/** Sets the block size of the device, re-opening it if needed. */
 	virtual void setBlockSize(int blockSize) {}
+
+	// Called by Driver::subscribe().
+	virtual void subscribe(Port* port);
+	virtual void unsubscribe(Port* port);
 
 	// Called by this Device class, forwards to subscribed Ports.
 	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames);
