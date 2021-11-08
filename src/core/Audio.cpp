@@ -581,6 +581,11 @@ struct AudioWidget : ModuleWidget {
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.285, 113.115)), module, TAudio::AUDIO_OUTPUTS + 0));
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(18.122, 113.115)), module, TAudio::AUDIO_OUTPUTS + 1));
 
+			Audio2Display* display = createWidget<Audio2Display>(mm2px(Vec(0.0, 13.039)));
+			display->box.size = mm2px(Vec(25.4, 47.726));
+			display->setAudioPort(module ? &module->port : NULL);
+			addChild(display);
+
 			addChild(createLightCentered<SmallSimpleLight<RedLight>>(mm2px(Vec(6.691, 28.899)), module, TAudio::VU_LIGHTS + 6 * 0 + 0));
 			addChild(createLightCentered<SmallSimpleLight<RedLight>>(mm2px(Vec(18.709, 28.899)), module, TAudio::VU_LIGHTS + 6 * 1 + 0));
 			addChild(createLightCentered<SmallSimpleLight<YellowLight>>(mm2px(Vec(6.691, 34.196)), module, TAudio::VU_LIGHTS + 6 * 0 + 1));
@@ -593,11 +598,6 @@ struct AudioWidget : ModuleWidget {
 			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(18.709, 50.089)), module, TAudio::VU_LIGHTS + 6 * 1 + 4));
 			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(6.691, 55.386)), module, TAudio::VU_LIGHTS + 6 * 0 + 5));
 			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(18.709, 55.386)), module, TAudio::VU_LIGHTS + 6 * 1 + 5));
-
-			Audio2Display* display = createWidget<Audio2Display>(mm2px(Vec(0.0, 13.039)));
-			display->box.size = mm2px(Vec(25.4, 47.726));
-			display->setAudioPort(module ? &module->port : NULL);
-			addChild(display);
 
 			// AudioButton example
 			// AudioButton* audioButton_ADAT = createWidget<AudioButton_ADAT>(Vec(0, 0));
