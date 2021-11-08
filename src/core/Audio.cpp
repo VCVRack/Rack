@@ -419,12 +419,12 @@ struct Audio2Display : LedDisplay {
 	void drawLayer(const DrawArgs& args, int layer) override {
 		if (layer == 1) {
 			static const std::vector<float> posY = {
-				mm2px(28.899),
-				mm2px(34.196),
-				mm2px(39.494),
-				mm2px(44.791),
-				mm2px(50.089),
-				mm2px(55.386),
+				mm2px(28.899 - 13.039),
+				mm2px(34.196 - 13.039),
+				mm2px(39.494 - 13.039),
+				mm2px(44.791 - 13.039),
+				mm2px(50.089 - 13.039),
+				mm2px(55.386 - 13.039),
 			};
 			static const std::vector<std::string> texts = {
 				" 0", "-3", "-6", "-12", "-24", "-36",
@@ -443,7 +443,7 @@ struct Audio2Display : LedDisplay {
 			nvgFillColor(args.vg, nvgRGB(99, 99, 99));
 
 			for (int i = 0; i < 6; i++) {
-				nvgText(args.vg, 36.0, posY[i] - box.pos.y, texts[i].c_str(), NULL);
+				nvgText(args.vg, 36.0, posY[i], texts[i].c_str(), NULL);
 			}
 			nvgRestore(args.vg);
 		}
