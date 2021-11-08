@@ -50,7 +50,9 @@ struct PortTooltip : ui::Tooltip {
 				text += string::f("% .3fV", math::normalizeZero(v));
 			}
 			// Connected to
-			for (CableWidget* cable : APP->scene->rack->getCablesOnPort(portWidget)) {
+			std::vector<CableWidget*> cables = APP->scene->rack->getCablesOnPort(portWidget);
+			for (auto it = cables.rbegin(); it != cables.rend(); it++) {
+				CableWidget* cable = *it;
 				PortWidget* otherPw = (portWidget->type == engine::Port::INPUT) ? cable->outputPort : cable->inputPort;
 				if (!otherPw)
 					continue;
