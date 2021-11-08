@@ -98,12 +98,12 @@ void RackScrollWidget::step() {
 	rackWidget->box.pos = scrollBox.pos.div(zoom).neg();
 
 	// Scroll rack if dragging certain widgets near the edge of the screen
-	math::Vec pos = APP->scene->mousePos;
+	math::Vec pos = APP->scene->mousePos - box.pos;
 	math::Rect viewport = getViewport(box.zeroPos());
 	widget::Widget* dw = APP->event->getDraggedWidget();
 	if (dw && APP->event->dragButton == GLFW_MOUSE_BUTTON_LEFT &&
 		(dynamic_cast<RackWidget*>(dw) || dynamic_cast<ModuleWidget*>(dw) || dynamic_cast<PortWidget*>(dw))) {
-		float margin = 20.0;
+		float margin = 1.0;
 		float speed = 15.0;
 		if (pos.x <= viewport.pos.x + margin)
 			offset.x -= speed;
