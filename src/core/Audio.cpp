@@ -407,7 +407,6 @@ struct Audio2Display : LedDisplay {
 
 		deviceChoice = createWidget<AudioDeviceMenuChoice>(math::Vec());
 		deviceChoice->box.size.x = box.size.x;
-		deviceChoice->box.size.y = mm2px(4.0);
 		deviceChoice->port = port;
 		addChild(deviceChoice);
 		pos = deviceChoice->box.getBottomLeft();
@@ -415,6 +414,40 @@ struct Audio2Display : LedDisplay {
 		deviceSeparator = createWidget<LedDisplaySeparator>(pos);
 		deviceSeparator->box.size.x = box.size.x;
 		addChild(deviceSeparator);
+	}
+
+	void drawLayer(const DrawArgs& args, int layer) override {
+		if (layer == 1) {
+			static const std::vector<float> posY = {
+				mm2px(28.899),
+				mm2px(34.196),
+				mm2px(39.494),
+				mm2px(44.791),
+				mm2px(50.089),
+				mm2px(55.386),
+			};
+			static const std::vector<std::string> texts = {
+				" 0", "-3", "-6", "-12", "-24", "-36",
+			};
+
+			std::string fontPath = asset::system("res/fonts/Nunito-Bold.ttf");
+			std::shared_ptr<Font> font = APP->window->loadFont(fontPath);
+			if (!font)
+				return;
+
+			nvgSave(args.vg);
+			nvgFontFaceId(args.vg, font->handle);
+			nvgFontSize(args.vg, 11);
+			nvgTextLetterSpacing(args.vg, 0.0);
+			nvgTextAlign(args.vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+			nvgFillColor(args.vg, nvgRGB(99, 99, 99));
+
+			for (int i = 0; i < 6; i++) {
+				nvgText(args.vg, 36.0, posY[i] - box.pos.y, texts[i].c_str(), NULL);
+			}
+			nvgRestore(args.vg);
+		}
+		LedDisplay::drawLayer(args, layer);
 	}
 };
 
@@ -564,8 +597,6 @@ struct AudioWidget : ModuleWidget {
 			Audio2Display* display = createWidget<Audio2Display>(mm2px(Vec(0.0, 13.039)));
 			display->box.size = mm2px(Vec(25.4, 47.726));
 			display->setAudioPort(module ? &module->port : NULL);
-			// Adjust deviceChoice position
-			display->deviceChoice->textOffset = Vec(6, 14);
 			addChild(display);
 
 			// AudioButton example
