@@ -490,10 +490,10 @@ struct MIDI_CVWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.591, 112.975)), module, MIDI_CV::STOP_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 113.115)), module, MIDI_CV::CONTINUE_OUTPUT));
 
-		MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(0.0, 13.048)));
-		midiWidget->box.size = mm2px(Vec(40.64, 29.012));
-		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
-		addChild(midiWidget);
+		MidiDisplay* display = createWidget<MidiDisplay>(mm2px(Vec(0.0, 13.048)));
+		display->box.size = mm2px(Vec(40.64, 29.012));
+		display->setMidiPort(module ? &module->midiInput : NULL);
+		addChild(display);
 
 		// MidiButton example
 		// MidiButton* midiButton = createWidget<MidiButton_MIDI_DIN>(Vec(0, 0));

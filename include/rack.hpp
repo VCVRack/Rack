@@ -68,9 +68,9 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 
 #include <app/SliderKnob.hpp>
 #include <app/MultiLightWidget.hpp>
-#include <app/MidiWidget.hpp>
+#include <app/MidiDisplay.hpp>
 #include <app/CircularShadow.hpp>
-#include <app/AudioWidget.hpp>
+#include <app/AudioDisplay.hpp>
 #include <app/LedDisplay.hpp>
 #include <app/ModuleLightWidget.hpp>
 #include <app/LightWidget.hpp>

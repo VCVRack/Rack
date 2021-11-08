@@ -1,4 +1,4 @@
-#include <app/MidiWidget.hpp>
+#include <app/MidiDisplay.hpp>
 #include <ui/MenuSeparator.hpp>
 #include <helpers.hpp>
 
@@ -29,24 +29,22 @@ static void appendMidiDriverMenu(ui::Menu* menu, midi::Port* port) {
 	}
 }
 
-struct MidiDriverChoice : LedDisplayChoice {
-	midi::Port* port;
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->addChild(createMenuLabel("MIDI driver"));
-		appendMidiDriverMenu(menu, port);
+void MidiDriverChoice::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->addChild(createMenuLabel("MIDI driver"));
+	appendMidiDriverMenu(menu, port);
+}
+
+void MidiDriverChoice::step() {
+	text = (port && port->driver) ? port->getDriver()->getName() : "";
+	if (text.empty()) {
+		text = "(No driver)";
+		color.a = 0.5f;
 	}
-	void step() override {
-		text = (port && port->driver) ? port->getDriver()->getName() : "";
-		if (text.empty()) {
-			text = "(No driver)";
-			color.a = 0.5f;
-		}
-		else {
-			color.a = 1.f;
-		}
+	else {
+		color.a = 1.f;
 	}
-};
+}
 
 struct MidiDriverItem : ui::MenuItem {
 	midi::Port* port;
@@ -89,24 +87,22 @@ static void appendMidiDeviceMenu(ui::Menu* menu, midi::Port* port) {
 	}
 }
 
-struct MidiDeviceChoice : LedDisplayChoice {
-	midi::Port* port;
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->addChild(createMenuLabel("MIDI device"));
-		appendMidiDeviceMenu(menu, port);
+void MidiDeviceChoice::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->addChild(createMenuLabel("MIDI device"));
+	appendMidiDeviceMenu(menu, port);
+}
+
+void MidiDeviceChoice::step() {
+	text = (port && port->device) ? port->getDevice()->getName() : "";
+	if (text.empty()) {
+		text = "(No device)";
+		color.a = 0.5f;
 	}
-	void step() override {
-		text = (port && port->device) ? port->getDevice()->getName() : "";
-		if (text.empty()) {
-			text = "(No device)";
-			color.a = 0.5f;
-		}
-		else {
-			color.a = 1.f;
-		}
+	else {
+		color.a = 1.f;
 	}
-};
+}
 
 struct MidiDeviceItem : ui::MenuItem {
 	midi::Port* port;
@@ -140,17 +136,15 @@ static void appendMidiChannelMenu(ui::Menu* menu, midi::Port* port) {
 	}
 }
 
-struct MidiChannelChoice : LedDisplayChoice {
-	midi::Port* port;
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->addChild(createMenuLabel("MIDI channel"));
-		appendMidiChannelMenu(menu, port);
-	}
-	void step() override {
-		text = port ? port->getChannelName(port->getChannel()) : "Channel 1";
-	}
-};
+void MidiChannelChoice::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->addChild(createMenuLabel("MIDI channel"));
+	appendMidiChannelMenu(menu, port);
+}
+
+void MidiChannelChoice::step() {
+	text = port ? port->getChannelName(port->getChannel()) : "Channel 1";
+}
 
 struct MidiChannelItem : ui::MenuItem {
 	midi::Port* port;
@@ -162,7 +156,7 @@ struct MidiChannelItem : ui::MenuItem {
 };
 
 
-void MidiWidget::setMidiPort(midi::Port* port) {
+void MidiDisplay::setMidiPort(midi::Port* port) {
 	clearChildren();
 
 	math::Vec pos;

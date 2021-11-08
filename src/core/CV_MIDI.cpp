@@ -169,10 +169,10 @@ struct CV_MIDIWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.591, 112.975)), module, CV_MIDI::CONTINUE_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.249, 113.115)), module, CV_MIDI::STOP_INPUT));
 
-		MidiWidget* midiWidget = createWidget<MidiWidget>(mm2px(Vec(0.0, 13.039)));
-		midiWidget->box.size = mm2px(Vec(40.64, 29.021));
-		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
-		addChild(midiWidget);
+		MidiDisplay* display = createWidget<MidiDisplay>(mm2px(Vec(0.0, 13.039)));
+		display->box.size = mm2px(Vec(40.64, 29.021));
+		display->setMidiPort(module ? &module->midiOutput : NULL);
+		addChild(display);
 	}
 
 	void appendContextMenu(Menu* menu) override {

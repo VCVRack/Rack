@@ -206,12 +206,12 @@ struct MIDI_GateWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(31.289, 112.984)), module, MIDI_Gate::GATE_OUTPUTS + 14));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.838, 112.984)), module, MIDI_Gate::GATE_OUTPUTS + 15));
 
-		typedef Grid16MidiWidget<NoteChoice<MIDI_Gate>> TMidiWidget;
-		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(0.0, 13.039)));
-		midiWidget->box.size = mm2px(Vec(50.8, 55.88));
-		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
-		midiWidget->setModule(module);
-		addChild(midiWidget);
+		typedef Grid16MidiDisplay<NoteChoice<MIDI_Gate>> TMidiDisplay;
+		TMidiDisplay* display = createWidget<TMidiDisplay>(mm2px(Vec(0.0, 13.039)));
+		display->box.size = mm2px(Vec(50.8, 55.88));
+		display->setMidiPort(module ? &module->midiInput : NULL);
+		display->setModule(module);
+		addChild(display);
 	}
 
 	void appendContextMenu(Menu* menu) override {

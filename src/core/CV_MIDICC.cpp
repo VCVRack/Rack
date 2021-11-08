@@ -149,12 +149,12 @@ struct CV_MIDICCWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(31.289, 112.984)), module, CV_MIDICC::CC_INPUTS + 14));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(42.838, 112.984)), module, CV_MIDICC::CC_INPUTS + 15));
 
-		typedef Grid16MidiWidget<CcChoice<CV_MIDICC>> TMidiWidget;
-		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(0.0, 13.039)));
-		midiWidget->box.size = mm2px(Vec(50.8, 55.88));
-		midiWidget->setMidiPort(module ? &module->midiOutput : NULL);
-		midiWidget->setModule(module);
-		addChild(midiWidget);
+		typedef Grid16MidiDisplay<CcChoice<CV_MIDICC>> TMidiDisplay;
+		TMidiDisplay* display = createWidget<TMidiDisplay>(mm2px(Vec(0.0, 13.039)));
+		display->box.size = mm2px(Vec(50.8, 55.88));
+		display->setMidiPort(module ? &module->midiOutput : NULL);
+		display->setModule(module);
+		addChild(display);
 	}
 };
 

@@ -20,7 +20,7 @@ extern Model* modelNotes;
 
 
 template <class TChoice>
-struct Grid16MidiWidget : MidiWidget {
+struct Grid16MidiDisplay : MidiDisplay {
 	LedDisplaySeparator* hSeparators[4];
 	LedDisplaySeparator* vSeparators[4];
 	TChoice* choices[4][4];

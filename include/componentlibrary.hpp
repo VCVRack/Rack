@@ -7,8 +7,8 @@
 #include <app/ModuleLightWidget.hpp>
 #include <app/SvgSwitch.hpp>
 #include <app/SvgScrew.hpp>
-#include <app/AudioWidget.hpp>
-#include <app/MidiWidget.hpp>
+#include <app/AudioDisplay.hpp>
+#include <app/MidiDisplay.hpp>
 #include <asset.hpp>
 
 

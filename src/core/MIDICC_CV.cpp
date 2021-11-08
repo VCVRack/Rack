@@ -238,12 +238,12 @@ struct MIDICC_CVWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(31.289, 112.984)), module, MIDICC_CV::CC_OUTPUT + 14));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.839, 112.984)), module, MIDICC_CV::CC_OUTPUT + 15));
 
-		typedef Grid16MidiWidget<CcChoice<MIDICC_CV>> TMidiWidget;
-		TMidiWidget* midiWidget = createWidget<TMidiWidget>(mm2px(Vec(0.0, 13.039)));
-		midiWidget->box.size = mm2px(Vec(50.8, 55.88));
-		midiWidget->setMidiPort(module ? &module->midiInput : NULL);
-		midiWidget->setModule(module);
-		addChild(midiWidget);
+		typedef Grid16MidiDisplay<CcChoice<MIDICC_CV>> TMidiDisplay;
+		TMidiDisplay* display = createWidget<TMidiDisplay>(mm2px(Vec(0.0, 13.039)));
+		display->box.size = mm2px(Vec(50.8, 55.88));
+		display->setMidiPort(module ? &module->midiInput : NULL);
+		display->setModule(module);
+		addChild(display);
 	}
 
 	void appendContextMenu(Menu* menu) override {

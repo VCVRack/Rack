@@ -10,12 +10,33 @@ namespace rack {
 namespace app {
 
 
-struct MidiWidget : LedDisplay {
-	LedDisplayChoice* driverChoice;
+struct MidiDriverChoice : LedDisplayChoice {
+	midi::Port* port;
+	void onAction(const ActionEvent& e) override;
+	void step() override;
+};
+
+
+struct MidiDeviceChoice : LedDisplayChoice {
+	midi::Port* port;
+	void onAction(const ActionEvent& e) override;
+	void step() override;
+};
+
+
+struct MidiChannelChoice : LedDisplayChoice {
+	midi::Port* port;
+	void onAction(const ActionEvent& e) override;
+	void step() override;
+};
+
+
+struct MidiDisplay : LedDisplay {
+	MidiDriverChoice* driverChoice;
 	LedDisplaySeparator* driverSeparator;
-	LedDisplayChoice* deviceChoice;
+	MidiDeviceChoice* deviceChoice;
 	LedDisplaySeparator* deviceSeparator;
-	LedDisplayChoice* channelChoice;
+	MidiChannelChoice* channelChoice;
 	void setMidiPort(midi::Port* port);
 };
 
@@ -29,7 +50,7 @@ struct MidiButton : SvgButton {
 
 
 /** Appends menu items to the given menu with driver, device, etc.
-Useful alternative to putting a MidiWidget on your module's panel.
+Useful alternative to putting a MidiDisplay on your module's panel.
 */
 void appendMidiMenu(ui::Menu* menu, midi::Port* port);
 

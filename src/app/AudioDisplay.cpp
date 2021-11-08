@@ -1,4 +1,4 @@
-#include <app/AudioWidget.hpp>
+#include <app/AudioDisplay.hpp>
 #include <ui/MenuSeparator.hpp>
 #include <helpers.hpp>
 #include <set>
@@ -47,29 +47,27 @@ static void appendAudioDriverMenu(ui::Menu* menu, audio::Port* port) {
 	}
 }
 
-struct AudioDriverChoice : LedDisplayChoice {
-	audio::Port* port;
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->addChild(createMenuLabel("Audio driver"));
-		appendAudioDriverMenu(menu, port);
+void AudioDriverChoice::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->addChild(createMenuLabel("Audio driver"));
+	appendAudioDriverMenu(menu, port);
+}
+
+void AudioDriverChoice::step() {
+	text = "";
+	if (box.size.x >= 200.0)
+		text += "Driver: ";
+	audio::Driver* driver = port ? port->getDriver() : NULL;
+	std::string driverName = driver ? driver->getName() : "";
+	if (driverName != "") {
+		text += driverName;
+		color.a = 1.0;
 	}
-	void step() override {
-		text = "";
-		if (box.size.x >= 200.0)
-			text += "Driver: ";
-		audio::Driver* driver = port ? port->getDriver() : NULL;
-		std::string driverName = driver ? driver->getName() : "";
-		if (driverName != "") {
-			text += driverName;
-			color.a = 1.0;
-		}
-		else {
-			text += "(No driver)";
-			color.a = 0.5;
-		}
+	else {
+		text += "(No driver)";
+		color.a = 0.5;
 	}
-};
+}
 
 struct AudioDriverItem : ui::MenuItem {
 	audio::Port* port;
@@ -132,35 +130,32 @@ static void appendAudioDeviceMenu(ui::Menu* menu, audio::Port* port) {
 	}
 }
 
-struct AudioDeviceChoice : LedDisplayChoice {
-	audio::Port* port;
+void AudioDeviceChoice::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->addChild(createMenuLabel("Audio device"));
+	appendAudioDeviceMenu(menu, port);
+}
 
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->addChild(createMenuLabel("Audio device"));
-		appendAudioDeviceMenu(menu, port);
-	}
-	void step() override {
-		text = "";
-		if (box.size.x >= 200.0)
-			text += "Device: ";
-		std::string detail = "";
-		if (port && port->getDevice())
-			detail = getDetailTemplate(port->getDevice()->getName(), port->getNumInputs(), port->inputOffset, port->getNumOutputs(), port->outputOffset);
+void AudioDeviceChoice::step() {
+	text = "";
+	if (box.size.x >= 200.0)
+		text += "Device: ";
+	std::string detail = "";
+	if (port && port->getDevice())
+		detail = getDetailTemplate(port->getDevice()->getName(), port->getNumInputs(), port->inputOffset, port->getNumOutputs(), port->outputOffset);
 
-		if (detail != "") {
-			text += detail;
-			color.a = 1.0;
-		}
-		else {
-			if (box.size.x >= 80.0)
-				text += "(No device)";
-			else
-				text += "No device";
-			color.a = 0.5;
-		}
+	if (detail != "") {
+		text += detail;
+		color.a = 1.0;
 	}
-};
+	else {
+		if (box.size.x >= 80.0)
+			text += "(No device)";
+		else
+			text += "No device";
+		color.a = 0.5;
+	}
+}
 
 struct AudioDeviceItem : ui::MenuItem {
 	audio::Port* port;
@@ -203,29 +198,27 @@ static void appendAudioSampleRateMenu(ui::Menu* menu, audio::Port* port) {
 	}
 }
 
-struct AudioSampleRateChoice : LedDisplayChoice {
-	audio::Port* port;
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->addChild(createMenuLabel("Sample rate"));
-		appendAudioSampleRateMenu(menu, port);
+void AudioSampleRateChoice::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->addChild(createMenuLabel("Sample rate"));
+	appendAudioSampleRateMenu(menu, port);
+}
+
+void AudioSampleRateChoice::step() {
+	text = "";
+	if (box.size.x >= 100.0)
+		text += "Rate: ";
+	float sampleRate = port ? port->getSampleRate() : 0;
+	if (sampleRate > 0) {
+		text += string::f("%g", sampleRate / 1000.f);
+		color.a = 1.0;
 	}
-	void step() override {
-		text = "";
-		if (box.size.x >= 100.0)
-			text += "Rate: ";
-		float sampleRate = port ? port->getSampleRate() : 0;
-		if (sampleRate > 0) {
-			text += string::f("%g", sampleRate / 1000.f);
-			color.a = 1.0;
-		}
-		else {
-			text += "---";
-			color.a = 0.5;
-		}
-		text += " kHz";
+	else {
+		text += "---";
+		color.a = 0.5;
 	}
-};
+	text += " kHz";
+}
 
 struct AudioSampleRateItem : ui::MenuItem {
 	audio::Port* port;
@@ -269,28 +262,26 @@ static void appendAudioBlockSizeMenu(ui::Menu* menu, audio::Port* port) {
 	}
 }
 
-struct AudioBlockSizeChoice : LedDisplayChoice {
-	audio::Port* port;
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		menu->addChild(createMenuLabel("Block size"));
-		appendAudioBlockSizeMenu(menu, port);
+void AudioBlockSizeChoice::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	menu->addChild(createMenuLabel("Block size"));
+	appendAudioBlockSizeMenu(menu, port);
+}
+
+void AudioBlockSizeChoice::step() {
+	text = "";
+	if (box.size.x >= 100.0)
+		text += "Block size: ";
+	int blockSize = port ? port->getBlockSize() : 0;
+	if (blockSize > 0) {
+		text += string::f("%d", blockSize);
+		color.a = 1.0;
 	}
-	void step() override {
-		text = "";
-		if (box.size.x >= 100.0)
-			text += "Block size: ";
-		int blockSize = port ? port->getBlockSize() : 0;
-		if (blockSize > 0) {
-			text += string::f("%d", blockSize);
-			color.a = 1.0;
-		}
-		else {
-			text += "---";
-			color.a = 0.5;
-		}
+	else {
+		text += "---";
+		color.a = 0.5;
 	}
-};
+}
 
 struct AudioBlockSizeItem : ui::MenuItem {
 	audio::Port* port;
@@ -302,7 +293,7 @@ struct AudioBlockSizeItem : ui::MenuItem {
 };
 
 
-void AudioWidget::setAudioPort(audio::Port* port) {
+void AudioDisplay::setAudioPort(audio::Port* port) {
 	clearChildren();
 
 	math::Vec pos;
@@ -349,21 +340,9 @@ void AudioWidget::setAudioPort(audio::Port* port) {
 }
 
 
-struct AudioDeviceMenuChoice : AudioDeviceChoice {
-	void onAction(const ActionEvent& e) override {
-		ui::Menu* menu = createMenu();
-		appendAudioMenu(menu, port);
-	}
-};
-
-
-void AudioDeviceWidget::setAudioPort(audio::Port* port) {
-	AudioDeviceMenuChoice* deviceChoice = createWidget<AudioDeviceMenuChoice>(math::Vec());
-	deviceChoice->box.size.x = box.size.x;
-	deviceChoice->box.size.y = box.size.y;
-	deviceChoice->port = port;
-	addChild(deviceChoice);
-	this->deviceChoice = deviceChoice;
+void AudioDeviceMenuChoice::onAction(const ActionEvent& e) {
+	ui::Menu* menu = createMenu();
+	appendAudioMenu(menu, port);
 }
 
 

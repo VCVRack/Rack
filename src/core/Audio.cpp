@@ -397,6 +397,28 @@ struct Audio : Module {
 };
 
 
+/** For Audio-2 module. */
+struct Audio2Display : LedDisplay {
+	AudioDeviceMenuChoice* deviceChoice;
+	LedDisplaySeparator* deviceSeparator;
+
+	void setAudioPort(audio::Port* port) {
+		math::Vec pos;
+
+		deviceChoice = createWidget<AudioDeviceMenuChoice>(math::Vec());
+		deviceChoice->box.size.x = box.size.x;
+		deviceChoice->box.size.y = mm2px(4.0);
+		deviceChoice->port = port;
+		addChild(deviceChoice);
+		pos = deviceChoice->box.getBottomLeft();
+
+		deviceSeparator = createWidget<LedDisplaySeparator>(pos);
+		deviceSeparator->box.size.x = box.size.x;
+		addChild(deviceSeparator);
+	}
+};
+
+
 template <int NUM_AUDIO_INPUTS, int NUM_AUDIO_OUTPUTS>
 struct AudioWidget : ModuleWidget {
 	typedef Audio<NUM_AUDIO_INPUTS, NUM_AUDIO_OUTPUTS> TAudio;
@@ -440,10 +462,10 @@ struct AudioWidget : ModuleWidget {
 			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(13.54, 107.097)), module, TAudio::OUTPUT_LIGHTS + 2 * 2));
 			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(36.638, 107.097)), module, TAudio::OUTPUT_LIGHTS + 2 * 3));
 
-			app::AudioWidget* audioWidget = createWidget<app::AudioWidget>(mm2px(Vec(0.0, 13.039)));
-			audioWidget->box.size = mm2px(Vec(50.8, 29.021));
-			audioWidget->setAudioPort(module ? &module->port : NULL);
-			addChild(audioWidget);
+			AudioDisplay* display = createWidget<AudioDisplay>(mm2px(Vec(0.0, 13.039)));
+			display->box.size = mm2px(Vec(50.8, 29.021));
+			display->setAudioPort(module ? &module->port : NULL);
+			addChild(display);
 		}
 		else if (NUM_AUDIO_INPUTS == 16 && NUM_AUDIO_OUTPUTS == 16) {
 			setPanel(Svg::load(asset::system("res/Core/Audio16.svg")));
@@ -505,10 +527,10 @@ struct AudioWidget : ModuleWidget {
 			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(59.745, 107.097)), module, TAudio::OUTPUT_LIGHTS + 2 * 6));
 			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(82.844, 107.097)), module, TAudio::OUTPUT_LIGHTS + 2 * 7));
 
-			app::AudioWidget* audioWidget = createWidget<app::AudioWidget>(mm2px(Vec(0.0, 13.039)));
-			audioWidget->box.size = mm2px(Vec(96.52, 29.021));
-			audioWidget->setAudioPort(module ? &module->port : NULL);
-			addChild(audioWidget);
+			AudioDisplay* display = createWidget<AudioDisplay>(mm2px(Vec(0.0, 13.039)));
+			display->box.size = mm2px(Vec(96.52, 29.021));
+			display->setAudioPort(module ? &module->port : NULL);
+			addChild(display);
 		}
 		else if (NUM_AUDIO_INPUTS == 2 && NUM_AUDIO_OUTPUTS == 2) {
 			setPanel(Svg::load(asset::system("res/Core/Audio2.svg")));
@@ -539,12 +561,12 @@ struct AudioWidget : ModuleWidget {
 			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(6.691, 55.386)), module, TAudio::VU_LIGHTS + 6 * 0 + 5));
 			addChild(createLightCentered<SmallSimpleLight<GreenLight>>(mm2px(Vec(18.709, 55.386)), module, TAudio::VU_LIGHTS + 6 * 1 + 5));
 
-			app::AudioDeviceWidget* audioWidget = createWidget<app::AudioDeviceWidget>(mm2px(Vec(0.0, 13.039)));
-			audioWidget->box.size = mm2px(Vec(25.4, 47.726));
-			audioWidget->setAudioPort(module ? &module->port : NULL);
+			Audio2Display* display = createWidget<Audio2Display>(mm2px(Vec(0.0, 13.039)));
+			display->box.size = mm2px(Vec(25.4, 47.726));
+			display->setAudioPort(module ? &module->port : NULL);
 			// Adjust deviceChoice position
-			audioWidget->deviceChoice->textOffset = Vec(6, 14);
-			addChild(audioWidget);
+			display->deviceChoice->textOffset = Vec(6, 14);
+			addChild(display);
 
 			// AudioButton example
 			// AudioButton* audioButton_ADAT = createWidget<AudioButton_ADAT>(Vec(0, 0));
