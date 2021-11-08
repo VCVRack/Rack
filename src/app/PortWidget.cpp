@@ -297,7 +297,7 @@ void PortWidget::step() {
 
 
 void PortWidget::draw(const DrawArgs& args) {
-	CableWidget* cw = APP->scene->rack->incompleteCable;
+	CableWidget* cw = APP->scene->rack->getIncompleteCable();
 	if (cw) {
 		// Dim the PortWidget if the active cable cannot plug into this PortWidget
 		if (type == engine::Port::OUTPUT ? cw->outputPort : cw->inputPort) {
@@ -461,7 +461,7 @@ void PortWidget::onDragDrop(const DragDropEvent& e) {
 			return;
 	}
 
-	CableWidget* cw = APP->scene->rack->incompleteCable;
+	CableWidget* cw = APP->scene->rack->getIncompleteCable();
 	if (cw) {
 		cw->hoveredOutputPort = cw->hoveredInputPort = NULL;
 		if (type == engine::Port::OUTPUT)
@@ -488,7 +488,7 @@ void PortWidget::onDragEnter(const DragEnterEvent& e) {
 			return;
 	}
 
-	CableWidget* cw = APP->scene->rack->incompleteCable;
+	CableWidget* cw = APP->scene->rack->getIncompleteCable();
 	if (cw) {
 		if (type == engine::Port::OUTPUT)
 			cw->hoveredOutputPort = this;
@@ -508,7 +508,7 @@ void PortWidget::onDragLeave(const DragLeaveEvent& e) {
 	if (!originPort)
 		return;
 
-	CableWidget* cw = APP->scene->rack->incompleteCable;
+	CableWidget* cw = APP->scene->rack->getIncompleteCable();
 	if (cw) {
 		if (type == engine::Port::OUTPUT)
 			cw->hoveredOutputPort = NULL;

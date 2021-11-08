@@ -22,7 +22,6 @@ struct RackWidget : widget::OpaqueWidget {
 	struct Internal;
 	Internal* internal;
 
-	CableWidget* incompleteCable = NULL;
 	ParamWidget* touchedParam = NULL;
 
 	PRIVATE RackWidget();
@@ -110,6 +109,7 @@ struct RackWidget : widget::OpaqueWidget {
 	/** Removes cable and releases ownership to caller.
 	*/
 	void removeCable(CableWidget* cw);
+	CableWidget* getIncompleteCable();
 	/** Takes ownership of `cw` and adds it as a child if it isn't already. */
 	void setIncompleteCable(CableWidget* cw);
 	CableWidget* releaseIncompleteCable();

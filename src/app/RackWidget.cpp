@@ -23,6 +23,22 @@ namespace rack {
 namespace app {
 
 
+struct RackWidget::Internal {
+	RailWidget* rail = NULL;
+	widget::Widget* moduleContainer = NULL;
+	widget::Widget* cableContainer = NULL;
+	CableWidget* incompleteCable = NULL;
+	int nextCableColorId = 0;
+	/** The last mouse position in the RackWidget */
+	math::Vec mousePos;
+
+	bool selecting = false;
+	math::Vec selectionStart;
+	math::Vec selectionEnd;
+	std::set<ModuleWidget*> selectedModules;
+};
+
+
 /** Creates a new Module and ModuleWidget */
 static ModuleWidget* moduleWidgetFromJson(json_t* moduleJ) {
 	plugin::Model* model = plugin::modelFromJson(moduleJ);
@@ -78,21 +94,6 @@ struct CableContainer : widget::TransparentWidget {
 			Widget::drawLayer(args, 3);
 		}
 	}
-};
-
-
-struct RackWidget::Internal {
-	RailWidget* rail = NULL;
-	widget::Widget* moduleContainer = NULL;
-	widget::Widget* cableContainer = NULL;
-	int nextCableColorId = 0;
-	/** The last mouse position in the RackWidget */
-	math::Vec mousePos;
-
-	bool selecting = false;
-	math::Vec selectionStart;
-	math::Vec selectionEnd;
-	std::set<ModuleWidget*> selectedModules;
 };
 
 
@@ -1275,7 +1276,7 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 }
 
 void RackWidget::clearCables() {
-	incompleteCable = NULL;
+	internal->incompleteCable = NULL;
 	internal->cableContainer->clearChildren();
 }
 
@@ -1302,8 +1303,8 @@ void RackWidget::clearCablesAction() {
 void RackWidget::clearCablesOnPort(PortWidget* port) {
 	for (CableWidget* cw : getCablesOnPort(port)) {
 		// Check if cable is connected to port
-		if (cw == incompleteCable) {
-			incompleteCable = NULL;
+		if (cw == internal->incompleteCable) {
+			internal->incompleteCable = NULL;
 			internal->cableContainer->removeChild(cw);
 		}
 		else {
@@ -1323,25 +1324,29 @@ void RackWidget::removeCable(CableWidget* cw) {
 	internal->cableContainer->removeChild(cw);
 }
 
+CableWidget* RackWidget::getIncompleteCable() {
+	return internal->incompleteCable;
+}
+
 void RackWidget::setIncompleteCable(CableWidget* cw) {
-	if (incompleteCable) {
-		internal->cableContainer->removeChild(incompleteCable);
-		delete incompleteCable;
-		incompleteCable = NULL;
+	if (internal->incompleteCable) {
+		internal->cableContainer->removeChild(internal->incompleteCable);
+		delete internal->incompleteCable;
+		internal->incompleteCable = NULL;
 	}
 	if (cw) {
 		internal->cableContainer->addChild(cw);
-		incompleteCable = cw;
+		internal->incompleteCable = cw;
 	}
 }
 
 CableWidget* RackWidget::releaseIncompleteCable() {
-	if (!incompleteCable)
+	if (!internal->incompleteCable)
 		return NULL;
 
-	CableWidget* cw = incompleteCable;
-	internal->cableContainer->removeChild(incompleteCable);
-	incompleteCable = NULL;
+	CableWidget* cw = internal->incompleteCable;
+	internal->cableContainer->removeChild(internal->incompleteCable);
+	internal->incompleteCable = NULL;
 	return cw;
 }
 
@@ -1402,7 +1407,6 @@ NVGcolor RackWidget::getNextCableColor() {
 	internal->nextCableColorId %= settings::cableColors.size();
 	return settings::cableColors[id];
 }
-
 
 
 } // namespace app
