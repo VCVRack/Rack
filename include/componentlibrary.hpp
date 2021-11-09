@@ -671,8 +671,8 @@ struct BefacoTinyKnob : app::SvgKnob {
 	widget::SvgWidget* bg;
 
 	BefacoTinyKnob() {
-		minAngle = -0.75 * M_PI;
-		maxAngle = 0.75 * M_PI;
+		minAngle = -0.8 * M_PI;
+		maxAngle = 0.8 * M_PI;
 
 		bg = new widget::SvgWidget;
 		fb->addChildBelow(bg, tw);
