@@ -643,16 +643,16 @@ struct Trimpot : app::SvgKnob {
 };
 
 struct BefacoBigKnob : app::SvgKnob {
+	widget::SvgWidget* bg;
+
 	BefacoBigKnob() {
 		minAngle = -0.75 * M_PI;
 		maxAngle = 0.75 * M_PI;
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/BefacoBigKnob.svg")));
-	}
-};
 
-struct BefacoBigSnapKnob : BefacoBigKnob {
-	BefacoBigSnapKnob() {
-		snap = true;
+		bg = new widget::SvgWidget;
+		fb->addChildBelow(bg, tw);
+		bg->setSvg(Svg::load(asset::system("res/ComponentLibrary/BefacoBigKnob-bg.svg")));
 	}
 };
 
