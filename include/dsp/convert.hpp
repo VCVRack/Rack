@@ -24,10 +24,14 @@ static_assert(sizeof(Int24) == 3, "Int24 type must be 3 bytes");
 
 
 /** Converts between normalized types.
-Default implementation is the default cast.
 */
 template <typename To, typename From>
-To convert(From x) {return x;}
+To convert(From x) = delete;
+
+
+/** Trivial conversions */
+template <>
+inline float convert(float x) {return x;}
 
 
 /** Integer to float */
