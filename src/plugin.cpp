@@ -54,9 +54,11 @@ static void* loadLibrary(std::string libraryPath) {
 #else
 	// Since Rack 2, plugins on Linux/Mac link to the absolute path /tmp/Rack2/libRack.<ext>
 	// Create a symlink at /tmp/Rack2 to the system dir containting libRack.
+	std::string systemDir = system::getAbsolute(asset::systemDir);
+	std::string linkPath = "/tmp/Rack2";
 	if (!settings::devMode) {
-		std::string systemDir = system::getAbsolute(asset::systemDir);
-		std::string linkPath = "/tmp/Rack2";
+		// Clean up old symbolic link in case a different edition was run earlier
+		system::remove(linkPath);
 		system::createSymbolicLink(systemDir, linkPath);
 	}
 	// Load library with dlopen
