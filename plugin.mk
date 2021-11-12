@@ -67,10 +67,14 @@ dist: all
 	cp $(TARGET) dist/$(SLUG)/
 ifdef ARCH_MAC
 	$(STRIP) -S dist/$(SLUG)/$(TARGET)
-	$(INSTALL_NAME_TOOL) -change libRack.dylib @rpath/libRack.dylib dist/$(SLUG)/$(TARGET)
-	$(INSTALL_NAME_TOOL) -add_rpath . dist/$(SLUG)/$(TARGET)
+	$(INSTALL_NAME_TOOL) -change libRack.dylib /tmp/Rack2/libRack.dylib dist/$(SLUG)/$(TARGET)
 	$(OTOOL) -L dist/$(SLUG)/$(TARGET)
-else
+endif
+ifdef ARCH_LIN
+	$(STRIP) -s dist/$(SLUG)/$(TARGET)
+	# TODO Change libRack.so path to /tmp/Rack2/libRack.dylib
+endif
+ifdef ARCH_WIN
 	$(STRIP) -s dist/$(SLUG)/$(TARGET)
 endif
 	@# Copy distributables

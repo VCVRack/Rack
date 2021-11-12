@@ -165,6 +165,17 @@ bool createDirectories(const std::string& path) {
 }
 
 
+bool createSymbolicLink(const std::string& target, const std::string& link) {
+	try {
+		fs::create_symlink(fs::u8path(target), fs::u8path(link));
+		return true;
+	}
+	catch (fs::filesystem_error& e) {
+		return false;
+	}
+}
+
+
 bool remove(const std::string& path) {
 	try {
 		return fs::remove(fs::u8path(path));

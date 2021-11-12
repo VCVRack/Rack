@@ -49,6 +49,7 @@ bool createDirectory(const std::string& path);
 Returns whether the creation was successful.
 */
 bool createDirectories(const std::string& path);
+bool createSymbolicLink(const std::string& target, const std::string& link);
 /** Deletes a file or empty directory.
 Returns whether the deletion was successful.
 */

@@ -52,11 +52,13 @@ static void* loadLibrary(std::string libraryPath) {
 		throw Exception("Failed to load library %s: code %d", libraryPath.c_str(), error);
 	}
 #else
-	// As of Rack v2.0, plugins are linked with `-rpath=.` so change current directory so it can find libRack.
-	std::string cwd = system::getWorkingDirectory();
-	system::setWorkingDirectory(asset::systemDir);
-	// Change it back when we're finished
-	DEFER({system::setWorkingDirectory(cwd);});
+	// Since Rack 2, plugins on Linux/Mac link to the absolute path /tmp/Rack2/libRack.<ext>
+	// Create a symlink at /tmp/Rack2 to the system dir containting libRack.
+	if (!settings::devMode) {
+		std::string systemDir = system::getAbsolute(asset::systemDir);
+		std::string linkPath = "/tmp/Rack2";
+		system::createSymbolicLink(systemDir, linkPath);
+	}
 	// Load library with dlopen
 	void* handle = NULL;
 	#if defined ARCH_LIN
