@@ -70,7 +70,8 @@ void init() {
 
 void destroy() {
 	curl_global_cleanup();
-	OPENSSL_cleanup();
+	// Don't destroy OpenSSL because it's not designed to be reinitialized.
+	// OPENSSL_cleanup();
 }
 
 

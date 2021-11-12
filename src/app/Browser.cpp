@@ -41,12 +41,10 @@ namespace browser {
 
 
 static fuzzysearch::Database<plugin::Model*> modelDb;
-static bool modelDbInitialized = false;
 
 
-static void fuzzySearchInit() {
-	if (modelDbInitialized)
-		return;
+static void modelDbInit() {
+	modelDb = fuzzysearch::Database<plugin::Model*>();
 	modelDb.setWeights({1.f, 1.f, 0.1f, 1.f, 0.5f, 0.5f});
 	modelDb.setThreshold(0.25f);
 
@@ -75,8 +73,6 @@ static void fuzzySearchInit() {
 			modelDb.addEntry(model, fields);
 		}
 	}
-
-	modelDbInitialized = true;
 }
 
 
@@ -731,8 +727,6 @@ struct Browser : widget::OpaqueWidget {
 			}
 		}
 		else {
-			// Lazily initialize search database
-			fuzzySearchInit();
 			// Score results against search query
 			auto results = modelDb.search(search);
 			// DEBUG("=============");
@@ -1011,6 +1005,12 @@ inline void ZoomButton::onAction(const ActionEvent& e) {
 
 
 } // namespace browser
+
+
+
+void browserInit() {
+	browser::modelDbInit();
+}
 
 
 widget::Widget* browserCreate() {

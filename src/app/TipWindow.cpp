@@ -32,7 +32,7 @@ struct TipInfo {
 
 
 // Remember to use “smart quotes.”
-static std::vector<TipInfo> tipInfos = {
+static const std::vector<TipInfo> tipInfos = {
 	{"To add a module to your patch, right-click an empty rack space or press Enter. Click and drag a module from the Module Browser into the desired rack space.\n\nYou can force-move modules by holding " RACK_MOD_CTRL_NAME " while dragging them.\n\nClick and drag on empty rack space to select multiple modules.", "", ""},
 	{"Pan around the rack by using the scroll bars, dragging while holding the middle mouse button, " RACK_MOD_ALT_NAME "+clicking and dragging, or pressing the arrow keys. Arrow key panning speed can be modified by holding " RACK_MOD_CTRL_NAME ", " RACK_MOD_SHIFT_NAME ", or " RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME ".\n\nZoom in and out using the View menu, " RACK_MOD_CTRL_NAME "+scroll, or " RACK_MOD_CTRL_NAME "+= and " RACK_MOD_CTRL_NAME "+minus.", "", ""},
 	// {"Want to use VCV Rack as a plugin in your DAW? VCV Rack Studio Edition is available now as a 64-bit VST 2 plugin for Ableton Live, FL Studio, Reason, REAPER, Bitwig, and more.", "Learn more", "https://vcvrack.com/Rack"},
@@ -158,7 +158,7 @@ struct TipWindow : widget::OpaqueWidget {
 		// Increment tip index
 		settings::tipIndex = math::eucMod(settings::tipIndex + delta, (int) tipInfos.size());
 
-		TipInfo& tipInfo = tipInfos[settings::tipIndex];
+		const TipInfo& tipInfo = tipInfos[settings::tipIndex];
 		label->text = tipInfo.text;
 		linkButton->setVisible(tipInfo.linkText != "");
 		linkButton->text = tipInfo.linkText;

@@ -49,6 +49,7 @@ static bool isTruncated() {
 void init() {
 	assert(!outputFile);
 	std::lock_guard<std::mutex> lock(mutex);
+	truncated = false;
 
 	// Don't open a file in development mode.
 	if (logPath.empty()) {

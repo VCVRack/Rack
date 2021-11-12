@@ -11,6 +11,7 @@
 #include <engine/Engine.hpp>
 #include <app/common.hpp>
 #include <app/Scene.hpp>
+#include <app/Browser.hpp>
 #include <plugin.hpp>
 #include <context.hpp>
 #include <window/Window.hpp>
@@ -175,6 +176,7 @@ int main(int argc, char* argv[]) {
 	keyboard::init();
 	gamepad::init();
 	plugin::init();
+	app::browserInit();
 	library::init();
 	discord::init();
 	if (!settings::headless) {
