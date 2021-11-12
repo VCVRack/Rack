@@ -26,9 +26,9 @@ include $(RACK_DIR)/arch.mk
 ifdef ARCH_LIN
 	TARGET := plugin.so
 	# This prevents static variables in the DSO (dynamic shared object) from being preserved after dlclose().
-	# I don't really understand the side effects (see GCC manual), but so far tests are positive.
 	FLAGS += -fno-gnu-unique
-	LDFLAGS += -Wl,-rpath=.
+	# When Rack loads a plugin, it symlinks /tmp/Rack2 to its system dir, so the plugin can link to libRack.
+	LDFLAGS += -Wl,-rpath=/tmp/Rack2
 	# Since the plugin's compiler could be a different version than Rack's compiler, link libstdc++ and libgcc statically to avoid ABI issues.
 	LDFLAGS += -static-libstdc++ -static-libgcc
 	RACK_USER_DIR ?= $(HOME)/.Rack2
@@ -69,12 +69,7 @@ ifdef ARCH_MAC
 	$(STRIP) -S dist/$(SLUG)/$(TARGET)
 	$(INSTALL_NAME_TOOL) -change libRack.dylib /tmp/Rack2/libRack.dylib dist/$(SLUG)/$(TARGET)
 	$(OTOOL) -L dist/$(SLUG)/$(TARGET)
-endif
-ifdef ARCH_LIN
-	$(STRIP) -s dist/$(SLUG)/$(TARGET)
-	# TODO Change libRack.so path to /tmp/Rack2/libRack.dylib
-endif
-ifdef ARCH_WIN
+else
 	$(STRIP) -s dist/$(SLUG)/$(TARGET)
 endif
 	@# Copy distributables
