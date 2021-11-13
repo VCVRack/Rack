@@ -16,7 +16,7 @@ namespace engine {
 // Arbitrary prime number so it doesn't over- or under-estimate time of buffered processors.
 static const int METER_DIVIDER = 37;
 static const int METER_BUFFER_LEN = 32;
-static const float METER_TIME = 0.5f;
+static const float METER_TIME = 1.f;
 
 
 struct Module::Internal {

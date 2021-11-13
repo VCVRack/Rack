@@ -239,6 +239,7 @@ void ModuleWidget::draw(const DrawArgs& args) {
 		for (int i = 0; i < meterLength; i++) {
 			int index = math::eucMod(meterIndex + i + 1, meterLength);
 			float meter = math::clamp(meterBuffer[index] * sampleRate, 0.f, 1.f);
+			meter = std::max(0.f, meter);
 			math::Vec p;
 			p.x = (float) i / (meterLength - 1) * box.size.x;
 			p.y = (1.f - meter) * plotHeight;
