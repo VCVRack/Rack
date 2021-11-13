@@ -427,6 +427,10 @@ struct Rect {
 		r.size = size.minus(delta.mult(2.f));
 		return r;
 	}
+	/** Returns `pos + size * p` */
+	Vec interpolate(Vec p) {
+		return pos.plus(size.mult(p));
+	}
 
 	// Method aliases
 	bool isContaining(Vec v) const {
