@@ -2,6 +2,8 @@
 
 #include <Quantity.hpp>
 #include <string.hpp>
+// for C4 and A4 frequencies
+#include <dsp/common.hpp>
 
 
 namespace rack {
@@ -26,12 +28,45 @@ std::string Quantity::getDisplayValueString() {
 	return string::f("%.*g", getDisplayPrecision(), math::normalizeZero(v));
 }
 
+/** Build-in variables for tinyexpr */
+struct TeVariable {
+	std::string name;
+	double value;
+};
+static std::vector<TeVariable> teVariables;
+static std::vector<te_variable> teVars;
+
+static void teVarsInit() {
+	if (!teVars.empty())
+		return;
+
+	// Add variables
+	teVariables.push_back({"inf", INFINITY});
+	teVariables.push_back({"c", dsp::FREQ_C4});
+	teVariables.push_back({"a", dsp::FREQ_A4});
+	for (int i = 0; i <= 8; i++)
+		teVariables.push_back({string::f("c%d", i), dsp::FREQ_C4 * std::pow(2.0, i - 4)});
+	for (int i = 0; i <= 8; i++)
+		teVariables.push_back({string::f("a%d", i), dsp::FREQ_A4 * std::pow(2.0, i - 4)});
+
+	// Build teVars
+	teVars.resize(teVariables.size());
+	for (size_t i = 0; i < teVariables.size(); i++) {
+		teVars[i].name = teVariables[i].name.c_str();
+		teVars[i].address = &teVariables[i].value;
+		teVars[i].type = TE_VARIABLE;
+		teVars[i].context = NULL;
+	}
+}
+
 void Quantity::setDisplayValueString(std::string s) {
-	static const double inf = INFINITY;
-	static te_variable vars[] = {
-		{"inf", &inf, TE_VARIABLE, NULL},
-	};
-	te_expr* expr = te_compile(s.c_str(), vars, LENGTHOF(vars), NULL);
+	teVarsInit();
+
+	// Uppercase letters aren't needed in formulas, so convert to lowercase in case user types INF or C4.
+	s = string::lowercase(s);
+
+	// Compile string with tinyexpr
+	te_expr* expr = te_compile(s.c_str(), teVars.data(), teVars.size(), NULL);
 	if (!expr)
 		return;
 
