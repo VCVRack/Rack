@@ -19,8 +19,7 @@
 #if defined ARCH_MAC
 	#include <mach/mach_init.h>
 	#include <mach/thread_act.h>
-	#include <mach/clock.h>
-	#include <mach/mach.h>
+	#include <mach/mach_time.h>
 	#include <sys/sysctl.h>
 #endif
 
@@ -660,8 +659,12 @@ std::string getStackTrace() {
 	static int64_t startCounter = 0;
 	static double counterTime = 0.0;
 #endif
-#if defined ARCH_LIN || defined ARCH_MAC
+#if defined ARCH_LIN
 	static int64_t startTime = 0;
+#endif
+#if defined ARCH_MAC
+	static int64_t startCounter = 0;
+	static double counterTime = 0.0;
 #endif
 
 static void initTime() {
@@ -680,12 +683,11 @@ static void initTime() {
 	startTime = int64_t(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
 #endif
 #if defined ARCH_MAC
-	clock_serv_t cclock;
-	mach_timespec_t mts;
-	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
-	clock_get_time(cclock, &mts);
-	mach_port_deallocate(mach_task_self(), cclock);
-	startTime = int64_t(mts.tv_sec) * 1000000000LL + mts.tv_nsec;
+	startCounter = mach_absolute_time();
+
+	mach_timebase_info_data_t tb;
+	mach_timebase_info(&tb);
+	counterTime = 1e-9 * (double) tb.numer / tb.denom;
 #endif
 }
 
@@ -703,13 +705,9 @@ double getTime() {
 	return (time - startTime) / 1e9;
 #endif
 #if defined ARCH_MAC
-	clock_serv_t cclock;
-	mach_timespec_t mts;
-	host_get_clock_service(mach_host_self(), SYSTEM_CLOCK, &cclock);
-	clock_get_time(cclock, &mts);
-	mach_port_deallocate(mach_task_self(), cclock);
-	int64_t time = int64_t(mts.tv_sec) * 1000000000LL + mts.tv_nsec;
-	return (time - startTime) / 1e9;
+	// Similar to mach_absolute_time() except it doesn't call the kernel every time.
+	int64_t counter = mach_approximate_time();
+	return (counter - startCounter) * counterTime;
 #endif
 }
 
