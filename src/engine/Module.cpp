@@ -349,7 +349,9 @@ void Module::doProcess(const ProcessArgs& args) {
 	// Stop CPU timer
 	if (meterEnabled) {
 		double endTime = system::getTime();
-		float duration = endTime - startTime;
+		// Subtract call time of getTime() itself, since we only want to measure process() time.
+		double endTime2 = system::getTime();
+		float duration = (endTime - startTime) - (endTime2 - endTime);
 
 		internal->meterSamples++;
 		internal->meterDurationTotal += duration;
