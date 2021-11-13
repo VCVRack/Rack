@@ -811,6 +811,7 @@ struct MomentarySwitch : TSwitch {
 
 struct NKK : app::SvgSwitch {
 	NKK() {
+		shadow->opacity = 0.0;
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/NKK_0.svg")));
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/NKK_1.svg")));
 		addFrame(Svg::load(asset::system("res/ComponentLibrary/NKK_2.svg")));
