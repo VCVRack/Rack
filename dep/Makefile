@@ -120,7 +120,7 @@ openssl-1.1.1l:
 $(openssl): | openssl-1.1.1l
 	# The CFLAGS environment variable is ignored, so pass CFLAGS to their custom ./config script, which passes them to the compiler.
 	# Set no-pinshared so OpenSSL doesn't call GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, ...) on initialization on Windows. This prevents libRack from being unloaded on Windows with FreeLibrary().
-	cd openssl-1.1.1l && ./config --prefix="$(DEP_PATH)" no-shared no-hw no-threads no-zlib no-capieng no-pinshared $(CFLAGS)
+	cd openssl-1.1.1l && ./config --prefix="$(DEP_PATH)" no-shared no-hw threads no-zlib no-capieng no-pinshared $(CFLAGS)
 	$(MAKE) -C openssl-1.1.1l
 	$(MAKE) -C openssl-1.1.1l install_sw
 
@@ -131,7 +131,7 @@ curl-7.79.1:
 	rm curl-7.79.1.tar.gz
 
 CURL_FLAGS += --enable-symbol-hiding --enable-shared=no
-CURL_FLAGS += --enable-http --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --enable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-mqtt --disable-manual --disable-threaded-resolver --disable-pthreads --enable-verbose --disable-sspi --disable-ntlm --disable-ntlm-wb --disable-tls-srp --disable-unix-sockets --disable-doh --disable-mime --disable-dateparse --disable-netrc --disable-progress-meter --disable-alt-svc
+CURL_FLAGS += --enable-http --disable-ftp --disable-file --disable-ldap --disable-ldaps --disable-rtsp --enable-proxy --disable-dict --disable-telnet --disable-tftp --disable-pop3 --disable-imap --disable-smb --disable-smtp --disable-gopher --disable-mqtt --disable-manual --enable-threaded-resolver --enable-pthreads --enable-verbose --disable-sspi --disable-ntlm --disable-ntlm-wb --disable-tls-srp --disable-unix-sockets --disable-doh --disable-mime --disable-dateparse --disable-netrc --disable-progress-meter --disable-alt-svc
 CURL_FLAGS += --without-hyper --without-zlib --without-brotli --without-zstd --without-libpsl --without-libgsasl --without-libssh2 --without-librtmp --without-winidn --without-libidn2 --without-nghttp2 --without-ngtcp2 --without-nghttp3 --without-quiche
 CURL_FLAGS += --with-ssl="$(DEP_PATH)"
 
