@@ -47,12 +47,9 @@ static void fatalSignalHandler(int sig) {
 	// Ignore abort() since we call it below.
 	signal(SIGABRT, NULL);
 
-	FATAL("Fatal signal %d. Stack trace:\n%s", sig, system::getStackTrace().c_str());
-
-	// This might fail because we might not be in the main thread.
-	// But oh well, we're crashing anyway.
-	std::string text = APP_NAME + " has crashed. See " + logger::logPath + " for details.";
-	osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, text.c_str());
+	std::string sigName = "SIG" + string::uppercase(sys_signame[sig]);
+	std::string stackTrace = system::getStackTrace();
+	FATAL("Fatal signal %d %s. Stack trace:\n%s", sig, sigName.c_str(), stackTrace.c_str());
 
 	abort();
 }
