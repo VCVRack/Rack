@@ -705,8 +705,7 @@ double getTime() {
 	return (time - startTime) / 1e9;
 #endif
 #if defined ARCH_MAC
-	// Similar to mach_absolute_time() except it doesn't call the kernel every time.
-	int64_t counter = mach_approximate_time();
+	int64_t counter = mach_absolute_time();
 	return (counter - startCounter) * counterTime;
 #endif
 }
