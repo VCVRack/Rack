@@ -28,6 +28,7 @@
 #include <thread>
 #include <unistd.h> // for getopt
 #include <signal.h> // for signal
+#include <string.h> // for sys_siglist
 #if defined ARCH_WIN
 	#include <windows.h> // for CreateMutex
 #endif
@@ -47,7 +48,12 @@ static void fatalSignalHandler(int sig) {
 	// Ignore abort() since we call it below.
 	signal(SIGABRT, NULL);
 
-	std::string sigName = "SIG" + string::uppercase(sys_signame[sig]);
+#if defined ARCH_LIN
+	const char* sigNameC = strsignal(sig);
+#else
+	const char* sigNameC = sys_siglist[sig];
+#endif
+	std::string sigName = "SIG" + string::uppercase(sigNameC);
 	std::string stackTrace = system::getStackTrace();
 	FATAL("Fatal signal %d %s. Stack trace:\n%s", sig, sigName.c_str(), stackTrace.c_str());
 
