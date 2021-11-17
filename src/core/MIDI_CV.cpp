@@ -487,8 +487,8 @@ struct MIDI_CVWidget : ModuleWidget {
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 96.707)), module, MIDI_CV::CLOCK_DIV_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.591, 96.859)), module, MIDI_CV::RETRIGGER_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.905, 113.115)), module, MIDI_CV::START_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.591, 112.975)), module, MIDI_CV::STOP_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 113.115)), module, MIDI_CV::CONTINUE_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 113.115)), module, MIDI_CV::STOP_OUTPUT));
+		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.591, 112.975)), module, MIDI_CV::CONTINUE_OUTPUT));
 
 		MidiDisplay* display = createWidget<MidiDisplay>(mm2px(Vec(0.0, 13.048)));
 		display->box.size = mm2px(Vec(40.64, 29.012));
