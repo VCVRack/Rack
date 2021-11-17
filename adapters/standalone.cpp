@@ -50,8 +50,10 @@ static void fatalSignalHandler(int sig) {
 
 #if defined ARCH_LIN
 	const char* sigNameC = strsignal(sig);
-#else
+#elif defined ARCH_MAC
 	const char* sigNameC = sys_siglist[sig];
+#else
+	const char* sigNameC = "";
 #endif
 	std::string sigName = "SIG" + string::uppercase(sigNameC);
 	std::string stackTrace = system::getStackTrace();
