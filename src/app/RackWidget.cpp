@@ -1399,12 +1399,25 @@ std::vector<CableWidget*> RackWidget::getCablesOnPort(PortWidget* port) {
 }
 
 
+int RackWidget::getNextCableColorId() {
+	return internal->nextCableColorId;
+}
+
+
+void RackWidget::setNextCableColorId(int id) {
+	internal->nextCableColorId = id;
+}
+
+
 NVGcolor RackWidget::getNextCableColor() {
 	if (settings::cableColors.empty())
 		return color::WHITE;
 
 	int id = internal->nextCableColorId++;
-	internal->nextCableColorId %= settings::cableColors.size();
+	if (id >= settings::cableColors.size())
+		id = 0;
+	if (internal->nextCableColorId >= settings::cableColors.size())
+		internal->nextCableColorId = 0;
 	return settings::cableColors[id];
 }
 
