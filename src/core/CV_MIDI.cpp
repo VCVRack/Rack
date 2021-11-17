@@ -166,8 +166,8 @@ struct CV_MIDIWidget : ModuleWidget {
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.249, 96.707)), module, CV_MIDI::VOL_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.591, 96.859)), module, CV_MIDI::PAN_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.906, 113.115)), module, CV_MIDI::START_INPUT));
-		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.591, 112.975)), module, CV_MIDI::CONTINUE_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.249, 113.115)), module, CV_MIDI::STOP_INPUT));
+		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(32.591, 112.975)), module, CV_MIDI::CONTINUE_INPUT));
 
 		MidiDisplay* display = createWidget<MidiDisplay>(mm2px(Vec(0.0, 13.039)));
 		display->box.size = mm2px(Vec(40.64, 29.021));
