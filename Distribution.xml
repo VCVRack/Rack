@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <installer-gui-script minSpecVersion="1">
-	<title>VCV Rack Community 2</title>
+	<title>VCV Rack 2</title>
 
 	<allowed-os-versions>
 		<os-version min="10.9"/>

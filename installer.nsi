@@ -1,6 +1,6 @@
 !include "MUI2.nsh"
 
-!define NAME_FULL "VCV Rack Community Edition ${VERSION}"
+!define NAME_FULL "VCV Rack Free ${VERSION}"
 !define NAME "VCV Rack ${VERSION_MAJOR}"
 !define RACK_DIR "Rack${VERSION_MAJOR}"
 !define INSTALL_REG "Software\VCV\Rack${VERSION_MAJOR}"

@@ -1,6 +1,6 @@
 # VCV Rack licenses
 
-VCV Rack Community Edition **source code and binaries** are copyright © 2016-2021 VCV.
+VCV Rack Free **source code and binaries** are copyright © 2016-2021 VCV.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.en.html) as published by the [Free Software Foundation](https://www.fsf.org/), either version 3 of the License, or (at your option) any later version.
 In addition, you are granted the "VCV Rack Non-Commercial Plugin License Exception", allowed under section 7 of GPLv3, and a commercial licensing option.
