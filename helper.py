@@ -273,8 +273,8 @@ def panel_to_components(tree):
 
 	root = tree.getroot()
 	# Get SVG scale relative to mm
-	root_width = root.get('width')
-	if re.match('\d+mm', root_width):
+	root_height = root.get('height')
+	if root_height.endswith("mm"):
 		scale = 1
 	else:
 		svg_dpi = 75
