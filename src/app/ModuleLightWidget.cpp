@@ -8,6 +8,11 @@ namespace rack {
 namespace app {
 
 
+struct ModuleLightWidget::Internal {
+	ui::Tooltip* tooltip = NULL;
+};
+
+
 struct LightTooltip : ui::Tooltip {
 	ModuleLightWidget* lightWidget;
 
@@ -46,8 +51,14 @@ struct LightTooltip : ui::Tooltip {
 };
 
 
+ModuleLightWidget::ModuleLightWidget() {
+	internal = new Internal;
+}
+
+
 ModuleLightWidget::~ModuleLightWidget() {
 	destroyTooltip();
+	delete internal;
 }
 
 
@@ -72,7 +83,7 @@ engine::LightInfo* ModuleLightWidget::getLightInfo() {
 void ModuleLightWidget::createTooltip() {
 	if (!settings::tooltips)
 		return;
-	if (this->tooltip)
+	if (internal->tooltip)
 		return;
 	// If the LightInfo is null, don't show a tooltip
 	if (!getLightInfo())
@@ -80,16 +91,16 @@ void ModuleLightWidget::createTooltip() {
 	LightTooltip* tooltip = new LightTooltip;
 	tooltip->lightWidget = this;
 	APP->scene->addChild(tooltip);
-	this->tooltip = tooltip;
+	internal->tooltip = tooltip;
 }
 
 
 void ModuleLightWidget::destroyTooltip() {
-	if (!tooltip)
+	if (!internal->tooltip)
 		return;
-	APP->scene->removeChild(tooltip);
-	delete tooltip;
-	tooltip = NULL;
+	APP->scene->removeChild(internal->tooltip);
+	delete internal->tooltip;
+	internal->tooltip = NULL;
 }
 
 

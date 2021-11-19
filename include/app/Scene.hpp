@@ -19,8 +19,9 @@ struct Scene : widget::OpaqueWidget {
 	widget::Widget* menuBar;
 	widget::Widget* browser;
 
-	double lastAutosaveTime = 0.0;
-	/** The last mouse position in the Scene */
+	/** The last mouse position in the Scene.
+	DEPRECATED. Use getMousePos() instead.
+	*/
 	math::Vec mousePos;
 
 	PRIVATE Scene();

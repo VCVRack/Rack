@@ -21,7 +21,6 @@ struct SvgSwitch : Switch {
 	std::vector<std::shared_ptr<window::Svg>> frames;
 
 	/** Use frames 0 and 1 when the mouse is pressed and released, instead of using the param value as the frame index.
-	TODO change name
 	*/
 	bool latch = false;
 

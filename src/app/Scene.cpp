@@ -46,6 +46,8 @@ struct ResizeHandle : widget::OpaqueWidget {
 struct Scene::Internal {
 	ResizeHandle* resizeHandle;
 
+	double lastAutosaveTime = 0.0;
+
 	bool heldArrowKeys[4] = {};
 };
 
@@ -106,8 +108,8 @@ void Scene::step() {
 	// Autosave periodically
 	if (settings::autosaveInterval > 0.0) {
 		double time = system::getTime();
-		if (time - lastAutosaveTime >= settings::autosaveInterval) {
-			lastAutosaveTime = time;
+		if (time - internal->lastAutosaveTime >= settings::autosaveInterval) {
+			internal->lastAutosaveTime = time;
 			APP->patch->saveAutosave();
 			settings::save();
 		}

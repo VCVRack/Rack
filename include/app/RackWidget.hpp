@@ -22,6 +22,7 @@ struct RackWidget : widget::OpaqueWidget {
 	struct Internal;
 	Internal* internal;
 
+	/** DEPRECATED. Use get/setTouchedParam(). */
 	ParamWidget* touchedParam = NULL;
 
 	PRIVATE RackWidget();
@@ -124,6 +125,8 @@ struct RackWidget : widget::OpaqueWidget {
 	void setNextCableColorId(int id);
 	/** Returns and advances the next cable color. */
 	NVGcolor getNextCableColor();
+	ParamWidget* getTouchedParam();
+	void setTouchedParam(ParamWidget* pw);
 };
 
 

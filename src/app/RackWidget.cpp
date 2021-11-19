@@ -1422,5 +1422,15 @@ NVGcolor RackWidget::getNextCableColor() {
 }
 
 
+ParamWidget* RackWidget::getTouchedParam() {
+	return touchedParam;
+}
+
+
+void RackWidget::setTouchedParam(ParamWidget* pw) {
+	touchedParam = pw;
+}
+
+
 } // namespace app
 } // namespace rack
