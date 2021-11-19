@@ -29,9 +29,10 @@ namespace window {
 struct Font {
 	NVGcontext* vg;
 	int handle = -1;
+
+	~Font();
 	/** Don't call this directly but instead use `APP->window->loadFont()` */
 	void loadFile(const std::string& filename, NVGcontext* vg);
-	~Font();
 	/** Use `APP->window->loadFont()` instead. */
 	DEPRECATED static std::shared_ptr<Font> load(const std::string& filename);
 };
@@ -41,9 +42,10 @@ struct Font {
 struct Image {
 	NVGcontext* vg;
 	int handle = -1;
+
+	~Image();
 	/** Don't call this directly but instead use `APP->window->loadImage()` */
 	void loadFile(const std::string& filename, NVGcontext* vg);
-	~Image();
 	/** Use `APP->window->loadImage()` instead. */
 	DEPRECATED static std::shared_ptr<Image> load(const std::string& filename);
 };
@@ -57,10 +59,10 @@ struct Window {
 	GLFWwindow* win = NULL;
 	NVGcontext* vg = NULL;
 	NVGcontext* fbVg = NULL;
-	/** The scaling ratio */
+	/** UI scaling ratio */
 	float pixelRatio = 1.f;
-	/* The ratio between the framebuffer size and the window size reported by the OS.
-	This is not equal to gPixelRatio in general.
+	/** Ratio between the framebuffer size and the window size reported by the OS.
+	This is not equal to pixelRatio in general.
 	*/
 	float windowRatio = 1.f;
 	std::shared_ptr<Font> uiFont;

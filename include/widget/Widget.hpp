@@ -19,14 +19,18 @@ The bounding box of a Widget is a rectangle specified by `box` relative to their
 The appearance is defined by overriding `draw()`, and the behavior is defined by overriding `step()` and `on*()` event handlers.
 */
 struct Widget : WeakBase {
-	/** Stores position and size */
+	/** Position relative to parent and size of widget. */
 	math::Rect box = math::Rect(math::Vec(), math::Vec(INFINITY, INFINITY));
 	/** Automatically set when Widget is added as a child to another Widget */
 	Widget* parent = NULL;
 	std::list<Widget*> children;
-	/** Disables rendering but allow stepping */
+	/** Disables rendering but allow stepping.
+	Use isVisible(), setVisible(), show(), or hide() instead of using this variable directly.
+	*/
 	bool visible = true;
-	/** If set to true, parent will delete Widget in the next step() */
+	/** If set to true, parent will delete Widget in the next step().
+	Use requestDelete() instead of using this variable directly.
+	*/
 	bool requestedDelete = false;
 
 	virtual ~Widget();

@@ -27,6 +27,11 @@ math::Rect ZoomWidget::getViewport(math::Rect r) {
 }
 
 
+float ZoomWidget::getZoom() {
+	return zoom;
+}
+
+
 void ZoomWidget::setZoom(float zoom) {
 	if (zoom == this->zoom)
 		return;

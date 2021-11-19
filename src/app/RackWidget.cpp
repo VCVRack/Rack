@@ -1414,9 +1414,9 @@ NVGcolor RackWidget::getNextCableColor() {
 		return color::WHITE;
 
 	int id = internal->nextCableColorId++;
-	if (id >= settings::cableColors.size())
+	if (id >= (int) settings::cableColors.size())
 		id = 0;
-	if (internal->nextCableColorId >= settings::cableColors.size())
+	if (internal->nextCableColorId >= (int) settings::cableColors.size())
 		internal->nextCableColorId = 0;
 	return settings::cableColors[id];
 }

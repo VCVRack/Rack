@@ -30,6 +30,11 @@ namespace window {
 static const math::Vec WINDOW_SIZE_MIN = math::Vec(480, 320);
 
 
+Font::~Font() {
+	// There is no NanoVG deleteFont() function yet, so do nothing
+}
+
+
 void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 	this->vg = vg;
 	handle = nvgCreateFont(vg, filename.c_str(), filename.c_str());
@@ -39,13 +44,15 @@ void Font::loadFile(const std::string& filename, NVGcontext* vg) {
 }
 
 
-Font::~Font() {
-	// There is no NanoVG deleteFont() function yet, so do nothing
+std::shared_ptr<Font> Font::load(const std::string& filename) {
+	return APP->window->loadFont(filename);
 }
 
 
-std::shared_ptr<Font> Font::load(const std::string& filename) {
-	return APP->window->loadFont(filename);
+Image::~Image() {
+	// TODO What if handle is invalid?
+	if (handle >= 0)
+		nvgDeleteImage(vg, handle);
 }
 
 
@@ -55,13 +62,6 @@ void Image::loadFile(const std::string& filename, NVGcontext* vg) {
 	if (handle <= 0)
 		throw Exception("Failed to load image %s", filename.c_str());
 	INFO("Loaded image %s", filename.c_str());
-}
-
-
-Image::~Image() {
-	// TODO What if handle is invalid?
-	if (handle >= 0)
-		nvgDeleteImage(vg, handle);
 }
 
 

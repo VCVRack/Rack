@@ -30,7 +30,8 @@ struct Plugin {
 	To guarantee uniqueness, it is a good idea to prefix the slug by your "company name" if available, e.g. "MyCompany-MyPlugin"
 	*/
 	std::string slug;
-	/** Your plugin's latest version, using the guidelines at https://github.com/VCVRack/Rack/issues/266. Do not include the "v" prefix.
+	/** Your plugin's latest version.
+	Do not include the "v" prefix.
 	*/
 	std::string version;
 	/** The license type of your plugin. Use "proprietary" if all rights are reserved. If your license is in the [SPDX license list](https://spdx.org/licenses/), use its abbreviation in the "Identifier" column.

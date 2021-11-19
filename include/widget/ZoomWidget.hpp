@@ -8,15 +8,14 @@ namespace widget {
 
 /** A Widget with a dynamic zoom level. */
 struct ZoomWidget : Widget {
+	/** Use setZoom() and getZoom() instead of using this variable directly. */
 	float zoom = 1.f;
 
 	math::Vec getRelativeOffset(math::Vec v, Widget* ancestor) override;
 	float getRelativeZoom(Widget* ancestor) override;
 	math::Rect getViewport(math::Rect r) override;
+	float getZoom();
 	void setZoom(float zoom);
-	float getZoom() {
-		return zoom;
-	}
 	void draw(const DrawArgs& args) override;
 	void drawLayer(const DrawArgs& args, int layer) override;
 
