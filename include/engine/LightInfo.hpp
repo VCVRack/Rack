@@ -14,10 +14,10 @@ struct LightInfo {
 	int lightId = -1;
 
 	/** The name of the light, using sentence capitalization.
-	e.g. "Level", "Pitch light", "Mode CV".
+	e.g. "Level", "Oscillator phase", "Mode CV".
 
 	Don't use the word "light" or "LED" in the name.
-	Since this text is often prepended or appended to the name, the name will appear as e.g. "Level light light", "Light: Level light".
+	Since this text is often prepended or appended to the name, the name will appear as e.g. "Level light light".
 	*/
 	std::string name;
 
