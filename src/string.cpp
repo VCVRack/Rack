@@ -100,15 +100,6 @@ bool endsWith(const std::string& str, const std::string& suffix) {
 }
 
 
-float fuzzyScore(const std::string& s, const std::string& query) {
-	size_t pos = s.find(query);
-	if (pos == std::string::npos)
-		return 0.f;
-
-	return (float)(query.size() + 1) / (s.size() + 1);
-}
-
-
 std::string toBase64(const uint8_t* data, size_t dataLen) {
 	static const char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 

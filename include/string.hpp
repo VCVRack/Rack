@@ -31,12 +31,6 @@ bool startsWith(const std::string& str, const std::string& prefix);
 /** Returns whether a string ends with the given substring. */
 bool endsWith(const std::string& str, const std::string& suffix);
 
-/** Scores how well a query matches a string.
-A score of 0 means no match.
-The score is arbitrary and is only meaningful for sorting.
-*/
-float fuzzyScore(const std::string& s, const std::string& query);
-
 /** Converts a byte array to a Base64-encoded string.
 https://en.wikipedia.org/wiki/Base64
 */
