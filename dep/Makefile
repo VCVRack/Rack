@@ -111,18 +111,18 @@ $(jansson): | jansson-2.12
 	$(MAKE) -C jansson-2.12
 	$(MAKE) -C jansson-2.12 install
 
-openssl-1.1.1l:
-	$(WGET) "https://www.openssl.org/source/openssl-1.1.1l.tar.gz"
-	$(SHA256) openssl-1.1.1l.tar.gz 0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1
-	$(UNTAR) openssl-1.1.1l.tar.gz
-	rm openssl-1.1.1l.tar.gz
+openssl-1.1.1k:
+	$(WGET) "https://www.openssl.org/source/openssl-1.1.1k.tar.gz"
+	$(SHA256) openssl-1.1.1k.tar.gz 892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5
+	$(UNTAR) openssl-1.1.1k.tar.gz
+	rm openssl-1.1.1k.tar.gz
 
-$(openssl): | openssl-1.1.1l
+$(openssl): | openssl-1.1.1k
 	# The CFLAGS environment variable is ignored, so pass CFLAGS to their custom ./config script, which passes them to the compiler.
 	# Set no-pinshared so OpenSSL doesn't call GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_PIN, ...) on initialization on Windows. This prevents libRack from being unloaded on Windows with FreeLibrary().
-	cd openssl-1.1.1l && ./config --prefix="$(DEP_PATH)" no-shared no-hw threads no-zlib no-capieng no-pinshared $(CFLAGS)
-	$(MAKE) -C openssl-1.1.1l
-	$(MAKE) -C openssl-1.1.1l install_sw
+	cd openssl-1.1.1k && ./config --prefix="$(DEP_PATH)" no-shared no-hw threads no-zlib no-capieng no-pinshared $(CFLAGS)
+	$(MAKE) -C openssl-1.1.1k
+	$(MAKE) -C openssl-1.1.1k install_sw
 
 curl-7.79.1:
 	$(WGET) "https://curl.se/download/curl-7.79.1.tar.gz"
@@ -262,7 +262,7 @@ $(ghcfilesystem): filesystem/include/ghc
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1l curl-7.79.1 zstd-1.4.5 libarchive-3.4.3 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog
+src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1k curl-7.79.1 zstd-1.4.5 libarchive-3.4.3 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog
 
 clean:
 	git clean -fdx
