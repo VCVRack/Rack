@@ -7,7 +7,7 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 */
 
 #ifdef PRIVATE
-#error "Plugins must only include rack.hpp. Including other Rack headers is unsupported."
+#warning "Plugins must only include rack.hpp. Including other Rack headers is unsupported."
 #endif
 
 /** Functions with the PRIVATE attribute should not be called by plugins.
