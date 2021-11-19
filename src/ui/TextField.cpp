@@ -69,7 +69,15 @@ void TextField::draw(const DrawArgs& args) {
 	int begin = std::min(cursor, selection);
 	int end = std::max(cursor, selection);
 
-	bndTextField(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, text.c_str(), begin, end);
+	std::string drawText;
+	if (password) {
+		drawText = std::string(text.size(), '*');
+	}
+	else {
+		drawText = text;
+	}
+
+	bndTextField(args.vg, 0.0, 0.0, box.size.x, box.size.y, BND_CORNER_NONE, state, -1, drawText.c_str(), begin, end);
 
 	// Draw placeholder text
 	if (text.empty()) {

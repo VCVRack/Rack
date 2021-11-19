@@ -64,7 +64,6 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 #include <ui/RadioButton.hpp>
 #include <ui/Menu.hpp>
 #include <ui/ScrollWidget.hpp>
-#include <ui/PasswordField.hpp>
 
 #include <app/SliderKnob.hpp>
 #include <app/MultiLightWidget.hpp>
