@@ -146,7 +146,11 @@ struct Engine {
 	Write-locks.
 	*/
 	void moduleFromJson(Module* module, json_t* rootJ);
-	/** Dispatches Save event to all modules
+	/** Dispatches Save event to a module.
+	Read-locks.
+	*/
+	void prepareSaveModule(Module* module);
+	/** Dispatches Save event to all modules.
 	Read-locks.
 	*/
 	void prepareSave();

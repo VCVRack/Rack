@@ -773,6 +773,9 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	history::ComplexAction* h = new history::ComplexAction;
 	h->name = "duplicate module";
 
+	// Save patch store in this module so we can copy it below
+	APP->engine->prepareSaveModule(module);
+
 	// JSON serialization is the obvious way to do this
 	json_t* moduleJ = toJson();
 	DEFER({
@@ -782,6 +785,11 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 
 	// Clone Module
 	engine::Module* clonedModule = model->createModule();
+
+	// Set ID here so we can copy module storage dir
+	clonedModule->id = random::u64() % (1ull << 53);
+	system::copy(module->getPatchStorageDirectory(), clonedModule->getPatchStorageDirectory());
+
 	// This doesn't need a lock (via Engine::moduleFromJson()) because the Module is not added to the Engine yet.
 	try {
 		clonedModule->fromJson(moduleJ);

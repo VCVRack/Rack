@@ -947,6 +947,13 @@ void Engine::moduleFromJson(Module* module, json_t* rootJ) {
 }
 
 
+void Engine::prepareSaveModule(Module* module) {
+	ReadLock lock(internal->mutex);
+	Module::SaveEvent e;
+	module->onSave(e);
+}
+
+
 void Engine::prepareSave() {
 	ReadLock lock(internal->mutex);
 	for (Module* module : internal->modules) {
