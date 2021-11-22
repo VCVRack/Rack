@@ -96,8 +96,16 @@ extern std::map<std::string, std::map<std::string, ModuleInfo>> moduleInfos;
 */
 ModuleInfo* getModuleInfo(const std::string& pluginSlug, const std::string& moduleSlug);
 
-/** pluginSlug -> {moduleSlug} */
-extern std::map<std::string, std::set<std::string>> moduleWhitelist;
+/** The VCV JSON API returns the data structure
+{pluginSlug: [moduleSlugs] or true}
+where "true" represents that the user is subscribed to the plugin (all modules and future modules).
+C++ isn't weakly typed, so we need the PluginWhitelist data structure to store this information.
+*/
+struct PluginWhitelist {
+	bool subscribed = false;
+	std::set<std::string> moduleSlugs;
+};
+extern std::map<std::string, PluginWhitelist> moduleWhitelist;
 
 bool isModuleWhitelisted(const std::string& pluginSlug, const std::string& moduleSlug);
 

@@ -62,7 +62,7 @@ bool discordUpdateActivity = true;
 BrowserSort browserSort = BROWSER_SORT_UPDATED;
 float browserZoom = -1.f;
 std::map<std::string, std::map<std::string, ModuleInfo>> moduleInfos;
-std::map<std::string, std::set<std::string>> moduleWhitelist;
+std::map<std::string, PluginWhitelist> moduleWhitelist;
 
 
 ModuleInfo* getModuleInfo(const std::string& pluginSlug, const std::string& moduleSlug) {
@@ -81,8 +81,13 @@ bool isModuleWhitelisted(const std::string& pluginSlug, const std::string& modul
 	// All modules in a plugin are visible if plugin set is empty.
 	if (pluginIt == moduleWhitelist.end())
 		return true;
-	auto moduleIt = pluginIt->second.find(moduleSlug);
-	if (moduleIt == pluginIt->second.end())
+	// All modules in a plugin are visible if plugin set is subscribed.
+	const PluginWhitelist& plugin = pluginIt->second;
+	if (plugin.subscribed)
+		return true;
+	// Check if plugin whitelist contains module
+	auto moduleIt = plugin.moduleSlugs.find(moduleSlug);
+	if (moduleIt == plugin.moduleSlugs.end())
 		return false;
 	return true;
 }
@@ -204,10 +209,20 @@ json_t* toJson() {
 	// moduleWhitelist
 	json_t* moduleWhitelistJ = json_object();
 	for (const auto& pluginPair : moduleWhitelist) {
-		json_t* pluginJ = json_array();
-		for (const std::string& moduleSlug : pluginPair.second) {
-			json_array_append_new(pluginJ, json_stringn(moduleSlug.c_str(), moduleSlug.size()));
+		const PluginWhitelist& plugin = pluginPair.second;
+		json_t* pluginJ;
+
+		// If plugin is subscribed, set to true, otherwise an array of module slugs.
+		if (plugin.subscribed) {
+			pluginJ = json_true();
 		}
+		else {
+			pluginJ = json_array();
+			for (const std::string& moduleSlug : plugin.moduleSlugs) {
+				json_array_append_new(pluginJ, json_stringn(moduleSlug.c_str(), moduleSlug.size()));
+			}
+		}
+
 		json_object_set_new(moduleWhitelistJ, pluginPair.first.c_str(), pluginJ);
 	}
 	json_object_set_new(rootJ, "moduleWhitelist", moduleWhitelistJ);
@@ -398,15 +413,18 @@ void fromJson(json_t* rootJ) {
 		const char* pluginSlug;
 		json_t* pluginJ;
 		json_object_foreach(moduleWhitelistJ, pluginSlug, pluginJ) {
-			// Create an empty modules set, even if there are no modules in the whitelist.
-			// An empty set means no modules will be displayed in the Browser.
-			auto& modules = moduleWhitelist[pluginSlug];
+			auto& plugin = moduleWhitelist[pluginSlug];
+
+			if (json_is_true(pluginJ)) {
+				plugin.subscribed = true;
+				continue;
+			}
 
 			size_t moduleIndex;
 			json_t* moduleJ;
 			json_array_foreach(pluginJ, moduleIndex, moduleJ) {
 				std::string moduleSlug = json_string_value(moduleJ);
-				modules.insert(moduleSlug);
+				plugin.moduleSlugs.insert(moduleSlug);
 			}
 		}
 	}

@@ -187,40 +187,33 @@ void checkUpdates() {
 	}
 	DEFER({json_decref(manifestsResJ);});
 
-	// Get user's plugins list
-	std::string pluginsUrl = API_URL + "/plugins";
-	json_t* pluginsResJ = network::requestJson(network::METHOD_GET, pluginsUrl, NULL, getTokenCookies());
-	if (!pluginsResJ) {
-		WARN("Request for user's plugins failed");
-		updateStatus = "Could not query user's plugins";
+	// Get user's modules
+	std::string modulesUrl = API_URL + "/modules";
+	json_t* modulesResJ = network::requestJson(network::METHOD_GET, modulesUrl, NULL, getTokenCookies());
+	if (!modulesResJ) {
+		WARN("Request for user's modules failed");
+		updateStatus = "Could not query user's modules";
 		return;
 	}
-	DEFER({json_decref(pluginsResJ);});
-
-	json_t* errorJ = json_object_get(pluginsResJ, "error");
-	if (errorJ) {
-		WARN("Request for user's plugins returned an error: %s", json_string_value(errorJ));
-		updateStatus = "Could not query plugins";
-		return;
-	}
+	DEFER({json_decref(modulesResJ);});
 
 	json_t* manifestsJ = json_object_get(manifestsResJ, "manifests");
-	json_t* pluginsJ = json_object_get(pluginsResJ, "plugins");
+	json_t* pluginsJ = json_object_get(modulesResJ, "modules");
 
-	size_t pluginIndex;
-	json_t* pluginJ;
-	json_array_foreach(pluginsJ, pluginIndex, pluginJ) {
+	const char* modulesKey;
+	json_t* modulesJ;
+	json_object_foreach(pluginsJ, modulesKey, modulesJ) {
+		std::string pluginSlug = modulesKey;
 		// Get plugin manifest
-		std::string slug = json_string_value(pluginJ);
-		json_t* manifestJ = json_object_get(manifestsJ, slug.c_str());
+		json_t* manifestJ = json_object_get(manifestsJ, pluginSlug.c_str());
 		if (!manifestJ) {
-			WARN("VCV account has plugin %s but no manifest was found", slug.c_str());
+			WARN("VCV account has plugin %s but no manifest was found", pluginSlug.c_str());
 			continue;
 		}
 
 		// Don't replace existing UpdateInfo, even if version is newer.
 		// This keeps things sane and ensures that only one version of each plugin is downloaded to `plugins/` at a time.
-		auto it = updateInfos.find(slug);
+		auto it = updateInfos.find(pluginSlug);
 		if (it != updateInfos.end()) {
 			continue;
 		}
@@ -234,7 +227,7 @@ void checkUpdates() {
 		// Get version
 		json_t* versionJ = json_object_get(manifestJ, "version");
 		if (!versionJ) {
-			// WARN("Plugin %s has no version in manifest", slug.c_str());
+			// WARN("Plugin %s has no version in manifest", pluginSlug.c_str());
 			continue;
 		}
 		update.version = json_string_value(versionJ);
@@ -244,7 +237,7 @@ void checkUpdates() {
 		}
 
 		// Check if update is needed
-		plugin::Plugin* p = plugin::getPlugin(slug);
+		plugin::Plugin* p = plugin::getPlugin(pluginSlug);
 		if (p && p->version == update.version)
 			continue;
 
@@ -259,41 +252,39 @@ void checkUpdates() {
 			update.changelogUrl = json_string_value(changelogUrlJ);
 
 		// Add update to updates map
-		updateInfos[slug] = update;
+		updateInfos[pluginSlug] = update;
 	}
 
-	// Get module whitelist
+	// Merge module whitelist
 	{
-		std::string whitelistUrl = API_URL + "/modules";
-		json_t* whitelistResJ = network::requestJson(network::METHOD_GET, whitelistUrl, NULL, getTokenCookies());
-		if (!whitelistResJ) {
-			WARN("Request for module whitelist failed");
-			updateStatus = "Could not query user's modules";
-			return;
-		}
-		DEFER({json_decref(whitelistResJ);});
-
 		// Clone plugin slugs from settings to temporary whitelist.
-		// This makes plugins entirely hidden if removed.
-		std::map<std::string, std::set<std::string>> moduleWhitelist;
+		// This makes existing plugins entirely hidden if removed from user's VCV account.
+		std::map<std::string, settings::PluginWhitelist> moduleWhitelist;
 		for (const auto& pluginPair : settings::moduleWhitelist) {
-			// Create an empty set
 			std::string pluginSlug = pluginPair.first;
-			moduleWhitelist[pluginSlug];
+			moduleWhitelist[pluginSlug] = settings::PluginWhitelist();
 		}
 
 		// Iterate plugins
-		json_t* pluginsJ = json_object_get(whitelistResJ, "plugins");
-		const char* pluginSlug;
+		const char* modulesKey;
 		json_t* modulesJ;
-		json_object_foreach(pluginsJ, pluginSlug, modulesJ) {
+		json_object_foreach(pluginsJ, modulesKey, modulesJ) {
+			std::string pluginSlug = modulesKey;
+			settings::PluginWhitelist& pw = moduleWhitelist[pluginSlug];
+
+			// If value is "true", plugin is subscribed
+			if (json_is_true(modulesJ)) {
+				pw.subscribed = true;
+				continue;
+			}
+
 			// Iterate modules in plugin
 			size_t moduleIndex;
 			json_t* moduleSlugJ;
 			json_array_foreach(modulesJ, moduleIndex, moduleSlugJ) {
 				std::string moduleSlug = json_string_value(moduleSlugJ);
 				// Insert module in whitelist
-				moduleWhitelist[pluginSlug].insert(moduleSlug);
+				pw.moduleSlugs.insert(moduleSlug);
 			}
 		}
 
