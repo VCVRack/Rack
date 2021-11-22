@@ -116,7 +116,7 @@ struct RtAudioDevice : audio::Device {
 		}
 
 		if (blockSize <= 0) {
-			blockSize = 256;
+			blockSize = 512;
 		}
 
 		INFO("Opening RtAudio %s device %d: %s (%d in, %d out, %g sample rate, %d block size)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
