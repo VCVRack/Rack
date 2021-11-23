@@ -80,7 +80,7 @@ static void run() {
 #if defined ARCH_LIN || defined ARCH_MAC
 	int fd = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (fd < 0) {
-		WARN("Could not open Discord socket");
+		// WARN("Could not open Discord socket");
 		return;
 	}
 	DEFER({close(fd);});
@@ -123,14 +123,14 @@ static void run() {
 	json_object_set(handshakeJ, "client_id", json_string(CLIENT_ID));
 	DEFER({json_decref(handshakeJ);});
 	if (sendJson(fd, 0, handshakeJ)) {
-		WARN("Could not request Discord handshake");
+		// WARN("Could not request Discord handshake");
 		return;
 	}
 
 	// Receive handshake response
 	json_t* handshakeResJ = receiveJson(fd);
 	if (!handshakeResJ) {
-		WARN("Could not receive Discord handshake response");
+		// WARN("Could not receive Discord handshake response");
 		return;
 	}
 	DEFER({json_decref(handshakeResJ);});
@@ -155,14 +155,14 @@ static void run() {
 	}
 	DEFER({json_decref(payloadJ);});
 	if (sendJson(fd, 1, payloadJ)) {
-		WARN("Could not set activity on Discord");
+		// WARN("Could not set activity on Discord");
 		return;
 	}
 
 	// Receive activity response
 	json_t* payloadResJ = receiveJson(fd);
 	if (!payloadResJ) {
-		WARN("Could not receive Discord activity response");
+		// WARN("Could not receive Discord activity response");
 		return;
 	}
 	DEFER({json_decref(payloadResJ);});
