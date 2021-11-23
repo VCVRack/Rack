@@ -750,7 +750,7 @@ void init() {
 	// Set up GLFW
 #if defined ARCH_MAC
 	glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, GLFW_TRUE);
-	glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_TRUE);
+	glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
 #endif
 
 	glfwSetErrorCallback(errorCallback);
