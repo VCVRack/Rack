@@ -7,7 +7,7 @@
 		<key>BundleIsVersionChecked</key><false/>
 		<key>BundleIsRelocatable</key><false/>
 		<key>BundleOverwriteAction</key><string>upgrade</string>
-		<key>RootRelativeBundlePath</key><string>VCV Rack 2.app</string>
+		<key>RootRelativeBundlePath</key><string>VCV Rack 2 Free.app</string>
 	</dict>
 </array>
 </plist>

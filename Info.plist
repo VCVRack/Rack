@@ -4,8 +4,8 @@
 <dict>
 	<key>CFBundleInfoDictionaryVersion</key><string>6.0</string>
 	<key>CFBundleDevelopmentRegion</key><string>English</string>
-	<key>CFBundleName</key><string>VCV Rack 2</string>
-	<key>CFBundleDisplayName</key><string>VCV Rack 2</string>
+	<key>CFBundleName</key><string>VCV Rack 2 Free</string>
+	<key>CFBundleDisplayName</key><string>VCV Rack 2 Free</string>
 	<key>CFBundleIdentifier</key><string>com.vcvrack.rack</string>
 	<key>CFBundleVersion</key><string>{VERSION}</string>
 	<key>CFBundlePackageType</key><string>APPL</string>
