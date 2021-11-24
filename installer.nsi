@@ -1,10 +1,10 @@
 !include "MUI2.nsh"
 
 !define NAME_FULL "VCV Rack Free ${VERSION}"
-!define NAME "VCV Rack ${VERSION_MAJOR}"
-!define RACK_DIR "Rack${VERSION_MAJOR}"
-!define INSTALL_REG "Software\VCV\Rack${VERSION_MAJOR}"
-!define UNINSTALL_REG "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCVRack${VERSION_MAJOR}"
+!define NAME "VCV Rack ${VERSION_MAJOR} Free"
+!define RACK_DIR "Rack${VERSION_MAJOR}Free"
+!define INSTALL_REG "Software\VCV\Rack${VERSION_MAJOR}Free"
+!define UNINSTALL_REG "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCVRack${VERSION_MAJOR}Free"
 
 Name "${NAME_FULL}"
 Unicode True
