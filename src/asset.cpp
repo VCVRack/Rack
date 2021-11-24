@@ -38,6 +38,13 @@ static void initSystemDir() {
 		return;
 	}
 
+	// Environment variable overrides
+	const char* env = getenv("RACK_SYSTEM_DIR");
+	if (env) {
+		systemDir = env;
+		return;
+	}
+
 #if defined ARCH_MAC
 	CFBundleRef bundle = CFBundleGetMainBundle();
 	assert(bundle);
@@ -82,6 +89,13 @@ static void initUserDir() {
 
 	if (settings::devMode) {
 		userDir = systemDir;
+		return;
+	}
+
+	// Environment variable overrides
+	const char* env = getenv("RACK_USER_DIR");
+	if (env) {
+		userDir = env;
 		return;
 	}
 
