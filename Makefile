@@ -147,9 +147,9 @@ DIST_NAME := Rack-"$(VERSION)"-$(ARCH_OS_NAME)
 DIST_SDK_DIR := Rack-SDK
 DIST_SDK := Rack-SDK-"$(VERSION)"-$(ARCH_OS_NAME).zip
 ifdef ARCH_MAC
-	DIST_BUNDLE := VCV Rack $(VERSION_MAJOR).app
+	DIST_BUNDLE := VCV Rack $(VERSION_MAJOR) Free.app
 else
-	DIST_DIR := Rack$(VERSION_MAJOR)
+	DIST_DIR := Rack$(VERSION_MAJOR)Free
 endif
 DIST_MD := $(wildcard *.md)
 DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))

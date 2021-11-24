@@ -74,7 +74,7 @@ struct TipWindow : widget::OpaqueWidget {
 		// header->box.size.x = box.size.x - 2*margin;
 		header->box.size.y = 20;
 		header->fontSize = 20;
-		header->text = "Welcome to " + APP_NAME + " " + APP_VERSION;
+		header->text = "Welcome to " + APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION;
 		layout->addChild(header);
 
 		label = new ui::Label;
