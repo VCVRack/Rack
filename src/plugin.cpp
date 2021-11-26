@@ -162,7 +162,7 @@ static Plugin* loadPlugin(std::string path) {
 		plugin->fromJson(rootJ);
 
 		// Reject plugin if slug already exists
-		Plugin* existingPlugin = getPlugin(plugin->slug);
+		Plugin* existingPlugin = getExactPlugin(plugin->slug);
 		if (existingPlugin)
 			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
 	}
@@ -290,7 +290,7 @@ static const std::map<std::string, std::string> pluginSlugFallbacks = {
 };
 
 
-static Plugin* getPluginSimple(const std::string& pluginSlug) {
+Plugin* getExactPlugin(const std::string& pluginSlug) {
 	if (pluginSlug.empty())
 		return NULL;
 	auto it = std::find_if(plugins.begin(), plugins.end(), [=](Plugin* p) {
@@ -303,14 +303,14 @@ static Plugin* getPluginSimple(const std::string& pluginSlug) {
 
 
 Plugin* getPlugin(const std::string& pluginSlug) {
-	Plugin* p = getPluginSimple(pluginSlug);
+	Plugin* p = getExactPlugin(pluginSlug);
 	if (p)
 		return p;
 
 	// Use fallback plugin slug
 	auto it = pluginSlugFallbacks.find(pluginSlug);
 	if (it != pluginSlugFallbacks.end())
-		return getPluginSimple(it->second);
+		return getExactPlugin(it->second);
 	return NULL;
 }
 
@@ -326,7 +326,7 @@ static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = 
 };
 
 
-static Model* getModelSimple(const std::string& pluginSlug, const std::string& modelSlug) {
+Model* getExactModel(const std::string& pluginSlug, const std::string& modelSlug) {
 	if (pluginSlug.empty() || modelSlug.empty())
 		return NULL;
 	Plugin* p = getPlugin(pluginSlug);
@@ -340,14 +340,14 @@ static Model* getModelSimple(const std::string& pluginSlug, const std::string& m
 
 
 Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
-	Model* m = getModelSimple(pluginSlug, modelSlug);
+	Model* m = getExactModel(pluginSlug, modelSlug);
 	if (m)
 		return m;
 
 	// Use fallback (module slug, plugin slug)
 	auto it = moduleSlugFallbacks.find(std::make_tuple(pluginSlug, modelSlug));
 	if (it != moduleSlugFallbacks.end()) {
-		return getModelSimple(std::get<0>(it->second), std::get<1>(it->second));
+		return getExactModel(std::get<0>(it->second), std::get<1>(it->second));
 	}
 	return NULL;
 }
