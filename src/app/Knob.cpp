@@ -165,6 +165,7 @@ void Knob::onDragMove(const DragMoveEvent& e) {
 		if (linearMode) {
 			float delta = (horizontal ? e.mouseDelta.x : -e.mouseDelta.y);
 			delta *= settings::knobLinearSensitivity;
+			delta *= speed;
 			delta *= getModSpeed();
 			delta *= rangeRatio;
 
@@ -270,6 +271,7 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 	// Calculate delta value
 	float delta = e.scrollDelta.y;
 	delta *= settings::knobScrollSensitivity;
+	delta *= speed;
 	delta *= getModSpeed();
 	delta *= rangeRatio;
 
