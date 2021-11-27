@@ -26,7 +26,7 @@ void init() {
 	if (settings::autoCheckUpdates && !settings::devMode) {
 		std::thread t([&]() {
 			system::setThreadName("Library");
-			// checkAppUpdate();
+			checkAppUpdate();
 			checkUpdates();
 		});
 		t.detach();
