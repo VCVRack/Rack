@@ -389,7 +389,7 @@ struct Module {
 		float sampleRate;
 		float sampleTime;
 	};
-	/** Called after the Engine sample rate changes.
+	/** Called when the Engine sample rate changes, and when the Module is added to the Engine.
 	*/
 	virtual void onSampleRateChange(const SampleRateChangeEvent& e) {
 		// Call deprecated event method by default

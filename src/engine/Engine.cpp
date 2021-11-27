@@ -806,6 +806,11 @@ void Engine::addModule(Module* module) {
 	// Dispatch AddEvent
 	Module::AddEvent eAdd;
 	module->onAdd(eAdd);
+	// Dispatch SampleRateChangeEvent
+	Module::SampleRateChangeEvent eSrc;
+	eSrc.sampleRate = internal->sampleRate;
+	eSrc.sampleTime = internal->sampleTime;
+	module->onSampleRateChange(eSrc);
 	// Update ParamHandles' module pointers
 	for (ParamHandle* paramHandle : internal->paramHandles) {
 		if (paramHandle->moduleId == module->id)
