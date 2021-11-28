@@ -106,11 +106,14 @@ struct Module {
 	}
 	virtual ~Module();
 
-	/** Configures the number of Params, Outputs, Inputs, and Lights. */
+	/** Configures the number of Params, Outputs, Inputs, and Lights.
+	Should only be called from a Module subclass's constructor.
+	*/
 	void config(int numParams, int numInputs, int numOutputs, int numLights = 0);
 
 	/** Helper for creating a ParamQuantity and setting its properties.
 	See ParamQuantity for documentation of arguments.
+	Should only be called from a Module subclass's constructor.
 	*/
 	template <class TParamQuantity = ParamQuantity>
 	TParamQuantity* configParam(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::string unit = "", float displayBase = 0.f, float displayMultiplier = 1.f, float displayOffset = 0.f) {
@@ -138,6 +141,7 @@ struct Module {
 
 	/** Helper for creating a SwitchQuantity and setting its label strings.
 	See ParamQuantity and SwitchQuantity for documentation of arguments.
+	Should only be called from a Module subclass's constructor.
 	*/
 	template <class TSwitchQuantity = SwitchQuantity>
 	TSwitchQuantity* configSwitch(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::vector<std::string> labels = {}) {
@@ -146,6 +150,9 @@ struct Module {
 		return sq;
 	}
 
+	/** Helper for creating a SwitchQuantity with no label.
+	Should only be called from a Module subclass's constructor.
+	*/
 	template <class TSwitchQuantity = SwitchQuantity>
 	TSwitchQuantity* configButton(int paramId, std::string name = "") {
 		TSwitchQuantity* sq = configParam<TSwitchQuantity>(paramId, 0.f, 1.f, 0.f, name);
@@ -155,6 +162,7 @@ struct Module {
 
 	/** Helper for creating a PortInfo for an input port and setting its properties.
 	See PortInfo for documentation of arguments.
+	Should only be called from a Module subclass's constructor.
 	*/
 	template <class TPortInfo = PortInfo>
 	TPortInfo* configInput(int portId, std::string name = "") {
@@ -173,6 +181,7 @@ struct Module {
 
 	/** Helper for creating a PortInfo for an output port and setting its properties.
 	See PortInfo for documentation of arguments.
+	Should only be called from a Module subclass's constructor.
 	*/
 	template <class TPortInfo = PortInfo>
 	TPortInfo* configOutput(int portId, std::string name = "") {
@@ -192,6 +201,7 @@ struct Module {
 	/** Helper for creating a LightInfo and setting its properties.
 	For multi-colored lights, use the first lightId.
 	See LightInfo for documentation of arguments.
+	Should only be called from a Module subclass's constructor.
 	*/
 	template <class TLightInfo = LightInfo>
 	TLightInfo* configLight(int lightId, std::string name = "") {
@@ -208,6 +218,7 @@ struct Module {
 	}
 
 	/** Adds a direct route from an input to an output when the module is bypassed.
+	Should only be called from a Module subclass's constructor.
 	*/
 	void configBypass(int inputId, int outputId) {
 		assert(inputId < (int) inputs.size());
