@@ -1,16 +1,14 @@
 {
   "slug": "Core",
-  "name": "Core",
+  "name": "VCV Core",
   "version": "2.0.0",
   "license": "GPL-3.0-or-later",
   "author": "VCV",
   "brand": "VCV",
   "authorEmail": "support@vcvrack.com",
   "authorUrl": "https://vcvrack.com/",
-  "pluginUrl": "",
   "manualUrl": "https://vcvrack.com/manual/Core",
   "sourceUrl": "https://github.com/VCVRack/Rack",
-  "donateUrl": "",
   "changelogUrl": "https://github.com/VCVRack/Rack/blob/v2/CHANGELOG.md",
   "description": "Necessary modules built into VCV Rack",
   "modules": [
