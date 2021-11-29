@@ -651,9 +651,9 @@ struct SyncUpdateItem : ui::MenuItem {
 				rightText = "";
 				plugin::Plugin* p = plugin::getExactPlugin(slug);
 				if (p) {
-					rightText += "v" + p->version + " → ";
+					rightText += p->version + " → ";
 				}
-				rightText += "v" + update.version;
+				rightText += update.version;
 			}
 		}
 
