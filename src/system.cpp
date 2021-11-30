@@ -515,7 +515,8 @@ static void unarchiveToDirectory(const std::string& archivePath, const std::vect
 	// Open dir for writing
 	struct archive* disk = archive_write_disk_new();
 	DEFER({archive_write_free(disk);});
-	int flags = ARCHIVE_EXTRACT_TIME;
+	// Don't restore timestamps
+	int flags = 0;
 	archive_write_disk_set_options(disk, flags);
 	DEFER({archive_write_close(disk);});
 
