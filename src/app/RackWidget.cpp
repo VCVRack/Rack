@@ -1398,6 +1398,21 @@ std::vector<CableWidget*> RackWidget::getCablesOnPort(PortWidget* port) {
 	return cws;
 }
 
+std::vector<CableWidget*> RackWidget::getCompleteCablesOnPort(PortWidget* port) {
+	assert(port);
+	std::vector<CableWidget*> cws;
+	for (widget::Widget* w : internal->cableContainer->children) {
+		CableWidget* cw = dynamic_cast<CableWidget*>(w);
+		assert(cw);
+		if (!cw->isComplete())
+			continue;
+		if (cw->inputPort == port || cw->outputPort == port) {
+			cws.push_back(cw);
+		}
+	}
+	return cws;
+}
+
 
 int RackWidget::getNextCableColorId() {
 	return internal->nextCableColorId;

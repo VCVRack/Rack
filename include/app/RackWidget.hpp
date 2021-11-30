@@ -120,6 +120,7 @@ struct RackWidget : widget::OpaqueWidget {
 	std::vector<CableWidget*> getCompleteCables();
 	/** Returns all cables attached to port, complete or not. */
 	std::vector<CableWidget*> getCablesOnPort(PortWidget* port);
+	std::vector<CableWidget*> getCompleteCablesOnPort(PortWidget* port);
 	/** Returns but does not advance the next cable color. */
 	int getNextCableColorId();
 	void setNextCableColorId(int id);

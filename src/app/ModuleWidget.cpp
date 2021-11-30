@@ -743,9 +743,7 @@ void ModuleWidget::randomizeAction() {
 
 void ModuleWidget::appendDisconnectActions(history::ComplexAction* complexAction) {
 	for (PortWidget* pw : getPorts()) {
-		for (CableWidget* cw : APP->scene->rack->getCablesOnPort(pw)) {
-			if (!cw->isComplete())
-				continue;
+		for (CableWidget* cw : APP->scene->rack->getCompleteCablesOnPort(pw)) {
 			// history::CableRemove
 			history::CableRemove* h = new history::CableRemove;
 			h->setCable(cw);
@@ -811,7 +809,7 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	if (cloneCables) {
 		// Clone cables attached to input ports
 		for (PortWidget* pw : getInputs()) {
-			for (CableWidget* cw : APP->scene->rack->getCablesOnPort(pw)) {
+			for (CableWidget* cw : APP->scene->rack->getCompleteCablesOnPort(pw)) {
 				// Create cable attached to cloned ModuleWidget's input
 				engine::Cable* clonedCable = new engine::Cable;
 				clonedCable->inputModule = clonedModule;

@@ -50,7 +50,7 @@ struct PortTooltip : ui::Tooltip {
 				text += string::f("% .3fV", math::normalizeZero(v));
 			}
 			// Connected to
-			std::vector<CableWidget*> cables = APP->scene->rack->getCablesOnPort(portWidget);
+			std::vector<CableWidget*> cables = APP->scene->rack->getCompleteCablesOnPort(portWidget);
 			for (auto it = cables.rbegin(); it != cables.rend(); it++) {
 				CableWidget* cable = *it;
 				PortWidget* otherPw = (portWidget->type == engine::Port::INPUT) ? cable->outputPort : cable->inputPort;
@@ -226,7 +226,7 @@ void PortWidget::createContextMenu() {
 	assert(portInfo);
 	menu->addChild(createMenuLabel(portInfo->getFullName()));
 
-	std::vector<CableWidget*> cws = APP->scene->rack->getCablesOnPort(this);
+	std::vector<CableWidget*> cws = APP->scene->rack->getCompleteCablesOnPort(this);
 	CableWidget* topCw = cws.empty() ? NULL : cws.back();
 
 	menu->addChild(createMenuItem("Delete top cable", RACK_MOD_SHIFT_NAME "+click",
