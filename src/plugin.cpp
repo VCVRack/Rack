@@ -68,6 +68,9 @@ static void* loadLibrary(std::string libraryPath) {
 	#elif defined ARCH_MAC
 	handle = dlopen(libraryPath.c_str(), RTLD_NOW | RTLD_LOCAL);
 	#endif
+	if (!settings::devMode) {
+		system::remove(linkPath);
+	}
 	if (!handle)
 		throw Exception("Failed to load library %s: %s", libraryPath.c_str(), dlerror());
 #endif
