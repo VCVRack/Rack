@@ -107,9 +107,8 @@ static void logVa(Level level, const char* filename, int line, const char* func,
 		std::fprintf(outputFile, "\x1B[0m");
 	std::vfprintf(outputFile, format, args);
 	std::fprintf(outputFile, "\n");
-	// Don't flush log file, just console output.
-	if (outputFile == stderr)
-		std::fflush(outputFile);
+	// Note: This adds around 10us, but it's important for logging to finish writing the file, and logging is not used in performance critical code.
+	std::fflush(outputFile);
 }
 
 void log(Level level, const char* filename, int line, const char* func, const char* format, ...) {
