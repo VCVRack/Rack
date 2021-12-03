@@ -16,12 +16,12 @@ PRIVATE void destroy();
 
 /** Finds a loaded Plugin by slug. */
 Plugin* getPlugin(const std::string& pluginSlug);
-/** Finds a loaded Plugin by slug, ignoring plugin slug aliases. */
-Plugin* getExactPlugin(const std::string& pluginSlug);
+/** Finds a loaded Plugin by slug, or a fallback plugin if exists. */
+Plugin* getPluginFallback(const std::string& pluginSlug);
 /** Finds a loaded Model by plugin and model slug. */
 Model* getModel(const std::string& pluginSlug, const std::string& modelSlug);
-/** Finds a loaded Model by plugin and model slug, ignoring module slug aliases. */
-Model* getExactModel(const std::string& pluginSlug, const std::string& modelSlug);
+/** Finds a loaded Model by plugin and model slug, or a fallback model if exists. */
+Model* getModelFallback(const std::string& pluginSlug, const std::string& modelSlug);
 
 /** Creates a Model from a JSON module object.
 Throws an Exception if the model is not found.

@@ -165,7 +165,7 @@ static Plugin* loadPlugin(std::string path) {
 		plugin->fromJson(rootJ);
 
 		// Reject plugin if slug already exists
-		Plugin* existingPlugin = getExactPlugin(plugin->slug);
+		Plugin* existingPlugin = getPlugin(plugin->slug);
 		if (existingPlugin)
 			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
 	}
@@ -285,17 +285,22 @@ void destroy() {
 }
 
 
-// To request fallback slugs to be added to this list, open a GitHub issue.
+/** Given slug => fallback slug.
+Correctly handles bidirectional fallbacks.
+To request fallback slugs to be added to this list, open a GitHub issue.
+*/
 static const std::map<std::string, std::string> pluginSlugFallbacks = {
 	{"VultModulesFree", "VultModules"},
 	{"VultModules", "VultModulesFree"},
+	{"AudibleInstrumentsPreview", "AudibleInstruments"},
 	// {"", ""},
 };
 
 
-Plugin* getExactPlugin(const std::string& pluginSlug) {
+Plugin* getPlugin(const std::string& pluginSlug) {
 	if (pluginSlug.empty())
 		return NULL;
+
 	auto it = std::find_if(plugins.begin(), plugins.end(), [=](Plugin* p) {
 		return p->slug == pluginSlug;
 	});
@@ -305,53 +310,73 @@ Plugin* getExactPlugin(const std::string& pluginSlug) {
 }
 
 
-Plugin* getPlugin(const std::string& pluginSlug) {
-	Plugin* p = getExactPlugin(pluginSlug);
+Plugin* getPluginFallback(const std::string& pluginSlug) {
+	if (pluginSlug.empty())
+		return NULL;
+
+	// Attempt example plugin
+	Plugin* p = getPlugin(pluginSlug);
 	if (p)
 		return p;
 
-	// Use fallback plugin slug
+	// Attempt fallback plugin slug
 	auto it = pluginSlugFallbacks.find(pluginSlug);
 	if (it != pluginSlugFallbacks.end())
-		return getExactPlugin(it->second);
+		return getPlugin(it->second);
+
 	return NULL;
 }
 
 
-// To request fallback slugs to be added to this list, open a GitHub issue.
+/** Given slug => fallback slug.
+Correctly handles bidirectional fallbacks.
+To request fallback slugs to be added to this list, open a GitHub issue.
+*/
 using PluginModuleSlug = std::tuple<std::string, std::string>;
 static const std::map<PluginModuleSlug, PluginModuleSlug> moduleSlugFallbacks = {
-	{{"AudibleInstrumentsPreview", "Plaits"}, {"AudibleInstruments", "Plaits"}},
-	{{"AudibleInstrumentsPreview", "Marbles"}, {"AudibleInstruments", "Marbles"}},
 	{{"MindMeld-ShapeMasterPro", "ShapeMasterPro"}, {"MindMeldModular", "ShapeMaster"}},
 	{{"MindMeldModular", "ShapeMaster"}, {"MindMeld-ShapeMasterPro", "ShapeMasterPro"}},
 	// {{"", ""}, {"", ""}},
 };
 
 
-Model* getExactModel(const std::string& pluginSlug, const std::string& modelSlug) {
+Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
 	if (pluginSlug.empty() || modelSlug.empty())
 		return NULL;
+
 	Plugin* p = getPlugin(pluginSlug);
-	if (p) {
-		Model* model = p->getModel(modelSlug);
-		if (model)
-			return model;
-	}
-	return NULL;
+	if (!p)
+		return NULL;
+
+	return p->getModel(modelSlug);
 }
 
 
-Model* getModel(const std::string& pluginSlug, const std::string& modelSlug) {
-	Model* m = getExactModel(pluginSlug, modelSlug);
+Model* getModelFallback(const std::string& pluginSlug, const std::string& modelSlug) {
+	if (pluginSlug.empty() || modelSlug.empty())
+		return NULL;
+
+	// Attempt exact plugin and model
+	Model* m = getModel(pluginSlug, modelSlug);
 	if (m)
 		return m;
 
-	// Use fallback (module slug, plugin slug)
+	// Attempt fallback module
 	auto it = moduleSlugFallbacks.find(std::make_tuple(pluginSlug, modelSlug));
 	if (it != moduleSlugFallbacks.end()) {
-		return getExactModel(std::get<0>(it->second), std::get<1>(it->second));
+		Model* m = getModel(std::get<0>(it->second), std::get<1>(it->second));
+		if (m)
+			return m;
 	}
+
+	// Attempt fallback plugin
+	auto it2 = pluginSlugFallbacks.find(pluginSlug);
+	if (it2 != pluginSlugFallbacks.end()) {
+		Model* m = getModel(it2->second, modelSlug);
+		if (m)
+			return m;
+	}
+
 	return NULL;
 }
 
@@ -371,7 +396,7 @@ Model* modelFromJson(json_t* moduleJ) {
 	modelSlug = normalizeSlug(modelSlug);
 
 	// Get Model
-	Model* model = getModel(pluginSlug, modelSlug);
+	Model* model = getModelFallback(pluginSlug, modelSlug);
 	if (!model)
 		throw Exception("Could not find module \"%s\" \"%s\"", pluginSlug.c_str(), modelSlug.c_str());
 	return model;

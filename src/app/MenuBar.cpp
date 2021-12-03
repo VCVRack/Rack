@@ -649,7 +649,7 @@ struct SyncUpdateItem : ui::MenuItem {
 			}
 			else {
 				rightText = "";
-				plugin::Plugin* p = plugin::getExactPlugin(slug);
+				plugin::Plugin* p = plugin::getPlugin(slug);
 				if (p) {
 					rightText += p->version + " → ";
 				}
