@@ -2,7 +2,11 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
-### 2.0.0 (in development)
+### 2.0.1 (2021-12-02)
+- Fix network connection timeout.
+- Flush log file when logging to avoid truncated logs.
+
+### 2.0.0 (2021-11-30)
 - Redesign Module Browser with compact layout, adjustable zoom levels, sorting options, intelligent searching, and multiple tag selection.
 - Redesign component graphics and Core panels by [Pyer](https://www.pyer.be/).
 - Add port tooltips with name, voltage, and list of connected ports.
@@ -107,6 +111,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 	- Add on/off threshold values to `dsp::SchmittTrigger`.
 	- Add `dsp::convert()` template functions for converting audio between normalized floats and integers.
 	- Add `bool app::SvgSwitch::latch` setting for latching button switches.
+	- Dispatch `Module::SampleRateChange` event when `Module` is added to engine.
 
 ### 1.1.6 (2019-11-04)
 - Add ability for plugins to use LuaJIT on Mac.
