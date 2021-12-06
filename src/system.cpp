@@ -305,6 +305,27 @@ std::vector<uint8_t> readFile(const std::string& path) {
 }
 
 
+uint8_t* readFile(const std::string& path, size_t* size) {
+	FILE* f = std::fopen(path.c_str(), "rb");
+	if (!f)
+		throw Exception("Cannot read file %s", path.c_str());
+	DEFER({
+		std::fclose(f);
+	});
+
+	// Get file size so we can make a single allocation
+	std::fseek(f, 0, SEEK_END);
+	size_t len = std::ftell(f);
+	std::fseek(f, 0, SEEK_SET);
+
+	uint8_t* data = (uint8_t*) std::malloc(len);
+	std::fread(data, 1, len, f);
+	if (size)
+		*size = len;
+	return data;
+}
+
+
 void writeFile(const std::string& path, const std::vector<uint8_t>& data) {
 	FILE* f = std::fopen(path.c_str(), "wb");
 	if (!f)

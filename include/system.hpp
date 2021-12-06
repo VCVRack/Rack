@@ -115,6 +115,7 @@ std::string getExtension(const std::string& path);
 Throws on error.
 */
 std::vector<uint8_t> readFile(const std::string& path);
+uint8_t* readFile(const std::string& path, size_t* size);
 
 /** Writes a memory buffer to a file, overwriting if already exists.
 Throws on error.
