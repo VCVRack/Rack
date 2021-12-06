@@ -2,6 +2,15 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
+### 2.0.2 (2021-12-06)
+- Turn off lights if module is bypassed.
+- Fix Font and Image not loading UTF-8 filenames on Windows.
+- Fix plugins not loading if their fallback alias exists.
+- Fix crash when sometimes unsetting audio interface on Mac.
+- Rack Pro
+	- Save/restore plugin window size in patch.
+	- Fix crash on scan in Renoise.
+
 ### 2.0.1 (2021-12-02)
 - Fix network connection timeout.
 - Flush log file when logging to avoid truncated logs.
