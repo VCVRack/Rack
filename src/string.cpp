@@ -234,7 +234,8 @@ std::string formatTime(const char* format, double timestamp) {
 }
 
 std::string formatTimeISO(double timestamp) {
-	return formatTime("%FT%T%z", timestamp);
+	// Windows doesn't support %F or %T, and %z gives the full timezone name instead of offset
+	return formatTime("%Y-%m-%d %H:%M:%S %z", timestamp);
 }
 
 
