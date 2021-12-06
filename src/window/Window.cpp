@@ -709,6 +709,10 @@ double Window::getFrameDurationRemaining() {
 
 
 std::shared_ptr<Font> Window::loadFont(const std::string& filename) {
+	// HACK If ModuleWidgets call loadFont() in their constructor, APP->window might be null.
+	if (!this)
+		return NULL;
+
 	const auto& pair = internal->fontCache.find(filename);
 	if (pair != internal->fontCache.end())
 		return pair->second;
@@ -729,6 +733,10 @@ std::shared_ptr<Font> Window::loadFont(const std::string& filename) {
 
 
 std::shared_ptr<Image> Window::loadImage(const std::string& filename) {
+	// HACK If ModuleWidgets call loadFont() in their constructor, APP->window might be null.
+	if (!this)
+		return NULL;
+
 	const auto& pair = internal->imageCache.find(filename);
 	if (pair != internal->imageCache.end())
 		return pair->second;
