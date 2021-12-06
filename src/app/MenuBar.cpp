@@ -425,7 +425,7 @@ struct ViewButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 
-		menu->addChild(createBoolPtrMenuItem("Hide cursor while dragging", "", &settings::allowCursorLock));
+		menu->addChild(createBoolPtrMenuItem("Lock cursor while dragging params", "", &settings::allowCursorLock));
 
 		static const std::vector<std::string> knobModeLabels = {
 			"Linear",
