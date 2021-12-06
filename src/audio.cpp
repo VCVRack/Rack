@@ -19,10 +19,12 @@ static std::vector<std::pair<int, Driver*>> drivers;
 ////////////////////
 
 void Device::subscribe(Port* port) {
+	std::lock_guard<std::mutex> lock(processMutex);
 	subscribed.insert(port);
 }
 
 void Device::unsubscribe(Port* port) {
+	std::lock_guard<std::mutex> lock(processMutex);
 	auto it = subscribed.find(port);
 	if (it != subscribed.end())
 		subscribed.erase(it);
@@ -32,6 +34,7 @@ void Device::processBuffer(const float* input, int inputStride, float* output, i
 	// Zero output in case no Port writes values to it.
 	std::memset(output, 0, frames * outputStride * sizeof(float));
 
+	std::lock_guard<std::mutex> lock(processMutex);
 	for (Port* port : subscribed) {
 		// Setting the thread context should probably be the responsibility of Port, but because processInput() etc are overridden, this is the only good place for it.
 		contextSet(port->context);

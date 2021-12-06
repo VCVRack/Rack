@@ -1,6 +1,5 @@
 #include <map>
 #include <algorithm>
-#include <mutex>
 
 #pragma GCC diagnostic push
 #ifndef __clang__
@@ -43,8 +42,6 @@ struct RtAudioDevice : audio::Device {
 	RtAudio::StreamOptions options;
 	int blockSize = 0;
 	float sampleRate = 0;
-	/** Ensures that ports do not subscribe/unsubscribe while processBuffer() is called. */
-	std::mutex processMutex;
 
 	RtAudioDevice(RtAudio::Api api, int deviceId) {
 		this->api = api;
@@ -212,24 +209,12 @@ struct RtAudioDevice : audio::Device {
 		openStream();
 	}
 
-	void subscribe(audio::Port* port) override {
-		std::lock_guard<std::mutex> lock(processMutex);
-		Device::subscribe(port);
-	}
-
-	void unsubscribe(audio::Port* port) override {
-		std::lock_guard<std::mutex> lock(processMutex);
-		Device::unsubscribe(port);
-	}
-
 	static int rtAudioCallback(void* outputBuffer, void* inputBuffer, unsigned int nFrames, double streamTime, RtAudioStreamStatus status, void* userData) {
 		// fprintf(stderr, ".");
 		// fflush(stderr);
 
 		RtAudioDevice* that = (RtAudioDevice*) userData;
 		assert(that);
-
-		std::lock_guard<std::mutex> lock(that->processMutex);
 
 		system::setThreadName("RtAudio");
 
