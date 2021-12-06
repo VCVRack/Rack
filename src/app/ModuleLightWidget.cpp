@@ -107,17 +107,21 @@ void ModuleLightWidget::destroyTooltip() {
 void ModuleLightWidget::step() {
 	std::vector<float> brightnesses(baseColors.size());
 
-	if (module && firstLightId >= 0) {
-		assert((int) module->lights.size() >= firstLightId + (int) baseColors.size());
-
-		for (size_t i = 0; i < baseColors.size(); i++) {
-			float b = module->lights[firstLightId + i].getBrightness();
-			if (!std::isfinite(b))
-				b = 0.f;
-			b = math::clamp(b, 0.f, 1.f);
-			// Because LEDs are nonlinear, this seems to look more natural.
-			b = std::sqrt(b);
-			brightnesses[i] = b;
+	int lastLightId = firstLightId + (int) baseColors.size();
+	if (module) {
+		if (module->isBypassed()) {
+			// Leave lights off
+		}
+		else if (0 <= firstLightId && lastLightId <= (int) module->lights.size()) {
+			for (size_t i = 0; i < baseColors.size(); i++) {
+				float b = module->lights[firstLightId + i].getBrightness();
+				if (!std::isfinite(b))
+					b = 0.f;
+				b = math::clamp(b, 0.f, 1.f);
+				// Because LEDs are nonlinear, this seems to look more natural.
+				b = std::sqrt(b);
+				brightnesses[i] = b;
+			}
 		}
 	}
 	else {
