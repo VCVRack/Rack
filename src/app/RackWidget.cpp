@@ -395,6 +395,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 		// Get cable ID
 		json_t* idJ = json_object_get(cableJ, "id");
 		int64_t id;
+		// In <=v0.6, the cable ID was the index in the array.
 		if (idJ)
 			id = json_integer_value(idJ);
 		else
@@ -409,11 +410,20 @@ void RackWidget::fromJson(json_t* rootJ) {
 
 		// Create CableWidget
 		CableWidget* cw = new CableWidget;
-		cw->setCable(cable);
-		cw->fromJson(cableJ);
-		// In <=v1, cable colors were not serialized, so choose one from the available colors.
-		if (cw->color.a == 0.f) {
-			cw->color = getNextCableColor();
+		try {
+			cw->setCable(cable);
+			cw->fromJson(cableJ);
+			// In <=v1, cable colors were not serialized, so choose one from the available colors.
+			if (cw->color.a == 0.f) {
+				cw->color = getNextCableColor();
+			}
+		}
+		catch (Exception& e) {
+			delete cw;
+			// If creating CableWidget fails, remove Cable from Engine.
+			APP->engine->removeCable(cable);
+			delete cable;
+			continue;
 		}
 		addCable(cw);
 	}

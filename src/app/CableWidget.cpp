@@ -166,17 +166,22 @@ void CableWidget::setCable(engine::Cable* cable) {
 		delete this->cable;
 		this->cable = NULL;
 	}
-	this->cable = cable;
 	if (cable) {
-		app::ModuleWidget* outputModule = APP->scene->rack->getModule(cable->outputModule->id);
-		assert(outputModule);
-		outputPort = outputModule->getOutput(cable->outputId);
-		assert(outputPort);
+		app::ModuleWidget* outputMw = APP->scene->rack->getModule(cable->outputModule->id);
+		if (!outputMw)
+			throw Exception("Cable cannot find output ModuleWidget %lld", cable->outputModule->id);
+		outputPort = outputMw->getOutput(cable->outputId);
+		if (!outputPort)
+			throw Exception("Cable cannot find output port %d", cable->outputId);
 
-		app::ModuleWidget* inputModule = APP->scene->rack->getModule(cable->inputModule->id);
-		assert(inputModule);
-		inputPort = inputModule->getInput(cable->inputId);
-		assert(inputPort);
+		app::ModuleWidget* inputMw = APP->scene->rack->getModule(cable->inputModule->id);
+		if (!inputMw)
+			throw Exception("Cable cannot find input ModuleWidget %lld", cable->inputModule->id);
+		inputPort = inputMw->getInput(cable->inputId);
+		if (!inputPort)
+			throw Exception("Cable cannot find input port %d", cable->inputId);
+
+		this->cable = cable;
 	}
 	else {
 		outputPort = NULL;
