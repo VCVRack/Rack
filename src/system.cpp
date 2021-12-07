@@ -377,7 +377,7 @@ static void archiveDirectory(const std::string& archivePath, std::vector<uint8_t
 	DEFER({archive_write_free(a);});
 	// For some reason libarchive adds 10k of padding to archive_write_open() (but not archive_write_open_filename()) unless this is set to 0.
 	archive_write_set_bytes_per_block(a, 0);
-	archive_write_set_format_ustar(a);
+	archive_write_set_format_pax_restricted(a);
 	archive_write_add_filter_zstd(a);
 	if (!(0 <= compressionLevel && compressionLevel <= 19))
 		throw Exception("Invalid Zstandard compression level");
