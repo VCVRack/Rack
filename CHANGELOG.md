@@ -2,6 +2,11 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
+### 2.0.3 (in development)
+- Fix crash when loading Font when Window does not exist.
+- Rack Pro
+	- Show machine ID in splash window for offline activation.
+
 ### 2.0.2 (2021-12-06)
 - Turn off lights if module is bypassed.
 - Fix Font and Image not loading UTF-8 filenames on Windows.
