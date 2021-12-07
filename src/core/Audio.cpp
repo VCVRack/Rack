@@ -537,10 +537,10 @@ struct AudioWidget : ModuleWidget {
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.364, 113.115)), module, TAudio::AUDIO_OUTPUTS + 9));
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(30.914, 113.115)), module, TAudio::AUDIO_OUTPUTS + 10));
 			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(42.464, 113.115)), module, TAudio::AUDIO_OUTPUTS + 11));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(65.565, 112.962)), module, TAudio::AUDIO_OUTPUTS + 12));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.015, 113.115)), module, TAudio::AUDIO_OUTPUTS + 13));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(88.664, 112.962)), module, TAudio::AUDIO_OUTPUTS + 14));
-			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(77.114, 113.115)), module, TAudio::AUDIO_OUTPUTS + 15));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(54.015, 113.115)), module, TAudio::AUDIO_OUTPUTS + 12));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(65.565, 113.115)), module, TAudio::AUDIO_OUTPUTS + 13));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(77.114, 113.115)), module, TAudio::AUDIO_OUTPUTS + 14));
+			addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(88.664, 113.115)), module, TAudio::AUDIO_OUTPUTS + 15));
 
 			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(13.545, 52.168)), module, TAudio::INPUT_LIGHTS + 2 * 0));
 			addChild(createLightCentered<SmallLight<GreenRedLight>>(mm2px(Vec(36.779, 52.168)), module, TAudio::INPUT_LIGHTS + 2 * 1));
