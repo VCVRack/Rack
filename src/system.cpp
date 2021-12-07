@@ -379,7 +379,8 @@ static void archiveDirectory(const std::string& archivePath, std::vector<uint8_t
 	archive_write_set_bytes_per_block(a, 0);
 	archive_write_set_format_ustar(a);
 	archive_write_add_filter_zstd(a);
-	assert(0 <= compressionLevel && compressionLevel <= 19);
+	if (!(0 <= compressionLevel && compressionLevel <= 19))
+		throw Exception("Invalid Zstandard compression level");
 	r = archive_write_set_filter_option(a, NULL, "compression-level", std::to_string(compressionLevel).c_str());
 	if (r < ARCHIVE_OK)
 		throw Exception("Archiver could not set filter option: %s", archive_error_string(a));
@@ -523,10 +524,11 @@ static void unarchiveToDirectory(const std::string& archivePath, const std::vect
 	}
 	else {
 		// Open file
+		const size_t blockSize = 1 << 16;
 #if defined ARCH_WIN
-		r = archive_read_open_filename_w(a, string::UTF8toUTF16(archivePath).c_str(), 1 << 16);
+		r = archive_read_open_filename_w(a, string::UTF8toUTF16(archivePath).c_str(), blockSize);
 #else
-		r = archive_read_open_filename(a, archivePath.c_str(), 1 << 16);
+		r = archive_read_open_filename(a, archivePath.c_str(), blockSize);
 #endif
 		if (r < ARCHIVE_OK)
 			throw Exception("Unarchiver could not open archive %s: %s", archivePath.c_str(), archive_error_string(a));
@@ -538,6 +540,8 @@ static void unarchiveToDirectory(const std::string& archivePath, const std::vect
 	DEFER({archive_write_free(disk);});
 	// Don't restore timestamps
 	int flags = 0;
+	// Delete existing files instead of truncating and rewriting
+	flags |= ARCHIVE_EXTRACT_UNLINK;
 	archive_write_disk_set_options(disk, flags);
 	DEFER({archive_write_close(disk);});
 
