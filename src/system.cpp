@@ -434,13 +434,21 @@ static void archiveDirectory(const std::string& archivePath, std::vector<uint8_t
 #else
 		entryPath = archive_entry_pathname(entry);
 #endif
+
 		entryPath = getRelativePath(entryPath, dirPath);
+
 #if defined ARCH_WIN
 		// FIXME This doesn't seem to set UTF-8 paths on Windows.
 		archive_entry_copy_pathname_w(entry, string::UTF8toUTF16(entryPath).c_str());
 #else
 		archive_entry_set_pathname(entry, entryPath.c_str());
 #endif
+
+		// Set uid and gid to 0 because we don't need to store these.
+		archive_entry_set_uid(entry, 0);
+		archive_entry_set_uname(entry, NULL);
+		archive_entry_set_gid(entry, 0);
+		archive_entry_set_gname(entry, NULL);
 
 		// Write file to archive
 		r = archive_write_header(a, entry);
