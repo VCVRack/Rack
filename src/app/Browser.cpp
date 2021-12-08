@@ -220,7 +220,7 @@ struct ModelBox : widget::OpaqueWidget {
 		const settings::ModuleInfo* mi = settings::getModuleInfo(model->plugin->slug, model->slug);
 		if (mi && mi->favorite) {
 			nvgBeginPath(args.vg);
-			math::Rect borderBox = box.zeroPos().shrink(math::Vec(1, 1));
+			math::Rect borderBox = box.zeroPos();
 			nvgRect(args.vg, RECT_ARGS(borderBox));
 			nvgStrokeWidth(args.vg, 2);
 			nvgStrokeColor(args.vg, componentlibrary::SCHEME_YELLOW);
@@ -512,7 +512,6 @@ struct Browser : widget::OpaqueWidget {
 		countLabel->color.a = 0.5;
 		headerLayout->addChild(countLabel);
 
-
 		SortButton* sortButton = new SortButton;
 		sortButton->box.size.x = 150;
 		sortButton->browser = this;
@@ -538,7 +537,8 @@ struct Browser : widget::OpaqueWidget {
 		modelScroll->container->addChild(modelMargin);
 
 		modelContainer = new ui::SequentialLayout;
-		modelContainer->margin = math::Vec(margin, 0);
+		// Add 2 pixels for favorites border
+		modelContainer->margin = math::Vec(margin, 2);
 		modelContainer->spacing = math::Vec(margin, margin);
 		modelMargin->addChild(modelContainer);
 
