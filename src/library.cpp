@@ -20,12 +20,21 @@ namespace library {
 
 static std::mutex appUpdateMutex;
 static std::mutex updateMutex;
+static std::mutex timeoutMutex;
+static std::condition_variable updateCv;
 
 
 void init() {
 	if (settings::autoCheckUpdates && !settings::devMode) {
 		std::thread t([&]() {
 			system::setThreadName("Library");
+			// Wait a few seconds before updating in case library is destroyed immediately afterwards
+			{
+				std::unique_lock<std::mutex> lock(timeoutMutex);
+				if (updateCv.wait_for(lock, std::chrono::duration<double>(4.0)) != std::cv_status::timeout)
+					return;
+			}
+
 			checkAppUpdate();
 			checkUpdates();
 		});
@@ -36,12 +45,10 @@ void init() {
 
 void destroy() {
 	// Wait until all library threads are finished
-	{
-		std::lock_guard<std::mutex> lock(appUpdateMutex);
-	}
-	{
-		std::lock_guard<std::mutex> lock(updateMutex);
-	}
+	updateCv.notify_all();
+	std::lock_guard<std::mutex> timeoutLock(timeoutMutex);
+	std::lock_guard<std::mutex> appUpdateLock(appUpdateMutex);
+	std::lock_guard<std::mutex> updateLock(updateMutex);
 }
 
 
