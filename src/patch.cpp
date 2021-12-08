@@ -248,6 +248,8 @@ static bool isPatchLegacyV1(std::string path) {
 void Manager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
+	clear();
+
 	system::removeRecursively(autosavePath);
 	system::createDirectories(autosavePath);
 
@@ -268,6 +270,8 @@ void Manager::load(std::string path) {
 
 
 void Manager::loadTemplate() {
+	clear();
+
 	try {
 		load(templatePath);
 	}
@@ -282,7 +286,6 @@ void Manager::loadTemplate() {
 
 			system::removeRecursively(autosavePath);
 			system::createDirectories(autosavePath);
-			clear();
 		}
 	}
 
