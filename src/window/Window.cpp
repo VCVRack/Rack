@@ -270,7 +270,7 @@ Window::Window() {
 	win = glfwCreateWindow(1024, 768, "", NULL, NULL);
 	if (!win) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not open GLFW window. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
-		exit(1);
+		throw Exception("Could not create Window");
 	}
 
 	float contentScale;
@@ -319,7 +319,7 @@ Window::Window() {
 	err = glewInit();
 	if (err != GLEW_OK) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLEW. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
-		exit(1);
+		throw Exception("Could not initialize GLEW");
 	}
 
 	const GLubyte* vendor = glGetString(GL_VENDOR);
@@ -343,7 +343,7 @@ Window::Window() {
 #endif
 	if (!vg) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize NanoVG. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
-		exit(1);
+		throw Exception("Could not initialize NanoVG");
 	}
 
 	// Load default Blendish font
@@ -766,7 +766,7 @@ void init() {
 	err = glfwInit();
 	if (err != GLFW_TRUE) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not initialize GLFW.");
-		exit(1);
+		throw Exception("Could not initialize GLFW");
 	}
 }
 
