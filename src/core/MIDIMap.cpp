@@ -153,7 +153,7 @@ struct MIDIMap : Module {
 			refreshParamHandleText(learningId);
 		}
 		// Ignore negative values generated using the nonstandard 8-bit MIDI extension from the gamepad driver
-		if (values[cc] < 0)
+		if (value < 0)
 			return;
 		values[cc] = value;
 	}
