@@ -2,10 +2,16 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
-### 2.0.3 (in development)
-- Fix crash when loading Font when Window does not exist.
+### 2.0.3 (2021-12-09)
+- Fix MIDI-Map not accepting MIDI CC.
+- Fix order of Audio-16 outputs 13/14 and 15/16.
+- Clear patch before removing autosave dir when loading patch. This fixes inability to load patches on Windows when modules hold file handles to patch storage.
+- Fix crash when patch attempts to add a cable that connects to a valid Port but an inexistent PortWidget (e.g. if a module defines a Port but omits the PortWidget).
+- Upgrade from ustar to pax tar patch format. Don't store actual uid/gid, just set to 0.
 - Rack Pro
+	- Add external audio/MIDI drivers in plugin, except ASIO on Windows.
 	- Show machine ID in splash window for offline activation.
+	- Prevent "Reserved" plugin parameter from being changed when moving module parameters.
 
 ### 2.0.2 (2021-12-06)
 - Turn off lights if module is bypassed.
