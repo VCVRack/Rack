@@ -2,6 +2,10 @@
 
 In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
+### 2.0.3b (2021-12-09)
+- Rack Pro
+	- Use separate template patch when running as a plugin.
+
 ### 2.0.3 (2021-12-09)
 - Fix MIDI-Map not accepting MIDI CC.
 - Fix order of Audio-16 outputs 13/14 and 15/16.
