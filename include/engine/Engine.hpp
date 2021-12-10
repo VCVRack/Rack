@@ -42,7 +42,7 @@ struct Engine {
 	Write-locks.
 	*/
 	void setMasterModule(Module* module);
-	PRIVATE void setMasterModule_NoLock(Module* module);
+	void setMasterModule_NoLock(Module* module);
 	Module* getMasterModule();
 
 	/** Returns the sample rate used by the engine for stepping each module.

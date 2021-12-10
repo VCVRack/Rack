@@ -174,7 +174,10 @@ struct AudioPort : audio::Port {
 		deviceSampleRate = 0.f;
 		engineInputBuffer.clear();
 		engineOutputBuffer.clear();
-		setMaster(false);
+		// We can be in an Engine write-lock here (e.g. onReset() calls this indirectly), so use non-locking master module API.
+		// setMaster(false);
+		if (APP->engine->getMasterModule() == module)
+			APP->engine->setMasterModule_NoLock(NULL);
 		// DEBUG("onStopStream");
 	}
 };
