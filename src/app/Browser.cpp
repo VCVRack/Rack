@@ -905,7 +905,7 @@ inline void BrandButton::step() {
 		text += ": ";
 		text += browser->brand;
 	}
-	text = string::ellipsize(text, 21);
+	text = string::ellipsize(text, 20);
 	ChoiceButton::step();
 }
 
