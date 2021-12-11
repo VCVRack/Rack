@@ -779,6 +779,30 @@ struct Browser : widget::OpaqueWidget {
 		if (!e.isConsumed())
 			e.consume(this);
 	}
+
+	void onHoverKey(const HoverKeyEvent& e) override {
+		if (e.action == GLFW_PRESS) {
+			// Secret key command to dump all visible modules into rack
+			if (e.key == GLFW_KEY_F2 && (e.mods & RACK_MOD_MASK) == (RACK_MOD_CTRL | GLFW_MOD_SHIFT | GLFW_MOD_ALT)) {
+				int count = 0;
+				for (widget::Widget* w : modelContainer->children) {
+					ModelBox* mb = dynamic_cast<ModelBox*>(w);
+					if (!mb)
+						continue;
+					if (!mb->visible)
+						continue;
+					count++;
+					DEBUG("Dumping into rack (%d): %s/%s", count, mb->model->plugin->slug.c_str(), mb->model->slug.c_str());
+					chooseModel(mb->model);
+				}
+				e.consume(this);
+			}
+		}
+
+		if (e.isConsumed())
+			return;
+		OpaqueWidget::onHoverKey(e);
+	}
 };
 
 
