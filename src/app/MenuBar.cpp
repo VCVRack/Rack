@@ -254,11 +254,17 @@ struct CableTensionQuantity : Quantity {
 	float getDefaultValue() override {
 		return 0.5;
 	}
+	float getDisplayValue() override {
+		return getValue() * 100;
+	}
+	void setDisplayValue(float displayValue) override {
+		setValue(displayValue / 100);
+	}
 	std::string getLabel() override {
 		return "Cable tension";
 	}
-	int getDisplayPrecision() override {
-		return 2;
+	std::string getUnit() override {
+		return "%";
 	}
 };
 struct CableTensionSlider : ui::Slider {
