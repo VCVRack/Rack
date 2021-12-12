@@ -31,14 +31,6 @@ Example usage:
 */
 #define RACK_HELD 3
 
-// GLFW_* aliases to match GLFW-defined macros
-#define GLFW_MOD_CTRL        RACK_MOD_CTRL
-#define GLFW_MOD_CTRL_NAME   RACK_MOD_CTRL_NAME
-#define GLFW_MOD_ALT_NAME    RACK_MOD_ALT_NAME
-#define GLFW_MOD_SHIFT_NAME  RACK_MOD_SHIFT_NAME
-#define GLFW_MOD_MASK        RACK_MOD_MASK
-#define GLFW_HELD            RACK_HELD
-
 
 namespace rack {
 namespace widget {
