@@ -106,6 +106,8 @@ struct Window::Internal {
 static void windowPosCallback(GLFWwindow* win, int x, int y) {
 	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
 		return;
+	if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
+		return;
 	if (glfwGetWindowMonitor(win))
 		return;
 	settings::windowPos = math::Vec(x, y);
@@ -115,6 +117,8 @@ static void windowPosCallback(GLFWwindow* win, int x, int y) {
 
 static void windowSizeCallback(GLFWwindow* win, int width, int height) {
 	if (glfwGetWindowAttrib(win, GLFW_MAXIMIZED))
+		return;
+	if (glfwGetWindowAttrib(win, GLFW_ICONIFIED))
 		return;
 	if (glfwGetWindowMonitor(win))
 		return;
