@@ -455,6 +455,7 @@ json_t* Manager::toJson() {
 
 void Manager::fromJson(json_t* rootJ) {
 	clear();
+	warningLog = "";
 
 	// version
 	std::string version;
