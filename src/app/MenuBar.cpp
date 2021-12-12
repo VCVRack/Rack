@@ -107,6 +107,13 @@ struct FileButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 
+		// Load selection
+		menu->addChild(createMenuItem("Import selection", "", [=]() {
+			APP->scene->rack->loadSelectionDialog();
+		}, false, true));
+
+		menu->addChild(new ui::MenuSeparator);
+
 		menu->addChild(createMenuItem("Quit", RACK_MOD_CTRL_NAME "+Q", []() {
 			APP->window->close();
 		}));

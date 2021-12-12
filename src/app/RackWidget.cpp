@@ -1235,11 +1235,6 @@ void RackWidget::appendSelectionContextMenu(ui::Menu* menu) {
 		pasteClipboardAction();
 	}, false, true));
 
-	// Load
-	menu->addChild(createMenuItem("Import selection", "", [=]() {
-		loadSelectionDialog();
-	}, false, true));
-
 	// Save
 	menu->addChild(createMenuItem("Save selection as", "", [=]() {
 		saveSelectionDialog();
