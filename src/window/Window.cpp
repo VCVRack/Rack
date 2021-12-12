@@ -271,7 +271,7 @@ Window::Window() {
 #endif
 
 	// Create window
-	win = glfwCreateWindow(1024, 768, "", NULL, NULL);
+	win = glfwCreateWindow(1280, 720, "", NULL, NULL);
 	if (!win) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not open GLFW window. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		throw Exception("Could not create Window");
@@ -282,8 +282,10 @@ Window::Window() {
 	INFO("Window content scale: %f", contentScale);
 
 	glfwSetWindowSizeLimits(win, WINDOW_SIZE_MIN.x, WINDOW_SIZE_MIN.y, GLFW_DONT_CARE, GLFW_DONT_CARE);
-	glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
-	if (settings::windowPos.isFinite()) {
+	if (settings::windowSize.x > 0 && settings::windowSize.y > 0) {
+		glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
+	}
+	if (settings::windowPos.x > 0 && settings::windowPos.y > 0) {
 		glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
 	}
 	if (settings::windowMaximized) {
