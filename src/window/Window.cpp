@@ -416,7 +416,7 @@ void Window::step() {
 	internal->frameTime = frameTime;
 	internal->lastFrameDuration = frameTime - lastFrameTime;
 	// DEBUG("%.2lf Hz", 1.0 / internal->lastFrameDuration);
-	double t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
+	// double t1 = 0.0, t2 = 0.0, t3 = 0.0, t4 = 0.0, t5 = 0.0;
 
 	// Make event handlers and step() have a clean NanoVG context
 	nvgReset(vg);
@@ -477,7 +477,7 @@ void Window::step() {
 	int winWidth, winHeight;
 	glfwGetWindowSize(win, &winWidth, &winHeight);
 	windowRatio = (float)fbWidth / winWidth;
-	t1 = system::getTime();
+	// t1 = system::getTime();
 
 	if (APP->scene) {
 		// DEBUG("%f %f %d %d", pixelRatio, windowRatio, fbWidth, winWidth);
@@ -486,7 +486,7 @@ void Window::step() {
 
 		// Step scene
 		APP->scene->step();
-		t2 = system::getTime();
+		// t2 = system::getTime();
 
 		// Render scene
 		bool visible = glfwGetWindowAttrib(win, GLFW_VISIBLE) && !glfwGetWindowAttrib(win, GLFW_ICONIFIED);
@@ -500,13 +500,13 @@ void Window::step() {
 			args.vg = vg;
 			args.clipBox = APP->scene->box.zeroPos();
 			APP->scene->draw(args);
-			t3 = system::getTime();
+			// t3 = system::getTime();
 
 			glViewport(0, 0, fbWidth, fbHeight);
 			glClearColor(0.0, 0.0, 0.0, 1.0);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 			nvgEndFrame(vg);
-			t4 = system::getTime();
+			// t4 = system::getTime();
 		}
 	}
 
@@ -518,7 +518,7 @@ void Window::step() {
 		std::this_thread::sleep_for(std::chrono::duration<double>(frameDurationRemaining));
 	}
 
-	t5 = system::getTime();
+	// t5 = system::getTime();
 
 	// DEBUG("pre-step %6.1f step %6.1f draw %6.1f nvgEndFrame %6.1f glfwSwapBuffers %6.1f total %6.1f",
 	// 	(t1 - frameTime) * 1e3f,
