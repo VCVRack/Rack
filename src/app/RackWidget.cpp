@@ -292,7 +292,7 @@ void RackWidget::mergeJson(json_t* rootJ) {
 		// TODO Legacy v0.6?
 		ModuleWidget* mw = getModule(id);
 		if (!mw) {
-			WARN("Cannot find ModuleWidget %" PRId64, id);
+			WARN("Cannot find ModuleWidget %lld", (long long) id);
 			continue;
 		}
 
@@ -317,7 +317,7 @@ void RackWidget::mergeJson(json_t* rootJ) {
 		int64_t id = json_integer_value(idJ);
 		CableWidget* cw = getCable(id);
 		if (!cw) {
-			WARN("Cannot find CableWidget %" PRId64, id);
+			WARN("Cannot find CableWidget %lld", (long long) id);
 			continue;
 		}
 
@@ -356,7 +356,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 		// Get Module
 		engine::Module* module = APP->engine->getModule(id);
 		if (!module) {
-			WARN("Cannot find Module %" PRId64, id);
+			WARN("Cannot find Module %lld", (long long) id);
 			continue;
 		}
 
@@ -404,7 +404,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 		// Get Cable
 		engine::Cable* cable = APP->engine->getCable(id);
 		if (!cable) {
-			WARN("Cannot find Cable %" PRId64, id);
+			WARN("Cannot find Cable %lld", (long long) id);
 			continue;
 		}
 

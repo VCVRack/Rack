@@ -31,31 +31,31 @@ void Cable::fromJson(json_t* rootJ) {
 	// inputModuleId
 	json_t* inputModuleIdJ = json_object_get(rootJ, "inputModuleId");
 	if (!inputModuleIdJ)
-		throw Exception("Input module ID not found for cable %" PRId64, id);
+		throw Exception("Input module ID not found for cable %lld", (long long) id);
 	int64_t inputModuleId = json_integer_value(inputModuleIdJ);
 	inputModule = APP->engine->getModule(inputModuleId);
 	if (!inputModule)
-		throw Exception("Input module %" PRId64 " not found for cable %" PRId64, inputModuleId, id);
+		throw Exception("Input module %lld not found for cable %lld", (long long) inputModuleId, (long long) id);
 
 	// inputId
 	json_t* inputIdJ = json_object_get(rootJ, "inputId");
 	if (!inputIdJ)
-		throw Exception("Input ID not found for cable %" PRId64, id);
+		throw Exception("Input ID not found for cable %lld", (long long) id);
 	inputId = json_integer_value(inputIdJ);
 
 	// outputModuleId
 	json_t* outputModuleIdJ = json_object_get(rootJ, "outputModuleId");
 	if (!outputModuleIdJ)
-		throw Exception("Output module ID not found for cable %" PRId64, id);
+		throw Exception("Output module ID not found for cable %lld", (long long) id);
 	int64_t outputModuleId = json_integer_value(outputModuleIdJ);
 	outputModule = APP->engine->getModule(outputModuleId);
 	if (!outputModule)
-		throw Exception("Output module %" PRId64 " not found for cable %" PRId64, outputModuleId, id);
+		throw Exception("Output module %lld not found for cable %lld", (long long) outputModuleId, (long long) id);
 
 	// outputId
 	json_t* outputIdJ = json_object_get(rootJ, "outputId");
 	if (!outputIdJ)
-		throw Exception("Output ID not found for cable %" PRId64, id);
+		throw Exception("Output ID not found for cable %lld", (long long) id);
 	outputId = json_integer_value(outputIdJ);
 }
 
