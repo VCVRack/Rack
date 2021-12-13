@@ -21,7 +21,7 @@ bool isPlugin = false;
 
 std::string token;
 bool windowMaximized = false;
-math::Vec windowSize = math::Vec(1280, 720);
+math::Vec windowSize = math::Vec(1024, 720);
 math::Vec windowPos = math::Vec(NAN, NAN);
 bool invertZoom = false;
 float pixelRatio = 0.0;

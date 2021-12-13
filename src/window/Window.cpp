@@ -271,7 +271,7 @@ Window::Window() {
 #endif
 
 	// Create window
-	win = glfwCreateWindow(1280, 720, "", NULL, NULL);
+	win = glfwCreateWindow(1024, 720, "", NULL, NULL);
 	if (!win) {
 		osdialog_message(OSDIALOG_ERROR, OSDIALOG_OK, "Could not open GLFW window. Does your graphics card support OpenGL 2.0 or greater? If so, make sure you have the latest graphics drivers installed.");
 		throw Exception("Could not create Window");
