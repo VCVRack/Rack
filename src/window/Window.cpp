@@ -285,7 +285,7 @@ Window::Window() {
 	if (settings::windowSize.x > 0 && settings::windowSize.y > 0) {
 		glfwSetWindowSize(win, settings::windowSize.x, settings::windowSize.y);
 	}
-	if (settings::windowPos.x > 0 && settings::windowPos.y > 0) {
+	if (settings::windowPos.x > -32000 && settings::windowPos.y > -32000) {
 		glfwSetWindowPos(win, settings::windowPos.x, settings::windowPos.y);
 	}
 	if (settings::windowMaximized) {
