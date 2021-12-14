@@ -147,6 +147,11 @@ struct BlankWidget : ModuleWidget {
 		bottomRightScrew = createWidget<ScrewSilver>(Vec(box.size.x - 30, 365));
 		addChild(topRightScrew);
 		addChild(bottomRightScrew);
+
+		// Set box width from loaded Module before adding to the RackWidget, so modules aren't unnecessarily shoved around.
+		if (module) {
+			box.size.x = module->width * RACK_GRID_WIDTH;
+		}
 	}
 
 	void step() override {
@@ -159,10 +164,12 @@ struct BlankWidget : ModuleWidget {
 		topRightScrew->box.pos.x = box.size.x - 30;
 		bottomRightScrew->box.pos.x = box.size.x - 30;
 		if (box.size.x < RACK_GRID_WIDTH * 6) {
-			topRightScrew->visible = bottomRightScrew->visible = false;
+			topRightScrew->hide();
+			bottomRightScrew->hide();
 		}
 		else {
-			topRightScrew->visible = bottomRightScrew->visible = true;
+			topRightScrew->show();
+			bottomRightScrew->show();
 		}
 		rightHandle->box.pos.x = box.size.x - rightHandle->box.size.x;
 		ModuleWidget::step();
