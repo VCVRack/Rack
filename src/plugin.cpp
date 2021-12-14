@@ -245,8 +245,13 @@ void init() {
 		std::string fundamentalDir = system::join(pluginsPath, "Fundamental");
 		if (system::isFile(fundamentalSrc)) {
 			INFO("Extracting bundled Fundamental package");
-			system::unarchiveToDirectory(fundamentalSrc.c_str(), pluginsPath.c_str());
-			loadPlugin(fundamentalDir);
+			try {
+				system::unarchiveToDirectory(fundamentalSrc.c_str(), pluginsPath.c_str());
+				loadPlugin(fundamentalDir);
+			}
+			catch (Exception& e) {
+				WARN("Could not extract Fundamental package: %s", e.what());
+			}
 		}
 	}
 }
@@ -266,8 +271,14 @@ void destroy() {
 			destroyCallback = (DestroyCallback) dlsym(handle, "destroy");
 #endif
 		}
-		if (destroyCallback)
-			destroyCallback();
+		if (destroyCallback) {
+			try {
+				destroyCallback();
+			}
+			catch (Exception& e) {
+				WARN("Could not destroy plugin %s", plugin->slug.c_str());
+			}
+		}
 
 		// We must delete the Plugin instance *before* freeing the library, because the vtables of Model subclasses are defined in the library, which are needed in the Plugin destructor.
 		delete plugin;
