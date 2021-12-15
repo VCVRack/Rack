@@ -831,7 +831,6 @@ struct HelpButton : MenuButton {
 
 			menu->addChild(createMenuItem("Update " + APP_NAME, APP_VERSION + " → " + library::appVersion, [=]() {
 				system::openBrowser(library::appDownloadUrl);
-				APP->window->close();
 			}));
 
 			menu->addChild(createMenuItem("Review changelog", "", [=]() {
