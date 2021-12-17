@@ -255,7 +255,7 @@ struct MIDICC_CVWidget : ModuleWidget {
 
 		menu->addChild(createBoolPtrMenuItem("MPE mode", "", &module->mpeMode));
 
-		menu->addChild(createBoolPtrMenuItem("CC 0-31 controls are 14-bit", "", &module->lsbMode));
+		menu->addChild(createBoolPtrMenuItem("14-bit CC 0-31 / 32-63", "", &module->lsbMode));
 	}
 };
 
