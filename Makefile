@@ -98,6 +98,9 @@ all: $(TARGET) $(STANDALONE_TARGET)
 dep:
 	$(MAKE) -C dep
 
+cleandep:
+	$(MAKE) -C dep clean
+
 run: $(STANDALONE_TARGET)
 	./$< -d
 
