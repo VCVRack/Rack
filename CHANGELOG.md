@@ -1,6 +1,20 @@
 # VCV Rack changelog
 
-In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
+In this document, Ctrl means Cmd on Mac.
+
+### 2.0.4 (in development)
+- Fix hang when initializing Audio module.
+- Fix hidden window after closing while minimized and reopening.
+- Move Import Selection menu item to File menu bar.
+- Switch from GTK3 to `zenity` for opening dialogs on Linux.
+- Implement prompt dialog on Windows.
+- Make Windows installer add Rack to list of CFA allowed apps, allowing Rack to write to "My Documents" folder if Controlled Folder Access is enabled.
+- Rack Pro
+	- Improve stability of DAW MIDI clock.
+	- Fix graphics glitch when duplicating module with Ctrl+D in Ableton Live.
+	- Re-enable patch load error dialog.
+- SDK
+	- Compile with `-fno-omit-frame-pointer`.
 
 ### 2.0.3b (2021-12-09)
 - Rack Pro
@@ -58,13 +72,13 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add "knobLinearSensitivity" property to settings.
 - Add timestamps to MIDI messages.
 - Allow sending and receiving SysEx messages through MIDI drivers.
-- Allow scrolling with Alt-click and drag.
+- Allow scrolling with Alt+click and drag.
 - Add "File > Open recent" menu item for opening recent patches.
 - Add "Preset > Save template" to module context menu which saves the default module preset to load when a new instance is added to the rack.
 - Break Rack executable into libRack shared library and lightweight standalone Rack executable.
 - Add support for 1/2x and 1/4x low-fidelity sample rates to engine and "Engine > Sample rates" menu.
 - Add Escape key command for existing fullscreen, in case F11 doesn't work.
-- Copy cable color when cloning cables with Mod+click.
+- Copy cable color when cloning cables with Ctrl+click.
 - Fix key commands on AZERTY, Dvorak, and all other keyboard layouts.
 - Add Mouse device to Computer keyboard/mouse MIDI driver.
 - Make scrollbar mouse interaction similar to modern OS behavior.
@@ -82,8 +96,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add engine CPU meter and framerate meter to menu bar.
 - Allow zooming rack with extra mouse buttons 4 and 5.
 - Add `"pixelRatio"` to settings for forcing the UI pixel scale.
-- If Mod+clicking on any menu item, the menu stays open (except for some menu items like "Delete Module").
-- Add Mod+F1 key command when cursor is hovering a module to open its user manual.
+- If Ctrl+clicking on any menu item, the menu stays open (except for some menu items like "Delete Module").
+- Add Ctrl+F1 key command when cursor is hovering a module to open its user manual.
 - Redesign CPU meter with percentage history graph.
 - Add PulseAudio driver on Linux.
 - Distribute .pkg installer on Mac.
@@ -183,7 +197,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Re-enable JACK MIDI driver on Linux.
 - Fix scroll speed for mice and trackpads on Mac.
 - Fix undo history bug when dragging patch file to the Rack window.
-- Fix crash when pasting presets to an empty rack space with Mod-V.
+- Fix crash when pasting presets to an empty rack space with Ctrl+V.
 - Fix module expanders being assigned incorrectly when loading presets.
 - Add check for duplicate port IDs for modules.
 
@@ -195,8 +209,8 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 ### 1.1.0 (2019-06-27)
 - Request microphone access on Mac to prevent Mac 10.14+ from blocking audio input.
 - Clear filters in Module Browser when backspace is pressed while the search field is empty.
-- Add Mod-0 key command to set zoom to 100%.
-- Emulate middle-click with Ctrl-shift-click on Mac.
+- Add Ctrl+0 key command to set zoom to 100%.
+- Emulate middle-click with Ctrl+shift-click on Mac.
 - Fix MIDI receiving in Bridge MIDI driver.
 - Fix opening/saving UTF-8 filenames on Windows.
 - Fix bug where cable ID's were not being set in .vcv patches.
@@ -213,9 +227,9 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add parameter tooltips for quickly viewing parameter values.
 - Add parameter context menu for entering numerical values, unmapping, etc.
 - Change parameter initialization to double-click.
-- Add ability to Mod-click on an input port to clone the existing cable.
-- Add module "force" dragging when holding Mod.
-- Add ability to disable modules with a context menu item and key command Mod-E.
+- Add ability to Ctrl+click on an input port to clone the existing cable.
+- Add module "force" dragging when holding Ctrl.
+- Add ability to disable modules with a context menu item and key command Ctrl+E.
 - Add sample rates up to 768,000 Hz (16 x 48,000 Hz).
 - Overhaul Module Browser with visual previews of modules.
 - Add plugin info sub-menu to module context menu with links to manual, website, source code, etc.
@@ -229,7 +243,7 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 - Add engine real-time priority setting.
 - Make rack infinite in all four directions.
 - Add bus board graphic to rack.
-- Add key command Mod-`-` and Mod-`=`, or Mod-scroll, for zooming the rack.
+- Add key command Ctrl+`-` and Ctrl+`=`, or Ctrl+scroll, for zooming the rack.
 - Fix draw order of cable plugs and wires.
 - Make Gamepad MIDI driver generate MIDI CC instead of MIDI notes for buttons.
 - Add Numpad keyboard MIDI device.
@@ -334,10 +348,10 @@ In this document, Mod is Ctrl on Windows/Linux and Cmd on Mac.
 
 ### 0.3.1 (2017-09-13)
 - Fix Windows open dialog current working directory graphics problem.
-- Mod-C/Mod-V to copy/paste from text and password fields.
+- Ctrl+C/Ctrl+V to copy/paste from text and password fields.
 - Automatically remember settings and login token between launches.
 - Remove .zip after downloading and extracting plugin.
-- Mod-click to right click on Mac.
+- Ctrl+click to right click on Mac.
 - Fix menu "flicker" when menu cannot fit in window.
 - tweaks to Fundamental and Audible Instruments plugins.
 
