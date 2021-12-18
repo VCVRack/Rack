@@ -107,6 +107,10 @@ Section "${NAME}" INSTALL_SECTION
 	; Create shortcuts
 	CreateShortcut "$DESKTOP\${NAME}.lnk" "$INSTDIR\Rack.exe"
 	CreateShortcut "$SMPROGRAMS\${NAME}.lnk" "$INSTDIR\Rack.exe"
+
+	; Add allowed app to Controlled Folder Access
+	ExpandEnvStrings $0 "%COMSPEC%"
+	ExecShellWait "" '"$0"' "/C powershell -ExecutionPolicy Bypass -WindowStyle Hidden $\"Add-MpPreference -ControlledFolderAccessAllowedApplications '$INSTDIR\Rack.exe'$\"" SW_HIDE
 SectionEnd
 
 
