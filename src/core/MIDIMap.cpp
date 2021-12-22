@@ -368,7 +368,7 @@ struct MIDIMapChoice : LedDisplayChoice {
 		// Set text
 		text = "";
 		if (module->ccs[id] >= 0) {
-			text += string::f("CC%02d ", module->ccs[id]);
+			text += string::f("CC%02d: ", module->ccs[id]);
 		}
 		if (module->paramHandles[id].moduleId >= 0) {
 			text += getParamName();
@@ -412,9 +412,10 @@ struct MIDIMapChoice : LedDisplayChoice {
 			return "";
 		ParamQuantity* paramQuantity = m->paramQuantities[paramId];
 		std::string s;
-		s += mw->model->name;
-		s += " ";
 		s += paramQuantity->name;
+		s += " (";
+		s += mw->model->name;
+		s += ")";
 		return s;
 	}
 };
