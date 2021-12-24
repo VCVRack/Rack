@@ -2,7 +2,7 @@
 
 In this document, Ctrl means Cmd on Mac.
 
-### 2.0.4 (in development)
+### 2.0.4 (2021-12-18)
 - Fix hang when initializing Audio module.
 - Fix hidden window after closing while minimized and reopening.
 - Move Import Selection menu item to File menu bar.
