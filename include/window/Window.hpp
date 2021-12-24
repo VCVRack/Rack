@@ -103,6 +103,7 @@ struct Window {
 	}
 
 	PRIVATE bool& fbDirtyOnSubpixelChange();
+	PRIVATE int& fbCount();
 };
 
 

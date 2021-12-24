@@ -120,9 +120,14 @@ void FramebufferWidget::draw(const DrawArgs& args) {
 		setDirty();
 	}
 
-	// It's more important to not lag the frame than to draw the framebuffer
-	if (dirty && APP->window->getFrameDurationRemaining() > 0.0) {
-		render(scale, offsetF, args.clipBox);
+	if (dirty) {
+		// Render only if there is frame time remaining (to avoid lagging frames significantly), or if it's one of the first framebuffers this frame (to avoid framebuffers from never rendering).
+		int count = ++APP->window->fbCount();
+		const int maxCount = 4;
+		const float minRemaining = -1 / 60.0;
+		if (count <= maxCount || APP->window->getFrameDurationRemaining() > minRemaining) {
+			render(scale, offsetF, args.clipBox);
+		}
 	}
 
 	if (!internal->fb)
