@@ -74,16 +74,14 @@ struct RtMidiInputDevice : midi::InputDevice {
 		if (!userData)
 			return;
 
-		system::setThreadName("RtMidi input");
-
-		RtMidiInputDevice* midiInputDevice = (RtMidiInputDevice*) userData;
-		if (!midiInputDevice)
+		RtMidiInputDevice* that = (RtMidiInputDevice*) userData;
+		if (!that)
 			return;
 
 		midi::Message msg;
 		msg.bytes = std::vector<uint8_t>(message->begin(), message->end());
 		// Don't set msg.frame from timeStamp here, because it's set in onMessage().
-		midiInputDevice->onMessage(msg);
+		that->onMessage(msg);
 	}
 };
 
