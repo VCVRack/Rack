@@ -102,7 +102,8 @@ struct RtAudioDevice : audio::Device {
 		options.numberOfBuffers = 2;
 		options.streamName = "VCV Rack";
 
-		float closestSampleRate = deviceInfo.preferredSampleRate;
+		// Most people prefer 44100 default sample rate although many devices report 48000 from `deviceInfo.preferredSampleRate`.
+		float closestSampleRate = 44100;
 		if (sampleRate > 0) {
 			// Find the closest sample rate to the requested one.
 			for (float sr : deviceInfo.sampleRates) {
@@ -113,7 +114,11 @@ struct RtAudioDevice : audio::Device {
 		}
 
 		if (blockSize <= 0) {
-			blockSize = 512;
+			// DirectSound should use a higher default block size
+			if (api == RtAudio::WINDOWS_DS)
+				blockSize = 1024;
+			else
+				blockSize = 256;
 		}
 
 		INFO("Opening RtAudio %s device %d: %s (%d in, %d out, %g sample rate, %d block size)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
