@@ -27,12 +27,12 @@
 /* Exponentiation associativity:
 For a^b^c = (a^b)^c and -a^b = (-a)^b do nothing.
 For a^b^c = a^(b^c) and -a^b = -(a^b) uncomment the next line.*/
-/* #define TE_POW_FROM_RIGHT */
+#define TE_POW_FROM_RIGHT
 
 /* Logarithms
 For log = base 10 log do nothing
 For log = natural log uncomment the next line. */
-/* #define TE_NAT_LOG */
+#define TE_NAT_LOG
 
 #include "tinyexpr.h"
 #include <stdlib.h>
