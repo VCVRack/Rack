@@ -6,7 +6,6 @@
 #include <atomic>
 #include <tuple>
 #include <pmmintrin.h>
-#include <pthread.h>
 
 #include <engine/Engine.hpp>
 #include <settings.hpp>
@@ -15,6 +14,7 @@
 #include <context.hpp>
 #include <patch.hpp>
 #include <plugin.hpp>
+#include <mutex.hpp>
 
 
 namespace rack {
@@ -29,59 +29,6 @@ static void initMXCSR() {
 	// Reset other flags
 	_MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
 }
-
-
-/** Allows multiple "reader" threads to obtain a lock simultaneously, but only one "writer" thread.
-This implementation is currently just a wrapper for pthreads, which works on Linux/Mac/.
-This is available in C++17 as std::shared_mutex, but unfortunately we're using C++11.
-*/
-struct ReadWriteMutex {
-	pthread_rwlock_t rwlock;
-
-	ReadWriteMutex() {
-		if (pthread_rwlock_init(&rwlock, NULL))
-			throw Exception("pthread_rwlock_init failed");
-	}
-	~ReadWriteMutex() {
-		pthread_rwlock_destroy(&rwlock);
-	}
-	void lockReader() {
-		if (pthread_rwlock_rdlock(&rwlock))
-			throw Exception("pthread_rwlock_rdlock failed");
-	}
-	void unlockReader() {
-		if (pthread_rwlock_unlock(&rwlock))
-			throw Exception("pthread_rwlock_unlock failed");
-	}
-	void lockWriter() {
-		if (pthread_rwlock_wrlock(&rwlock))
-			throw Exception("pthread_rwlock_wrlock failed");
-	}
-	void unlockWriter() {
-		if (pthread_rwlock_unlock(&rwlock))
-			throw Exception("pthread_rwlock_unlock failed");
-	}
-};
-
-struct ReadLock {
-	ReadWriteMutex& m;
-	ReadLock(ReadWriteMutex& m) : m(m) {
-		m.lockReader();
-	}
-	~ReadLock() {
-		m.unlockReader();
-	}
-};
-
-struct WriteLock {
-	ReadWriteMutex& m;
-	WriteLock(ReadWriteMutex& m) : m(m) {
-		m.lockWriter();
-	}
-	~WriteLock() {
-		m.unlockWriter();
-	}
-};
 
 
 /** Barrier based on mutexes.

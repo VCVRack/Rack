@@ -23,6 +23,7 @@ Directly including Rack headers other than rack.hpp in your plugin is unsupporte
 #include <math.hpp>
 #include <string.hpp>
 #include <system.hpp>
+#include <mutex.hpp>
 #include <random.hpp>
 #include <network.hpp>
 #include <asset.hpp>
