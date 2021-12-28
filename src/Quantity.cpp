@@ -2,8 +2,6 @@
 
 #include <Quantity.hpp>
 #include <string.hpp>
-// for C4 and A4 frequencies
-#include <dsp/common.hpp>
 
 
 namespace rack {
@@ -28,7 +26,9 @@ std::string Quantity::getDisplayValueString() {
 	return string::f("%.*g", getDisplayPrecision(), math::normalizeZero(v));
 }
 
-/** Build-in variables for tinyexpr */
+/** Build-in variables for tinyexpr
+Because formulas are lowercased for case-insensitivity, all variables must be lowercase.
+*/
 struct TeVariable {
 	std::string name;
 	double value;
@@ -40,14 +40,35 @@ static void teVarsInit() {
 	if (!teVars.empty())
 		return;
 
-	// Add variables
+	// Math variables
 	teVariables.push_back({"inf", INFINITY});
-	teVariables.push_back({"c", dsp::FREQ_C4});
-	teVariables.push_back({"a", dsp::FREQ_A4});
-	for (int i = 0; i <= 8; i++)
-		teVariables.push_back({string::f("c%d", i), dsp::FREQ_C4 * std::pow(2.0, i - 4)});
-	for (int i = 0; i <= 8; i++)
-		teVariables.push_back({string::f("a%d", i), dsp::FREQ_A4 * std::pow(2.0, i - 4)});
+
+	// Note names
+	struct Note {
+		std::string name;
+		int semi;
+	};
+	const static std::vector<Note> notes = {
+		{"c", 0},
+		{"d", 2},
+		{"e", 4},
+		{"f", 5},
+		{"g", 7},
+		{"a", 9},
+		{"b", 11},
+	};
+	for (const Note& note : notes) {
+		// Example: c, c#, and cb
+		teVariables.push_back({string::f("%s", note.name.c_str()), 440.f * std::pow(2.0, (note.semi - 9) / 12.f)});
+		teVariables.push_back({string::f("%s#", note.name.c_str()), 440.f * std::pow(2.0, (note.semi - 9 + 1) / 12.f)});
+		teVariables.push_back({string::f("%sb", note.name.c_str()), 440.f * std::pow(2.0, (note.semi - 9 - 1) / 12.f)});
+		for (int oct = 0; oct <= 9; oct++) {
+			// Example: c4, c#4, and cb4
+			teVariables.push_back({string::f("%s%d", note.name.c_str(), oct), 440.f * std::pow(2.0, oct - 4 + (note.semi - 9) / 12.f)});
+			teVariables.push_back({string::f("%s#%d", note.name.c_str(), oct), 440.f * std::pow(2.0, oct - 4 + (note.semi - 9 + 1) / 12.f)});
+			teVariables.push_back({string::f("%sb%d", note.name.c_str(), oct), 440.f * std::pow(2.0, oct - 4 + (note.semi - 9 - 1) / 12.f)});
+		}
+	}
 
 	// Build teVars
 	teVars.resize(teVariables.size());
