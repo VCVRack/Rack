@@ -2,6 +2,13 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.0.5 (2022-01-01)
+- Swap order of parameter name and module name in MIDI-Map.
+- Parse all note names from c0 to b9 and accidentals like c# and cb in parameter entry field.
+- Tweak framebuffer render-skipping algorithm to always render at least 1 framebuffer after the frame deadline, to prevent framebuffers from never being rendered.
+- Set audio device default sample rate to 44100, and block size to 256 except DirectSound to 1024.
+- Fix file dialog truncating Unicode filenames on Mac.
+
 ### 2.0.4 (2021-12-18)
 - Fix hang when initializing Audio module.
 - Fix hidden window after closing while minimized and reopening.
