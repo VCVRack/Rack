@@ -139,7 +139,7 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "tooltips", json_boolean(tooltips));
 
-	// json_object_set_new(rootJ, "cpuMeter", json_boolean(cpuMeter));
+	json_object_set_new(rootJ, "cpuMeter", json_boolean(cpuMeter));
 
 	json_object_set_new(rootJ, "lockModules", json_boolean(lockModules));
 
@@ -309,9 +309,9 @@ void fromJson(json_t* rootJ) {
 	if (tooltipsJ)
 		tooltips = json_boolean_value(tooltipsJ);
 
-	// json_t* cpuMeterJ = json_object_get(rootJ, "cpuMeter");
-	// if (cpuMeterJ)
-	// 	cpuMeter = json_boolean_value(cpuMeterJ);
+	json_t* cpuMeterJ = json_object_get(rootJ, "cpuMeter");
+	if (cpuMeterJ)
+		cpuMeter = json_boolean_value(cpuMeterJ);
 
 	json_t* lockModulesJ = json_object_get(rootJ, "lockModules");
 	if (lockModulesJ)
