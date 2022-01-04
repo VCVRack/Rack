@@ -12,7 +12,7 @@ namespace rack {
 namespace engine {
 
 
-
+static const int PORT_DIVIDER = 7;
 // Arbitrary prime number so it doesn't over- or under-estimate time of buffered processors.
 static const int METER_DIVIDER = 37;
 static const int METER_BUFFER_LEN = 32;
@@ -373,9 +373,8 @@ void Module::doProcess(const ProcessArgs& args) {
 	}
 
 	// Iterate ports to step plug lights
-	const int portDivider = 8;
-	if (args.frame % portDivider == 0) {
-		float portTime = args.sampleTime * portDivider;
+	if (args.frame % PORT_DIVIDER == 0) {
+		float portTime = args.sampleTime * PORT_DIVIDER;
 		for (Input& input : inputs) {
 			Port_step(&input, portTime);
 		}
