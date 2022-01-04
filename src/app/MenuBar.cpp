@@ -97,6 +97,10 @@ struct FileButton : MenuButton {
 			APP->patch->saveAsDialog();
 		}));
 
+		menu->addChild(createMenuItem("Save a copy", "", []() {
+			APP->patch->saveAsDialog(false);
+		}));
+
 		menu->addChild(createMenuItem("Save template", "", []() {
 			APP->patch->saveTemplateDialog();
 		}));

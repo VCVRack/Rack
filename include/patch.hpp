@@ -33,7 +33,7 @@ struct Manager {
 	/** Saves the patch and nothing else. */
 	void save(std::string path);
 	void saveDialog();
-	void saveAsDialog();
+	void saveAsDialog(bool setPath = true);
 	void saveTemplateDialog();
 	void saveAutosave();
 	void cleanAutosave();

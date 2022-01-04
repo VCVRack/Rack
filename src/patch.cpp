@@ -126,7 +126,7 @@ void Manager::saveDialog() {
 }
 
 
-void Manager::saveAsDialog() {
+void Manager::saveAsDialog(bool setPath) {
 	std::string dir;
 	std::string filename;
 	if (this->path == "") {
@@ -156,7 +156,9 @@ void Manager::saveAsDialog() {
 	}
 
 	APP->history->setSaved();
-	this->path = path;
+	if (setPath) {
+		this->path = path;
+	}
 
 	try {
 		save(path);
