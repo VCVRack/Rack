@@ -101,13 +101,13 @@ struct FileButton : MenuButton {
 			APP->patch->saveAsDialog(false);
 		}));
 
-		menu->addChild(createMenuItem("Save template", "", []() {
-			APP->patch->saveTemplateDialog();
-		}));
-
 		menu->addChild(createMenuItem("Revert", RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME "+O", []() {
 			APP->patch->revertDialog();
 		}, APP->patch->path == ""));
+
+		menu->addChild(createMenuItem("Overwrite template", "", []() {
+			APP->patch->saveTemplateDialog();
+		}));
 
 		menu->addChild(new ui::MenuSeparator);
 
