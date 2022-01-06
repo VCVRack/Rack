@@ -40,20 +40,12 @@ struct RtAudioDevice : audio::Device {
 	RtAudio::StreamParameters inputParameters;
 	RtAudio::StreamParameters outputParameters;
 	RtAudio::StreamOptions options;
-	int blockSize;
-	float sampleRate;
+	int blockSize = 0;
+	float sampleRate = 0;
 
 	RtAudioDevice(RtAudio::Api api, int deviceId) {
 		this->api = api;
 		this->deviceId = deviceId;
-
-		sampleRate = 44100;
-
-		// DirectSound latency is too high for 256 block size.
-		if (api == RtAudio::WINDOWS_DS)
-			blockSize = 1024;
-		else
-			blockSize = 256;
 
 		// Create RtAudio object
 		INFO("Creating RtAudio %s context", RTAUDIO_API_NAMES.at(api).c_str());
@@ -110,12 +102,23 @@ struct RtAudioDevice : audio::Device {
 		options.numberOfBuffers = 2;
 		options.streamName = "VCV Rack";
 
-		float closestSampleRate = INFINITY;
-		// Find the closest sample rate to the requested one.
-		for (float sr : deviceInfo.sampleRates) {
-			if (std::fabs(sr - sampleRate) < std::fabs(closestSampleRate - sampleRate)) {
-				closestSampleRate = sr;
+		// Most people prefer 44100 default sample rate although many devices report 48000 from `deviceInfo.preferredSampleRate`.
+		float closestSampleRate = 44100;
+		if (sampleRate > 0) {
+			// Find the closest sample rate to the requested one.
+			for (float sr : deviceInfo.sampleRates) {
+				if (std::fabs(sr - sampleRate) < std::fabs(closestSampleRate - sampleRate)) {
+					closestSampleRate = sr;
+				}
 			}
+		}
+
+		if (blockSize <= 0) {
+			// DirectSound should use a higher default block size
+			if (api == RtAudio::WINDOWS_DS)
+				blockSize = 1024;
+			else
+				blockSize = 256;
 		}
 
 		INFO("Opening RtAudio %s device %d: %s (%d in, %d out, %g sample rate, %d block size)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
