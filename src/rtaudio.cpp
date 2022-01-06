@@ -102,8 +102,7 @@ struct RtAudioDevice : audio::Device {
 		options.numberOfBuffers = 2;
 		options.streamName = "VCV Rack";
 
-		// Most people prefer 44100 default sample rate although many devices report 48000 from `deviceInfo.preferredSampleRate`.
-		float closestSampleRate = 44100;
+		float closestSampleRate = deviceInfo.preferredSampleRate;
 		if (sampleRate > 0) {
 			// Find the closest sample rate to the requested one.
 			for (float sr : deviceInfo.sampleRates) {
