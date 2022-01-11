@@ -256,6 +256,11 @@ struct MIDI_CV : Module {
 
 	void processSystem(const midi::Message &msg) {
 		switch (msg.getChannel()) {
+			// Song Position Pointer
+			case 0x2: {
+				int32_t pos = int32_t(msg.getNote()) | (int32_t(msg.getValue()) << 7);
+				clock = pos * 6;
+			} break;
 			// Timing
 			case 0x8: {
 				clockPulse.trigger(1e-3);
@@ -276,7 +281,6 @@ struct MIDI_CV : Module {
 			// Stop
 			case 0xc: {
 				stopPulse.trigger(1e-3);
-				clock = 0;
 			} break;
 			default: break;
 		}
