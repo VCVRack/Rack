@@ -89,18 +89,9 @@ struct AudioPort : audio::Port {
 			// Set up sample rate converter
 			outputSrc.setRates(deviceSampleRate, engineSampleRate);
 			outputSrc.setChannels(deviceNumInputs);
-			// Convert audio input -> engine output
-			dsp::Frame<NUM_AUDIO_OUTPUTS> audioInputBuffer[frames];
-			std::memset(audioInputBuffer, 0, sizeof(audioInputBuffer));
-			for (int i = 0; i < frames; i++) {
-				for (int j = 0; j < deviceNumInputs; j++) {
-					float v = input[i * inputStride + j];
-					audioInputBuffer[i].samples[j] = v;
-				}
-			}
-			int audioInputFrames = frames;
+			int inputFrames = frames;
 			int outputFrames = engineOutputBuffer.capacity();
-			outputSrc.process(audioInputBuffer, &audioInputFrames, engineOutputBuffer.endData(), &outputFrames);
+			outputSrc.process(input, inputStride, &inputFrames, (float*) engineOutputBuffer.endData(), NUM_AUDIO_OUTPUTS, &outputFrames);
 			engineOutputBuffer.endIncr(outputFrames);
 			// Request exactly as many frames as we have in the engine output buffer.
 			requestedEngineFrames = engineOutputBuffer.size();
@@ -129,21 +120,20 @@ struct AudioPort : audio::Port {
 			inputSrc.setRates(engineSampleRate, deviceSampleRate);
 			inputSrc.setChannels(deviceNumOutputs);
 			// Convert engine input -> audio output
-			dsp::Frame<NUM_AUDIO_OUTPUTS> audioOutputBuffer[frames];
 			int inputFrames = engineInputBuffer.size();
-			int audioOutputFrames = frames;
-			inputSrc.process(engineInputBuffer.startData(), &inputFrames, audioOutputBuffer, &audioOutputFrames);
+			int outputFrames = frames;
+			inputSrc.process((const float*) engineInputBuffer.startData(), NUM_AUDIO_INPUTS, &inputFrames, output, outputStride, &outputFrames);
 			engineInputBuffer.startIncr(inputFrames);
-			// Copy the audio output buffer
-			for (int i = 0; i < audioOutputFrames; i++) {
+			// Clamp output samples
+			for (int i = 0; i < outputFrames; i++) {
 				for (int j = 0; j < deviceNumOutputs; j++) {
-					float v = audioOutputBuffer[i].samples[j];
+					float v = output[i * outputStride + j];
 					v = clamp(v, -1.f, 1.f);
 					output[i * outputStride + j] = v;
 				}
 			}
 			// Fill the rest of the audio output buffer with zeros
-			for (int i = audioOutputFrames; i < frames; i++) {
+			for (int i = outputFrames; i < frames; i++) {
 				for (int j = 0; j < deviceNumOutputs; j++) {
 					output[i * outputStride + j] = 0.f;
 				}
