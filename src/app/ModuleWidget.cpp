@@ -782,6 +782,7 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	engine::Module::jsonStripIds(moduleJ);
 
 	// Clone Module
+	INFO("Creating module %s", model->getFullName().c_str());
 	engine::Module* clonedModule = model->createModule();
 
 	// Set ID here so we can copy module storage dir
@@ -798,6 +799,7 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	APP->engine->addModule(clonedModule);
 
 	// Clone ModuleWidget
+	INFO("Creating module widget %s", model->getFullName().c_str());
 	ModuleWidget* clonedModuleWidget = model->createModuleWidget(clonedModule);
 	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
 

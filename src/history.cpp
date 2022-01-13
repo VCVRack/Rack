@@ -61,6 +61,7 @@ void ModuleAdd::undo() {
 }
 
 void ModuleAdd::redo() {
+	INFO("Creating module %s", model->getFullName().c_str());
 	engine::Module* module = model->createModule();
 	module->id = moduleId;
 	try {
@@ -71,6 +72,7 @@ void ModuleAdd::redo() {
 	}
 	APP->engine->addModule(module);
 
+	INFO("Creating module widget %s", model->getFullName().c_str());
 	app::ModuleWidget* mw = model->createModuleWidget(module);
 	mw->box.pos = pos;
 	APP->scene->rack->addModule(mw);

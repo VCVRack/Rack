@@ -43,11 +43,13 @@ struct RackWidget::Internal {
 static ModuleWidget* moduleWidgetFromJson(json_t* moduleJ) {
 	plugin::Model* model = plugin::modelFromJson(moduleJ);
 	assert(model);
+	INFO("Creating module %s", model->getFullName().c_str());
 	engine::Module* module = model->createModule();
 	assert(module);
 	module->fromJson(moduleJ);
 
 	// Create ModuleWidget
+	INFO("Creating module widget %s", model->getFullName().c_str());
 	ModuleWidget* moduleWidget = module->model->createModuleWidget(module);
 	assert(moduleWidget);
 	return moduleWidget;
@@ -361,6 +363,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 		}
 
 		// Create ModuleWidget
+		INFO("Creating module widget %s", module->model->getFullName().c_str());
 		ModuleWidget* mw = module->model->createModuleWidget(module);
 
 		// pos

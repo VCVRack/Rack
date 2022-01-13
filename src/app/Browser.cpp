@@ -83,9 +83,11 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 	mi.lastAdded = system::getUnixTime();
 
 	// Create Module and ModuleWidget
+	INFO("Creating module %s", model->getFullName().c_str());
 	engine::Module* module = model->createModule();
 	APP->engine->addModule(module);
 
+	INFO("Creating module widget %s", model->getFullName().c_str());
 	ModuleWidget* moduleWidget = model->createModuleWidget(module);
 	APP->scene->rack->addModuleAtMouse(moduleWidget);
 
@@ -189,6 +191,7 @@ struct ModelBox : widget::OpaqueWidget {
 		mwc = new ModuleWidgetContainer;
 		fb->addChild(mwc);
 
+		INFO("Creating module widget %s", model->getFullName().c_str());
 		moduleWidget = model->createModuleWidget(NULL);
 		mwc->addChild(moduleWidget);
 		mwc->box.size = moduleWidget->box.size;
