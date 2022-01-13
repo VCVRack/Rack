@@ -172,33 +172,45 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 
-	INFO("Initializing environment");
+	INFO("Initializing network");
 	network::init();
+	INFO("Initializing audio");
 	audio::init();
 	rtaudioInit();
+	INFO("Initializing MIDI");
 	midi::init();
 	rtmidiInit();
 	keyboard::init();
 	gamepad::init();
+	INFO("Initializing plugins");
 	plugin::init();
+	INFO("Initializing browser");
 	app::browserInit();
+	INFO("Initializing library");
 	library::init();
 	discord::init();
 	if (!settings::headless) {
+		INFO("Initializing UI");
 		ui::init();
+		INFO("Initializing window");
 		window::init();
 	}
 
 	// Initialize context
-	INFO("Initializing context");
 	contextSet(new Context);
+	INFO("Creating engine");
 	APP->engine = new engine::Engine;
+	INFO("Creating history state");
 	APP->history = new history::State;
+	INFO("Creating event state");
 	APP->event = new widget::EventState;
+	INFO("Creating scene");
 	APP->scene = new app::Scene;
 	APP->event->rootWidget = APP->scene;
+	INFO("Creating patch manager");
 	APP->patch = new patch::Manager;
 	if (!settings::headless) {
+		INFO("Creating window");
 		APP->window = new window::Window;
 	}
 
@@ -246,7 +258,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Destroy context
-	INFO("Destroying context");
+	INFO("Deleting context");
 	delete APP;
 	contextSet(NULL);
 	if (!settings::headless) {
@@ -254,16 +266,22 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Destroy environment
-	INFO("Destroying environment");
 	if (!settings::headless) {
+		INFO("Destroying window");
 		window::destroy();
+		INFO("Destroying UI");
 		ui::destroy();
 	}
 	discord::destroy();
+	INFO("Destroying library");
 	library::destroy();
+	INFO("Destroying MIDI");
 	midi::destroy();
+	INFO("Destroying audio");
 	audio::destroy();
+	INFO("Destroying plugins");
 	plugin::destroy();
+	INFO("Destroying network");
 	network::destroy();
 	INFO("Destroying logger");
 	logger::destroy();
