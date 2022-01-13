@@ -41,6 +41,7 @@ namespace plugin {
 // private API
 ////////////////////
 
+/** Returns library handle */
 static void* loadLibrary(std::string libraryPath) {
 #if defined ARCH_WIN
 	SetErrorMode(SEM_NOOPENFILEERRORBOX | SEM_FAILCRITICALERRORS);
@@ -257,40 +258,46 @@ void init() {
 }
 
 
+static void destroyPlugin(Plugin* plugin) {
+	void* handle = plugin->handle;
+
+	// Call destroy() if defined in the plugin library
+	typedef void (*DestroyCallback)();
+	DestroyCallback destroyCallback = NULL;
+	if (handle) {
+#if defined ARCH_WIN
+		destroyCallback = (DestroyCallback) GetProcAddress((HMODULE) handle, "destroy");
+#else
+		destroyCallback = (DestroyCallback) dlsym(handle, "destroy");
+#endif
+	}
+	if (destroyCallback) {
+		try {
+			destroyCallback();
+		}
+		catch (Exception& e) {
+			WARN("Could not destroy plugin %s", plugin->slug.c_str());
+		}
+	}
+
+	// We must delete the Plugin instance *before* freeing the library, because the vtables of Model subclasses are defined in the library, which are needed in the Plugin destructor.
+	delete plugin;
+
+	// Free library handle
+	if (handle) {
+#if defined ARCH_WIN
+		FreeLibrary((HINSTANCE) handle);
+#else
+		dlclose(handle);
+#endif
+	}
+}
+
+
 void destroy() {
 	for (Plugin* plugin : plugins) {
-		void* handle = plugin->handle;
-
-		// Call destroy() if defined in the plugin library
-		typedef void (*DestroyCallback)();
-		DestroyCallback destroyCallback = NULL;
-		if (handle) {
-#if defined ARCH_WIN
-			destroyCallback = (DestroyCallback) GetProcAddress((HMODULE) handle, "destroy");
-#else
-			destroyCallback = (DestroyCallback) dlsym(handle, "destroy");
-#endif
-		}
-		if (destroyCallback) {
-			try {
-				destroyCallback();
-			}
-			catch (Exception& e) {
-				WARN("Could not destroy plugin %s", plugin->slug.c_str());
-			}
-		}
-
-		// We must delete the Plugin instance *before* freeing the library, because the vtables of Model subclasses are defined in the library, which are needed in the Plugin destructor.
-		delete plugin;
-
-		// Free library handle
-		if (handle) {
-#if defined ARCH_WIN
-			FreeLibrary((HINSTANCE) handle);
-#else
-			dlclose(handle);
-#endif
-		}
+		INFO("Destroying plugin %s", plugin->name.c_str());
+		destroyPlugin(plugin);
 	}
 	plugins.clear();
 }
