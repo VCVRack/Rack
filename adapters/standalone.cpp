@@ -28,7 +28,6 @@
 #include <thread>
 #include <unistd.h> // for getopt
 #include <signal.h> // for signal
-#include <string.h> // for sys_siglist
 #if defined ARCH_WIN
 	#include <windows.h> // for CreateMutex
 #endif
@@ -45,21 +44,12 @@ using namespace rack;
 static void fatalSignalHandler(int sig) {
 	// Ignore this signal to avoid recursion.
 	signal(sig, NULL);
-	// Ignore abort() since we call it below.
-	signal(SIGABRT, NULL);
 
-#if defined ARCH_LIN
-	const char* sigNameC = strsignal(sig);
-#elif defined ARCH_MAC
-	const char* sigNameC = sys_siglist[sig];
-#else
-	const char* sigNameC = "";
-#endif
-	std::string sigName = "SIG" + string::uppercase(sigNameC);
 	std::string stackTrace = system::getStackTrace();
-	FATAL("Fatal signal %d %s. Stack trace:\n%s", sig, sigName.c_str(), stackTrace.c_str());
+	FATAL("Fatal signal %d. Stack trace:\n%s", sig, stackTrace.c_str());
 
-	abort();
+	// Re-raise signal
+	raise(sig);
 }
 
 
