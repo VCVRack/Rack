@@ -648,7 +648,7 @@ std::string getStackTrace() {
 #if ARCH_LIN
 		// Parse line, e.g.
 		// ./main(__mangled_symbol+0x100) [0x12345678]
-		std::regex r(R"((.*)\((.*)\+(.*)\) (.*))");
+		std::regex r(R"((.+?)\((.*?)\+(.+?)\) (.+?))");
 		std::smatch match;
 		if (std::regex_match(line, match, r)) {
 			s += match[1].str();
@@ -669,8 +669,30 @@ std::string getStackTrace() {
 			// If regex fails, just use the raw line
 			s += line;
 		}
-#else
-		s += line;
+#elif ARCH_MAC
+		// Parse line, e.g.
+		// 1   Rack                                0x0000000002ddc3eb _mangled_symbol + 27
+		std::regex r(R"((\d+)\s+(.+?)\s+(.+?) (.*?) \+ (.+?))");
+		std::smatch match;
+		if (std::regex_match(line, match, r)) {
+			s += match[2].str();
+			s += "(";
+			std::string symbol = match[4].str();
+			// Demangle symbol
+			char* symbolD = abi::__cxa_demangle(symbol.c_str(), NULL, NULL, NULL);
+			if (symbolD) {
+				symbol = symbolD;
+				free(symbolD);
+			}
+			s += symbol;
+			s += "+";
+			s += match[5].str();
+			s += ")";
+		}
+		else {
+			// If regex fails, just use the raw line
+			s += line;
+		}
 #endif
 		s += "\n";
 	}
