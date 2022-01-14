@@ -5,7 +5,7 @@
 
 #include <dirent.h>
 #include <sys/stat.h>
-#include <cxxabi.h> // for __cxxabiv1::__cxa_demangle
+#include <cxxabi.h> // for abi::__cxa_demangle
 
 #if defined ARCH_LIN || defined ARCH_MAC
 	#include <pthread.h>
@@ -631,28 +631,31 @@ void setThreadName(const std::string& name) {
 
 
 std::string getStackTrace() {
-	int stackLen = 128;
-	void* stack[stackLen];
+	void* stack[128];
+	int stackLen = LENGTHOF(stack);
 	std::string s;
 
 #if defined ARCH_LIN || defined ARCH_MAC
 	stackLen = backtrace(stack, stackLen);
 	char** strings = backtrace_symbols(stack, stackLen);
+	if (!strings)
+		return "";
 
 	// Skip the first line because it's this function.
 	for (int i = 1; i < stackLen; i++) {
 		s += string::f("%d: ", stackLen - i - 1);
 		std::string line = strings[i];
-#if 0
-		// Parse line
+#if ARCH_LIN
+		// Parse line, e.g.
+		// ./main(__mangled_symbol+0x100) [0x12345678]
 		std::regex r(R"((.*)\((.*)\+(.*)\) (.*))");
 		std::smatch match;
-		if (std::regex_search(line, match, r)) {
+		if (std::regex_match(line, match, r)) {
 			s += match[1].str();
 			s += "(";
 			std::string symbol = match[2].str();
 			// Demangle symbol
-			char* symbolD = __cxxabiv1::__cxa_demangle(symbol.c_str(), NULL, NULL, NULL);
+			char* symbolD = abi::__cxa_demangle(symbol.c_str(), NULL, NULL, NULL);
 			if (symbolD) {
 				symbol = symbolD;
 				free(symbolD);
@@ -661,6 +664,10 @@ std::string getStackTrace() {
 			s += "+";
 			s += match[3].str();
 			s += ")";
+		}
+		else {
+			// If regex fails, just use the raw line
+			s += line;
 		}
 #else
 		s += line;
