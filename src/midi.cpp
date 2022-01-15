@@ -1,6 +1,7 @@
 #include <map>
 #include <utility>
 #include <queue>
+#include <mutex>
 
 #include <midi.hpp>
 #include <string.hpp>
@@ -305,6 +306,7 @@ struct InputQueue_Queue : std::priority_queue<Message, std::vector<Message>, Inp
 
 struct InputQueue::Internal {
 	InputQueue_Queue queue;
+	std::mutex mutex;
 };
 
 InputQueue::InputQueue() {
@@ -317,6 +319,7 @@ InputQueue::~InputQueue() {
 }
 
 void InputQueue::onMessage(const Message& message) {
+	std::lock_guard<std::mutex> lock(internal->mutex);
 	// Reject MIDI message if queue is full
 	if (internal->queue.size() >= InputQueue_maxSize)
 		return;
@@ -328,6 +331,7 @@ bool InputQueue::tryPop(Message* messageOut, int64_t maxFrame) {
 	if (internal->queue.empty())
 		return false;
 
+	std::lock_guard<std::mutex> lock(internal->mutex);
 	const Message& msg = internal->queue.top();
 	if (msg.getFrame() <= maxFrame) {
 		*messageOut = msg;
