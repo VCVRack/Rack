@@ -2,6 +2,18 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.0.6 (2022-01-15)
+- Add "Save a copy" to File menu.
+- Remember CPU meter state across launches.
+- Use audio device's suggested sample rate as initial sample rate.
+- Add more logging of initialization/destruction of subsystems and module instantiation.
+- Make MIDI input queue thread-safe, fixing probabilistic crash when processing MIDI input.
+- Rack Pro
+	- Generate MIDI Start message in DAWs like Cubase that pre-roll transport.
+	- Generate MIDI Song Position Pointer messages when DAW is playing.
+	- Fix VST2 input/output channel labels being truncated in Ableton Live.
+	- Improve VST2 audio performance by avoiding unnecessary copying of buffers.
+
 ### 2.0.5 (2022-01-01)
 - Swap order of parameter name and module name in MIDI-Map.
 - Parse all note names from c0 to b9 and accidentals like c# and cb in parameter entry field.
