@@ -263,8 +263,7 @@ ifdef ARCH_MAC
 	# Mark app as notarized
 	xcrun stapler staple dist/"$(DIST_NAME)".pkg
 	# Check notarization
-	stapler validate --verbose dist/"$(DIST_NAME)".pkg
-	spctl --assess --type execute --ignore-cache --no-cache -vv dist/"$(DIST_BUNDLE)"
+	stapler validate dist/"$(DIST_NAME)".pkg
 endif
 
 
