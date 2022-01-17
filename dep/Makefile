@@ -186,15 +186,9 @@ $(libsamplerate): | libsamplerate-0.1.9
 	$(MAKE) -C libsamplerate-0.1.9
 	$(MAKE) -C libsamplerate-0.1.9 install
 
-rtmidi-4.0.0:
-	$(WGET) "http://www.music.mcgill.ca/~gary/rtmidi/release/rtmidi-4.0.0.tar.gz"
-	$(SHA256) rtmidi-4.0.0.tar.gz 370cfe710f43fbeba8d2b8c8bc310f314338c519c2cf2865e2d2737b251526cd
-	$(UNTAR) rtmidi-4.0.0.tar.gz
-	rm rtmidi-4.0.0.tar.gz
-
 RTMIDI_FLAGS += --enable-shared=no
 ifdef ARCH_LIN
-RTMIDI_FLAGS += --with-jack --with-alsa
+RTMIDI_FLAGS += --with-alsa --with-jack
 endif
 ifdef ARCH_MAC
 RTMIDI_FLAGS += --with-core --without-jack
@@ -203,10 +197,11 @@ ifdef ARCH_WIN
 RTMIDI_FLAGS += --with-winmm
 endif
 
-$(rtmidi): | rtmidi-4.0.0
-	cd rtmidi-4.0.0 && $(CONFIGURE) $(RTMIDI_FLAGS)
-	$(MAKE) -C rtmidi-4.0.0
-	$(MAKE) -C rtmidi-4.0.0 install
+$(rtmidi): | rtmidi
+	cd rtmidi && ./autogen.sh --no-configure
+	cd rtmidi && $(CONFIGURE) $(RTMIDI_FLAGS)
+	$(MAKE) -C rtmidi
+	$(MAKE) -C rtmidi install
 
 RTAUDIO_FLAGS += -DRTAUDIO_BUILD_STATIC_LIBS=ON -DRTAUDIO_BUILD_TESTING=OFF
 ifdef ARCH_LIN
@@ -262,7 +257,7 @@ $(ghcfilesystem): filesystem/include/ghc
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1k curl-7.79.1 zstd-1.4.5 libarchive-3.4.3 rtmidi-4.0.0 rtaudio nanovg nanosvg oui-blendish osdialog
+src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 openssl-1.1.1k curl-7.79.1 zstd-1.4.5 libarchive-3.4.3 rtaudio nanovg nanosvg oui-blendish osdialog
 
 clean:
 	git clean -fdx

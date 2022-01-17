@@ -31,3 +31,6 @@
 [submodule "dep/pffft"]
 	path = dep/pffft
 	url = https://bitbucket.org/jpommier/pffft.git
+[submodule "dep/rtmidi"]
+	path = dep/rtmidi
+	url = https://github.com/VCVRack/rtmidi.git
