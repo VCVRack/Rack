@@ -48,36 +48,31 @@ struct RtAudioDevice : audio::Device {
 		this->deviceId = deviceId;
 
 		// Create RtAudio object
-		INFO("Creating RtAudio %s context", RTAUDIO_API_NAMES.at(api).c_str());
-		try {
-			rtAudio = new RtAudio(api);
-		}
-		catch (RtAudioError& e) {
-			throw Exception("Failed to create RtAudio %s context: %s", RTAUDIO_API_NAMES.at(api).c_str(), e.what());
-		}
+		INFO("Creating RtAudio %s device", RTAUDIO_API_NAMES.at(api).c_str());
+		rtAudio = new RtAudio(api, [](RtAudioErrorType type, const std::string& errorText) {
+			WARN("RtAudio error %d: %s", type, errorText.c_str());
+		});
 
 		rtAudio->showWarnings(false);
 
-		// Query device ID
 		try {
+			// Query device ID
 			deviceInfo = rtAudio->getDeviceInfo(deviceId);
-		}
-		catch (RtAudioError& e) {
-			throw Exception("Failed to query RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
-		}
+			if (!deviceInfo.probed) {
+				throw Exception("Failed to query RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			}
 
-		openStream();
+			openStream();
+		}
+		catch (Exception& e) {
+			delete rtAudio;
+			throw;
+		}
 	}
 
 	~RtAudioDevice() {
-		try {
-			closeStream();
-			delete rtAudio;
-		}
-		catch (Exception& e) {
-			WARN("Failed to destroy RtAudio %s context: %s", RTAUDIO_API_NAMES.at(api).c_str(), e.what());
-			// Ignore exceptions
-		}
+		closeStream();
+		delete rtAudio;
 	}
 
 	void openStream() {
@@ -102,10 +97,10 @@ struct RtAudioDevice : audio::Device {
 		options.numberOfBuffers = 2;
 		options.streamName = "VCV Rack";
 
-		float closestSampleRate = deviceInfo.preferredSampleRate;
+		int32_t closestSampleRate = deviceInfo.preferredSampleRate;
 		if (sampleRate > 0) {
 			// Find the closest sample rate to the requested one.
-			for (float sr : deviceInfo.sampleRates) {
+			for (int32_t sr : deviceInfo.sampleRates) {
 				if (std::fabs(sr - sampleRate) < std::fabs(closestSampleRate - sampleRate)) {
 					closestSampleRate = sr;
 				}
@@ -120,52 +115,42 @@ struct RtAudioDevice : audio::Device {
 				blockSize = 256;
 		}
 
-		INFO("Opening RtAudio %s device %d: %s (%d in, %d out, %g sample rate, %d block size)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
-		try {
-			rtAudio->openStream(
-			  outputParameters.nChannels > 0 ? &outputParameters : NULL,
-			  inputParameters.nChannels > 0 ? &inputParameters : NULL,
-			  RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize,
-			  &rtAudioCallback, this, &options, NULL);
-		}
-		catch (RtAudioError& e) {
-			throw Exception("Failed to open RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
+		INFO("Opening RtAudio %s device %d: %s (%d in, %d out, %d sample rate, %d block size)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
+		if (rtAudio->openStream(
+			outputParameters.nChannels > 0 ? &outputParameters : NULL,
+			inputParameters.nChannels > 0 ? &inputParameters : NULL,
+			RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize,
+			&rtAudioCallback, this, &options)) {
+			throw Exception("Failed to open RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		}
 
-		INFO("Starting RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		try {
-			rtAudio->startStream();
-		}
-		catch (RtAudioError& e) {
-			throw Exception("Failed to start RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
-		}
+			INFO("Starting RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			if (rtAudio->startStream()) {
+				throw Exception("Failed to start RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			}
 
-		// Update sample rate to actual value
-		sampleRate = rtAudio->getStreamSampleRate();
-		INFO("Opened RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
-		onStartStream();
+			// Update sample rate to actual value
+			sampleRate = rtAudio->getStreamSampleRate();
+
+			onStartStream();
+		}
+		catch (Exception& e) {
+			rtAudio->closeStream();
+			throw;
+		}
 	}
 
 	void closeStream() {
-		INFO("Stopping RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		if (rtAudio->isStreamRunning()) {
-			try {
-				rtAudio->stopStream();
-			}
-			catch (RtAudioError& e) {
-				throw Exception("Failed to stop RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
-			}
+			INFO("Stopping RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			rtAudio->stopStream();
 		}
-		INFO("Closing RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
 		if (rtAudio->isStreamOpen()) {
-			try {
-				rtAudio->closeStream();
-			}
-			catch (RtAudioError& e) {
-				throw Exception("Failed to close RtAudio %s device %d: %s", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, e.what());
-			}
+			INFO("Closing RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			rtAudio->closeStream();
 		}
-		INFO("Closed RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+
 		onStopStream();
 	}
 
@@ -224,7 +209,12 @@ struct RtAudioDevice : audio::Device {
 
 		int inputStride = that->getNumInputs();
 		int outputStride = that->getNumOutputs();
-		that->processBuffer((const float*) inputBuffer, inputStride, (float*) outputBuffer, outputStride, nFrames);
+		try {
+			that->processBuffer((const float*) inputBuffer, inputStride, (float*) outputBuffer, outputStride, nFrames);
+		}
+		catch (Exception& e) {
+			// Log nothing to avoid spamming the log.
+		}
 		return 0;
 	}
 };
@@ -241,12 +231,9 @@ struct RtAudioDriver : audio::Driver {
 		this->api = api;
 
 		INFO("Creating RtAudio %s driver", RTAUDIO_API_NAMES.at(api).c_str());
-		try {
-			rtAudio = new RtAudio(api);
-		}
-		catch (RtAudioError& e) {
-			throw Exception("Failed to create RtAudio %s driver: %s", RTAUDIO_API_NAMES.at(api).c_str(), e.what());
-		}
+		rtAudio = new RtAudio(api, [](RtAudioErrorType type, const std::string& errorText) {
+			WARN("RtAudio error %d: %s", type, errorText.c_str());
+		});
 
 		rtAudio->showWarnings(false);
 
