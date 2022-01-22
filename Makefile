@@ -75,6 +75,8 @@ ifdef ARCH_WIN
 
 	STANDALONE_TARGET := Rack.exe
 	STANDALONE_LDFLAGS += -mwindows
+	# 1MiB stack size to match MSVC
+	STANDALONE_LDFLAGS += -Wl,--stack,0x100000
 	STANDALONE_OBJECTS += build/Rack.res
 endif
 
