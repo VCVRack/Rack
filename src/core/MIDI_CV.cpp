@@ -146,7 +146,7 @@ struct MIDI_CV : Module {
 			else
 				pwFilters[c].out = pw;
 			pwValues[c] = pw;
-			outputs[PW_OUTPUT].setVoltage(pw * 5.f);
+			outputs[PW_OUTPUT].setVoltage(pw * 5.f, c);
 
 			float mod = mods[c] / 127.f;
 			mod = clamp(mod, 0.f, 1.f);
@@ -154,7 +154,7 @@ struct MIDI_CV : Module {
 				mod = modFilters[c].process(args.sampleTime, mod);
 			else
 				modFilters[c].out = mod;
-			outputs[MOD_OUTPUT].setVoltage(mod * 10.f);
+			outputs[MOD_OUTPUT].setVoltage(mod * 10.f, c);
 		}
 
 		// Set note outputs
