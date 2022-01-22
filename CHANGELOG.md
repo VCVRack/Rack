@@ -2,6 +2,13 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.1.0 ()
+- Update to RtMidi 5.0.0.
+- Update to RtAudio 5.2.0.
+- Core
+	- Add "Pitch bend range" setting to MIDI to CV module.
+	- Fix MIDI to CV incorrectly setting pitch wheel and mod wheel outputs in MPE mode.
+
 ### 2.0.6 (2022-01-15)
 - Add "Save a copy" to File menu.
 - Remember CPU meter state across launches.
