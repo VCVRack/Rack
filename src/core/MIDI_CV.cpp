@@ -541,43 +541,23 @@ struct MIDI_CVWidget : ModuleWidget {
 
 		static const std::vector<int> clockDivisions = {24 * 4, 24 * 2, 24, 24 / 2, 24 / 4, 24 / 8, 2, 1};
 		static const std::vector<std::string> clockDivisionLabels = {"Whole", "Half", "Quarter", "8th", "16th", "32nd", "12 PPQN", "24 PPQN"};
-		struct ClockDivisionItem : MenuItem {
-			MIDI_CV* module;
-			Menu* createChildMenu() override {
-				Menu* menu = new Menu;
-				for (size_t i = 0; i < clockDivisions.size(); i++) {
-					menu->addChild(createCheckMenuItem(clockDivisionLabels[i], "",
-						[=]() {return module->clockDivision == clockDivisions[i];},
-						[=]() {module->clockDivision = clockDivisions[i];}
-					));
-				}
-				return menu;
+		menu->addChild(createSubmenuItem("CLK/N divider", "", [=](Menu* menu) {
+			for (size_t i = 0; i < clockDivisions.size(); i++) {
+				menu->addChild(createCheckMenuItem(clockDivisionLabels[i], "",
+					[=]() {return module->clockDivision == clockDivisions[i];},
+					[=]() {module->clockDivision = clockDivisions[i];}
+				));
 			}
-		};
-		ClockDivisionItem* clockDivisionItem = new ClockDivisionItem;
-		clockDivisionItem->text = "CLK/N divider";
-		clockDivisionItem->rightText = RIGHT_ARROW;
-		clockDivisionItem->module = module;
-		menu->addChild(clockDivisionItem);
+		}));
 
-		struct ChannelItem : MenuItem {
-			MIDI_CV* module;
-			Menu* createChildMenu() override {
-				Menu* menu = new Menu;
-				for (int c = 1; c <= 16; c++) {
-					menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c), "",
-						[=]() {return module->channels == c;},
-						[=]() {module->setChannels(c);}
-					));
-				}
-				return menu;
+		menu->addChild(createSubmenuItem("Polyphony channels", string::f("%d", module->channels), [=](Menu* menu) {
+			for (int c = 1; c <= 16; c++) {
+				menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c), "",
+					[=]() {return module->channels == c;},
+					[=]() {module->setChannels(c);}
+				));
 			}
-		};
-		ChannelItem* channelItem = new ChannelItem;
-		channelItem->text = "Polyphony channels";
-		channelItem->rightText = string::f("%d", module->channels) + "  " + RIGHT_ARROW;
-		channelItem->module = module;
-		menu->addChild(channelItem);
+		}));
 
 		menu->addChild(createIndexPtrSubmenuItem("Polyphony mode", {
 			"Rotate",
