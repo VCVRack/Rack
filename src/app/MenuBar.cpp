@@ -819,26 +819,32 @@ struct HelpButton : MenuButton {
 		}));
 
 		menu->addChild(createMenuItem("User manual", "F1", [=]() {
-			system::openBrowser("https://vcvrack.com/manual/");
+			system::openBrowser("https://vcvrack.com/manual");
+		}));
+
+		menu->addChild(createMenuItem("Support", "", [=]() {
+			system::openBrowser("https://vcvrack.com/support");
 		}));
 
 		menu->addChild(createMenuItem("VCVRack.com", "", [=]() {
 			system::openBrowser("https://vcvrack.com/");
 		}));
 
+		menu->addChild(new ui::MenuSeparator);
+
+		menu->addChild(createMenuLabel(APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION));
+
 		menu->addChild(createMenuItem("Open user folder", "", [=]() {
 			system::openDirectory(asset::user(""));
 		}));
 
-		if (library::isAppUpdateAvailable()) {
-			menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuItem("Changelog", "", [=]() {
+			system::openBrowser("https://github.com/VCVRack/Rack/blob/v2/CHANGELOG.md");
+		}));
 
+		if (library::isAppUpdateAvailable()) {
 			menu->addChild(createMenuItem("Update " + APP_NAME, APP_VERSION + " → " + library::appVersion, [=]() {
 				system::openBrowser(library::appDownloadUrl);
-			}));
-
-			menu->addChild(createMenuItem("Review changelog", "", [=]() {
-				system::openBrowser(library::appChangelogUrl);
 			}));
 		}
 		else if (!settings::autoCheckUpdates && !settings::devMode) {
@@ -849,10 +855,6 @@ struct HelpButton : MenuButton {
 				t.detach();
 			}, false, true));
 		}
-
-		menu->addChild(new ui::MenuSeparator);
-
-		menu->addChild(createMenuLabel(APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION));
 	}
 
 	void step() override {
