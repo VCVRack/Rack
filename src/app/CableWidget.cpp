@@ -34,7 +34,7 @@ struct PlugLight : componentlibrary::TRedGreenBlueLight<app::MultiLightWidget> {
 
 
 struct PlugWidget : widget::Widget {
-	float angle = 0.f;
+	float angle = 0.5f * M_PI;
 	PortWidget* portWidget = NULL;
 
 	widget::FramebufferWidget* fb;
