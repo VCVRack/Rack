@@ -147,7 +147,7 @@ template <class TModule>
 struct NoteChoice : LedDisplayChoice {
 	TModule* module;
 	int id;
-	int focusNote;
+	uint8_t focusNote;
 
 	NoteChoice() {
 		box.size.y = mm2px(6.666);
@@ -164,7 +164,7 @@ struct NoteChoice : LedDisplayChoice {
 	}
 
 	void step() override {
-		int note;
+		int8_t note;
 		if (!module) {
 			note = id + 36;
 		}
@@ -206,7 +206,7 @@ struct NoteChoice : LedDisplayChoice {
 			return;
 		if (module->learningId == id) {
 			if (0 <= focusNote && focusNote < 128) {
-				module->learnedNotes[id] = focusNote;
+				module->setLearnedNote(id, focusNote);
 			}
 			module->learningId = -1;
 		}

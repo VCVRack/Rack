@@ -6,16 +6,16 @@ namespace core {
 
 
 struct GateMidiOutput : midi::Output {
-	int vels[128];
+	uint8_t vels[128];
 	bool lastGates[128];
-	double frame = 0.0;
+	int64_t frame = -1;
 
 	GateMidiOutput() {
 		reset();
 	}
 
 	void reset() {
-		for (int note = 0; note < 128; note++) {
+		for (uint8_t note = 0; note < 128; note++) {
 			vels[note] = 100;
 			lastGates[note] = false;
 		}
@@ -24,7 +24,7 @@ struct GateMidiOutput : midi::Output {
 
 	void panic() {
 		// Send all note off commands
-		for (int note = 0; note < 128; note++) {
+		for (uint8_t note = 0; note < 128; note++) {
 			// Note off
 			midi::Message m;
 			m.setStatus(0x8);
@@ -36,11 +36,11 @@ struct GateMidiOutput : midi::Output {
 		}
 	}
 
-	void setVelocity(int vel, int note) {
+	void setVelocity(uint8_t note, uint8_t vel) {
 		vels[note] = vel;
 	}
 
-	void setGate(bool gate, int note) {
+	void setGate(uint8_t note, bool gate) {
 		if (gate && !lastGates[note]) {
 			// Note on
 			midi::Message m;
@@ -62,7 +62,7 @@ struct GateMidiOutput : midi::Output {
 		lastGates[note] = gate;
 	}
 
-	void setFrame(double frame) {
+	void setFrame(int64_t frame) {
 		this->frame = frame;
 	}
 };
@@ -86,12 +86,13 @@ struct Gate_MIDI : Module {
 	GateMidiOutput midiOutput;
 	bool velocityMode = false;
 	int learningId = -1;
-	uint8_t learnedNotes[16] = {};
+	int8_t learnedNotes[16] = {};
+	dsp::SchmittTrigger cellTriggers[16];
 
 	Gate_MIDI() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		for (int i = 0; i < 16; i++)
-			configInput(GATE_INPUTS + i, string::f("Cell %d", i + 1));
+		for (int id = 0; id < 16; id++)
+			configInput(GATE_INPUTS + id, string::f("Cell %d", id + 1));
 		onReset();
 	}
 
@@ -109,28 +110,42 @@ struct Gate_MIDI : Module {
 	void process(const ProcessArgs& args) override {
 		midiOutput.setFrame(args.frame);
 
-		for (int i = 0; i < 16; i++) {
-			int note = learnedNotes[i];
+		for (int id = 0; id < 16; id++) {
+			int8_t note = learnedNotes[id];
+			if (note < 0)
+				continue;
+
 			if (velocityMode) {
-				int vel = (int) std::round(inputs[GATE_INPUTS + i].getVoltage() / 10.f * 127);
+				int8_t vel = (int8_t) clamp(std::round(inputs[GATE_INPUTS + id].getVoltage() / 10.f * 127), 0.f, 127.f);
 				vel = clamp(vel, 0, 127);
-				midiOutput.setVelocity(vel, note);
-				midiOutput.setGate(vel > 0, note);
+				midiOutput.setVelocity(note, vel);
+				midiOutput.setGate(note, vel > 0);
 			}
 			else {
-				bool gate = inputs[GATE_INPUTS + i].getVoltage() >= 1.f;
-				midiOutput.setVelocity(100, note);
-				midiOutput.setGate(gate, note);
+				cellTriggers[id].process(inputs[GATE_INPUTS + id].getVoltage(), 0.1f, 2.f);
+				midiOutput.setVelocity(note, 100);
+				midiOutput.setGate(note, cellTriggers[id].isHigh());
 			}
 		}
+	}
+
+	void setLearnedNote(int id, int8_t note) {
+		// Unset IDs of similar note
+		if (note >= 0) {
+			for (int id = 0; id < 16; id++) {
+				if (learnedNotes[id] == note)
+					learnedNotes[id] = -1;
+			}
+		}
+		learnedNotes[id] = note;
 	}
 
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 
 		json_t* notesJ = json_array();
-		for (int i = 0; i < 16; i++) {
-			json_t* noteJ = json_integer(learnedNotes[i]);
+		for (int id = 0; id < 16; id++) {
+			json_t* noteJ = json_integer(learnedNotes[id]);
 			json_array_append_new(notesJ, noteJ);
 		}
 		json_object_set_new(rootJ, "notes", notesJ);
@@ -144,10 +159,10 @@ struct Gate_MIDI : Module {
 	void dataFromJson(json_t* rootJ) override {
 		json_t* notesJ = json_object_get(rootJ, "notes");
 		if (notesJ) {
-			for (int i = 0; i < 16; i++) {
-				json_t* noteJ = json_array_get(notesJ, i);
+			for (int id = 0; id < 16; id++) {
+				json_t* noteJ = json_array_get(notesJ, id);
 				if (noteJ)
-					learnedNotes[i] = json_integer_value(noteJ);
+					setLearnedNote(id, json_integer_value(noteJ));
 			}
 		}
 

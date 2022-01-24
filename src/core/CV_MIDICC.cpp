@@ -6,21 +6,21 @@ namespace core {
 
 
 struct CCMidiOutput : midi::Output {
-	int lastValues[128];
-	double frame = 0.0;
+	uint8_t lastValues[128];
+	int64_t frame = -1;
 
 	CCMidiOutput() {
 		reset();
 	}
 
 	void reset() {
-		for (int n = 0; n < 128; n++) {
+		for (uint8_t n = 0; n < 128; n++) {
 			lastValues[n] = -1;
 		}
 		Output::reset();
 	}
 
-	void setValue(int value, int cc) {
+	void setValue(uint8_t value, uint8_t cc) {
 		if (value == lastValues[cc])
 			return;
 		lastValues[cc] = value;
@@ -33,7 +33,7 @@ struct CCMidiOutput : midi::Output {
 		sendMessage(m);
 	}
 
-	void setFrame(double frame) {
+	void setFrame(int64_t frame) {
 		this->frame = frame;
 	}
 };

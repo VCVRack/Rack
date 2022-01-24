@@ -31,7 +31,7 @@ struct MIDI_Gate : Module {
 	/** Cell ID in learn mode, or -1 if none. */
 	int learningId;
 	/** [cell] */
-	uint8_t learnedNotes[16];
+	int8_t learnedNotes[16];
 	bool velocityMode;
 	bool mpeMode;
 
@@ -113,7 +113,7 @@ struct MIDI_Gate : Module {
 		int c = mpeMode ? channel : 0;
 		// Learn
 		if (learningId >= 0) {
-			learnedNotes[learningId] = note;
+			setLearnedNote(learningId, note);
 			learningId = -1;
 		}
 		// Find id
@@ -134,6 +134,10 @@ struct MIDI_Gate : Module {
 				gates[i][c] = false;
 			}
 		}
+	}
+
+	void setLearnedNote(int id, int8_t note) {
+		learnedNotes[id] = note;
 	}
 
 	json_t* dataToJson() override {
@@ -160,7 +164,7 @@ struct MIDI_Gate : Module {
 			for (int i = 0; i < 16; i++) {
 				json_t* noteJ = json_array_get(notesJ, i);
 				if (noteJ)
-					learnedNotes[i] = json_integer_value(noteJ);
+					setLearnedNote(i, json_integer_value(noteJ));
 			}
 		}
 
