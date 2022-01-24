@@ -114,7 +114,7 @@ struct CcChoice : LedDisplayChoice {
 			return;
 		if (module->learningId == id) {
 			if (0 <= focusCc && focusCc < 128) {
-				module->learnedCcs[id] = focusCc;
+				module->setLearnedCc(id, focusCc);
 			}
 			module->learningId = -1;
 		}

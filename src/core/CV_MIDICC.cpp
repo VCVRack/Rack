@@ -57,18 +57,18 @@ struct CV_MIDICC : Module {
 	CCMidiOutput midiOutput;
 	dsp::Timer rateLimiterTimer;
 	int learningId = -1;
-	int learnedCcs[16] = {};
+	int8_t learnedCcs[16] = {};
 
 	CV_MIDICC() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		for (int i = 0; i < 16; i++)
-			configInput(CC_INPUTS + i, string::f("Cell %d", i + 1));
+		for (int id = 0; id < 16; id++)
+			configInput(CC_INPUTS + id, string::f("Cell %d", id + 1));
 		onReset();
 	}
 
 	void onReset() override {
-		for (int i = 0; i < 16; i++) {
-			learnedCcs[i] = i;
+		for (int id = 0; id < 16; id++) {
+			learnedCcs[id] = id;
 		}
 		learningId = -1;
 		midiOutput.reset();
@@ -85,19 +85,29 @@ struct CV_MIDICC : Module {
 
 		midiOutput.setFrame(args.frame);
 
-		for (int i = 0; i < 16; i++) {
-			int value = (int) std::round(inputs[CC_INPUTS + i].getVoltage() / 10.f * 127);
-			value = clamp(value, 0, 127);
-			midiOutput.setValue(value, learnedCcs[i]);
+		for (int id = 0; id < 16; id++) {
+			uint8_t value = (uint8_t) clamp(std::round(inputs[CC_INPUTS + id].getVoltage() / 10.f * 127), 0.f, 127.f);
+			midiOutput.setValue(value, learnedCcs[id]);
 		}
+	}
+
+	void setLearnedCc(int id, int8_t cc) {
+		// Unset IDs of similar CCs
+		if (cc >= 0) {
+			for (int id = 0; id < 16; id++) {
+				if (learnedCcs[id] == cc)
+					learnedCcs[id] = -1;
+			}
+		}
+		learnedCcs[id] = cc;
 	}
 
 	json_t* dataToJson() override {
 		json_t* rootJ = json_object();
 
 		json_t* ccsJ = json_array();
-		for (int i = 0; i < 16; i++) {
-			json_array_append_new(ccsJ, json_integer(learnedCcs[i]));
+		for (int id = 0; id < 16; id++) {
+			json_array_append_new(ccsJ, json_integer(learnedCcs[id]));
 		}
 		json_object_set_new(rootJ, "ccs", ccsJ);
 
@@ -108,10 +118,10 @@ struct CV_MIDICC : Module {
 	void dataFromJson(json_t* rootJ) override {
 		json_t* ccsJ = json_object_get(rootJ, "ccs");
 		if (ccsJ) {
-			for (int i = 0; i < 16; i++) {
-				json_t* ccJ = json_array_get(ccsJ, i);
+			for (int id = 0; id < 16; id++) {
+				json_t* ccJ = json_array_get(ccsJ, id);
 				if (ccJ)
-					learnedCcs[i] = json_integer_value(ccJ);
+					setLearnedCc(id, json_integer_value(ccJ));
 			}
 		}
 

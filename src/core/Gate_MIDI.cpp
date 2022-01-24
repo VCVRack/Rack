@@ -116,8 +116,7 @@ struct Gate_MIDI : Module {
 				continue;
 
 			if (velocityMode) {
-				int8_t vel = (int8_t) clamp(std::round(inputs[GATE_INPUTS + id].getVoltage() / 10.f * 127), 0.f, 127.f);
-				vel = clamp(vel, 0, 127);
+				uint8_t vel = (uint8_t) clamp(std::round(inputs[GATE_INPUTS + id].getVoltage() / 10.f * 127), 0.f, 127.f);
 				midiOutput.setVelocity(note, vel);
 				midiOutput.setGate(note, vel > 0);
 			}

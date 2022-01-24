@@ -29,7 +29,7 @@ struct MIDICC_CV : Module {
 	*/
 	int8_t msbValues[32][16];
 	int learningId;
-	int learnedCcs[16];
+	int8_t learnedCcs[16];
 	/** [cell][channel] */
 	dsp::ExponentialFilter valueFilters[16][16];
 	bool smooth;
@@ -38,31 +38,31 @@ struct MIDICC_CV : Module {
 
 	MIDICC_CV() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
-		for (int i = 0; i < 16; i++)
-			configOutput(CC_OUTPUT + i, string::f("Cell %d", i + 1));
+		for (int id = 0; id < 16; id++)
+			configOutput(CC_OUTPUT + id, string::f("Cell %d", id + 1));
 
-		for (int i = 0; i < 16; i++) {
+		for (int id = 0; id < 16; id++) {
 			for (int c = 0; c < 16; c++) {
-				valueFilters[i][c].setTau(1 / 30.f);
+				valueFilters[id][c].setTau(1 / 30.f);
 			}
 		}
 		onReset();
 	}
 
 	void onReset() override {
-		for (int cc = 0; cc < 128; cc++) {
+		for (int8_t cc = 0; cc < 128; cc++) {
 			for (int c = 0; c < 16; c++) {
 				ccValues[cc][c] = 0;
 			}
 		}
-		for (int cc = 0; cc < 32; cc++) {
+		for (int8_t cc = 0; cc < 32; cc++) {
 			for (int c = 0; c < 16; c++) {
 				msbValues[cc][c] = 0;
 			}
 		}
 		learningId = -1;
-		for (int i = 0; i < 16; i++) {
-			learnedCcs[i] = i;
+		for (int id = 0; id < 16; id++) {
+			learnedCcs[id] = id;
 		}
 		midiInput.reset();
 		smooth = true;
@@ -78,12 +78,12 @@ struct MIDICC_CV : Module {
 
 		int channels = mpeMode ? 16 : 1;
 
-		for (int i = 0; i < 16; i++) {
-			if (!outputs[CC_OUTPUT + i].isConnected())
+		for (int id = 0; id < 16; id++) {
+			if (!outputs[CC_OUTPUT + id].isConnected())
 				continue;
-			outputs[CC_OUTPUT + i].setChannels(channels);
+			outputs[CC_OUTPUT + id].setChannels(channels);
 
-			int cc = learnedCcs[i];
+			int cc = learnedCcs[id];
 
 			for (int c = 0; c < channels; c++) {
 				int16_t cellValue = int16_t(ccValues[cc][c]) * 128;
@@ -95,15 +95,15 @@ struct MIDICC_CV : Module {
 				value = clamp(value, -1.f, 1.f);
 
 				// Detect behavior from MIDI buttons.
-				if (smooth && std::fabs(valueFilters[i][c].out - value) < 1.f) {
+				if (smooth && std::fabs(valueFilters[id][c].out - value) < 1.f) {
 					// Smooth value with filter
-					valueFilters[i][c].process(args.sampleTime, value);
+					valueFilters[id][c].process(args.sampleTime, value);
 				}
 				else {
 					// Jump value
-					valueFilters[i][c].out = value;
+					valueFilters[id][c].out = value;
 				}
-				outputs[CC_OUTPUT + i].setVoltage(valueFilters[i][c].out * 10.f, c);
+				outputs[CC_OUTPUT + id].setVoltage(valueFilters[id][c].out * 10.f, c);
 			}
 		}
 	}
@@ -129,7 +129,7 @@ struct MIDICC_CV : Module {
 		int8_t value = msg.bytes[2];
 		// Learn
 		if (learningId >= 0 && ccValues[cc][c] != value) {
-			learnedCcs[learningId] = cc;
+			setLearnedCc(learningId, cc);
 			learningId = -1;
 		}
 
@@ -145,6 +145,17 @@ struct MIDICC_CV : Module {
 		else {
 			ccValues[cc][c] = value;
 		}
+	}
+
+	void setLearnedCc(int id, int8_t cc) {
+		// Unset IDs of similar CCs
+		if (cc >= 0) {
+			for (int id = 0; id < 16; id++) {
+				if (learnedCcs[id] == cc)
+					learnedCcs[id] = -1;
+			}
+		}
+		learnedCcs[id] = cc;
 	}
 
 	json_t* dataToJson() override {
@@ -178,7 +189,7 @@ struct MIDICC_CV : Module {
 			for (int i = 0; i < 16; i++) {
 				json_t* ccJ = json_array_get(ccsJ, i);
 				if (ccJ)
-					learnedCcs[i] = json_integer_value(ccJ);
+					setLearnedCc(i, json_integer_value(ccJ));
 			}
 		}
 

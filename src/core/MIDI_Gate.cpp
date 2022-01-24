@@ -137,6 +137,13 @@ struct MIDI_Gate : Module {
 	}
 
 	void setLearnedNote(int id, int8_t note) {
+		// Unset IDs of similar note
+		if (note >= 0) {
+			for (int id = 0; id < 16; id++) {
+				if (learnedNotes[id] == note)
+					learnedNotes[id] = -1;
+			}
+		}
 		learnedNotes[id] = note;
 	}
 
