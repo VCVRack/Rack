@@ -50,12 +50,12 @@ struct MIDICC_CV : Module {
 	}
 
 	void onReset() override {
-		for (int8_t cc = 0; cc < 128; cc++) {
+		for (uint8_t cc = 0; cc < 128; cc++) {
 			for (int c = 0; c < 16; c++) {
 				ccValues[cc][c] = 0;
 			}
 		}
-		for (int8_t cc = 0; cc < 32; cc++) {
+		for (uint8_t cc = 0; cc < 32; cc++) {
 			for (int c = 0; c < 16; c++) {
 				msbValues[cc][c] = 0;
 			}
@@ -83,7 +83,11 @@ struct MIDICC_CV : Module {
 				continue;
 			outputs[CC_OUTPUT + id].setChannels(channels);
 
-			int cc = learnedCcs[id];
+			int8_t cc = learnedCcs[id];
+			if (cc < 0) {
+				outputs[CC_OUTPUT + id].clearVoltages();
+				continue;
+			}
 
 			for (int c = 0; c < channels; c++) {
 				int16_t cellValue = int16_t(ccValues[cc][c]) * 128;

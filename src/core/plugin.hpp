@@ -147,7 +147,7 @@ template <class TModule>
 struct NoteChoice : LedDisplayChoice {
 	TModule* module;
 	int id;
-	uint8_t focusNote;
+	int focusNote;
 
 	NoteChoice() {
 		box.size.y = mm2px(6.666);
