@@ -273,12 +273,6 @@ static void RackWidget_updateExpanders(RackWidget* that) {
 }
 
 void RackWidget::mergeJson(json_t* rootJ) {
-	// Get module offset so modules are aligned to (0, 0) when the patch is loaded.
-	math::Vec moduleOffset = internal->moduleContainer->getChildrenBoundingBox().pos;
-	if (!moduleOffset.isFinite()) {
-		moduleOffset = RACK_OFFSET;
-	}
-
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
 	if (!modulesJ)
@@ -299,7 +293,7 @@ void RackWidget::mergeJson(json_t* rootJ) {
 		}
 
 		// pos
-		math::Vec pos = mw->box.pos.minus(moduleOffset);
+		math::Vec pos = mw->box.pos.minus(RACK_OFFSET);
 		pos = pos.div(RACK_GRID_SIZE).round();
 		json_t* posJ = json_pack("[i, i]", (int) pos.x, (int) pos.y);
 		json_object_set_new(moduleJ, "pos", posJ);
