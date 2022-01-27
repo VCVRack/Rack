@@ -242,14 +242,14 @@ void TextField::onSelectKey(const SelectKeyEvent& e) {
 				APP->event->setSelectedWidget(nextField);
 			e.consume(this);
 		}
-		// Shift-Tab
+		// Shift+Tab
 		if (e.key == GLFW_KEY_TAB && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
 			if (prevField)
 				APP->event->setSelectedWidget(prevField);
 			e.consume(this);
 		}
-		// Consume all printable keys
-		if (e.keyName != "") {
+		// Consume all printable keys unless Ctrl is held
+		if ((e.mods & RACK_MOD_CTRL) == 0 && e.keyName != "") {
 			e.consume(this);
 		}
 

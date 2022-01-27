@@ -326,7 +326,7 @@ void Scene::onHoverKey(const HoverKeyEvent& e) {
 
 	// Key commands that can be overridden by children
 	if (e.action == GLFW_PRESS || e.action == GLFW_REPEAT) {
-		// Alternate key command for exiting fullscreen, since F11 doesn't work reliably on Mac due to "Show desktop" OS binding.
+		// Alternative key command for exiting fullscreen, since F11 doesn't work reliably on Mac due to "Show desktop" OS binding.
 		if (e.key == GLFW_KEY_ESCAPE && (e.mods & RACK_MOD_MASK) == 0) {
 			if (APP->window->isFullScreen()) {
 				APP->window->setFullScreen(false);
