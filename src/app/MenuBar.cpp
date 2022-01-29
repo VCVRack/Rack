@@ -548,6 +548,9 @@ struct EngineButton : MenuButton {
 				));
 			}
 		}));
+		menu->addChild(createCheckMenuItem("Disable DAW time warp workaround", "", 
+			[=]() { return settings::disableDawTimeWarpWorkaround; },
+			[=]() { settings::disableDawTimeWarpWorkaround ^= true; }));
 	}
 };
 

@@ -7,6 +7,7 @@
 #include <string.hpp>
 #include <system.hpp>
 #include <context.hpp>
+#include <settings.hpp>
 #include <engine/Engine.hpp>
 
 
@@ -339,11 +340,13 @@ bool InputQueue::tryPop(Message* messageOut, int64_t maxFrame) {
 		return true;
 	}
 
-	// If next MIDI message is too far in the future, clear the queue.
-	// This solves the issue of unconsumed messages getting stuck in the future when a DAW rewinds the engine frame.
-	int futureFrames = 2 * APP->engine->getBlockFrames();
-	if (msg.getFrame() - maxFrame > futureFrames) {
-		internal->queue.clear();
+	if (!rack::settings::disableDawTimeWarpWorkaround) {
+		// If next MIDI message is too far in the future, clear the queue.
+		// This solves the issue of unconsumed messages getting stuck in the future when a DAW rewinds the engine frame.
+		int futureFrames = 2 * APP->engine->getBlockFrames();
+		if (msg.getFrame() - maxFrame > futureFrames) {
+			internal->queue.clear();
+		}
 	}
 	return false;
 }

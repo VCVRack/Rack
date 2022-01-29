@@ -36,6 +36,7 @@ float knobLinearSensitivity = 0.001f;
 float knobScrollSensitivity = 0.001f;
 float sampleRate = 0;
 int threadCount = 1;
+bool disableDawTimeWarpWorkaround = false;
 bool tooltips = true;
 bool cpuMeter = false;
 bool lockModules = false;
@@ -136,6 +137,8 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "sampleRate", json_real(sampleRate));
 
 	json_object_set_new(rootJ, "threadCount", json_integer(threadCount));
+
+	json_object_set_new(rootJ, "disableDawTimeWarpWorkaround", json_boolean(disableDawTimeWarpWorkaround));
 
 	json_object_set_new(rootJ, "tooltips", json_boolean(tooltips));
 
@@ -304,6 +307,10 @@ void fromJson(json_t* rootJ) {
 	json_t* threadCountJ = json_object_get(rootJ, "threadCount");
 	if (threadCountJ)
 		threadCount = json_integer_value(threadCountJ);
+
+	json_t* disableDawTimeWarpWorkaroundJ = json_object_get(rootJ, "disableDawTimeWarpWorkaround");
+	if (disableDawTimeWarpWorkaroundJ)
+		disableDawTimeWarpWorkaround = json_boolean_value(disableDawTimeWarpWorkaroundJ);
 
 	json_t* tooltipsJ = json_object_get(rootJ, "tooltips");
 	if (tooltipsJ)
