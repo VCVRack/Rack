@@ -36,7 +36,7 @@ struct RackWidget::Internal {
 	math::Vec selectionStart;
 	math::Vec selectionEnd;
 	std::set<ModuleWidget*> selectedModules;
-	std::map<ModuleWidget*, math::Vec> moduleOldPositions;
+	std::map<widget::Widget*, math::Vec> moduleOldPositions;
 };
 
 
@@ -241,38 +241,6 @@ void RackWidget::clear() {
 	}
 }
 
-static void RackWidget_updateExpanders(RackWidget* that) {
-	for (widget::Widget* w : that->internal->moduleContainer->children) {
-		math::Vec pLeft = w->box.pos.div(RACK_GRID_SIZE).round();
-		math::Vec pRight = w->box.getTopRight().div(RACK_GRID_SIZE).round();
-		ModuleWidget* mwLeft = NULL;
-		ModuleWidget* mwRight = NULL;
-
-		// Find adjacent modules
-		for (widget::Widget* w2 : that->internal->moduleContainer->children) {
-			if (w2 == w)
-				continue;
-
-			math::Vec p2Left = w2->box.pos.div(RACK_GRID_SIZE).round();
-			math::Vec p2Right = w2->box.getTopRight().div(RACK_GRID_SIZE).round();
-
-			// Check if this is a left module
-			if (p2Right.equals(pLeft)) {
-				mwLeft = dynamic_cast<ModuleWidget*>(w2);
-			}
-
-			// Check if this is a right module
-			if (p2Left.equals(pRight)) {
-				mwRight = dynamic_cast<ModuleWidget*>(w2);
-			}
-		}
-
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
-		mw->module->leftExpander.moduleId = mwLeft ? mwLeft->module->id : -1;
-		mw->module->rightExpander.moduleId = mwRight ? mwRight->module->id : -1;
-	}
-}
-
 void RackWidget::mergeJson(json_t* rootJ) {
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
@@ -378,7 +346,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 		internal->moduleContainer->addChild(mw);
 	}
 
-	RackWidget_updateExpanders(this);
+	updateExpanders();
 
 	// cables
 	json_t* cablesJ = json_object_get(rootJ, "cables");
@@ -477,7 +445,7 @@ static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 		newModuleIds[id] = mw->module->id;
 	}
 
-	// This calls RackWidget_updateExpanders()
+	// This calls updateExpanders()
 	that->setSelectionPosNearest(math::Vec(0, 0));
 
 	// Add positioned selected modules to history
@@ -618,7 +586,7 @@ void RackWidget::addModule(ModuleWidget* m) {
 
 	internal->moduleContainer->addChild(m);
 
-	RackWidget_updateExpanders(this);
+	updateExpanders();
 }
 
 void RackWidget::addModuleAtMouse(ModuleWidget* mw) {
@@ -662,7 +630,7 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 
 	// Accept requested position
 	mw->setPosition(mwBox.pos);
-	RackWidget_updateExpanders(this);
+	updateExpanders();
 	return true;
 }
 
@@ -726,7 +694,7 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 	mw->setPosition(pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE));
 
 	// Comparison of center X coordinates
-	auto cmp = [&](const widget::Widget * a, const widget::Widget * b) {
+	auto cmp = [&](const widget::Widget* a, const widget::Widget* b) {
 		return a->box.pos.x + a->box.size.x / 2 < b->box.pos.x + b->box.size.x / 2;
 	};
 
@@ -736,9 +704,15 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 	for (widget::Widget* w2 : internal->moduleContainer->children) {
 		if (w2 == mw)
 			continue;
+		// Set position to old position
+		auto it = internal->moduleOldPositions.find(w2);
+		if (it != internal->moduleOldPositions.end()) {
+			w2->box.pos = it->second;
+		}
 		// Modules must be on the same row as `mw`
 		if (w2->box.pos.y != mw->box.pos.y)
 			continue;
+		// Insert into leftModules or rightModules
 		if (cmp(w2, mw))
 			leftModules.insert(w2);
 		else
@@ -771,7 +745,7 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 		xLimit = newPos.x + w->box.size.x;
 	}
 
-	RackWidget_updateExpanders(this);
+	updateExpanders();
 }
 
 ModuleWidget* RackWidget::getModule(int64_t moduleId) {
@@ -1200,7 +1174,7 @@ bool RackWidget::requestSelectionPos(math::Vec delta) {
 	for (const auto& pair : mwBoxes) {
 		pair.first->setPosition(pair.second.pos);
 	}
-	RackWidget_updateExpanders(this);
+	updateExpanders();
 	return true;
 }
 
@@ -1450,6 +1424,39 @@ ParamWidget* RackWidget::getTouchedParam() {
 
 void RackWidget::setTouchedParam(ParamWidget* pw) {
 	touchedParam = pw;
+}
+
+
+void RackWidget::updateExpanders() {
+	for (widget::Widget* w : internal->moduleContainer->children) {
+		math::Vec pLeft = w->box.pos.div(RACK_GRID_SIZE).round();
+		math::Vec pRight = w->box.getTopRight().div(RACK_GRID_SIZE).round();
+		ModuleWidget* mwLeft = NULL;
+		ModuleWidget* mwRight = NULL;
+
+		// Find adjacent modules
+		for (widget::Widget* w2 : internal->moduleContainer->children) {
+			if (w2 == w)
+				continue;
+
+			math::Vec p2Left = w2->box.pos.div(RACK_GRID_SIZE).round();
+			math::Vec p2Right = w2->box.getTopRight().div(RACK_GRID_SIZE).round();
+
+			// Check if this is a left module
+			if (p2Right.equals(pLeft)) {
+				mwLeft = dynamic_cast<ModuleWidget*>(w2);
+			}
+
+			// Check if this is a right module
+			if (p2Left.equals(pRight)) {
+				mwRight = dynamic_cast<ModuleWidget*>(w2);
+			}
+		}
+
+		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
+		mw->module->leftExpander.moduleId = mwLeft ? mwLeft->module->id : -1;
+		mw->module->rightExpander.moduleId = mwRight ? mwRight->module->id : -1;
+	}
 }
 
 

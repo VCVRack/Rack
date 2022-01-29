@@ -128,6 +128,8 @@ struct RackWidget : widget::OpaqueWidget {
 	NVGcolor getNextCableColor();
 	ParamWidget* getTouchedParam();
 	void setTouchedParam(ParamWidget* pw);
+
+	PRIVATE void updateExpanders();
 };
 
 
