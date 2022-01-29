@@ -36,6 +36,7 @@ struct RackWidget::Internal {
 	math::Vec selectionStart;
 	math::Vec selectionEnd;
 	std::set<ModuleWidget*> selectedModules;
+	std::map<ModuleWidget*, math::Vec> moduleOldPositions;
 };
 
 
@@ -800,9 +801,9 @@ bool RackWidget::hasModules() {
 }
 
 void RackWidget::updateModuleOldPositions() {
-	// Set all modules' oldPos field from their current position.
+	internal->moduleOldPositions.clear();
 	for (ModuleWidget* mw : getModules()) {
-		mw->oldPos() = mw->box.pos;
+		internal->moduleOldPositions[mw] = mw->getPosition();
 	}
 }
 
@@ -812,7 +813,10 @@ history::ComplexAction* RackWidget::getModuleDragAction() {
 
 	for (ModuleWidget* mw : getModules()) {
 		// Create ModuleMove action if the module was moved.
-		math::Vec oldPos = mw->oldPos();
+		auto it = internal->moduleOldPositions.find(mw);
+		if (it == internal->moduleOldPositions.end())
+			continue;
+		math::Vec oldPos = it->second;
 		if (!oldPos.equals(mw->box.pos)) {
 			history::ModuleMove* mmh = new history::ModuleMove;
 			mmh->moduleId = mw->module->id;

@@ -36,12 +36,6 @@ struct ModuleWidget::Internal {
 	math::Vec dragRackPos;
 	bool dragEnabled = true;
 
-	/** The position in the RackWidget when dragging began.
-	Used for history::ModuleMove.
-	Set by RackWidget::updateModuleOldPositions() when *any* module begins dragging, since force-dragging can move other modules around.
-	*/
-	math::Vec oldPos;
-
 	widget::Widget* panel = NULL;
 };
 
@@ -1042,10 +1036,6 @@ math::Vec& ModuleWidget::dragOffset() {
 
 bool& ModuleWidget::dragEnabled() {
 	return internal->dragEnabled;
-}
-
-math::Vec& ModuleWidget::oldPos() {
-	return internal->oldPos;
 }
 
 engine::Module* ModuleWidget::releaseModule() {
