@@ -451,10 +451,7 @@ void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 					APP->scene->rack->setSelectionPosNearest(delta);
 				}
 				else {
-					if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
-						APP->scene->rack->setModulePosForce(this, pos);
-					else
-						APP->scene->rack->setModulePosNearest(this, pos);
+					APP->scene->rack->setModulePosForce(this, pos);
 				}
 			}
 		}
