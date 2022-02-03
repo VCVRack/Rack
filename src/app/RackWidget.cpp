@@ -177,16 +177,14 @@ void RackWidget::onHoverKey(const HoverKeyEvent& e) {
 }
 
 void RackWidget::onButton(const ButtonEvent& e) {
-	Widget::onButton(e);
-	e.stopPropagating();
+	OpaqueWidget::onButton(e);
 	if (e.isConsumed())
 		return;
 
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		APP->scene->browser->show();
-		e.consume(this);
-	}
-	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+	if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		if (e.action == GLFW_PRESS) {
+			APP->scene->browser->show();
+		}
 		e.consume(this);
 	}
 }
