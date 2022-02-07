@@ -365,26 +365,36 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 void ModuleWidget::onButton(const ButtonEvent& e) {
 	bool selected = APP->scene->rack->isSelected(this);
 
-	if (selected) {
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-			ui::Menu* menu = createMenu();
-			APP->scene->rack->appendSelectionContextMenu(menu);
+	if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+		if (selected) {
+			if (e.action == GLFW_PRESS) {
+				ui::Menu* menu = createMenu();
+				APP->scene->rack->appendSelectionContextMenu(menu);
+			}
+			e.consume(this);
+			return;
 		}
-
-		e.consume(this);
 	}
 
-	OpaqueWidget::onButton(e);
+	Widget::onButton(e);
+	e.stopPropagating();
 
-	if (e.getTarget() == this) {
-		// Set starting drag position
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
+	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+		if (e.action == GLFW_PRESS) {
+			// Toggle selection on Shift-click
+			if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+				APP->scene->rack->select(this, !selected);
+			}
+			// If module positions are locked, don't consume left-click
+			if ((e.mods & RACK_MOD_MASK) == 0) {
+				if (settings::lockModules && !selected) {
+					return;
+				}
+			}
+
 			internal->dragOffset = e.pos;
 		}
-		// Toggle selection on Shift-click
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT && (e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-			APP->scene->rack->select(this, !selected);
-		}
+		e.consume(this);
 	}
 
 	if (!e.isConsumed() && !selected) {
@@ -426,33 +436,31 @@ void ModuleWidget::onDragEnd(const DragEndEvent& e) {
 
 void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
-		if (!settings::lockModules) {
-			math::Vec mousePos = APP->scene->rack->getMousePos();
+		math::Vec mousePos = APP->scene->rack->getMousePos();
 
-			if (!internal->dragEnabled) {
-				// Set dragRackPos on the first time after dragging
-				if (!internal->dragRackPos.isFinite())
-					internal->dragRackPos = mousePos;
-				// Check if the mouse has moved enough to start dragging the module.
-				const float minDist = RACK_GRID_WIDTH;
-				if (internal->dragRackPos.minus(mousePos).square() >= std::pow(minDist, 2))
-					internal->dragEnabled = true;
+		if (!internal->dragEnabled) {
+			// Set dragRackPos on the first time after dragging
+			if (!internal->dragRackPos.isFinite())
+				internal->dragRackPos = mousePos;
+			// Check if the mouse has moved enough to start dragging the module.
+			const float minDist = RACK_GRID_WIDTH;
+			if (internal->dragRackPos.minus(mousePos).square() >= std::pow(minDist, 2))
+				internal->dragEnabled = true;
+		}
+
+		// Move module
+		if (internal->dragEnabled) {
+			// Round y coordinate to nearest rack height
+			math::Vec pos = mousePos;
+			pos.x -= internal->dragOffset.x;
+			pos.y -= RACK_GRID_HEIGHT / 2;
+			if (APP->scene->rack->isSelected(this)) {
+				pos = (pos / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
+				math::Vec delta = pos.minus(box.pos);
+				APP->scene->rack->setSelectionPosNearest(delta);
 			}
-
-			// Move module
-			if (internal->dragEnabled) {
-				// Round y coordinate to nearest rack height
-				math::Vec pos = mousePos;
-				pos.x -= internal->dragOffset.x;
-				pos.y -= RACK_GRID_HEIGHT / 2;
-				if (APP->scene->rack->isSelected(this)) {
-					pos = (pos / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
-					math::Vec delta = pos.minus(box.pos);
-					APP->scene->rack->setSelectionPosNearest(delta);
-				}
-				else {
-					APP->scene->rack->setModulePosForce(this, pos);
-				}
+			else {
+				APP->scene->rack->setModulePosForce(this, pos);
 			}
 		}
 	}
