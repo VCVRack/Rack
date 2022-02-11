@@ -378,6 +378,8 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 
 	Widget::onButton(e);
 	e.stopPropagating();
+	if (e.isConsumed())
+		return;
 
 	if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		if (e.action == GLFW_PRESS) {
@@ -397,9 +399,9 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 		e.consume(this);
 	}
 
-	if (!e.isConsumed() && !selected) {
-		// Open context menu on right-click
-		if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_RIGHT) {
+	// Open context menu on right-click
+	if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
+		if (!selected) {
 			createContextMenu();
 			e.consume(this);
 		}
