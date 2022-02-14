@@ -82,6 +82,9 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 	mi.added++;
 	mi.lastAdded = system::getUnixTime();
 
+	history::ComplexAction* h = new history::ComplexAction;
+	h->name = "add module";
+
 	// Create Module and ModuleWidget
 	INFO("Creating module %s", model->getFullName().c_str());
 	engine::Module* module = model->createModule();
@@ -89,16 +92,20 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 
 	INFO("Creating module widget %s", model->getFullName().c_str());
 	ModuleWidget* moduleWidget = model->createModuleWidget(module);
+
+	APP->scene->rack->updateModuleOldPositions();
 	APP->scene->rack->addModuleAtMouse(moduleWidget);
+	h->push(APP->scene->rack->getModuleMoveAction());
 
 	// Load template preset
 	moduleWidget->loadTemplate();
 
 	// history::ModuleAdd
-	history::ModuleAdd* h = new history::ModuleAdd;
-	h->name = "create module";
+	history::ModuleAdd* ha = new history::ModuleAdd;
 	// This serializes the module so redoing returns to the current state.
-	h->setModule(moduleWidget);
+	ha->setModule(moduleWidget);
+	h->push(ha);
+
 	APP->history->push(h);
 
 	// Hide Module Browser

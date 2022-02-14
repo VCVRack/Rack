@@ -402,12 +402,12 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 			// Toggle selection on Shift-click
 			if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
 				APP->scene->rack->select(this, true);
+				return;
 			}
-			if ((e.mods & RACK_MOD_MASK) == 0) {
-				// If module positions are locked, don't consume left-click
-				if (settings::lockModules) {
-					return;
-				}
+
+			// If module positions are locked, don't consume left-click
+			if (settings::lockModules) {
+				return;
 			}
 
 			internal->dragOffset = e.pos;
@@ -442,7 +442,7 @@ void ModuleWidget::onDragEnd(const DragEndEvent& e) {
 		// The next time the module is dragged, it should always move immediately
 		internal->dragEnabled = true;
 
-		history::ComplexAction* h = APP->scene->rack->getModuleDragAction();
+		history::ComplexAction* h = APP->scene->rack->getModuleMoveAction();
 		if (!h->isEmpty())
 			APP->history->push(h);
 		else
@@ -816,7 +816,9 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	// Clone ModuleWidget
 	INFO("Creating module widget %s", model->getFullName().c_str());
 	ModuleWidget* clonedModuleWidget = model->createModuleWidget(clonedModule);
+	APP->scene->rack->updateModuleOldPositions();
 	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
+	h->push(APP->scene->rack->getModuleMoveAction());
 
 	// history::ModuleAdd
 	history::ModuleAdd* hma = new history::ModuleAdd;
@@ -871,7 +873,7 @@ void ModuleWidget::bypassAction(bool bypassed) {
 
 void ModuleWidget::removeAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
-	complexAction->name = "remove module";
+	complexAction->name = "delete module";
 	appendDisconnectActions(complexAction);
 
 	// history::ModuleRemove

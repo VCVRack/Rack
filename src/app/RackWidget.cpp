@@ -536,13 +536,20 @@ void RackWidget::pasteModuleJsonAction(json_t* moduleJ) {
 	assert(mw);
 	assert(mw->module);
 
+	history::ComplexAction* h = new history::ComplexAction;
+	h->name = "paste module";
+
 	APP->engine->addModule(mw->module);
+
+	updateModuleOldPositions();
 	addModuleAtMouse(mw);
+	h->push(getModuleMoveAction());
 
 	// history::ModuleAdd
-	history::ModuleAdd* h = new history::ModuleAdd;
-	h->name = "paste module";
-	h->setModule(mw);
+	history::ModuleAdd* ha = new history::ModuleAdd;
+	ha->setModule(mw);
+	h->push(ha);
+
 	APP->history->push(h);
 }
 
@@ -591,7 +598,7 @@ void RackWidget::addModuleAtMouse(ModuleWidget* mw) {
 	assert(mw);
 	// Move module nearest to the mouse position
 	math::Vec pos = internal->mousePos.minus(mw->box.size.div(2));
-	setModulePosNearest(mw, pos);
+	setModulePosForce(mw, pos);
 	addModule(mw);
 }
 
@@ -783,7 +790,7 @@ void RackWidget::updateModuleOldPositions() {
 	}
 }
 
-history::ComplexAction* RackWidget::getModuleDragAction() {
+history::ComplexAction* RackWidget::getModuleMoveAction() {
 	history::ComplexAction* h = new history::ComplexAction;
 	h->name = "move modules";
 
@@ -1130,7 +1137,7 @@ bool RackWidget::isSelectionBypassed() {
 
 void RackWidget::deleteSelectionAction() {
 	history::ComplexAction* complexAction = new history::ComplexAction;
-	complexAction->name = "remove modules";
+	complexAction->name = "delete modules";
 
 	// Copy selected set since removing ModuleWidgets modifies it.
 	std::set<ModuleWidget*> selectedModules = getSelected();
