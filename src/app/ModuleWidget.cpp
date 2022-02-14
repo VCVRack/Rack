@@ -365,17 +365,33 @@ void ModuleWidget::onHoverKey(const HoverKeyEvent& e) {
 void ModuleWidget::onButton(const ButtonEvent& e) {
 	bool selected = APP->scene->rack->isSelected(this);
 
-	if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
-		if (selected) {
+	if (selected) {
+		if (e.button == GLFW_MOUSE_BUTTON_RIGHT) {
 			if (e.action == GLFW_PRESS) {
+				// Open selection context menu on right-click
 				ui::Menu* menu = createMenu();
 				APP->scene->rack->appendSelectionContextMenu(menu);
 			}
 			e.consume(this);
-			return;
 		}
+
+		if (e.button == GLFW_MOUSE_BUTTON_LEFT) {
+			if (e.action == GLFW_PRESS) {
+				// Toggle selection on Shift-click
+				if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
+					APP->scene->rack->select(this, false);
+				}
+
+				internal->dragOffset = e.pos;
+			}
+
+			e.consume(this);
+		}
+
+		return;
 	}
 
+	// Dispatch event to children
 	Widget::onButton(e);
 	e.stopPropagating();
 	if (e.isConsumed())
@@ -385,11 +401,11 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 		if (e.action == GLFW_PRESS) {
 			// Toggle selection on Shift-click
 			if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
-				APP->scene->rack->select(this, !selected);
+				APP->scene->rack->select(this, true);
 			}
-			// If module positions are locked, don't consume left-click
 			if ((e.mods & RACK_MOD_MASK) == 0) {
-				if (settings::lockModules && !selected) {
+				// If module positions are locked, don't consume left-click
+				if (settings::lockModules) {
 					return;
 				}
 			}
@@ -401,10 +417,8 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 
 	// Open context menu on right-click
 	if (e.button == GLFW_MOUSE_BUTTON_RIGHT && e.action == GLFW_PRESS) {
-		if (!selected) {
-			createContextMenu();
-			e.consume(this);
-		}
+		createContextMenu();
+		e.consume(this);
 	}
 }
 
