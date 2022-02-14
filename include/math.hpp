@@ -356,6 +356,12 @@ struct Rect {
 	float getBottom() const {
 		return (size.y == INFINITY) ? INFINITY : (pos.y + size.y);
 	}
+	float getWidth() const {
+		return size.x;
+	}
+	float getHeight() const {
+		return size.y;
+	}
 	/** Returns the center point of the rectangle.
 	Returns a NaN coordinate if pos=-inf and size=inf.
 	*/
