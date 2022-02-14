@@ -708,7 +708,7 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 			w2->box.pos = it->second;
 		}
 		// Modules must be on the same row as `mw`
-		if (w2->box.pos.y != mw->box.pos.y)
+		if (w2->box.getTop() != mw->box.getTop())
 			continue;
 		// Insert into leftModules or rightModules
 		if (cmp(w2, mw))
@@ -717,30 +717,33 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 			rightModules.insert(w2);
 	}
 
-	// Shove left modules
-	float xLimit = mw->box.pos.x;
-	for (auto it = leftModules.rbegin(); it != leftModules.rend(); it++) {
-		widget::Widget* w = *it;
-		math::Vec newPos = w->box.pos;
-		newPos.x = xLimit - w->box.size.x;
-		newPos.x = std::round(newPos.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
-		if (w->box.pos.x < newPos.x)
-			break;
-		w->setPosition(newPos);
-		xLimit = newPos.x;
+	if (!leftModules.empty()) {
+		widget::Widget* leftModule = *leftModules.rbegin();
+		// Make sure module is to the right of the last leftModule.
+		if (leftModule->box.getRight() > mw->box.getLeft()) {
+			mw->box.pos.x = leftModule->box.getRight();
+		}
+
+		// If there isn't enough space between the last leftModule and first rightModule, place module to the right of the leftModule.
+		if (!rightModules.empty()) {
+			widget::Widget* rightModule = *rightModules.begin();
+			if (rightModule->box.getLeft() - leftModule->box.getRight() < mw->box.getWidth()) {
+				mw->box.pos.x = leftModule->box.getRight();
+			}
+		}
 	}
 
 	// Shove right modules
-	xLimit = mw->box.pos.x + mw->box.size.x;
+	float xLimit = mw->box.getRight();
 	for (auto it = rightModules.begin(); it != rightModules.end(); it++) {
-		widget::Widget* w = *it;
-		math::Vec newPos = w->box.pos;
+		widget::Widget* w2 = *it;
+		math::Vec newPos = w2->box.pos;
 		newPos.x = xLimit;
 		newPos.x = std::round(newPos.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
-		if (w->box.pos.x > newPos.x)
+		if (w2->box.pos.x > newPos.x)
 			break;
-		w->setPosition(newPos);
-		xLimit = newPos.x + w->box.size.x;
+		w2->box.pos = newPos;
+		xLimit = w2->box.getRight();
 	}
 
 	updateExpanders();
