@@ -691,18 +691,19 @@ void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
 void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 	mw->setPosition(pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE));
 
-	// Comparison of center X coordinates
+	// Comparison of X coordinates
 	auto cmp = [&](const widget::Widget* a, const widget::Widget* b) {
-		return a->box.pos.x + a->box.size.x / 2 < b->box.pos.x + b->box.size.x / 2;
+		return a->box.pos.x < b->box.pos.x;
 	};
 
 	// Collect modules to the left and right of `mw`
 	std::set<widget::Widget*, decltype(cmp)> leftModules(cmp);
 	std::set<widget::Widget*, decltype(cmp)> rightModules(cmp);
 	for (widget::Widget* w2 : internal->moduleContainer->children) {
+		// Skip this module
 		if (w2 == mw)
 			continue;
-		// Set position to old position
+		// Reset position to old position
 		auto it = internal->moduleOldPositions.find(w2);
 		if (it != internal->moduleOldPositions.end()) {
 			w2->box.pos = it->second;
@@ -711,7 +712,7 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 		if (w2->box.getTop() != mw->box.getTop())
 			continue;
 		// Insert into leftModules or rightModules
-		if (cmp(w2, mw))
+		if (w2->box.getCenter().x < mw->box.getCenter().x)
 			leftModules.insert(w2);
 		else
 			rightModules.insert(w2);
