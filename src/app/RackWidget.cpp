@@ -725,33 +725,37 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 			rightModules.insert(w2);
 	}
 
-	if (!leftModules.empty()) {
-		widget::Widget* leftModule = *leftModules.rbegin();
-		// Make sure module is to the right of the last leftModule.
+	widget::Widget* leftModule = leftModules.empty() ? NULL : *leftModules.rbegin();
+	widget::Widget* rightModule = rightModules.empty() ? NULL : *rightModules.begin();
+
+	if (leftModule) {
 		if (leftModule->box.getRight() > mw->box.getLeft()) {
 			mw->box.pos.x = leftModule->box.getRight();
 		}
-
-		// If there isn't enough space between the last leftModule and first rightModule, place module to the right of the leftModule.
-		if (!rightModules.empty()) {
-			widget::Widget* rightModule = *rightModules.begin();
-			if (rightModule->box.getLeft() - leftModule->box.getRight() < mw->box.getWidth()) {
-				mw->box.pos.x = leftModule->box.getRight();
-			}
+	}
+	if (rightModule) {
+		if (mw->box.getRight() > rightModule->box.getLeft()) {
+			mw->box.pos.x = rightModule->box.getLeft() - mw->box.size.x;
 		}
 	}
+	if (leftModule && rightModule) {
+		// If there isn't enough space between the last leftModule and first rightModule, place module to the right of the leftModule.
+		if (leftModule->box.getRight() + mw->box.getWidth() > rightModule->box.getLeft()) {
+			mw->box.pos.x = leftModule->box.getRight();
 
-	// Shove right modules
-	float xLimit = mw->box.getRight();
-	for (auto it = rightModules.begin(); it != rightModules.end(); it++) {
-		widget::Widget* w2 = *it;
-		math::Vec newPos = w2->box.pos;
-		newPos.x = xLimit;
-		newPos.x = std::round(newPos.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
-		if (w2->box.pos.x > newPos.x)
-			break;
-		w2->box.pos = newPos;
-		xLimit = w2->box.getRight();
+			// Shove right modules
+			float xLimit = mw->box.getRight();
+			for (auto it = rightModules.begin(); it != rightModules.end(); it++) {
+				widget::Widget* w2 = *it;
+				math::Vec newPos = w2->box.pos;
+				newPos.x = xLimit;
+				newPos.x = std::round(newPos.x / RACK_GRID_WIDTH) * RACK_GRID_WIDTH;
+				if (w2->box.pos.x > newPos.x)
+					break;
+				w2->box.pos = newPos;
+				xLimit = w2->box.getRight();
+			}
+		}
 	}
 
 	updateExpanders();
