@@ -543,7 +543,7 @@ void RackWidget::pasteModuleJsonAction(json_t* moduleJ) {
 
 	updateModuleOldPositions();
 	addModuleAtMouse(mw);
-	h->push(getModuleMoveAction());
+	h->push(getModuleDragAction());
 
 	// history::ModuleAdd
 	history::ModuleAdd* ha = new history::ModuleAdd;
@@ -822,7 +822,7 @@ void RackWidget::updateModuleOldPositions() {
 	}
 }
 
-history::ComplexAction* RackWidget::getModuleMoveAction() {
+history::ComplexAction* RackWidget::getModuleDragAction() {
 	history::ComplexAction* h = new history::ComplexAction;
 	h->name = "move modules";
 

@@ -442,7 +442,7 @@ void ModuleWidget::onDragEnd(const DragEndEvent& e) {
 		// The next time the module is dragged, it should always move immediately
 		internal->dragEnabled = true;
 
-		history::ComplexAction* h = APP->scene->rack->getModuleMoveAction();
+		history::ComplexAction* h = APP->scene->rack->getModuleDragAction();
 		if (!h->isEmpty())
 			APP->history->push(h);
 		else
@@ -818,7 +818,7 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	ModuleWidget* clonedModuleWidget = model->createModuleWidget(clonedModule);
 	APP->scene->rack->updateModuleOldPositions();
 	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
-	h->push(APP->scene->rack->getModuleMoveAction());
+	h->push(APP->scene->rack->getModuleDragAction());
 
 	// history::ModuleAdd
 	history::ModuleAdd* hma = new history::ModuleAdd;

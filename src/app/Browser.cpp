@@ -95,7 +95,7 @@ static ModuleWidget* chooseModel(plugin::Model* model) {
 
 	APP->scene->rack->updateModuleOldPositions();
 	APP->scene->rack->addModuleAtMouse(moduleWidget);
-	h->push(APP->scene->rack->getModuleMoveAction());
+	h->push(APP->scene->rack->getModuleDragAction());
 
 	// Load template preset
 	moduleWidget->loadTemplate();

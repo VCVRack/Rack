@@ -70,7 +70,7 @@ struct RackWidget : widget::OpaqueWidget {
 	std::vector<ModuleWidget*> getModules();
 	bool hasModules();
 	void updateModuleOldPositions();
-	history::ComplexAction* getModuleMoveAction();
+	history::ComplexAction* getModuleDragAction();
 
 	// Module selection methods
 
