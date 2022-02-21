@@ -380,6 +380,8 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 				// Toggle selection on Shift-click
 				if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
 					APP->scene->rack->select(this, false);
+					e.consume(NULL);
+					return;
 				}
 
 				internal->dragOffset = e.pos;
@@ -402,6 +404,7 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 			// Toggle selection on Shift-click
 			if ((e.mods & RACK_MOD_MASK) == GLFW_MOD_SHIFT) {
 				APP->scene->rack->select(this, true);
+				e.consume(NULL);
 				return;
 			}
 
