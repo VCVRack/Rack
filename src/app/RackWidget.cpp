@@ -640,53 +640,21 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 }
 
 static math::Vec eachNearestGridPos(math::Vec pos, std::function<bool(math::Vec pos)> f) {
-	// Dijkstra's algorithm to generate a sorted list of Vecs closest to `pos`.
+	math::Vec leftPos = pos.div(RACK_GRID_SIZE).floor().mult(RACK_GRID_SIZE);
+	math::Vec rightPos = leftPos + math::Vec(RACK_GRID_WIDTH, 0);
 
-	// Comparison of distance of Vecs to `pos`
-	auto cmpNearest = [&](const math::Vec& a, const math::Vec& b) {
-		return a.minus(pos).square() > b.minus(pos).square();
-	};
-	// Comparison of dictionary order of Vecs
-	auto cmp = [](const math::Vec& a, const math::Vec& b) {
-		if (a.y != b.y)
-			return a.y < b.y;
-		return a.x < b.x;
-	};
-	// Priority queue sorted by distance from `pos`
-	std::priority_queue<math::Vec, std::vector<math::Vec>, decltype(cmpNearest)> queue(cmpNearest);
-	// Set of already-tested Vecs
-	std::set<math::Vec, decltype(cmp)> visited(cmp);
-	// Seed priority queue with closest Vec
-	math::Vec closestPos = pos.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
-	queue.push(closestPos);
+	while (true) {
+		if (f(leftPos))
+			return leftPos;
+		leftPos.x -= RACK_GRID_WIDTH;
 
-	while (!queue.empty()) {
-		math::Vec testPos = queue.top();
-		// Check testPos
-		if (f(testPos))
-			return testPos;
-		// Move testPos to visited set
-		queue.pop();
-		visited.insert(testPos);
-
-		// Add adjacent Vecs
-		static const std::vector<math::Vec> deltas = {
-			math::Vec(1, 0).mult(RACK_GRID_SIZE),
-			math::Vec(0, 1).mult(RACK_GRID_SIZE),
-			math::Vec(-1, 0).mult(RACK_GRID_SIZE),
-			math::Vec(0, -1).mult(RACK_GRID_SIZE),
-		};
-		for (math::Vec delta : deltas) {
-			math::Vec newPos = testPos.plus(delta);
-			if (visited.find(newPos) == visited.end()) {
-				queue.push(newPos);
-			}
-		}
+		if (f(rightPos))
+			return rightPos;
+		rightPos.x += RACK_GRID_WIDTH;
 	}
 
-	// We failed to find a box. This shouldn't happen on an infinite rack.
 	assert(false);
-	return math::Vec();
+	return leftPos;
 }
 
 void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
