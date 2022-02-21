@@ -710,35 +710,33 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 		return a->box.getLeft() < b->box.getLeft();
 	};
 
-	// Collect modules to the right of old pos
-	std::set<widget::Widget*, decltype(cmp)> rightOldModules(cmp);
-	for (widget::Widget* w2 : internal->moduleContainer->children) {
-		// Skip this module
-		if (w2 == mw)
-			continue;
-		// Modules must be on the same row as old pos
-		if (w2->box.getTop() != mw->box.getTop())
-			continue;
-		// Insert into rightOldModules
-		if (w2->box.getCenter().x >= mw->box.getCenter().x)
-			rightOldModules.insert(w2);
-	}
+	// Check if new box occupies old box
+	if (!(newBox.pos.y == mw->box.pos.y && newBox.getLeft() <= mw->box.getRight() && newBox.getRight() >= mw->box.getLeft())) {
+		// Collect modules to the right of old pos
+		std::set<widget::Widget*, decltype(cmp)> rightOldModules(cmp);
+		for (widget::Widget* w2 : internal->moduleContainer->children) {
+			// Skip this module
+			if (w2 == mw)
+				continue;
+			// Modules must be on the same row as old pos
+			if (w2->box.getTop() != mw->box.getTop())
+				continue;
+			// Insert into rightOldModules
+			if (w2->box.getCenter().x >= mw->box.getCenter().x)
+				rightOldModules.insert(w2);
+		}
 
-	// Shove old right modules to the left
-	float xDelta = newBox.pos.x - mw->box.pos.x;
-	if (newBox.pos.y != mw->box.pos.y || xDelta > 0 || xDelta < -mw->box.size.x) {
-		xDelta = -mw->box.size.x;
-	}
-
-	float xRight = mw->box.getRight();
-	for (auto it = rightOldModules.begin(); it != rightOldModules.end(); it++) {
-		widget::Widget* w2 = *it;
-		// Break when module is no longer touching
-		if (xRight < w2->box.getLeft())
-			break;
-		xRight = w2->box.getRight();
-		// Move module to the left by the width of mw, so it replaces its position
-		w2->box.pos.x += xDelta;
+		// Shove old right modules to the left
+		float xRight = mw->box.getRight();
+		for (auto it = rightOldModules.begin(); it != rightOldModules.end(); it++) {
+			widget::Widget* w2 = *it;
+			// Break when module is no longer touching
+			if (xRight < w2->box.getLeft())
+				break;
+			xRight = w2->box.getRight();
+			// Move module to the left by the width of mw, so it replaces its position
+			w2->box.pos.x -= mw->box.size.x;
+		}
 	}
 
 	// Collect modules to the left and right of pos
