@@ -350,7 +350,7 @@ def panel_to_components(tree):
 		if not color:
 			style = el.get('style')
 			if style:
-				color_match = re.search(r'fill:\S*(#[0-9a-fA-F]{6})', style)
+				color_match = re.search(r'fill:\s*(#[0-9a-fA-F]{6})', style)
 				color = color_match.group(1)
 		if not color:
 			eprint(f"Cannot get color of component: {el}")
