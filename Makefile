@@ -1,7 +1,7 @@
 RACK_DIR ?= .
 VERSION_MAJOR := 2
 # VERSION := 2.git.$(shell git rev-parse --short HEAD)
-VERSION := 2.0.6
+VERSION := 2.1.0
 
 FLAGS += -Iinclude -Idep/include
 
