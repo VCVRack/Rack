@@ -506,13 +506,13 @@ bool ModuleWidget::pasteJsonAction(json_t* moduleJ) {
 	engine::Module::jsonStripIds(moduleJ);
 
 	json_t* oldModuleJ = toJson();
+	DEFER({json_decref(oldModuleJ);});
 
 	try {
 		fromJson(moduleJ);
 	}
 	catch (Exception& e) {
 		WARN("%s", e.what());
-		json_decref(oldModuleJ);
 		return false;
 	}
 
@@ -520,7 +520,9 @@ bool ModuleWidget::pasteJsonAction(json_t* moduleJ) {
 	history::ModuleChange* h = new history::ModuleChange;
 	h->name = "paste module preset";
 	h->moduleId = module->id;
+	json_incref(oldModuleJ);
 	h->oldModuleJ = oldModuleJ;
+	json_incref(moduleJ);
 	h->newModuleJ = moduleJ;
 	APP->history->push(h);
 	return true;
