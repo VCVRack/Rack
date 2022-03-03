@@ -21,11 +21,10 @@ SvgButton::SvgButton() {
 void SvgButton::onButton(const ButtonEvent& e) {
 	OpaqueWidget::onButton(e);
 
-	// Accept left and right-click dragging.
-	if (e.action == GLFW_PRESS && (e.button == GLFW_MOUSE_BUTTON_LEFT || e.button == GLFW_MOUSE_BUTTON_RIGHT)) {
+	// Dispatch ActionEvent on left click
+	if (e.action == GLFW_PRESS && e.button == GLFW_MOUSE_BUTTON_LEFT) {
 		ActionEvent eAction;
 		onAction(eAction);
-		e.consume(this);
 	}
 }
 
@@ -64,10 +63,11 @@ void SvgButton::onDragEnd(const DragEndEvent& e) {
 
 
 void SvgButton::onDragDrop(const DragDropEvent& e) {
-	if (e.origin == this) {
-		ActionEvent eAction;
-		onAction(eAction);
-	}
+	// Don't dispatch ActionEvent on DragDrop because it's already called on mouse down.
+	// if (e.origin == this) {
+	// 	ActionEvent eAction;
+	// 	onAction(eAction);
+	// }
 }
 
 
