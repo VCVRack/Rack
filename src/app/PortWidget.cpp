@@ -118,6 +118,22 @@ struct PortCloneCableItem : ui::MenuItem {
 };
 
 
+struct CableColorItem : ColorMenuItem {
+	CableWidget* cw;
+
+	void onAction(const ActionEvent& e) override {
+		// history::CableColorChange
+		history::CableColorChange* h = new history::CableColorChange;
+		h->setCable(cw);
+		h->newColor = color;
+		h->oldColor = cw->color;
+		APP->history->push(h);
+
+		cw->color = color;
+	}
+};
+
+
 struct PortCableItem : ColorMenuItem {
 	PortWidget* pw;
 	CableWidget* cw;
@@ -135,6 +151,21 @@ struct PortCableItem : ColorMenuItem {
 			// Deletes `this`
 			doAction();
 		}
+	}
+
+	ui::Menu* createChildMenu() override {
+		ui::Menu* menu = new ui::Menu;
+
+		for (NVGcolor color : settings::cableColors) {
+			// Include extra leading spaces for the color circle
+			CableColorItem* item = createMenuItem<CableColorItem>("     Set color");
+			item->disabled = color::isEqual(color, cw->color);
+			item->cw = cw;
+			item->color = color;
+			menu->addChild(item);
+		}
+
+		return menu;
 	}
 };
 
@@ -261,19 +292,20 @@ void PortWidget::createContextMenu() {
 
 	if (!cws.empty()) {
 		menu->addChild(new ui::MenuSeparator);
-	}
+		menu->addChild(createMenuLabel("Click+drag to grab cable"));
 
-	// Cable items
-	for (auto it = cws.rbegin(); it != cws.rend(); it++) {
-		CableWidget* cw = *it;
-		PortWidget* pw = (type == engine::Port::INPUT) ? cw->outputPort : cw->inputPort;
-		engine::PortInfo* portInfo = pw->getPortInfo();
+		// Cable items
+		for (auto it = cws.rbegin(); it != cws.rend(); it++) {
+			CableWidget* cw = *it;
+			PortWidget* pw = (type == engine::Port::INPUT) ? cw->outputPort : cw->inputPort;
+			engine::PortInfo* portInfo = pw->getPortInfo();
 
-		PortCableItem* item = createMenuItem<PortCableItem>("     " + portInfo->module->model->name + ": " + portInfo->getName());
-		item->color = cw->color;
-		item->pw = this;
-		item->cw = cw;
-		menu->addChild(item);
+			PortCableItem* item = createMenuItem<PortCableItem>("     " + portInfo->module->model->name + ": " + portInfo->getName(), RIGHT_ARROW);
+			item->color = cw->color;
+			item->pw = this;
+			item->cw = cw;
+			menu->addChild(item);
+		}
 	}
 }
 

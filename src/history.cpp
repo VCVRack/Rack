@@ -192,6 +192,28 @@ void CableAdd::redo() {
 }
 
 
+void CableColorChange::setCable(app::CableWidget* cw) {
+	assert(cw);
+	assert(cw->cable);
+	assert(cw->cable->id >= 0);
+	cableId = cw->cable->id;
+}
+
+void CableColorChange::undo() {
+	app::CableWidget* cw = APP->scene->rack->getCable(cableId);
+	if (!cw)
+		return;
+	cw->color = oldColor;
+}
+
+void CableColorChange::redo() {
+	app::CableWidget* cw = APP->scene->rack->getCable(cableId);
+	if (!cw)
+		return;
+	cw->color = newColor;
+}
+
+
 State::State() {
 	clear();
 }

@@ -157,6 +157,19 @@ struct CableRemove : InverseAction<CableAdd> {
 };
 
 
+struct CableColorChange : Action {
+	int64_t cableId;
+	NVGcolor newColor;
+	NVGcolor oldColor;
+	void setCable(app::CableWidget* cw);
+	void undo() override;
+	void redo() override;
+	CableColorChange() {
+		name = "change cable color";
+	}
+};
+
+
 struct State {
 	struct Internal;
 	Internal* internal;
