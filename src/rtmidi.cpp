@@ -398,8 +398,13 @@ void rtmidiInit() {
 	RtMidi::getCompiledApi(rtApis);
 	for (RtMidi::Api api : rtApis) {
 		int driverId = (int) api;
-		midi::Driver* driver = new RtMidiDriver(driverId);
-		midi::addDriver(driverId, driver);
+		try {
+			midi::Driver* driver = new RtMidiDriver(driverId);
+			midi::addDriver(driverId, driver);
+		}
+		catch (Exception& e) {
+			WARN("Could not create RtMidiDriver %d", api);
+		}
 	}
 }
 
