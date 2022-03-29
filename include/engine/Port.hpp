@@ -13,7 +13,9 @@ static const int PORT_MAX_CHANNELS = 16;
 
 struct Port {
 	/** Voltage of the port. */
-	union {
+	/** NOTE alignas is required in order to allow SSE usage.
+	Consecutive data (like in a vector) would otherwise pack Ports in a way that breaks SSE. */
+	union alignas(32) {
 		/** Unstable API. Use getVoltage() and setVoltage() instead. */
 		float voltages[PORT_MAX_CHANNELS] = {};
 		/** DEPRECATED. Unstable API. Use getVoltage() and setVoltage() instead. */

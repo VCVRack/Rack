@@ -34,7 +34,8 @@ struct Vector<float, 4> {
 	using type = float;
 	constexpr static int size = 4;
 
-	union {
+	/** NOTE alignas is required in order to allow SSE usage. */
+	union alignas(32) {
 		__m128 v;
 		/** Accessing this array of scalars is slow and defeats the purpose of vectorizing.
 		*/
@@ -108,7 +109,8 @@ struct Vector<int32_t, 4> {
 	using type = int32_t;
 	constexpr static int size = 4;
 
-	union {
+	/** NOTE alignas is required in order to allow SSE usage. */
+	union alignas(32) {
 		__m128i v;
 		int32_t s[4];
 	};
