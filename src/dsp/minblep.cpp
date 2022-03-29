@@ -10,7 +10,7 @@ namespace dsp {
 void minBlepImpulse(int z, int o, float* output) {
 	// Symmetric sinc array with `z` zero-crossings on each side
 	int n = 2 * z * o;
-	float* x = new float[n];
+	float* x = (float*) pffft_aligned_malloc(sizeof(float) * n);
 	for (int i = 0; i < n; i++) {
 		float p = math::rescale((float) i, 0.f, (float)(n - 1), (float) - z, (float) z);
 		x[i] = sinc(p);
@@ -20,7 +20,7 @@ void minBlepImpulse(int z, int o, float* output) {
 	blackmanHarrisWindow(x, n);
 
 	// Real cepstrum
-	float* fx = new float[2 * n];
+	float* fx = (float*) pffft_aligned_malloc(sizeof(float) * 2 * n);
 	// Valgrind complains that the array is uninitialized for some reason, unless we clear it.
 	std::memset(fx, 0, sizeof(float) * 2 * n);
 	RealFFT rfft(n);
@@ -75,8 +75,8 @@ void minBlepImpulse(int z, int o, float* output) {
 	std::memcpy(output, x, n * sizeof(float));
 
 	// Cleanup
-	delete[] x;
-	delete[] fx;
+	pffft_aligned_free(x);
+	pffft_aligned_free(fx);
 }
 
 

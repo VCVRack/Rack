@@ -42,16 +42,16 @@ struct RealTimeConvolver {
 	RealTimeConvolver(size_t blockSize) {
 		this->blockSize = blockSize;
 		pffft = pffft_new_setup(blockSize * 2, PFFFT_REAL);
-		outputTail = new float[blockSize];
+		outputTail = (float*) pffft_aligned_malloc(sizeof(float) * blockSize);
 		std::memset(outputTail, 0, blockSize * sizeof(float));
-		tmpBlock = new float[blockSize * 2];
+		tmpBlock = (float*) pffft_aligned_malloc(sizeof(float) * blockSize * 2);
 		std::memset(tmpBlock, 0, blockSize * 2 * sizeof(float));
 	}
 
 	~RealTimeConvolver() {
 		setKernel(NULL, 0);
-		delete[] outputTail;
-		delete[] tmpBlock;
+		pffft_aligned_free(outputTail);
+		pffft_aligned_free(tmpBlock);
 		pffft_destroy_setup(pffft);
 	}
 
