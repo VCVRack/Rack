@@ -273,6 +273,7 @@ int main(int argc, char* argv[]) {
 	plugin::destroy();
 	INFO("Destroying network");
 	network::destroy();
+	settings::destroy();
 	INFO("Destroying logger");
 	logger::destroy();
 

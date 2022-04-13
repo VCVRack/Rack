@@ -41,6 +41,18 @@ namespace plugin {
 // private API
 ////////////////////
 
+
+static void* getSymbol(void* handle, const char* name) {
+	if (!handle)
+		return NULL;
+
+#if defined ARCH_WIN
+	return GetProcAddress((HMODULE) handle, name);
+#else
+	return dlsym(handle, name);
+#endif
+}
+
 /** Returns library handle */
 static void* loadLibrary(std::string libraryPath) {
 #if defined ARCH_WIN
@@ -100,12 +112,7 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 	plugin->handle = loadLibrary(libraryPath);
 
 	// Get plugin's init() function
-	InitCallback initCallback;
-#if defined ARCH_WIN
-	initCallback = (InitCallback) GetProcAddress((HMODULE) plugin->handle, "init");
-#else
-	initCallback = (InitCallback) dlsym(plugin->handle, "init");
-#endif
+	InitCallback initCallback = (InitCallback) getSymbol(plugin->handle, "init");
 	if (!initCallback)
 		throw Exception("Failed to read init() symbol in %s", libraryPath.c_str());
 
@@ -169,6 +176,15 @@ static Plugin* loadPlugin(std::string path) {
 		Plugin* existingPlugin = getPlugin(plugin->slug);
 		if (existingPlugin)
 			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
+
+		// Call settingsFromJson() if exists
+		// Returns NULL for Core.
+		auto settingsFromJson = (decltype(&::settingsFromJson)) getSymbol(plugin->handle, "settingsFromJson");
+		if (settingsFromJson) {
+			json_t* settingsJ = json_object_get(settings::pluginSettingsJ, plugin->slug.c_str());
+			if (settingsJ)
+				settingsFromJson(settingsJ);
+		}
 	}
 	catch (Exception& e) {
 		WARN("Could not load plugin %s: %s", path.c_str(), e.what());
@@ -265,11 +281,7 @@ static void destroyPlugin(Plugin* plugin) {
 	typedef void (*DestroyCallback)();
 	DestroyCallback destroyCallback = NULL;
 	if (handle) {
-#if defined ARCH_WIN
-		destroyCallback = (DestroyCallback) GetProcAddress((HMODULE) handle, "destroy");
-#else
-		destroyCallback = (DestroyCallback) dlsym(handle, "destroy");
-#endif
+		destroyCallback = (DestroyCallback) getSymbol(handle, "destroy");
 	}
 	if (destroyCallback) {
 		try {
@@ -300,6 +312,20 @@ void destroy() {
 		destroyPlugin(plugin);
 	}
 	plugins.clear();
+}
+
+
+void settingsMergeJson(json_t* rootJ) {
+	for (Plugin* plugin : plugins) {
+		auto settingsToJson = (decltype(&::settingsToJson)) getSymbol(plugin->handle, "settingsToJson");
+		if (settingsToJson) {
+			json_t* settingsJ = settingsToJson();
+			json_object_set_new(rootJ, plugin->slug.c_str(), settingsJ);
+		}
+		else {
+			json_object_del(rootJ, plugin->slug.c_str());
+		}
+	}
 }
 
 

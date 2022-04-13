@@ -13,6 +13,7 @@ namespace plugin {
 
 PRIVATE void init();
 PRIVATE void destroy();
+PRIVATE void settingsMergeJson(json_t* rootJ);
 
 /** Finds a loaded Plugin by slug. */
 Plugin* getPlugin(const std::string& pluginSlug);

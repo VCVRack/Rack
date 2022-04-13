@@ -61,6 +61,7 @@ int tipIndex = -1;
 bool discordUpdateActivity = true;
 BrowserSort browserSort = BROWSER_SORT_UPDATED;
 float browserZoom = -1.f;
+json_t* pluginSettingsJ = NULL;
 std::map<std::string, std::map<std::string, ModuleInfo>> moduleInfos;
 std::map<std::string, PluginWhitelist> moduleWhitelist;
 
@@ -95,6 +96,12 @@ bool isModuleWhitelisted(const std::string& pluginSlug, const std::string& modul
 
 void init() {
 	settingsPath = asset::user("settings.json");
+}
+
+
+void destroy() {
+	if (pluginSettingsJ)
+		json_decref(pluginSettingsJ);
 }
 
 
@@ -175,6 +182,13 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "browserSort", json_integer((int) browserSort));
 
 	json_object_set_new(rootJ, "browserZoom", json_real(browserZoom));
+
+	// Merge pluginSettings instead of replace so plugins that fail to load don't cause their settings to be deleted.
+	if (!pluginSettingsJ)
+		pluginSettingsJ = json_object();
+	plugin::settingsMergeJson(pluginSettingsJ);
+	// Don't use *_set_new() here because we need to keep the reference to pluginSettingsJ.
+	json_object_set(rootJ, "pluginSettings", pluginSettingsJ);
 
 	// moduleInfos
 	json_t* moduleInfosJ = json_object();
@@ -374,6 +388,15 @@ void fromJson(json_t* rootJ) {
 	json_t* browserZoomJ = json_object_get(rootJ, "browserZoom");
 	if (browserZoomJ)
 		browserZoom = json_number_value(browserZoomJ);
+
+	// Delete previous pluginSettings object
+	if (pluginSettingsJ) {
+		json_decref(pluginSettingsJ);
+		pluginSettingsJ = NULL;
+	}
+	pluginSettingsJ = json_object_get(rootJ, "pluginSettings");
+	if (pluginSettingsJ)
+		json_incref(pluginSettingsJ);
 
 	moduleInfos.clear();
 	json_t* moduleInfosJ = json_object_get(rootJ, "moduleInfos");

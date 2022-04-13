@@ -83,6 +83,7 @@ enum BrowserSort {
 };
 extern BrowserSort browserSort;
 extern float browserZoom;
+extern json_t* pluginSettingsJ;
 
 struct ModuleInfo {
 	bool enabled = true;
@@ -110,6 +111,7 @@ extern std::map<std::string, PluginWhitelist> moduleWhitelist;
 bool isModuleWhitelisted(const std::string& pluginSlug, const std::string& moduleSlug);
 
 PRIVATE void init();
+PRIVATE void destroy();
 PRIVATE json_t* toJson();
 PRIVATE void fromJson(json_t* rootJ);
 PRIVATE void save(std::string path = "");
