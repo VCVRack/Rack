@@ -159,6 +159,14 @@ static Plugin* loadPlugin(std::string path) {
 			throw Exception("JSON parsing error at %s %d:%d %s", manifestFilename.c_str(), error.line, error.column, error.text);
 		DEFER({json_decref(rootJ);});
 
+		// Load manifest
+		plugin->fromJson(rootJ);
+
+		// Reject plugin if slug already exists
+		Plugin* existingPlugin = getPlugin(plugin->slug);
+		if (existingPlugin)
+			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
+
 		// Call init callback
 		InitCallback initCallback;
 		if (path == "") {
@@ -169,13 +177,9 @@ static Plugin* loadPlugin(std::string path) {
 		}
 		initCallback(plugin);
 
-		// Load manifest
-		plugin->fromJson(rootJ);
-
-		// Reject plugin if slug already exists
-		Plugin* existingPlugin = getPlugin(plugin->slug);
-		if (existingPlugin)
-			throw Exception("Plugin %s is already loaded, not attempting to load it again", plugin->slug.c_str());
+		// Load modules manifest
+		json_t* modulesJ = json_object_get(rootJ, "modules");
+		plugin->modulesFromJson(modulesJ);
 
 		// Call settingsFromJson() if exists
 		// Returns NULL for Core.

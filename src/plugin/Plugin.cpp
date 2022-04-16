@@ -107,15 +107,17 @@ void Plugin::fromJson(json_t* rootJ) {
 	json_t* changelogUrlJ = json_object_get(rootJ, "changelogUrl");
 	if (changelogUrlJ)
 		changelogUrl = json_string_value(changelogUrlJ);
+}
 
+
+void Plugin::modulesFromJson(json_t* rootJ) {
 	// Reordered models vector
 	std::list<Model*> newModels;
 
-	json_t* modulesJ = json_object_get(rootJ, "modules");
-	if (modulesJ && json_array_size(modulesJ) > 0) {
+	if (rootJ && json_array_size(rootJ) > 0) {
 		size_t moduleId;
 		json_t* moduleJ;
-		json_array_foreach(modulesJ, moduleId, moduleJ) {
+		json_array_foreach(rootJ, moduleId, moduleJ) {
 			// Get model slug
 			json_t* modelSlugJ = json_object_get(moduleJ, "slug");
 			if (!modelSlugJ) {

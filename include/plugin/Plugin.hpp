@@ -80,6 +80,7 @@ struct Plugin {
 	void addModel(Model* model);
 	Model* getModel(const std::string& slug);
 	void fromJson(json_t* rootJ);
+	void modulesFromJson(json_t* rootJ);
 	std::string getBrand();
 };
 
