@@ -47,7 +47,7 @@ static void* getSymbol(void* handle, const char* name) {
 		return NULL;
 
 #if defined ARCH_WIN
-	return GetProcAddress((HMODULE) handle, name);
+	return (void*) GetProcAddress((HMODULE) handle, name);
 #else
 	return dlsym(handle, name);
 #endif
