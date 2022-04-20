@@ -263,9 +263,14 @@ void ModuleWidget::draw(const DrawArgs& args) {
 		// Text
 		float percent = meterBuffer[meterIndex] * sampleRate * 100.f;
 		// float microseconds = meterBuffer[meterIndex] * 1e6f;
-		std::string meterText = string::f("%.1f%%", percent);
-		float x = box.size.x - bndLabelWidth(args.vg, -1, meterText.c_str());
-		bndMenuLabel(args.vg, x, plotHeight, INFINITY, BND_WIDGET_HEIGHT, -1, meterText.c_str());
+		std::string meterText = string::f("%.1f", percent);
+		// Only append "%" if wider than 2 HP
+		if (box.getWidth() > RACK_GRID_WIDTH * 2)
+			meterText += "%";
+		math::Vec pt;
+		pt.x = box.size.x - bndLabelWidth(args.vg, -1, meterText.c_str()) + 3;
+		pt.y = plotHeight + 0.5;
+		bndMenuLabel(args.vg, VEC_ARGS(pt), INFINITY, BND_WIDGET_HEIGHT, -1, meterText.c_str());
 	}
 
 	// Selection
