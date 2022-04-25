@@ -13,8 +13,8 @@ namespace window {
 
 
 /** Arbitrary DPI, standardized for Rack. */
-static const float SVG_DPI = 75.f;
-static const float MM_PER_IN = 25.4f;
+static constexpr const float SVG_DPI = 75.f;
+static constexpr const float MM_PER_IN = 25.4f;
 
 
 /** Converts inch measurements to pixels */

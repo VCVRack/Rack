@@ -8,7 +8,7 @@ namespace engine {
 
 
 /** This is inspired by the number of MIDI channels. */
-static const int PORT_MAX_CHANNELS = 16;
+static constexpr const int PORT_MAX_CHANNELS = 16;
 
 
 struct Port {
