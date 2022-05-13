@@ -664,50 +664,22 @@ void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {
 }
 
 void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
-	math::Rect newBox = mw->box;
-	newBox.pos = (pos / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
-
 	// Reset modules to their old positions, including this module
 	for (auto& pair : internal->moduleOldPositions) {
 		widget::Widget* w2 = pair.first;
 		w2->box.pos = pair.second;
 	}
 
+	math::Rect oldBox = mw->box;
+	math::Rect newBox = mw->box;
+	newBox.pos = (pos / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
+
 	// Comparator of X coordinates
 	auto cmp = [&](const widget::Widget* a, const widget::Widget* b) {
 		return a->box.getLeft() < b->box.getLeft();
 	};
 
-	// Check if new box occupies old box
-	if (!(newBox.pos.y == mw->box.pos.y && newBox.getLeft() <= mw->box.getRight() && newBox.getRight() >= mw->box.getLeft())) {
-		// Collect modules to the right of old pos
-		std::set<widget::Widget*, decltype(cmp)> rightOldModules(cmp);
-		for (widget::Widget* w2 : internal->moduleContainer->children) {
-			// Skip this module
-			if (w2 == mw)
-				continue;
-			// Modules must be on the same row as old pos
-			if (w2->box.getTop() != mw->box.getTop())
-				continue;
-			// Insert into rightOldModules
-			if (w2->box.getCenter().x >= mw->box.getCenter().x)
-				rightOldModules.insert(w2);
-		}
-
-		// Shove old right modules to the left
-		float xRight = mw->box.getRight();
-		for (auto it = rightOldModules.begin(); it != rightOldModules.end(); it++) {
-			widget::Widget* w2 = *it;
-			// Break when module is no longer touching
-			if (xRight < w2->box.getLeft())
-				break;
-			xRight = w2->box.getRight();
-			// Move module to the left by the width of mw, so it replaces its position
-			w2->box.pos.x -= mw->box.size.x;
-		}
-	}
-
-	// Collect modules to the left and right of pos
+	// Collect modules to the left and right of new pos
 	std::set<widget::Widget*, decltype(cmp)> leftModules(cmp);
 	std::set<widget::Widget*, decltype(cmp)> rightModules(cmp);
 	for (widget::Widget* w2 : internal->moduleContainer->children) {
@@ -750,7 +722,40 @@ void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 		newBox.pos.x = rightModule->box.getLeft() - newBox.size.x;
 	}
 
+	// Commit new pos
 	mw->box.pos = (newBox.pos / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
+
+	// Collect modules to the left and right of old pos, including this module.
+	std::set<widget::Widget*, decltype(cmp)> leftOldModules(cmp);
+	std::set<widget::Widget*, decltype(cmp)> rightOldModules(cmp);
+	for (widget::Widget* w2 : internal->moduleContainer->children) {
+		// Modules must be on the same row as pos
+		if (w2->box.getTop() != oldBox.getTop())
+			continue;
+		// Insert into leftOldModules or rightOldModules
+		if (w2->box.getLeft() < oldBox.getLeft())
+			leftOldModules.insert(w2);
+		else
+			rightOldModules.insert(w2);
+	}
+
+	widget::Widget* leftOldModule = leftOldModules.empty() ? NULL : *leftOldModules.rbegin();
+
+	// Shove right modules back to empty space left by module.
+	float xLeft = oldBox.getLeft();
+	if (leftOldModule)
+		xLeft = std::max(xLeft, leftOldModule->box.getRight());
+	float xRight = oldBox.getRight();
+	for (auto it = rightOldModules.begin(); it != rightOldModules.end(); it++) {
+		widget::Widget* w2 = *it;
+		// Break when module is no longer touching
+		if (xRight < w2->box.getLeft())
+			break;
+		// Move module to the left
+		xRight = w2->box.getRight();
+		w2->box.pos.x = xLeft;
+		xLeft = w2->box.getRight();
+	}
 
 	updateExpanders();
 }
