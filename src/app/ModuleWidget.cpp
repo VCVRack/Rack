@@ -827,7 +827,11 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	INFO("Creating module widget %s", model->getFullName().c_str());
 	ModuleWidget* clonedModuleWidget = model->createModuleWidget(clonedModule);
 	APP->scene->rack->updateModuleOldPositions();
-	APP->scene->rack->addModuleAtMouse(clonedModuleWidget);
+	APP->scene->rack->addModule(clonedModuleWidget);
+	// Place module to the right of `this` module, by forcing it to 1 HP to the right.
+	math::Vec clonedPos = box.pos + math::Vec(RACK_GRID_WIDTH, 0);
+	clonedModuleWidget->box.pos = clonedPos;
+	APP->scene->rack->setModulePosForce(clonedModuleWidget, clonedPos);
 	h->push(APP->scene->rack->getModuleDragAction());
 
 	// history::ModuleAdd
