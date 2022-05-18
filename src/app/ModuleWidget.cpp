@@ -829,9 +829,9 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	APP->scene->rack->updateModuleOldPositions();
 	APP->scene->rack->addModule(clonedModuleWidget);
 	// Place module to the right of `this` module, by forcing it to 1 HP to the right.
-	math::Vec clonedPos = box.pos + math::Vec(RACK_GRID_WIDTH, 0);
-	clonedModuleWidget->box.pos = clonedPos;
-	APP->scene->rack->setModulePosForce(clonedModuleWidget, clonedPos);
+	math::Vec clonedPos = box.pos;
+	clonedPos.x += clonedModuleWidget->box.getWidth();
+	APP->scene->rack->forceSetModulePos(clonedModuleWidget, clonedPos);
 	h->push(APP->scene->rack->getModuleDragAction());
 
 	// history::ModuleAdd
