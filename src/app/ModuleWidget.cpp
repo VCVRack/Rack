@@ -886,16 +886,23 @@ void ModuleWidget::bypassAction(bool bypassed) {
 }
 
 void ModuleWidget::removeAction() {
-	history::ComplexAction* complexAction = new history::ComplexAction;
-	complexAction->name = "delete module";
-	appendDisconnectActions(complexAction);
+	history::ComplexAction* h = new history::ComplexAction;
+	h->name = "delete module";
+
+	// Disconnect cables
+	appendDisconnectActions(h);
+
+	// Unset module position from rack.
+	APP->scene->rack->updateModuleOldPositions();
+	APP->scene->rack->forceUnsetModulePos(this);
+	h->push(APP->scene->rack->getModuleDragAction());
 
 	// history::ModuleRemove
 	history::ModuleRemove* moduleRemove = new history::ModuleRemove;
 	moduleRemove->setModule(this);
-	complexAction->push(moduleRemove);
+	h->push(moduleRemove);
 
-	APP->history->push(complexAction);
+	APP->history->push(h);
 
 	// This removes the module and transfers ownership to caller
 	APP->scene->rack->removeModule(this);
