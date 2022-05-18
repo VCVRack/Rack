@@ -66,6 +66,8 @@ struct RackWidget : widget::OpaqueWidget {
 	/** Moves a module to the closest non-colliding position */
 	void setModulePosNearest(ModuleWidget* mw, math::Vec pos);
 	void setModulePosForce(ModuleWidget* mw, math::Vec pos);
+	PRIVATE void forceSetModulePos(ModuleWidget* mw, math::Vec pos);
+	PRIVATE void forceUnsetModulePos(ModuleWidget* mw);
 	ModuleWidget* getModule(int64_t moduleId);
 	std::vector<ModuleWidget*> getModules();
 	bool hasModules();
