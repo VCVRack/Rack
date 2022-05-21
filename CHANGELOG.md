@@ -2,6 +2,15 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.1.1 (2022-05-21)
+- Allow changing cable colors with port menu.
+- Fix placement bugs and improve behavior when moving or duplicating modules.
+- Fix probabilistic crash when undoing a module paste action.
+- Rack Pro
+	- Fix VST2 window size not being remembered on Mac.
+- API
+	- Make `SvgButton` dispatch `ActionEvent` only on left mouse down, instead of left/right mouse down and drag drop.
+
 ### 2.1.0 (2022-02-26)
 - Change behavior of force-moving modules so that other modules return to original position while dragging.
 - Update to RtMidi 5.0.0.
