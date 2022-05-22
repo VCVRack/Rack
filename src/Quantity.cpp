@@ -70,14 +70,14 @@ static void teVarsInit() {
 		}
 	}
 
-	// Build teVars
-	teVars.resize(teVariables.size());
+	// Build teVars from teVariables
+	teVars.reserve(teVariables.size());
 	for (size_t i = 0; i < teVariables.size(); i++) {
-		teVars[i].name = teVariables[i].name.c_str();
-		teVars[i].address = &teVariables[i].value;
-		teVars[i].type = TE_VARIABLE;
-		teVars[i].context = NULL;
+		teVars.push_back({teVariables[i].name.c_str(), &teVariables[i].value, TE_VARIABLE, NULL});
 	}
+
+	// Add custom functions
+	teVars.push_back({"log2", (void*) log2, TE_FUNCTION1 | TE_FLAG_PURE, NULL});
 }
 
 void Quantity::setDisplayValueString(std::string s) {
