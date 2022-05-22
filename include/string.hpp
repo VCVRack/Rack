@@ -98,8 +98,9 @@ For example, the following versions are sorted earliest to latest.
 	1.b.0
 	1.0.0
 	1.0.1
-	1.1.0
+	1.2.0
 	1.10.0
+	2.0.0
 */
 struct Version {
 	std::vector<std::string> parts;
