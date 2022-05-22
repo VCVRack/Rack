@@ -90,5 +90,27 @@ std::wstring UTF8toUTF16(const std::string& s);
 #endif
 
 
+/** Structured version string, for comparison.
+
+For example, the following versions are sorted earliest to latest.
+
+	1.a.0
+	1.b.0
+	1.0.0
+	1.0.1
+	1.1.0
+	1.10.0
+*/
+struct Version {
+	std::vector<std::string> parts;
+
+	Version() {}
+	Version(const std::string& s);
+	Version(const char* s) : Version(std::string(s)) {}
+	operator std::string() const;
+	bool operator<(const Version& other);
+};
+
+
 } // namespace string
 } // namespace rack

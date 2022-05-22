@@ -270,5 +270,55 @@ std::wstring UTF8toUTF16(const std::string& s) {
 }
 #endif
 
+
+/** Parses `s` as a positive base-10 number. Returns -1 if invalid. */
+static int stringToInt(const std::string& s) {
+	if (s.empty())
+		return -1;
+
+	int i = 0;
+	for (char c : s) {
+		if (!std::isdigit((unsigned char) c))
+			return -1;
+		i *= 10;
+		i += (c - '0');
+	}
+	return i;
+}
+
+/** Returns whether version part p1 is earlier than p2. */
+static bool compareVersionPart(const std::string& p1, const std::string& p2) {
+	int i1 = stringToInt(p1);
+	int i2 = stringToInt(p2);
+
+	if (i1 >= 0 && i2 >= 0) {
+		// Compare integers.
+		return i1 < i2;
+	}
+	else if (i1 < 0 && i2 < 0) {
+		// Compare strings.
+		return p1 < p2;
+	}
+	else {
+		// Types are different. String is always less than int.
+		return i1 < 0;
+	}
+}
+
+
+Version::Version(const std::string& s) {
+	parts = split(s, ".");
+}
+
+Version::operator std::string() const {
+	return join(parts, ".");
+}
+
+bool Version::operator<(const Version& other) {
+	return std::lexicographical_compare(parts.begin(), parts.end(), other.parts.begin(), other.parts.end(), compareVersionPart);
+}
+
+
+
 } // namespace string
 } // namespace rack
