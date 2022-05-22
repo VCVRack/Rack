@@ -249,8 +249,12 @@ void checkUpdates() {
 
 		// Check if update is needed
 		plugin::Plugin* p = plugin::getPlugin(pluginSlug);
-		if (p && p->version == update.version)
-			continue;
+		if (p) {
+			if (update.version == p->version)
+				continue;
+			if (string::Version(update.version) < string::Version(p->version))
+				continue;
+		}
 
 		// Require that plugin is available
 		json_t* availableJ = json_object_get(manifestJ, "available");
