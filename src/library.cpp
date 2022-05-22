@@ -70,8 +70,12 @@ void checkAppUpdate() {
 	DEFER({json_decref(resJ);});
 
 	json_t* versionJ = json_object_get(resJ, "version");
-	if (versionJ)
-		appVersion = json_string_value(versionJ);
+	if (versionJ) {
+		std::string appVersion = json_string_value(versionJ);
+		// Check if app version is more recent than current version
+		if (string::Version(APP_VERSION) < string::Version(appVersion))
+			library::appVersion = appVersion;
+	}
 
 	json_t* changelogUrlJ = json_object_get(resJ, "changelogUrl");
 	if (changelogUrlJ)
@@ -87,7 +91,7 @@ void checkAppUpdate() {
 
 
 bool isAppUpdateAvailable() {
-	return (appVersion != "") && (appVersion != APP_VERSION);
+	return (appVersion != "");
 }
 
 
