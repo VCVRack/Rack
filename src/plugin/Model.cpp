@@ -10,6 +10,7 @@
 #include <ui/Menu.hpp>
 #include <ui/MenuSeparator.hpp>
 #include <helpers.hpp>
+#include <window/Window.hpp>
 
 
 namespace rack {
@@ -170,6 +171,13 @@ void Model::appendContextMenu(ui::Menu* menu, bool inBrowser) {
 	if (plugin->changelogUrl != "") {
 		menu->addChild(createMenuItem("Changelog", "", [=]() {
 			system::openBrowser(plugin->changelogUrl);
+		}));
+	}
+
+	// author email
+	if (plugin->authorEmail != "") {
+		menu->addChild(createMenuItem("Author email", "Copy to clipboard", [=]() {
+			glfwSetClipboardString(APP->window->win, plugin->authorEmail.c_str());
 		}));
 	}
 
