@@ -77,7 +77,7 @@ static void teVarsInit() {
 	}
 
 	// Add custom functions
-	teVars.push_back({"log2", (void*) log2, TE_FUNCTION1 | TE_FLAG_PURE, NULL});
+	teVars.push_back({"log2", (void*) (double(*)(double)) std::log2, TE_FUNCTION1 | TE_FLAG_PURE, NULL});
 }
 
 void Quantity::setDisplayValueString(std::string s) {
