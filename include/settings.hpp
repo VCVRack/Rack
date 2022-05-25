@@ -27,6 +27,8 @@ extern bool isPlugin;
 
 // Persistent state, serialized to settings.json.
 
+/** Launches Rack without loading plugins or the autosave patch. Always set to false when settings are saved. */
+extern bool safeMode;
 /** vcvrack.com user token */
 extern std::string token;
 /** Whether the window is maximized */

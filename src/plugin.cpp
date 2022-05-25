@@ -256,6 +256,10 @@ void init() {
 	// Get user plugins directory
 	system::createDirectory(pluginsPath);
 
+	// Don't load plugins if safe mode is enabled
+	if (settings::safeMode)
+		return;
+
 	// Extract packages and load plugins
 	extractPackages(pluginsPath);
 	loadPlugins(pluginsPath);

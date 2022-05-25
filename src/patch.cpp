@@ -47,6 +47,10 @@ void Manager::launch(std::string pathArg) {
 		return;
 	}
 
+	// Don't load autosave or template if safe mode is enabled
+	if (settings::safeMode)
+		return;
+
 	// Try loading the autosave patch
 	if (hasAutosave()) {
 		try {

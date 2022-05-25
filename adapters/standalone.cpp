@@ -74,8 +74,11 @@ int main(int argc, char* argv[]) {
 	// Parse command line arguments
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "dht:s:u:p:")) != -1) {
+	while ((c = getopt(argc, argv, "adht:s:u:p:")) != -1) {
 		switch (c) {
+			case 'a': {
+				settings::safeMode = true;
+			} break;
 			case 'd': {
 				settings::devMode = true;
 			} break;

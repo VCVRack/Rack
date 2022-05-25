@@ -19,6 +19,7 @@ bool devMode = false;
 bool headless = false;
 bool isPlugin = false;
 
+bool safeMode = false;
 std::string token;
 bool windowMaximized = false;
 math::Vec windowSize = math::Vec(1024, 720);
@@ -106,6 +107,9 @@ void destroy() {
 
 json_t* toJson() {
 	json_t* rootJ = json_object();
+
+	// Always disable safe mode when settings are saved.
+	json_object_set_new(rootJ, "safeMode", json_boolean(false));
 
 	json_object_set_new(rootJ, "token", json_string(token.c_str()));
 
@@ -241,6 +245,13 @@ json_t* toJson() {
 }
 
 void fromJson(json_t* rootJ) {
+	json_t* safeModeJ = json_object_get(rootJ, "safeMode");
+	if (safeModeJ) {
+		// If safe mode is enabled (e.g. by command line flag), don't disable it when loading.
+		if (json_boolean_value(safeModeJ))
+			safeMode = true;
+	}
+
 	json_t* tokenJ = json_object_get(rootJ, "token");
 	if (tokenJ)
 		token = json_string_value(tokenJ);
