@@ -208,10 +208,10 @@ int main(int argc, char* argv[]) {
 #if defined ARCH_MAC
 	// For some reason, launching from the command line sets glfwGetOpenedFilenames(), so make sure we're running the app bundle.
 	if (asset::bundlePath != "") {
-		// const char* const* openedFilenames = glfwGetOpenedFilenames();
-		// if (openedFilenames && openedFilenames[0]) {
-		// 	patchPath = openedFilenames[0];
-		// }
+		const char* const* openedFilenames = glfwGetOpenedFilenames();
+		if (openedFilenames && openedFilenames[0]) {
+			patchPath = openedFilenames[0];
+		}
 	}
 #endif
 
