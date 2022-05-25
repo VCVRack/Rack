@@ -48,8 +48,11 @@ void Manager::launch(std::string pathArg) {
 	}
 
 	// Don't load autosave or template if safe mode is enabled
-	if (settings::safeMode)
+	if (settings::safeMode) {
+		clear();
+		clearAutosave();
 		return;
+	}
 
 	// Try loading the autosave patch
 	if (hasAutosave()) {
@@ -217,6 +220,12 @@ void Manager::saveAutosave() {
 }
 
 
+void Manager::clearAutosave() {
+	system::removeRecursively(autosavePath);
+	system::createDirectories(autosavePath);
+}
+
+
 void Manager::cleanAutosave() {
 	// Remove files and directories in the `autosave/modules` directory that doesn't match a module in the rack.
 	std::string modulesDir = system::join(autosavePath, "modules");
@@ -255,9 +264,7 @@ void Manager::load(std::string path) {
 	INFO("Loading patch %s", path.c_str());
 
 	clear();
-
-	system::removeRecursively(autosavePath);
-	system::createDirectories(autosavePath);
+	clearAutosave();
 
 	if (isPatchLegacyV1(path)) {
 		// Copy the .vcv file directly to "patch.json".
@@ -276,8 +283,6 @@ void Manager::load(std::string path) {
 
 
 void Manager::loadTemplate() {
-	clear();
-
 	try {
 		load(templatePath);
 	}
@@ -290,8 +295,8 @@ void Manager::loadTemplate() {
 			std::string message = string::f("Could not load system template patch, clearing rack: %s", e.what());
 			osdialog_message(OSDIALOG_INFO, OSDIALOG_OK, message.c_str());
 
-			system::removeRecursively(autosavePath);
-			system::createDirectories(autosavePath);
+			clear();
+			clearAutosave();
 		}
 	}
 
