@@ -777,11 +777,6 @@ struct Browser : widget::OpaqueWidget {
 		refresh();
 	}
 
-	void onShow(const ShowEvent& e) override {
-		refresh();
-		OpaqueWidget::onShow(e);
-	}
-
 	void onButton(const ButtonEvent& e) override {
 		Widget::onButton(e);
 		e.stopPropagating();
