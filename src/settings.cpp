@@ -58,7 +58,6 @@ std::vector<NVGcolor> cableColors = {
 bool autoCheckUpdates = true;
 bool showTipsOnLaunch = true;
 int tipIndex = -1;
-bool discordUpdateActivity = true;
 BrowserSort browserSort = BROWSER_SORT_UPDATED;
 float browserZoom = -1.f;
 json_t* pluginSettingsJ = NULL;
@@ -175,9 +174,6 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "showTipsOnLaunch", json_boolean(showTipsOnLaunch));
 
 	json_object_set_new(rootJ, "tipIndex", json_integer(tipIndex));
-
-	if (!discordUpdateActivity)
-		json_object_set_new(rootJ, "discordUpdateActivity", json_boolean(discordUpdateActivity));
 
 	json_object_set_new(rootJ, "browserSort", json_integer((int) browserSort));
 
@@ -376,10 +372,6 @@ void fromJson(json_t* rootJ) {
 	json_t* tipIndexJ = json_object_get(rootJ, "tipIndex");
 	if (tipIndexJ)
 		tipIndex = json_integer_value(tipIndexJ);
-
-	json_t* discordUpdateActivityJ = json_object_get(rootJ, "discordUpdateActivity");
-	if (discordUpdateActivityJ)
-		discordUpdateActivity = json_boolean_value(discordUpdateActivityJ);
 
 	json_t* browserSortJ = json_object_get(rootJ, "browserSort");
 	if (browserSortJ)

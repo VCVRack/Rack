@@ -72,7 +72,6 @@ extern std::vector<NVGcolor> cableColors;
 extern bool autoCheckUpdates;
 extern bool showTipsOnLaunch;
 extern int tipIndex;
-extern bool discordUpdateActivity;
 enum BrowserSort {
 	BROWSER_SORT_UPDATED,
 	BROWSER_SORT_LAST_USED,

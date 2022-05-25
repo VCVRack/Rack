@@ -22,7 +22,6 @@
 #include <string.hpp>
 #include <library.hpp>
 #include <network.hpp>
-#include <discord.hpp>
 
 #include <osdialog.h>
 #include <thread>
@@ -178,7 +177,6 @@ int main(int argc, char* argv[]) {
 	app::browserInit();
 	INFO("Initializing library");
 	library::init();
-	discord::init();
 	if (!settings::headless) {
 		INFO("Initializing UI");
 		ui::init();
@@ -262,7 +260,6 @@ int main(int argc, char* argv[]) {
 		INFO("Destroying UI");
 		ui::destroy();
 	}
-	discord::destroy();
 	INFO("Destroying library");
 	library::destroy();
 	INFO("Destroying MIDI");
