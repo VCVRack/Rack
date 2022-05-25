@@ -315,11 +315,13 @@ static void destroyPlugin(Plugin* plugin) {
 
 
 void destroy() {
-	for (Plugin* plugin : plugins) {
+	while (!plugins.empty()) {
+		Plugin* plugin = plugins.back();
 		INFO("Destroying plugin %s", plugin->name.c_str());
 		destroyPlugin(plugin);
+		plugins.pop_back();
 	}
-	plugins.clear();
+	assert(plugins.empty());
 }
 
 
