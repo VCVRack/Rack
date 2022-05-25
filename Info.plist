@@ -27,10 +27,6 @@
 		</array>
 		<key>CFBundleTypeIconFile</key><string>icon.icns</string>
 		<key>CFBundleTypeName</key><string>VCV Rack Patch</string>
-		<key>CFBundleTypeOSTypes</key>
-		<array>
-			<string>RACK</string>
-		</array>
 		<key>CFBundleTypeRole</key><string>Editor</string>
 		</dict>
 	</array>
