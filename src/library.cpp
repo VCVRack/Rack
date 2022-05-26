@@ -25,21 +25,28 @@ static std::condition_variable updateCv;
 
 
 void init() {
-	if (settings::autoCheckUpdates && !settings::devMode) {
-		std::thread t([&]() {
-			system::setThreadName("Library");
-			// Wait a few seconds before updating in case library is destroyed immediately afterwards
-			{
-				std::unique_lock<std::mutex> lock(timeoutMutex);
-				if (updateCv.wait_for(lock, std::chrono::duration<double>(4.0)) != std::cv_status::timeout)
-					return;
-			}
+	if (!settings::autoCheckUpdates)
+		return;
+	// Dev mode is typically used when Rack or plugins are compiled from source, so updating might overwrite assets.
+	if (settings::devMode)
+		return;
+	// Safe mode disables plugin loading, so Rack will unnecessarily try to sync all plugins.
+	if (settings::safeMode)
+		return;
 
-			checkAppUpdate();
-			checkUpdates();
-		});
-		t.detach();
-	}
+	std::thread t([&]() {
+		system::setThreadName("Library");
+		// Wait a few seconds before updating in case library is destroyed immediately afterwards
+		{
+			std::unique_lock<std::mutex> lock(timeoutMutex);
+			if (updateCv.wait_for(lock, std::chrono::duration<double>(4.0)) != std::cv_status::timeout)
+				return;
+		}
+
+		checkAppUpdate();
+		checkUpdates();
+	});
+	t.detach();
 }
 
 
