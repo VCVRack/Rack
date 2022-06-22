@@ -225,6 +225,8 @@ struct Module {
 		assert(outputId < (int) outputs.size());
 		// Check that output is not yet routed
 		for (BypassRoute& br : bypassRoutes) {
+			// Prevent unused variable warning for compilers that ignore assert()
+			(void) br;
 			assert(br.outputId != outputId);
 		}
 
