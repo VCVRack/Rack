@@ -399,6 +399,30 @@ struct ViewButton : MenuButton {
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
 
+		menu->addChild(createMenuLabel("Window"));
+
+		bool fullscreen = APP->window->isFullScreen();
+		std::string fullscreenText = "F11";
+		if (fullscreen)
+			fullscreenText += " " CHECKMARK_STRING;
+		menu->addChild(createMenuItem("Fullscreen", fullscreenText, [=]() {
+			APP->window->setFullScreen(!fullscreen);
+		}));
+
+		double frameRate = APP->window->getMonitorRefreshRate() / settings::frameSwapInterval;
+		menu->addChild(createSubmenuItem("Frame rate", string::f("%.0f Hz", frameRate), [=](ui::Menu* menu) {
+			for (int i = 1; i <= 6; i++) {
+				double frameRate = APP->window->getMonitorRefreshRate() / i;
+				menu->addChild(createCheckMenuItem(string::f("%.0f Hz", frameRate), "",
+					[=]() {return settings::frameSwapInterval == i;},
+					[=]() {settings::frameSwapInterval = i;}
+				));
+			}
+		}));
+
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Appearance"));
+
 		menu->addChild(createBoolPtrMenuItem("Show tooltips", "", &settings::tooltips));
 
 		ZoomSlider* zoomSlider = new ZoomSlider;
@@ -421,28 +445,10 @@ struct ViewButton : MenuButton {
 		haloBrightnessSlider->box.size.x = 250.0;
 		menu->addChild(haloBrightnessSlider);
 
-		double frameRate = APP->window->getMonitorRefreshRate() / settings::frameSwapInterval;
-		menu->addChild(createSubmenuItem("Frame rate", string::f("%.0f Hz", frameRate), [=](ui::Menu* menu) {
-			for (int i = 1; i <= 6; i++) {
-				double frameRate = APP->window->getMonitorRefreshRate() / i;
-				menu->addChild(createCheckMenuItem(string::f("%.0f Hz", frameRate), "",
-					[=]() {return settings::frameSwapInterval == i;},
-					[=]() {settings::frameSwapInterval = i;}
-				));
-			}
-		}));
-
-		bool fullscreen = APP->window->isFullScreen();
-		std::string fullscreenText = "F11";
-		if (fullscreen)
-			fullscreenText += " " CHECKMARK_STRING;
-		menu->addChild(createMenuItem("Fullscreen", fullscreenText, [=]() {
-			APP->window->setFullScreen(!fullscreen);
-		}));
-
 		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Parameters"));
 
-		menu->addChild(createBoolPtrMenuItem("Lock cursor while dragging params", "", &settings::allowCursorLock));
+		menu->addChild(createBoolPtrMenuItem("Lock cursor while dragging", "", &settings::allowCursorLock));
 
 		static const std::vector<std::string> knobModeLabels = {
 			"Linear",
@@ -466,9 +472,12 @@ struct ViewButton : MenuButton {
 		knobScrollSensitivitySlider->box.size.x = 250.0;
 		menu->addChild(knobScrollSensitivitySlider);
 
-		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Module dragging"));
 
-		menu->addChild(createBoolPtrMenuItem("Auto-squeeze modules when dragging", "", &settings::squeezeModules));
+		menu->addChild(createBoolPtrMenuItem("Lock positions", "", &settings::lockModules));
+
+		menu->addChild(createBoolPtrMenuItem("Auto-squeeze algorithm (experimental)", "", &settings::squeezeModules));
 	}
 };
 
