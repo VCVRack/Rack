@@ -66,6 +66,7 @@ extern int threadCount;
 extern bool tooltips;
 extern bool cpuMeter;
 extern bool lockModules;
+extern bool squeezeModules;
 extern int frameSwapInterval;
 extern float autosaveInterval;
 extern bool skipLoadOnLaunch;

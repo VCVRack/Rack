@@ -478,13 +478,22 @@ void ModuleWidget::onDragMove(const DragMoveEvent& e) {
 			math::Vec pos = mousePos;
 			pos.x -= internal->dragOffset.x;
 			pos.y -= RACK_GRID_HEIGHT / 2;
+
 			if (APP->scene->rack->isSelected(this)) {
 				pos = (pos / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
 				math::Vec delta = pos.minus(box.pos);
 				APP->scene->rack->setSelectionPosNearest(delta);
 			}
 			else {
-				APP->scene->rack->setModulePosForce(this, pos);
+				if (settings::squeezeModules) {
+					APP->scene->rack->setModulePosSqueeze(this, pos);
+				}
+				else {
+					if ((APP->window->getMods() & RACK_MOD_MASK) == RACK_MOD_CTRL)
+						APP->scene->rack->setModulePosForce(this, pos);
+					else
+						APP->scene->rack->setModulePosNearest(this, pos);
+				}
 			}
 		}
 	}

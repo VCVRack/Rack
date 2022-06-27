@@ -598,7 +598,12 @@ void RackWidget::addModuleAtMouse(ModuleWidget* mw) {
 	assert(mw);
 	// Move module nearest to the mouse position
 	math::Vec pos = internal->mousePos.minus(mw->box.size.div(2));
-	setModulePosSqueeze(mw, pos);
+
+	if (settings::squeezeModules)
+		setModulePosSqueeze(mw, pos);
+	else
+		setModulePosNearest(mw, pos);
+
 	addModule(mw);
 }
 
@@ -666,21 +671,21 @@ bool RackWidget::requestModulePos(ModuleWidget* mw, math::Vec pos) {
 }
 
 static math::Vec eachNearestGridPos(math::Vec pos, std::function<bool(math::Vec pos)> f) {
-	math::Vec leftPos = pos.div(RACK_GRID_SIZE).floor().mult(RACK_GRID_SIZE);
-	math::Vec rightPos = leftPos + math::Vec(RACK_GRID_WIDTH, 0);
+	math::Vec leftPos = (pos / RACK_GRID_SIZE).round();
+	math::Vec rightPos = leftPos + math::Vec(1, 0);
 
 	while (true) {
-		if (f(leftPos))
-			return leftPos;
-		leftPos.x -= RACK_GRID_WIDTH;
+		if (f(leftPos * RACK_GRID_SIZE))
+			return leftPos * RACK_GRID_SIZE;
+		leftPos.x -= 1;
 
-		if (f(rightPos))
-			return rightPos;
-		rightPos.x += RACK_GRID_WIDTH;
+		if (f(rightPos * RACK_GRID_SIZE))
+			return rightPos * RACK_GRID_SIZE;
+		rightPos.x += 1;
 	}
 
 	assert(false);
-	return leftPos;
+	return math::Vec();
 }
 
 void RackWidget::setModulePosNearest(ModuleWidget* mw, math::Vec pos) {

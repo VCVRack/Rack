@@ -467,6 +467,8 @@ struct ViewButton : MenuButton {
 		menu->addChild(knobScrollSensitivitySlider);
 
 		menu->addChild(createBoolPtrMenuItem("Lock module positions", "", &settings::lockModules));
+
+		menu->addChild(createBoolPtrMenuItem("Auto-squeeze modules when dragging", "", &settings::squeezeModules));
 	}
 };
 
