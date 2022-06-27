@@ -61,16 +61,23 @@ struct RackWidget : widget::OpaqueWidget {
 	/** Removes the module and transfers ownership to the caller.
 	*/
 	void removeModule(ModuleWidget* mw);
+	ModuleWidget* getModule(int64_t moduleId);
+	std::vector<ModuleWidget*> getModules();
+	bool hasModules();
+
+	// Module position methods
+
 	/** Sets a module's box if non-colliding. Returns true if set */
 	bool requestModulePos(ModuleWidget* mw, math::Vec pos);
 	/** Moves a module to the closest non-colliding position */
 	void setModulePosNearest(ModuleWidget* mw, math::Vec pos);
+	/** Moves a module to a position, pushing other modules in the same row to the left or right, as needed. */
 	void setModulePosForce(ModuleWidget* mw, math::Vec pos);
-	PRIVATE void forceSetModulePos(ModuleWidget* mw, math::Vec pos);
-	PRIVATE void forceUnsetModulePos(ModuleWidget* mw);
-	ModuleWidget* getModule(int64_t moduleId);
-	std::vector<ModuleWidget*> getModules();
-	bool hasModules();
+	/** Moves a module, contracting old module positions and pushing modules to the right as needed to fit. */
+	void setModulePosSqueeze(ModuleWidget* mw, math::Vec pos);
+	PRIVATE void squeezeModulePos(ModuleWidget* mw, math::Vec pos);
+	PRIVATE void unsqueezeModulePos(ModuleWidget* mw);
+	/** Saves positions of modules for getModuleDragAction(). */
 	void updateModuleOldPositions();
 	history::ComplexAction* getModuleDragAction();
 
