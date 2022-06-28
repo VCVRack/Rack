@@ -33,7 +33,7 @@ struct TipInfo {
 
 // Remember to use “smart quotes.”
 static const std::vector<TipInfo> tipInfos = {
-	{"To add a module to your patch, right-click an empty rack space or press Enter. Click and drag a module from the Module Browser into the desired rack space.\n\nYou can force-move modules by holding " RACK_MOD_CTRL_NAME " while dragging them.\n\nClick and drag on empty rack space to select multiple modules.", "", ""},
+	{"To add a module to your patch, right-click an empty rack space or press Enter. Click and drag a module from the Module Browser into the desired rack space.\n\nClick and drag on empty rack space to select multiple modules.", "", ""},
 	{"Pan around the rack by using the scroll bars, dragging while holding the middle mouse button, " RACK_MOD_ALT_NAME "+clicking and dragging, or pressing the arrow keys. Arrow key panning speed can be modified by holding " RACK_MOD_CTRL_NAME ", " RACK_MOD_SHIFT_NAME ", or " RACK_MOD_CTRL_NAME "+" RACK_MOD_SHIFT_NAME ".\n\nZoom in and out using the View menu, " RACK_MOD_CTRL_NAME "+scroll, or " RACK_MOD_CTRL_NAME "+= and " RACK_MOD_CTRL_NAME "+minus.", "", ""},
 	// {"Want to use VCV Rack as a plugin in your DAW? VCV Rack Studio Edition is available now as a 64-bit VST 2 plugin for Ableton Live, FL Studio, Reason, REAPER, Bitwig, and more.", "Learn more", "https://vcvrack.com/Rack"},
 	{"You can use Rack in fullscreen mode by selecting “View > Fullscreen“ or pressing F11.\n\nIn fullscreen mode, the menu bar and scroll bars are hidden. This is ideal for screen recording with VCV Recorder.", "Get VCV Recorder", "https://vcvrack.com/Recorder"},
@@ -41,11 +41,11 @@ static const std::vector<TipInfo> tipInfos = {
 	{"Some developers of free plugins accept donations for their work. Right-click your favorite module's panel and select “Info > Donate”.\n\nYou can also donate via the module's VCV Library page.", "VCV Library", "https://library.vcvrack.com/"},
 	{"You can learn more about VCV Rack by browsing the official manual.", "VCV Rack manual", "https://vcvrack.com/manual/"},
 	{"Follow VCV Rack on Twitter for new module announcements, development news, and featured artists/music.", "Twitter @vcvrack", "https://twitter.com/vcvrack"},
-	{"Patch cables in Rack can carry up to 16 signals. You can use this feature to build polyphonic patches using modules with the “Polyphonic” tag. Cables carrying more than 1 signal appear thicker than normal cables. To try out polyphony, add the VCV MIDI-CV module to your patch, right-click its panel, and select your desired number of polyphonic channels.", "Learn more about polyphony in VCV Rack", "https://vcvrack.com/manual/Polyphony"},
+	{"Patch cables in Rack can carry up to 16 signals. You can use this ability to build polyphonic patches using modules having the “Polyphonic” tag. Cables carrying more than 1 signal appear thicker than normal cables. To try out polyphony, add the VCV MIDI-to-CV module to your patch, right-click its panel, and select your desired number of polyphonic channels.", "Learn more about polyphony in VCV Rack", "https://vcvrack.com/manual/Polyphony"},
 	{"Know C++ programming and want to create your own modules for Rack? Developing Rack modules is a great way to learn digital signal processing and quickly test your ideas with an easy-to-learn platform.\n\nDownload the Rack SDK and follow the development tutorial to get started.", "Plugin Development Tutorial", "https://vcvrack.com/manual/PluginDevelopmentTutorial"},
 	{"Wondering how to use a particular module? Right-click its panel and choose “Info > User manual”.\n\nYou can also open the module's Info menu to view the module's tags, website, VCV Library page, and changelog, if available.", "", ""},
 	{"Did you know that ModularGrid is integrated with the VCV Library? If a Eurorack hardware version of a Rack module is available, right-click its panel and choose “Info > ModularGrid”, or click the “ModularGrid” link on its VCV Library page.\n\nOn ModularGrid.net, search for the VCV logo for certain hardware modules.", "Example: Grayscale Permutation on ModularGrid", "https://www.modulargrid.net/e/grayscale-permutation-18hp"},
-	{"When a context menu is open, you can " RACK_MOD_CTRL_NAME "+click a menu item to keep the menu open. This can be useful when browsing module presets or settings.", "", ""},
+	{"When any context menu is open, you can " RACK_MOD_CTRL_NAME "+click a menu item to keep the menu open. This can be useful when browsing module presets or settings.", "", ""},
 	// {"", "", ""},
 };
 
