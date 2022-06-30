@@ -680,7 +680,7 @@ void ModuleWidget::saveTemplate() {
 
 void ModuleWidget::saveTemplateDialog() {
 	if (hasTemplate()) {
-		std::string message = string::f("Overwrite template preset for %s?", model->getFullName().c_str());
+		std::string message = string::f("Overwrite default preset for %s?", model->getFullName().c_str());
 		if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
 			return;
 	}
@@ -700,7 +700,7 @@ void ModuleWidget::clearTemplate() {
 }
 
 void ModuleWidget::clearTemplateDialog() {
-	std::string message = string::f("Delete template preset for %s?", model->getFullName().c_str());
+	std::string message = string::f("Delete default preset for %s?", model->getFullName().c_str());
 	if (!osdialog_message(OSDIALOG_INFO, OSDIALOG_OK_CANCEL, message.c_str()))
 		return;
 	clearTemplate();
@@ -929,8 +929,8 @@ void ModuleWidget::removeAction() {
 // Create ModulePresetPathItems for each patch in a directory.
 static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget, std::string presetDir) {
 	bool hasPresets = false;
-	// Note: This is not cached, so opening this menu each time might have a bit of latency.
 	if (system::isDirectory(presetDir)) {
+		// Note: This is not cached, so opening this menu each time might have a bit of latency.
 		std::vector<std::string> entries = system::getEntries(presetDir);
 		std::sort(entries.begin(), entries.end());
 		for (std::string path : entries) {
@@ -948,7 +948,7 @@ static void appendPresetItems(ui::Menu* menu, WeakPtr<ModuleWidget> moduleWidget
 					appendPresetItems(menu, moduleWidget, path);
 				}));
 			}
-			else if (system::getExtension(path) == ".vcvm") {
+			else if (system::getExtension(path) == ".vcvm" && name != "template") {
 				hasPresets = true;
 
 				menu->addChild(createMenuItem(name, "", [=]() {
@@ -1011,13 +1011,13 @@ void ModuleWidget::createContextMenu() {
 			weakThis->saveDialog();
 		}));
 
-		menu->addChild(createMenuItem("Save template", "", [=]() {
+		menu->addChild(createMenuItem("Save default", "", [=]() {
 			if (!weakThis)
 				return;
 			weakThis->saveTemplateDialog();
 		}));
 
-		menu->addChild(createMenuItem("Clear template", "", [=]() {
+		menu->addChild(createMenuItem("Clear default", "", [=]() {
 			if (!weakThis)
 				return;
 			weakThis->clearTemplateDialog();
