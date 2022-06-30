@@ -1523,31 +1523,31 @@ void RackWidget::setTouchedParam(ParamWidget* pw) {
 
 void RackWidget::updateExpanders() {
 	for (widget::Widget* w : internal->moduleContainer->children) {
-		math::Vec pLeft = w->box.pos.div(RACK_GRID_SIZE).round();
-		math::Vec pRight = w->box.getTopRight().div(RACK_GRID_SIZE).round();
+		ModuleWidget* mw = (ModuleWidget*) w;
+
+		math::Vec pLeft = mw->getGridBox().getTopLeft();
+		math::Vec pRight = mw->getGridBox().getTopRight();
 		ModuleWidget* mwLeft = NULL;
 		ModuleWidget* mwRight = NULL;
 
 		// Find adjacent modules
 		for (widget::Widget* w2 : internal->moduleContainer->children) {
-			if (w2 == w)
+			ModuleWidget* mw2 = (ModuleWidget*) w2;
+			if (mw2 == mw)
 				continue;
 
-			math::Vec p2Left = w2->box.pos.div(RACK_GRID_SIZE).round();
-			math::Vec p2Right = w2->box.getTopRight().div(RACK_GRID_SIZE).round();
+			math::Vec p2Left = mw2->getGridBox().getTopLeft();
+			math::Vec p2Right = mw2->getGridBox().getTopRight();
 
 			// Check if this is a left module
-			if (p2Right.equals(pLeft)) {
-				mwLeft = dynamic_cast<ModuleWidget*>(w2);
-			}
+			if (p2Right.equals(pLeft))
+				mwLeft = mw2;
 
 			// Check if this is a right module
-			if (p2Left.equals(pRight)) {
-				mwRight = dynamic_cast<ModuleWidget*>(w2);
-			}
+			if (p2Left.equals(pRight))
+				mwRight = mw2;
 		}
 
-		ModuleWidget* mw = dynamic_cast<ModuleWidget*>(w);
 		mw->module->leftExpander.moduleId = mwLeft ? mwLeft->module->id : -1;
 		mw->module->rightExpander.moduleId = mwRight ? mwRight->module->id : -1;
 	}
