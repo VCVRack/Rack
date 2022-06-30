@@ -764,8 +764,7 @@ void RackWidget::setModulePosSqueeze(ModuleWidget* mw, math::Vec pos) {
 
 	unsqueezeModulePos(mw);
 	squeezeModulePos(mw, pos);
-
-	updateExpanders();
+	// updateExpanders() called above twice
 }
 
 void RackWidget::squeezeModulePos(ModuleWidget* mw, math::Vec pos) {
@@ -820,6 +819,8 @@ void RackWidget::squeezeModulePos(ModuleWidget* mw, math::Vec pos) {
 
 	// Commit new pos
 	mw->setGridPosition(mwBox.pos);
+
+	updateExpanders();
 }
 
 void RackWidget::unsqueezeModulePos(ModuleWidget* mw) {
@@ -863,6 +864,8 @@ void RackWidget::unsqueezeModulePos(ModuleWidget* mw) {
 			xLeft = mw2->getGridBox().getRight();
 		}
 	}
+
+	updateExpanders();
 }
 
 void RackWidget::updateModuleOldPositions() {
