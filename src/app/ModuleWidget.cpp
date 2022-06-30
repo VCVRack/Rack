@@ -845,6 +845,7 @@ void ModuleWidget::cloneAction(bool cloneCables) {
 	else
 		APP->scene->rack->setModulePosNearest(clonedModuleWidget, clonedPos);
 	h->push(APP->scene->rack->getModuleDragAction());
+	APP->scene->rack->updateExpanders();
 
 	// history::ModuleAdd
 	history::ModuleAdd* hma = new history::ModuleAdd;
@@ -920,6 +921,8 @@ void ModuleWidget::removeAction() {
 	// This removes the module and transfers ownership to caller
 	APP->scene->rack->removeModule(this);
 	delete this;
+
+	APP->scene->rack->updateExpanders();
 }
 
 
