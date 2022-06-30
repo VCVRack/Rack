@@ -339,7 +339,7 @@ void RackWidget::fromJson(json_t* rootJ) {
 			pos = pos.mult(RACK_GRID_SIZE);
 		}
 		pos = pos.plus(RACK_OFFSET);
-		squeezeModulePos(mw, pos);
+		setModulePosForce(mw, pos);
 
 		internal->moduleContainer->addChild(mw);
 	}
