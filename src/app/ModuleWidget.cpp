@@ -389,6 +389,11 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 					return;
 				}
 
+				// If module positions are locked, don't consume left-click
+				if (settings::lockModules) {
+					return;
+				}
+
 				internal->dragOffset = e.pos;
 			}
 
