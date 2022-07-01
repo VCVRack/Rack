@@ -700,7 +700,7 @@ static bool compareModuleLeft(ModuleWidget* a, ModuleWidget* b) {
 
 void RackWidget::setModulePosForce(ModuleWidget* mw, math::Vec pos) {
 	math::Rect mwBox;
-	mwBox.pos = pos.div(RACK_GRID_SIZE).round();
+	mwBox.pos = ((pos - RACK_OFFSET) / RACK_GRID_SIZE).round();
 	mwBox.size = mw->getGridSize();
 
 	// Collect modules to the left and right of new pos
@@ -770,7 +770,7 @@ void RackWidget::setModulePosSqueeze(ModuleWidget* mw, math::Vec pos) {
 
 void RackWidget::squeezeModulePos(ModuleWidget* mw, math::Vec pos) {
 	math::Rect mwBox;
-	mwBox.pos = pos.div(RACK_GRID_SIZE).round();
+	mwBox.pos = ((pos - RACK_OFFSET) / RACK_GRID_SIZE).round();
 	mwBox.size = mw->getGridSize();
 
 	// Collect modules to the left and right of new pos

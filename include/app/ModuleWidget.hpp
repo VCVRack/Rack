@@ -116,19 +116,11 @@ struct ModuleWidget : widget::OpaqueWidget {
 	void removeAction();
 	void createContextMenu();
 
-	// Returns the position in grid coordinates
-	math::Vec getGridPosition() {
-		return getPosition().div(RACK_GRID_SIZE).round();
-	}
-	void setGridPosition(math::Vec pos) {
-		setPosition(pos.mult(RACK_GRID_SIZE));
-	}
-	math::Vec getGridSize() {
-		return getSize().div(RACK_GRID_SIZE).round();
-	}
-	math::Rect getGridBox() {
-		return math::Rect(getGridPosition(), getGridSize());
-	}
+	// Returns the rack position in grid coordinates
+	math::Vec getGridPosition();
+	void setGridPosition(math::Vec pos);
+	math::Vec getGridSize();
+	math::Rect getGridBox();
 
 	PRIVATE math::Vec& dragOffset();
 	PRIVATE bool& dragEnabled();

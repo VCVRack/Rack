@@ -1095,6 +1095,22 @@ void ModuleWidget::createContextMenu() {
 	appendContextMenu(menu);
 }
 
+math::Vec ModuleWidget::getGridPosition() {
+	return ((getPosition() - RACK_OFFSET) / RACK_GRID_SIZE).round();
+}
+
+void ModuleWidget::setGridPosition(math::Vec pos) {
+	setPosition(pos * RACK_GRID_SIZE + RACK_OFFSET);
+}
+
+math::Vec ModuleWidget::getGridSize() {
+	return (getSize() / RACK_GRID_SIZE).round();
+}
+
+math::Rect ModuleWidget::getGridBox() {
+	return math::Rect(getGridPosition(), getGridSize());
+}
+
 math::Vec& ModuleWidget::dragOffset() {
 	return internal->dragOffset;
 }
