@@ -2,6 +2,14 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.1.2 (in development)
+- Add old module moving behavior (nearest and force-moving), available by disabling "View > Auto-squeeze algorithm".
+- Reorganized View menu.
+- Add version comparator so Rack only updates plugins or itself if the remote version is "greater" than the local version, as defined by the `string::Version` documentation.
+- Add file association to Mac, so double-clicking a `.vcv` patch file in Finder opens Rack and loads the patch.
+- Fix expanders not updating (connecting or disconnecting to adjacent modules) when cloning or removing modules.
+- Fix VCV Audio 2 VU meter light thresholds not matching label.
+
 ### 2.1.1 (2022-05-21)
 - Allow changing cable colors with port menu.
 - Fix placement bugs and improve behavior when moving or duplicating modules.
