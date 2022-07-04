@@ -777,7 +777,7 @@ void RackWidget::squeezeModulePos(ModuleWidget* mw, math::Vec pos) {
 	std::set<ModuleWidget*, decltype(compareModuleLeft)*> leftModules(compareModuleLeft);
 	std::set<ModuleWidget*, decltype(compareModuleLeft)*> rightModules(compareModuleLeft);
 	for (widget::Widget* w2 : internal->moduleContainer->children) {
-		ModuleWidget* mw2 = (ModuleWidget*) w2;
+		ModuleWidget* mw2 = static_cast<ModuleWidget*>(w2);
 		// Skip this module
 		if (mw2 == mw)
 			continue;
@@ -802,11 +802,16 @@ void RackWidget::squeezeModulePos(ModuleWidget* mw, math::Vec pos) {
 		float xRight = mwBox.getRight();
 		for (auto it = rightModules.begin(); it != rightModules.end(); it++) {
 			widget::Widget* w2 = *it;
-			ModuleWidget* mw2 = (ModuleWidget*) w2;
-			if (mw2->getGridBox().getLeft() >= xRight)
+			ModuleWidget* mw2 = static_cast<ModuleWidget*>(w2);
+			math::Rect mw2Box = mw2->getGridBox();
+			// Break when module no longer needs to be shoved
+			if (mw2Box.getLeft() >= xRight)
 				break;
-			mw2->box.pos.x = xRight * RACK_GRID_WIDTH;
-			xRight = mw2->getGridBox().getRight();
+			// Shove module to the right of the last module
+			math::Rect newBox = mw2Box;
+			newBox.pos.x = xRight;
+			mw2->setGridPosition(newBox.pos);
+			xRight = newBox.getRight();
 		}
 	}
 	// Place right of leftModule
@@ -854,13 +859,16 @@ void RackWidget::unsqueezeModulePos(ModuleWidget* mw) {
 		for (auto it = rightModules.begin(); it != rightModules.end(); it++) {
 			widget::Widget* w2 = *it;
 			ModuleWidget* mw2 = static_cast<ModuleWidget*>(w2);
+			math::Rect mw2Box = mw2->getGridBox();
 			// Break when module is no longer touching
-			if (xRight < mw2->getGridBox().getLeft())
+			if (xRight < mw2Box.getLeft())
 				break;
-			// Move module to the left
-			xRight = mw2->getGridBox().getRight();
-			mw2->box.pos.x = xLeft * RACK_GRID_WIDTH;
-			xLeft = mw2->getGridBox().getRight();
+			// Shove module to the left
+			math::Rect newBox = mw2Box;
+			newBox.pos.x = xLeft;
+			mw2->setGridPosition(newBox.pos);
+			xLeft = newBox.getRight();
+			xRight = mw2Box.getRight();
 		}
 	}
 }
