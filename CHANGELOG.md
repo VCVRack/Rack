@@ -2,7 +2,7 @@
 
 In this document, Ctrl means Cmd on Mac.
 
-### 2.1.2 (in development)
+### 2.1.2 (2022-07-04)
 - Add old module moving behavior (nearest and force-moving), available by disabling "View > Auto-squeeze algorithm".
 - Reorganized View menu.
 - Add version comparator so Rack only updates plugins or itself if the remote version is "greater" than the local version, as defined by the `string::Version` documentation.
