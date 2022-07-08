@@ -101,7 +101,8 @@ $(glfw): | glfw
 	$(MAKE) -C glfw/build install
 
 jansson-2.12:
-	$(WGET) "http://www.digip.org/jansson/releases/jansson-2.12.tar.gz"
+# 	$(WGET) "http://www.digip.org/jansson/releases/jansson-2.12.tar.gz"
+	$(WGET) "https://github.com/akheron/jansson/releases/download/v2.12/jansson-2.12.tar.gz"
 	$(SHA256) jansson-2.12.tar.gz 5f8dec765048efac5d919aded51b26a32a05397ea207aa769ff6b53c7027d2c9
 	$(UNTAR) jansson-2.12.tar.gz
 	rm jansson-2.12.tar.gz
@@ -125,7 +126,8 @@ $(openssl): | openssl-1.1.1k
 	$(MAKE) -C openssl-1.1.1k install_sw
 
 curl-7.79.1:
-	$(WGET) "https://curl.se/download/curl-7.79.1.tar.gz"
+# 	$(WGET) "https://curl.se/download/curl-7.79.1.tar.gz"
+	$(WGET) "https://github.com/curl/curl/releases/download/curl-7_79_1/curl-7.79.1.tar.gz"
 	$(SHA256) curl-7.79.1.tar.gz 370b11201349816287fb0ccc995e420277fbfcaf76206e309b3f60f0eda090c2
 	$(UNTAR) curl-7.79.1.tar.gz
 	rm curl-7.79.1.tar.gz
@@ -152,7 +154,8 @@ $(zstd): | zstd-1.4.5
 	$(MAKE) -C zstd-1.4.5/build/cmake install
 
 libarchive-3.4.3:
-	$(WGET) "https://libarchive.org/downloads/libarchive-3.4.3.tar.gz"
+# 	$(WGET) "https://libarchive.org/downloads/libarchive-3.4.3.tar.gz"
+	$(WGET) "https://github.com/libarchive/libarchive/releases/download/v3.4.3/libarchive-3.4.3.tar.gz"
 	$(SHA256) libarchive-3.4.3.tar.gz ee1e749213c108cb60d53147f18c31a73d6717d7e3d2481c157e1b34c881ea39
 	$(UNTAR) libarchive-3.4.3.tar.gz
 	rm libarchive-3.4.3.tar.gz
@@ -176,7 +179,8 @@ $(libspeexdsp): | speexdsp-SpeexDSP-1.2rc3
 	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
 
 libsamplerate-0.1.9:
-	$(WGET) "http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz"
+# 	$(WGET) "http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz"
+	$(WGET) "https://github.com/libsndfile/libsamplerate/releases/download/0.1.9/libsamplerate-0.1.9.tar.gz"
 	$(SHA256) libsamplerate-0.1.9.tar.gz 0a7eb168e2f21353fb6d84da152e4512126f7dc48ccb0be80578c565413444c1
 	$(UNTAR) libsamplerate-0.1.9.tar.gz
 	rm libsamplerate-0.1.9.tar.gz
