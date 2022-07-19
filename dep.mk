@@ -25,11 +25,13 @@ UNTAR := tar xf
 UNZIP := unzip -o
 CONFIGURE := ./configure --prefix="$(DEP_PATH)" --host=$(MACHINE)
 
-ifdef ARCH_WIN
-	CMAKE := cmake -G 'MSYS Makefiles' -DCMAKE_INSTALL_PREFIX="$(DEP_PATH)"
-else
-	CMAKE := cmake -DCMAKE_INSTALL_PREFIX="$(DEP_PATH)"
+CMAKE := cmake
+# We must use the MSYS Makefile generator in an MSYS shell.
+# Cross-compiling for Windows shouldn't use this.
+ifdef MSYSTEM
+	CMAKE += -G 'MSYS Makefiles'
 endif
+CMAKE += -DCMAKE_INSTALL_PREFIX="$(DEP_PATH)"
 # Some platforms try to install to lib64
 CMAKE += -DCMAKE_INSTALL_LIBDIR=lib
 
