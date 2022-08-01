@@ -159,8 +159,7 @@ DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
 
 
 # Target not supported for public use
-dist: $(TARGET) $(STANDALONE_TARGET) $(DIST_HTML)
-	rm -rf dist
+dist: $(TARGET) $(STANDALONE_TARGET) $(DIST_HTML) | cleandist
 	mkdir -p dist
 	# Copy Rack to dist
 ifdef ARCH_LIN
