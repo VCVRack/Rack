@@ -298,8 +298,8 @@ struct Module {
 	Expander& getRightExpander() {
 		return rightExpander;
 	}
-	/** Returns the left Expander if `side` is false, and the right Expander if `side` is true. */
-	Expander& getExpander(bool side) {
+	/** Returns the left Expander for `side = 0` and the right Expander for `side = 1`. */
+	Expander& getExpander(int side) {
 		return side ? rightExpander : leftExpander;
 	}
 
