@@ -18,8 +18,6 @@ SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 build/src/common.cpp.o: FLAGS += -D_APP_VERSION=$(VERSION)
 
-STANDALONE_SOURCES += adapters/standalone.cpp
-
 FLAGS += -fPIC
 LDFLAGS += -shared
 
@@ -38,10 +36,6 @@ ifdef ARCH_LIN
 	LDFLAGS += dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libarchive.a dep/lib/libzstd.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a
 	LDFLAGS += -Wl,--no-whole-archive
 	LDFLAGS += -lpthread -lGL -ldl -lX11 -lasound -ljack -lpulse -lpulse-simple
-
-	STANDALONE_TARGET := Rack
-	STANDALONE_LDFLAGS += -static-libstdc++ -static-libgcc
-	STANDALONE_LDFLAGS += -Wl,-rpath=.
 endif
 
 ifdef ARCH_MAC
@@ -53,11 +47,6 @@ ifdef ARCH_MAC
 	LDFLAGS += -framework SystemConfiguration -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework CoreAudio -framework CoreMIDI
 	LDFLAGS += -Wl,-all_load
 	LDFLAGS += dep/lib/libGLEW.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/libarchive.a dep/lib/libzstd.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/librtmidi.a dep/lib/librtaudio.a
-
-	STANDALONE_TARGET := Rack
-	STANDALONE_LDFLAGS += -stdlib=libc++
-	# For LuaJIT to work inside plugins
-	STANDALONE_LDFLAGS += -Wl,-pagezero_size,10000 -Wl,-image_base,100000000
 endif
 
 ifdef ARCH_WIN
@@ -72,7 +61,27 @@ ifdef ARCH_WIN
 	LDFLAGS += dep/lib/libglew32.a dep/lib/libglfw3.a dep/lib/libjansson.a dep/lib/libspeexdsp.a dep/lib/libsamplerate.a dep/lib/libarchive_static.a dep/lib/libzstd.a dep/lib/libcurl.a dep/lib/libssl.a dep/lib/libcrypto.a dep/lib/librtaudio.a dep/lib/librtmidi.a
 	LDFLAGS += -Wl,-Bdynamic -Wl,--no-whole-archive
 	LDFLAGS += -lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp -lcrypt32
+endif
 
+include compile.mk
+
+# Standalone adapter
+
+STANDALONE_SOURCES += adapters/standalone.cpp
+
+ifdef ARCH_LIN
+	STANDALONE_TARGET := Rack
+	STANDALONE_LDFLAGS += -static-libstdc++ -static-libgcc
+	STANDALONE_LDFLAGS += -Wl,-rpath=.
+endif
+ifdef ARCH_MAC
+	STANDALONE_TARGET := Rack
+	STANDALONE_LDFLAGS += -stdlib=libc++
+	# For LuaJIT to work inside plugins
+	STANDALONE_LDFLAGS += -Wl,-pagezero_size,10000 -Wl,-image_base,100000000
+	STANDALONE_LDFLAGS += $(MAC_SDK_FLAGS)
+endif
+ifdef ARCH_WIN
 	STANDALONE_TARGET := Rack.exe
 	STANDALONE_LDFLAGS += -mwindows
 	# 1MiB stack size to match MSVC
@@ -80,15 +89,7 @@ ifdef ARCH_WIN
 	STANDALONE_OBJECTS += build/Rack.res
 endif
 
-include compile.mk
-
-# Standalone adapter
-
-ifdef ARCH_MAC
-	STANDALONE_LDFLAGS += $(MAC_SDK_FLAGS)
-endif
 STANDALONE_OBJECTS += $(TARGET)
--include $(STANDALONE_DEPENDENCIES)
 
 $(STANDALONE_TARGET): $(STANDALONE_SOURCES) $(STANDALONE_OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(STANDALONE_LDFLAGS)
