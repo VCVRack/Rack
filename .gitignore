@@ -1,13 +1,4 @@
 .DS_Store
-*.a
-*.so
-*.dylib
-*.dll
-*.exe
-*.res
-*.d
-*.dSYM
-*.vcvplugin
 
 /Rack
 /dep
