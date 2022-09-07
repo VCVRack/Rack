@@ -1,11 +1,8 @@
 MACHINE = $(shell $(CC) -dumpmachine)
 
 ifneq (,$(findstring x86_64-,$(MACHINE)))
-	ARCH_x64 := 1
+	ARCH_X64 := 1
 	ARCH_NAME := x64
-else ifneq (,$(findstring i686-,$(MACHINE)))
-	ARCH_x86 := 1
-	ARCH_NAME := x86
 else
 $(error Could not determine CPU architecture of $(MACHINE). Try hacking around in arch.mk)
 endif
