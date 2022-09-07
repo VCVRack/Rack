@@ -23,7 +23,7 @@ LDFLAGS += -shared
 
 ifdef ARCH_LIN
 	SED := sed -i
-	TARGET := build/libRack.so
+	TARGET := libRack.so
 
 	SOURCES += dep/osdialog/osdialog_zenity.c
 
@@ -40,7 +40,7 @@ endif
 
 ifdef ARCH_MAC
 	SED := sed -i ''
-	TARGET := build/libRack.dylib
+	TARGET := libRack.dylib
 
 	SOURCES += dep/osdialog/osdialog_mac.m
 	LDFLAGS += -lpthread -ldl
@@ -51,7 +51,7 @@ endif
 
 ifdef ARCH_WIN
 	SED := sed -i
-	TARGET := build/libRack.dll
+	TARGET := libRack.dll
 
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -municode
@@ -245,7 +245,7 @@ ifdef ARCH_MAC
 	$(STRIP) -S dist/"$(DIST_SDK_DIR)"/libRack.dylib
 endif
 ifdef ARCH_WIN
-	cp build/libRack.dll.a dist/"$(DIST_SDK_DIR)"/
+	cp libRack.dll.a dist/"$(DIST_SDK_DIR)"/
 endif
 	cd dist && zip -q -9 -r "$(DIST_SDK)" "$(DIST_SDK_DIR)"
 

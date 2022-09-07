@@ -1,4 +1,8 @@
 .DS_Store
+*.so
+*.dylib
+*.dll
+*.a
 
 /Rack
 /dep
