@@ -23,7 +23,7 @@ LDFLAGS += -shared
 
 ifdef ARCH_LIN
 	SED := sed -i
-	TARGET := libRack.so
+	TARGET := build/libRack.so
 
 	SOURCES += dep/osdialog/osdialog_zenity.c
 
@@ -40,7 +40,7 @@ endif
 
 ifdef ARCH_MAC
 	SED := sed -i ''
-	TARGET := libRack.dylib
+	TARGET := build/libRack.dylib
 
 	SOURCES += dep/osdialog/osdialog_mac.m
 	LDFLAGS += -lpthread -ldl
@@ -51,7 +51,7 @@ endif
 
 ifdef ARCH_WIN
 	SED := sed -i
-	TARGET := libRack.dll
+	TARGET := build/libRack.dll
 
 	SOURCES += dep/osdialog/osdialog_win.c
 	LDFLAGS += -municode
@@ -70,19 +70,19 @@ include compile.mk
 STANDALONE_SOURCES += adapters/standalone.cpp
 
 ifdef ARCH_LIN
-	STANDALONE_TARGET := Rack
+	STANDALONE_TARGET := build/Rack
 	STANDALONE_LDFLAGS += -static-libstdc++ -static-libgcc
 	STANDALONE_LDFLAGS += -Wl,-rpath=.
 endif
 ifdef ARCH_MAC
-	STANDALONE_TARGET := Rack
+	STANDALONE_TARGET := build/Rack
 	STANDALONE_LDFLAGS += -stdlib=libc++
 	# For LuaJIT to work inside plugins
 	STANDALONE_LDFLAGS += -Wl,-pagezero_size,10000 -Wl,-image_base,100000000
 	STANDALONE_LDFLAGS += $(MAC_SDK_FLAGS)
 endif
 ifdef ARCH_WIN
-	STANDALONE_TARGET := Rack.exe
+	STANDALONE_TARGET := build/Rack.exe
 	STANDALONE_LDFLAGS += -mwindows
 	# 1MiB stack size to match MSVC
 	STANDALONE_LDFLAGS += -Wl,--stack,0x100000
@@ -137,7 +137,7 @@ valgrind: $(STANDALONE_TARGET)
 	valgrind --suppressions=valgrind.supp ./$< -d
 
 clean:
-	rm -rfv build dist *.a Rack.res *.d $(TARGET) $(STANDALONE_TARGET)
+	rm -rfv build dist
 
 
 # For Windows resources
@@ -165,13 +165,14 @@ dist: $(TARGET) $(STANDALONE_TARGET) $(DIST_HTML) | cleandist
 	# Copy Rack to dist
 ifdef ARCH_LIN
 	mkdir -p dist/"$(DIST_DIR)"
-	cp $(TARGET) dist/"$(DIST_DIR)"/
-	cp $(STANDALONE_TARGET) dist/"$(DIST_DIR)"/
-	$(STRIP) -s dist/"$(DIST_DIR)"/$(TARGET)
-	$(STRIP) -s dist/"$(DIST_DIR)"/$(STANDALONE_TARGET)
+	cp $(TARGET) dist/"$(DIST_DIR)"/libRack.so
+	cp $(STANDALONE_TARGET) dist/"$(DIST_DIR)"/Rack
+	# Strip symbols from dist binaries
+	$(STRIP) -s dist/"$(DIST_DIR)"/libRack.so
+	$(STRIP) -s dist/"$(DIST_DIR)"/Rack
 	# Manually check that no nonstandard shared libraries are linked
-	ldd dist/"$(DIST_DIR)"/$(TARGET)
-	ldd dist/"$(DIST_DIR)"/$(STANDALONE_TARGET)
+	ldd dist/"$(DIST_DIR)"/libRack.so
+	ldd dist/"$(DIST_DIR)"/Rack
 	# Copy resources
 	cp -R $(DIST_RES) dist/"$(DIST_DIR)"/
 	cp $(DIST_HTML) dist/"$(DIST_DIR)"/
@@ -184,14 +185,14 @@ ifdef ARCH_MAC
 	mkdir -p dist/"$(DIST_BUNDLE)"/Contents
 	mkdir -p dist/"$(DIST_BUNDLE)"/Contents/Resources
 	mkdir -p dist/"$(DIST_BUNDLE)"/Contents/MacOS
-	cp $(TARGET) dist/"$(DIST_BUNDLE)"/Contents/Resources/
-	cp $(STANDALONE_TARGET) dist/"$(DIST_BUNDLE)"/Contents/MacOS/
-	$(STRIP) -S dist/"$(DIST_BUNDLE)"/Contents/Resources/$(TARGET)
-	$(STRIP) -S dist/"$(DIST_BUNDLE)"/Contents/MacOS/$(STANDALONE_TARGET)
-	install_name_tool -change $(TARGET) @executable_path/../Resources/$(TARGET) dist/"$(DIST_BUNDLE)"/Contents/MacOS/$(STANDALONE_TARGET)
+	cp $(TARGET) dist/"$(DIST_BUNDLE)"/Contents/Resources/libRack.dylib
+	cp $(STANDALONE_TARGET) dist/"$(DIST_BUNDLE)"/Contents/MacOS/Rack
+	$(STRIP) -S dist/"$(DIST_BUNDLE)"/Contents/Resources/libRack.dylib
+	$(STRIP) -S dist/"$(DIST_BUNDLE)"/Contents/MacOS/Rack
+	install_name_tool -change libRack.dylib @executable_path/../Resources/libRack.dylib dist/"$(DIST_BUNDLE)"/Contents/MacOS/Rack
 	# Manually check that no nonstandard shared libraries are linked
-	otool -L dist/"$(DIST_BUNDLE)"/Contents/Resources/$(TARGET)
-	otool -L dist/"$(DIST_BUNDLE)"/Contents/MacOS/$(STANDALONE_TARGET)
+	otool -L dist/"$(DIST_BUNDLE)"/Contents/Resources/libRack.dylib
+	otool -L dist/"$(DIST_BUNDLE)"/Contents/MacOS/Rack
 	# Copy resources
 	cp Info.plist dist/"$(DIST_BUNDLE)"/Contents/
 	$(SED) 's/{VERSION}/$(VERSION)/g' dist/"$(DIST_BUNDLE)"/Contents/Info.plist
@@ -201,7 +202,7 @@ ifdef ARCH_MAC
 	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_BUNDLE)"/Contents/Resources/Fundamental.vcvplugin
 	# Clean up and sign bundle
 	xattr -cr dist/"$(DIST_BUNDLE)"
-	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --timestamp --deep dist/"$(DIST_BUNDLE)"/Contents/Resources/$(TARGET) dist/"$(DIST_BUNDLE)"
+	codesign --verbose --sign "Developer ID Application: Andrew Belt (VRF26934X5)" --options runtime --entitlements Entitlements.plist --timestamp --deep dist/"$(DIST_BUNDLE)"/Contents/Resources/libRack.dylib dist/"$(DIST_BUNDLE)"
 	codesign --verify --deep --strict --verbose=2 dist/"$(DIST_BUNDLE)"
 	# Make standalone PKG
 	mkdir -p dist/Component
@@ -214,10 +215,10 @@ ifdef ARCH_MAC
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/"$(DIST_DIR)"
-	cp $(TARGET) dist/"$(DIST_DIR)"/
-	cp $(STANDALONE_TARGET) dist/"$(DIST_DIR)"/
-	$(STRIP) -s dist/"$(DIST_DIR)"/$(TARGET)
-	$(STRIP) -s dist/"$(DIST_DIR)"/$(STANDALONE_TARGET)
+	cp $(TARGET) dist/"$(DIST_DIR)"/libRack.dll
+	cp $(STANDALONE_TARGET) dist/"$(DIST_DIR)"/Rack.exe
+	$(STRIP) -s dist/"$(DIST_DIR)"/libRack.dll
+	$(STRIP) -s dist/"$(DIST_DIR)"/Rack.exe
 	# Copy resources
 	cp -R $(DIST_RES) dist/"$(DIST_DIR)"/
 	cp $(DIST_HTML) dist/"$(DIST_DIR)"/
@@ -236,15 +237,15 @@ endif
 	mkdir -p dist/"$(DIST_SDK_DIR)"/dep/
 	cp -R dep/include dist/"$(DIST_SDK_DIR)"/dep/
 ifdef ARCH_LIN
-	cp $(TARGET) dist/"$(DIST_SDK_DIR)"/
-	$(STRIP) -s dist/"$(DIST_SDK_DIR)"/$(TARGET)
+	cp $(TARGET) dist/"$(DIST_SDK_DIR)"/libRack.so
+	$(STRIP) -s dist/"$(DIST_SDK_DIR)"/libRack.so
 endif
 ifdef ARCH_MAC
-	cp $(TARGET) dist/"$(DIST_SDK_DIR)"/
-	$(STRIP) -S dist/"$(DIST_SDK_DIR)"/$(TARGET)
+	cp $(TARGET) dist/"$(DIST_SDK_DIR)"/libRack.dylib
+	$(STRIP) -S dist/"$(DIST_SDK_DIR)"/libRack.dylib
 endif
 ifdef ARCH_WIN
-	cp libRack.dll.a dist/"$(DIST_SDK_DIR)"/
+	cp build/libRack.dll.a dist/"$(DIST_SDK_DIR)"/
 endif
 	cd dist && zip -q -9 -r "$(DIST_SDK)" "$(DIST_SDK_DIR)"
 
