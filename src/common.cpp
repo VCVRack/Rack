@@ -27,6 +27,9 @@ const std::string APP_VERSION = TOSTRING(_APP_VERSION);
 #elif defined ARCH_LIN
 	const std::string APP_OS = "lin";
 #endif
+#if defined ARCH_X64
+	const std::string APP_ARCH = "x64";
+#endif
 const std::string API_URL = "https://api.vcvrack.com";
 
 

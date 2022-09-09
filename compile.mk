@@ -21,6 +21,10 @@ FLAGS += -Wall -Wextra -Wno-unused-parameter
 CXXFLAGS += -std=c++11
 
 # Architecture-independent flags
+ifdef ARCH_X64
+	FLAGS += -DARCH_X64
+endif
+
 ifdef ARCH_LIN
 	FLAGS += -DARCH_LIN
 	CXXFLAGS += -Wsuggest-override

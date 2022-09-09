@@ -7,7 +7,6 @@
 *.res
 *.d
 *.dSYM
-*.vcvplugin
 
 /Rack
 /dep
