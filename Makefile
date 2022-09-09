@@ -121,9 +121,6 @@ ifdef ARCH_LIN
 	gdb --args ./$< -d
 endif
 
-screenshot: $(STANDALONE_TARGET)
-	./$< -d -t 2
-
 perf: $(STANDALONE_TARGET)
 	# Requires perf
 	perf record --call-graph dwarf -o perf.data ./$< -d
