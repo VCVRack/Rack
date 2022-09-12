@@ -55,6 +55,7 @@ osdialog = include/osdialog.h
 pffft = include/pffft.h
 fuzzysearchdatabase = include/FuzzySearchDatabase.hpp
 ghcfilesystem = include/ghc/filesystem.hpp
+sse2neon = include/sse2neon/sse2neon.h
 
 DEPS += $(glew)
 DEPS += $(glfw)
@@ -72,6 +73,7 @@ DEPS += $(osdialog)
 DEPS += $(pffft)
 DEPS += $(fuzzysearchdatabase)
 DEPS += $(ghcfilesystem)
+DEPS += $(sse2neon)
 
 
 DEP_LOCAL := .
@@ -254,6 +256,10 @@ $(fuzzysearchdatabase): fuzzysearchdatabase/src/FuzzySearchDatabase.hpp
 $(ghcfilesystem): filesystem/include/ghc
 	mkdir -p include
 	cp -r $^ include/
+
+$(sse2neon): sse2neon/sse2neon.h
+	mkdir -p include
+	cp $^ include/
 
 # Helpers
 

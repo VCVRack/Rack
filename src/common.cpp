@@ -30,6 +30,9 @@ const std::string APP_VERSION = TOSTRING(_APP_VERSION);
 #if defined ARCH_X64
 	const std::string APP_ARCH = "x64";
 #endif
+#if defined ARCH_ARM64
+	const std::string APP_ARCH = "arm64";
+#endif
 const std::string API_URL = "https://api.vcvrack.com";
 
 

@@ -34,3 +34,6 @@
 [submodule "dep/rtmidi"]
 	path = dep/rtmidi
 	url = https://github.com/VCVRack/rtmidi.git
+[submodule "dep/sse2neon"]
+	path = dep/sse2neon
+	url = https://github.com/DLTcollab/sse2neon.git

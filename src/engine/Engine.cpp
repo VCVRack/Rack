@@ -5,7 +5,9 @@
 #include <mutex>
 #include <atomic>
 #include <tuple>
-#include <pmmintrin.h>
+#if defined ARCH_X64
+	#include <pmmintrin.h>
+#endif
 
 #include <engine/Engine.hpp>
 #include <settings.hpp>
@@ -21,6 +23,7 @@ namespace rack {
 namespace engine {
 
 
+#if defined ARCH_X64
 static void initMXCSR() {
 	// Set CPU to flush-to-zero (FTZ) and denormals-are-zero (DAZ) mode
 	// https://software.intel.com/en-us/node/682949
@@ -29,6 +32,7 @@ static void initMXCSR() {
 	// Reset other flags
 	_MM_SET_ROUNDING_MODE(_MM_ROUND_NEAREST);
 }
+#endif
 
 
 /** Barrier based on mutexes.
@@ -92,7 +96,9 @@ struct SpinBarrier {
 		while (true) {
 			if (step.load(std::memory_order_relaxed) != s)
 				return;
+#if defined ARCH_X64
 			__builtin_ia32_pause();
+#endif
 		}
 	}
 };
@@ -139,7 +145,9 @@ struct HybridBarrier {
 		while (!yielded.load(std::memory_order_relaxed)) {
 			if (step.load(std::memory_order_relaxed) != s)
 				return;
+#if defined ARCH_X64
 			__builtin_ia32_pause();
+#endif
 		}
 
 		// Wait on mutex CV
@@ -529,8 +537,10 @@ void Engine::stepBlock(int frames) {
 	std::lock_guard<std::mutex> stepLock(internal->blockMutex);
 	SharedLock<SharedMutex> lock(internal->mutex);
 	// Configure thread
+#if defined ARCH_X64
 	uint32_t csr = _mm_getcsr();
 	initMXCSR();
+#endif
 	random::init();
 
 	internal->blockFrame = internal->frame;
@@ -573,8 +583,10 @@ void Engine::stepBlock(int frames) {
 		internal->meterMax = 0.0;
 	}
 
+#if defined ARCH_X64
 	// Reset MXCSR back to original value
 	_mm_setcsr(csr);
+#endif
 }
 
 
@@ -1299,7 +1311,9 @@ void EngineWorker::run() {
 	// Configure thread
 	contextSet(engine->internal->context);
 	system::setThreadName(string::f("Worker %d", id));
+#if defined ARCH_X64
 	initMXCSR();
+#endif
 	random::init();
 
 	while (true) {

@@ -43,7 +43,7 @@ This derived source file is released under the zlib license.
   (this is the zlib license)
 */
 #pragma once
-#include <pmmintrin.h>
+#include "common.hpp"
 
 
 /** Generate 1.f without accessing memory */

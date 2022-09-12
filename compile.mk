@@ -14,7 +14,7 @@ FLAGS += -MMD -MP
 # Debugger symbols. These are removed with `strip`.
 FLAGS += -g
 # Optimization
-FLAGS += -O3 -march=nehalem -funsafe-math-optimizations -fno-omit-frame-pointer
+FLAGS += -O3 -funsafe-math-optimizations -fno-omit-frame-pointer
 # Warnings
 FLAGS += -Wall -Wextra -Wno-unused-parameter
 # C++ standard
@@ -23,6 +23,11 @@ CXXFLAGS += -std=c++11
 # Architecture-independent flags
 ifdef ARCH_X64
 	FLAGS += -DARCH_X64
+	FLAGS += -march=nehalem
+endif
+ifdef ARCH_ARM64
+	FLAGS += -DARCH_ARM64
+	FLAGS += -march=armv8-a+fp+simd
 endif
 
 ifdef ARCH_LIN
