@@ -13,10 +13,12 @@ SOURCES += dep/nanovg/src/nanovg.c
 SOURCES += dep/osdialog/osdialog.c
 SOURCES += dep/oui-blendish/blendish.c
 SOURCES += dep/pffft/pffft.c dep/pffft/fftpack.c
+SOURCES += dep/tinyexpr/tinyexpr.c
 SOURCES += $(wildcard src/*.c src/*/*.c)
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
 build/src/common.cpp.o: FLAGS += -D_APP_VERSION=$(VERSION)
+build/dep/tinyexpr/tinyexpr.c.o: FLAGS += -DTE_POW_FROM_RIGHT -DTE_NAT_LOG
 
 FLAGS += -fPIC
 LDFLAGS += -shared

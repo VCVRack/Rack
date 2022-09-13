@@ -58,14 +58,14 @@ static void teVarsInit() {
 		{"b", 11},
 	};
 	for (const Note& note : notes) {
-		// Example: c, c#, and cb
+		// Example: c, cs (or c#), and cb
 		teVariables.push_back({string::f("%s", note.name.c_str()), 440.f * std::pow(2.0, (note.semi - 9) / 12.f)});
-		teVariables.push_back({string::f("%s#", note.name.c_str()), 440.f * std::pow(2.0, (note.semi - 9 + 1) / 12.f)});
+		teVariables.push_back({string::f("%ss", note.name.c_str()), 440.f * std::pow(2.0, (note.semi - 9 + 1) / 12.f)});
 		teVariables.push_back({string::f("%sb", note.name.c_str()), 440.f * std::pow(2.0, (note.semi - 9 - 1) / 12.f)});
 		for (int oct = 0; oct <= 9; oct++) {
-			// Example: c4, c#4, and cb4
+			// Example: c4, cs4 (or c#4), and cb4
 			teVariables.push_back({string::f("%s%d", note.name.c_str(), oct), 440.f * std::pow(2.0, oct - 4 + (note.semi - 9) / 12.f)});
-			teVariables.push_back({string::f("%s#%d", note.name.c_str(), oct), 440.f * std::pow(2.0, oct - 4 + (note.semi - 9 + 1) / 12.f)});
+			teVariables.push_back({string::f("%ss%d", note.name.c_str(), oct), 440.f * std::pow(2.0, oct - 4 + (note.semi - 9 + 1) / 12.f)});
 			teVariables.push_back({string::f("%sb%d", note.name.c_str(), oct), 440.f * std::pow(2.0, oct - 4 + (note.semi - 9 - 1) / 12.f)});
 		}
 	}
@@ -85,6 +85,9 @@ void Quantity::setDisplayValueString(std::string s) {
 
 	// Uppercase letters aren't needed in formulas, so convert to lowercase in case user types INF or C4.
 	s = string::lowercase(s);
+
+	// Replace "#" with "s" so note names can be written as c#.
+	std::replace(s.begin(), s.end(), '#', 's');
 
 	// Compile string with tinyexpr
 	te_expr* expr = te_compile(s.c_str(), teVars.data(), teVars.size(), NULL);
