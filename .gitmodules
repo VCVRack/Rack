@@ -40,3 +40,6 @@
 [submodule "dep/tinyexpr"]
 	path = dep/tinyexpr
 	url = https://github.com/codeplea/tinyexpr.git
+[submodule "dep/speexdsp"]
+	path = dep/speexdsp
+	url = https://gitlab.xiph.org/xiph/speexdsp.git

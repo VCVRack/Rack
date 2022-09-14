@@ -168,16 +168,11 @@ $(libarchive): | $(zstd) libarchive-3.4.3
 	$(MAKE) -C libarchive-3.4.3/build
 	$(MAKE) -C libarchive-3.4.3/build install
 
-speexdsp-SpeexDSP-1.2rc3:
-	$(WGET) "https://vcvrack.com/downloads/dep/speexdsp-SpeexDSP-1.2rc3.tgz"
-	$(SHA256) speexdsp-SpeexDSP-1.2rc3.tgz c8dded1454747f65956f981c95e7f89a06abdaa2a53e8aeaa66bab2a3d59cebd
-	$(UNTAR) speexdsp-SpeexDSP-1.2rc3.tgz
-	rm speexdsp-SpeexDSP-1.2rc3.tgz
-
-$(libspeexdsp): | speexdsp-SpeexDSP-1.2rc3
-	cd speexdsp-SpeexDSP-1.2rc3 && $(CONFIGURE)
-	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3
-	$(MAKE) -C speexdsp-SpeexDSP-1.2rc3 install
+$(libspeexdsp): | speexdsp
+	cd speexdsp && ./autogen.sh
+	cd speexdsp && $(CONFIGURE)
+	$(MAKE) -C speexdsp
+	$(MAKE) -C speexdsp install
 
 libsamplerate-0.1.9:
 	$(WGET) "https://github.com/libsndfile/libsamplerate/releases/download/0.1.9/libsamplerate-0.1.9.tar.gz" || $(WGET) "http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz"
@@ -269,7 +264,7 @@ $(sse2neon): sse2neon/sse2neon.h
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.12 speexdsp-SpeexDSP-1.2rc3 libsamplerate-0.1.9 openssl-1.1.1k curl-7.79.1 zstd-1.4.5 libarchive-3.4.3 rtaudio nanovg nanosvg oui-blendish osdialog
+src: glew-2.1.0 glfw jansson-2.12 libsamplerate-0.1.9 openssl-1.1.1k curl-7.79.1 zstd-1.4.5 libarchive-3.4.3 rtaudio nanovg nanosvg oui-blendish osdialog
 
 clean:
 	git clean -fdx

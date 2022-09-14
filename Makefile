@@ -79,9 +79,6 @@ endif
 ifdef ARCH_MAC
 	STANDALONE_TARGET := Rack
 	STANDALONE_LDFLAGS += -stdlib=libc++
-	# For LuaJIT to work inside plugins
-	STANDALONE_LDFLAGS += -Wl,-pagezero_size,10000 -Wl,-image_base,100000000
-	STANDALONE_LDFLAGS += $(MAC_SDK_FLAGS)
 endif
 ifdef ARCH_WIN
 	STANDALONE_TARGET := Rack.exe
