@@ -26,3 +26,9 @@ else ifneq (,$(findstring linux,$(MACHINE_OS)))
 else
 $(error Operating system $(MACHINE_OS) not supported)
 endif
+
+
+ARCH_FULL_NAME := $(ARCH_OS_NAME)
+ifndef ARCH_X64
+	ARCH_FULL_NAME := $(ARCH_FULL_NAME)_$(ARCH_NAME)
+endif
