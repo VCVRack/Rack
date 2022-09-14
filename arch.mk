@@ -1,24 +1,28 @@
-MACHINE = $(shell $(CC) -dumpmachine)
+MACHINE := $(shell $(CC) -dumpmachine)
+MACHINE_LIST := $(subst -, ,$(MACHINE))
+MACHINE_ARCH := $(word 1, $(MACHINE_LIST))
+MACHINE_VENDOR := $(word 2, $(MACHINE_LIST))
+MACHINE_OS := $(word 3, $(MACHINE_LIST))
 
-ifneq (,$(findstring x86_64-,$(MACHINE)))
+ifeq ($(MACHINE_ARCH),x86_64)
 	ARCH_X64 := 1
 	ARCH_NAME := x64
-else ifneq (,$(findstring arm64-,$(MACHINE)))
+else ifeq ($(MACHINE_ARCH),arm64)
 	ARCH_ARM64 := 1
 	ARCH_NAME := arm64
 else
-$(error Could not determine CPU architecture of $(MACHINE). Try hacking around in arch.mk)
+$(error CPU architecture $(MACHINE_ARCH) not supported)
 endif
 
-ifneq (,$(findstring -darwin,$(MACHINE)))
+ifneq (,$(findstring darwin,$(MACHINE_OS)))
 	ARCH_MAC := 1
 	ARCH_OS_NAME := mac
-else ifneq (,$(findstring -mingw32,$(MACHINE)))
+else ifneq (,$(findstring mingw32,$(MACHINE_OS)))
 	ARCH_WIN := 1
 	ARCH_OS_NAME := win
-else ifneq (,$(findstring -linux,$(MACHINE)))
+else ifneq (,$(findstring linux,$(MACHINE_OS)))
 	ARCH_LIN := 1
 	ARCH_OS_NAME := lin
 else
-$(error Could not determine OS of $(MACHINE). Try hacking around in arch.mk)
+$(error Operating system $(MACHINE_OS) not supported)
 endif
