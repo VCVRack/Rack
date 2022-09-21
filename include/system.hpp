@@ -171,6 +171,7 @@ double getTime();
 */
 double getUnixTime();
 double getThreadTime();
+void sleep(double time);
 std::string getOperatingSystemInfo();
 
 // Applications

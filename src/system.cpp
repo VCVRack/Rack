@@ -809,6 +809,11 @@ double getThreadTime() {
 }
 
 
+void sleep(double time) {
+	std::this_thread::sleep_for(std::chrono::duration<double>(time));
+}
+
+
 std::string getOperatingSystemInfo() {
 #if defined ARCH_LIN
 	struct utsname u;
