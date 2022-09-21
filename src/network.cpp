@@ -23,6 +23,8 @@ static CURL* createCurl() {
 	assert(curl);
 
 	// curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+	std::string userAgent = APP_NAME + " " + APP_EDITION_NAME + "/" + APP_VERSION;
+	curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
 	// 65 second timeout for connections, just a bit over the typical HTTP default.
 	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 65);
