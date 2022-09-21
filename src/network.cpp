@@ -26,8 +26,9 @@ static CURL* createCurl() {
 	std::string userAgent = APP_NAME + " " + APP_EDITION_NAME + "/" + APP_VERSION;
 	curl_easy_setopt(curl, CURLOPT_USERAGENT, userAgent.c_str());
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, true);
-	// 65 second timeout for connections, just a bit over the typical HTTP default.
-	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 65);
+	// Timeout to wait on initial HTTP connection.
+	// This is lower than the typical HTTP timeout of 60 seconds to avoid DAWs from aborting plugin scans.
+	curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 30);
 
 	// If curl can't resolve a DNS entry, it sends a signal to interrupt the process.
 	// However, since we use curl on non-main thread, this crashes the application.
