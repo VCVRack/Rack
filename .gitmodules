@@ -34,12 +34,12 @@
 [submodule "dep/rtmidi"]
 	path = dep/rtmidi
 	url = https://github.com/VCVRack/rtmidi.git
-[submodule "dep/sse2neon"]
-	path = dep/sse2neon
-	url = https://github.com/DLTcollab/sse2neon.git
 [submodule "dep/tinyexpr"]
 	path = dep/tinyexpr
 	url = https://github.com/codeplea/tinyexpr.git
 [submodule "dep/speexdsp"]
 	path = dep/speexdsp
 	url = https://gitlab.xiph.org/xiph/speexdsp.git
+[submodule "dep/simde"]
+	path = dep/simde
+	url = https://github.com/simd-everywhere/simde.git

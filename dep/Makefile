@@ -56,7 +56,7 @@ pffft = include/pffft.h
 fuzzysearchdatabase = include/FuzzySearchDatabase.hpp
 ghcfilesystem = include/ghc/filesystem.hpp
 tinyexpr = include/tinyexpr.h
-sse2neon = include/sse2neon.h
+simde = include/simde
 
 DEPS += $(glew)
 DEPS += $(glfw)
@@ -75,7 +75,7 @@ DEPS += $(pffft)
 DEPS += $(fuzzysearchdatabase)
 DEPS += $(ghcfilesystem)
 DEPS += $(tinyexpr)
-DEPS += $(sse2neon)
+DEPS += $(simde)
 
 
 DEP_LOCAL := .
@@ -258,9 +258,9 @@ $(tinyexpr): tinyexpr/tinyexpr.h
 	mkdir -p include
 	cp $^ include/
 
-$(sse2neon): sse2neon/sse2neon.h
+$(simde): simde/simde
 	mkdir -p include
-	cp $^ include/
+	cp -R $^ include/
 
 # Helpers
 
