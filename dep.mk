@@ -33,10 +33,18 @@ UNZIP := unzip -o
 CONFIGURE := ./configure --prefix="$(DEP_PATH)"
 
 CMAKE := cmake
-# We must use the MSYS Makefile generator in an MSYS shell.
-# Cross-compiling for Windows shouldn't use this.
+ifdef ARCH_WIN
+	CMAKE += -DCMAKE_SYSTEM_NAME=Windows
+endif
+# We must specify the MSYS generator if in an MSYS shell
 ifdef MSYSTEM
-	CMAKE += -G 'MSYS Makefiles'
+	CMAKE += -G "MSYS Makefiles"
+endif
+ifdef ARCH_MAC
+	CMAKE += -DCMAKE_SYSTEM_NAME=Darwin -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
+endif
+ifdef ARCH_LIN
+	CMAKE += -DCMAKE_SYSTEM_NAME=Linux
 endif
 CMAKE += -DCMAKE_INSTALL_PREFIX="$(DEP_PATH)"
 # Some platforms try to install to lib64
