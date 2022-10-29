@@ -101,8 +101,10 @@ void init() {
 
 
 void destroy() {
-	if (pluginSettingsJ)
+	if (pluginSettingsJ) {
 		json_decref(pluginSettingsJ);
+		pluginSettingsJ = NULL;
+	}
 }
 
 
