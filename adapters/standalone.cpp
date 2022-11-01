@@ -7,6 +7,7 @@
 #include <rtmidi.hpp>
 #include <keyboard.hpp>
 #include <gamepad.hpp>
+#include <midiloopback.hpp>
 #include <settings.hpp>
 #include <engine/Engine.hpp>
 #include <app/common.hpp>
@@ -174,6 +175,7 @@ int main(int argc, char* argv[]) {
 	rtmidiInit();
 	keyboard::init();
 	gamepad::init();
+	midiloopback::init();
 	INFO("Initializing plugins");
 	plugin::init();
 	INFO("Initializing browser");
@@ -189,6 +191,8 @@ int main(int argc, char* argv[]) {
 
 	// Initialize context
 	contextSet(new Context);
+	INFO("Creating MIDI loopback");
+	APP->midiLoopbackContext = new midiloopback::Context;
 	INFO("Creating engine");
 	APP->engine = new engine::Engine;
 	INFO("Creating history state");

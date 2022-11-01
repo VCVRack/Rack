@@ -35,6 +35,11 @@ struct Scene;
 } // namespace app
 
 
+namespace midiloopback {
+struct Context;
+} // namespace midiloopback
+
+
 /** Rack instance state
 */
 struct Context {
@@ -44,6 +49,7 @@ struct Context {
 	window::Window* window = NULL;
 	history::State* history = NULL;
 	patch::Manager* patch = NULL;
+	midiloopback::Context* midiLoopbackContext = NULL;
 
 	~Context();
 };

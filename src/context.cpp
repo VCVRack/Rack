@@ -4,7 +4,7 @@
 #include <engine/Engine.hpp>
 #include <app/Scene.hpp>
 #include <history.hpp>
-#include <settings.hpp>
+#include <midiloopback.hpp>
 
 
 namespace rack {
@@ -38,6 +38,10 @@ Context::~Context() {
 	INFO("Deleting engine");
 	delete engine;
 	engine = NULL;
+
+	INFO("Deleting MIDI loopback");
+	delete midiLoopbackContext;
+	midiLoopbackContext = NULL;
 }
 
 
