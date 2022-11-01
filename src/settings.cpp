@@ -42,10 +42,10 @@ bool cpuMeter = false;
 bool lockModules = false;
 bool squeezeModules = true;
 #if defined ARCH_MAC
-	// Most Mac GPUs can't handle rendering the screen every frame, so use ~30 Hz by default.
-	int frameSwapInterval = 2;
+	// Most Mac GPUs can't handle rendering the screen every frame, so use 30 Hz by default.
+	float frameRateLimit = 30.f;
 #else
-	int frameSwapInterval = 1;
+	float frameRateLimit = 60.f;
 #endif
 float autosaveInterval = 15.0;
 bool skipLoadOnLaunch = false;
@@ -158,7 +158,7 @@ json_t* toJson() {
 
 	json_object_set_new(rootJ, "squeezeModules", json_boolean(squeezeModules));
 
-	json_object_set_new(rootJ, "frameSwapInterval", json_integer(frameSwapInterval));
+	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
 
 	json_object_set_new(rootJ, "autosaveInterval", json_real(autosaveInterval));
 
@@ -347,9 +347,20 @@ void fromJson(json_t* rootJ) {
 	if (squeezeModulesJ)
 		squeezeModules = json_boolean_value(squeezeModulesJ);
 
+	// Legacy setting in Rack <2.2
 	json_t* frameSwapIntervalJ = json_object_get(rootJ, "frameSwapInterval");
-	if (frameSwapIntervalJ)
-		frameSwapInterval = json_integer_value(frameSwapIntervalJ);
+	if (frameSwapIntervalJ) {
+		// Assume 60 Hz monitor refresh rate.
+		int frameSwapInterval = json_integer_value(frameSwapIntervalJ);
+		if (frameSwapInterval > 0)
+			frameRateLimit = 60.f / frameSwapInterval;
+		else
+			frameRateLimit = 0.f;
+	}
+
+	json_t* frameRateLimitJ = json_object_get(rootJ, "frameRateLimit");
+	if (frameRateLimitJ)
+		frameRateLimit = json_number_value(frameRateLimitJ);
 
 	json_t* autosaveIntervalJ = json_object_get(rootJ, "autosaveInterval");
 	if (autosaveIntervalJ)

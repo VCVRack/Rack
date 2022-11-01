@@ -89,8 +89,8 @@ struct Window::Internal {
 
 	int frame = 0;
 	bool ignoreNextMouseDelta = false;
-	int frameSwapInterval = -1;
 	double monitorRefreshRate = 0.0;
+	int frameSwapInterval = -1;
 	double frameTime = 0.0;
 	double lastFrameDuration = 0.0;
 
@@ -298,7 +298,6 @@ Window::Window() {
 	glfwSetInputMode(win, GLFW_LOCK_KEY_MODS, 1);
 
 	glfwMakeContextCurrent(win);
-	glfwSwapInterval(1);
 	const GLFWvidmode* monitorMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 	if (monitorMode->refreshRate > 0) {
 		internal->monitorRefreshRate = monitorMode->refreshRate;
@@ -433,9 +432,16 @@ void Window::step() {
 
 	// In case glfwPollEvents() sets another OpenGL context
 	glfwMakeContextCurrent(win);
-	if (settings::frameSwapInterval != internal->frameSwapInterval) {
-		glfwSwapInterval(settings::frameSwapInterval);
-		internal->frameSwapInterval = settings::frameSwapInterval;
+
+	// Set swap interval
+	int frameSwapInterval = 0;
+	if (settings::frameRateLimit > 0.f) {
+		frameSwapInterval = std::ceil(internal->monitorRefreshRate / settings::frameRateLimit);
+	}
+
+	if (frameSwapInterval != internal->frameSwapInterval) {
+		glfwSwapInterval(frameSwapInterval);
+		internal->frameSwapInterval = frameSwapInterval;
 	}
 
 	// Call cursorPosCallback every frame, not just when the mouse moves
@@ -711,7 +717,7 @@ double Window::getLastFrameDuration() {
 
 
 double Window::getFrameDurationRemaining() {
-	double frameDurationDesired = internal->frameSwapInterval / internal->monitorRefreshRate;
+	double frameDurationDesired = 1.f / settings::frameRateLimit;
 	return frameDurationDesired - (system::getTime() - internal->frameTime);
 }
 

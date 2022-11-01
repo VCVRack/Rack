@@ -409,13 +409,12 @@ struct ViewButton : MenuButton {
 			APP->window->setFullScreen(!fullscreen);
 		}));
 
-		double frameRate = APP->window->getMonitorRefreshRate() / settings::frameSwapInterval;
-		menu->addChild(createSubmenuItem("Frame rate", string::f("%.0f Hz", frameRate), [=](ui::Menu* menu) {
+		menu->addChild(createSubmenuItem("Frame rate", string::f("%.0f Hz", settings::frameRateLimit), [=](ui::Menu* menu) {
 			for (int i = 1; i <= 6; i++) {
 				double frameRate = APP->window->getMonitorRefreshRate() / i;
 				menu->addChild(createCheckMenuItem(string::f("%.0f Hz", frameRate), "",
-					[=]() {return settings::frameSwapInterval == i;},
-					[=]() {settings::frameSwapInterval = i;}
+					[=]() {return settings::frameRateLimit == frameRate;},
+					[=]() {settings::frameRateLimit = frameRate;}
 				));
 			}
 		}));
