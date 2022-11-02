@@ -91,13 +91,30 @@ struct Window {
 	int getMods();
 	void setFullScreen(bool fullScreen);
 	bool isFullScreen();
+	/** Returns the primary monitor's refresh rate in Hz. */
 	double getMonitorRefreshRate();
+	/** Returns the timestamp of the beginning of the current frame render process.
+	Returns NAN if no frames have begun rendering.
+	*/
 	double getFrameTime();
+	/** Returns the total time in seconds spent rendering the last frame.
+	Returns NAN if no frames have ended rendering.
+	*/
 	double getLastFrameDuration();
+	/** Returns the current time remaining in seconds until the frame deadline, according to the frame rate limit. */
 	double getFrameDurationRemaining();
 
+	/** Loads and caches a Font from a file path.
+	Do not store this reference across screen frames, as the Window may have changed, invalidating the Font.
+	*/
 	std::shared_ptr<Font> loadFont(const std::string& filename);
+	/** Loads and caches an Image from a file path.
+	Do not store this reference across screen frames, as the Window may have changed, invalidating the Image.
+	*/
 	std::shared_ptr<Image> loadImage(const std::string& filename);
+	/** Loads and caches an Svg from a file path.
+	Alias for `Svg::load()`.
+	*/
 	std::shared_ptr<Svg> loadSvg(const std::string& filename) {
 		return Svg::load(filename);
 	}
