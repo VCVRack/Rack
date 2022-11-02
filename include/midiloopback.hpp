@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <common.hpp>
 #include <midi.hpp>
 
@@ -11,7 +12,7 @@ struct Device;
 
 
 struct Context {
-	Device* devices[1] = {};
+	std::vector<Device*> devices;
 
 	Context();
 	~Context();

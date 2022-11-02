@@ -1,5 +1,6 @@
-#include <context.hpp>
 #include <midiloopback.hpp>
+#include <context.hpp>
+#include <string.hpp>
 
 
 namespace rack {
@@ -7,11 +8,14 @@ namespace midiloopback {
 
 
 static const int DRIVER_ID = -12;
+static const size_t NUM_DEVICES = 16;
 
 
 struct Device : midi::InputDevice, midi::OutputDevice {
+	int id = -1;
+
 	std::string getName() override {
-		return "Loopback";
+		return string::f("Loopback %d", id + 1);
 	}
 
 	void sendMessage(const midi::Message& message) override {
@@ -27,7 +31,11 @@ struct Driver : midi::Driver {
 
 	// Input methods
 	std::vector<int> getInputDeviceIds() override {
-		return {0};
+		std::vector<int> deviceIds;
+		for (size_t i = 0; i < NUM_DEVICES; i++) {
+			deviceIds.push_back(i);
+		}
+		return deviceIds;
 	}
 	int getDefaultInputDeviceId() override {
 		return 0;
@@ -51,13 +59,14 @@ struct Driver : midi::Driver {
 
 	// Output methods
 	std::vector<int> getOutputDeviceIds() override {
-		return {0};
+		// Output IDs match input IDs
+		return getInputDeviceIds();
 	}
 	int getDefaultOutputDeviceId() override {
-		return 0;
+		return getDefaultInputDeviceId();
 	}
 	std::string getOutputDeviceName(int deviceId) override {
-		return getDevice(deviceId)->getName();
+		return getInputDeviceName(deviceId);
 	}
 	midi::OutputDevice* subscribeOutput(int deviceId, midi::Output* output) override {
 		midi::OutputDevice* outputDevice = getDevice(deviceId);
@@ -77,19 +86,27 @@ struct Driver : midi::Driver {
 	Device* getDevice(int deviceId) {
 		if (!APP->midiLoopbackContext)
 			return NULL;
-		if (deviceId != 0)
+		if (!(0 <= deviceId && (size_t) deviceId < NUM_DEVICES))
 			return NULL;
-		return APP->midiLoopbackContext->devices[deviceId];
+		Context* context = APP->midiLoopbackContext;
+		return context->devices[deviceId];
 	}
 };
 
 
 Context::Context() {
-	devices[0] = new Device;
+	for (size_t i = 0; i < NUM_DEVICES; i++) {
+		Device* device = new Device;
+		device->id = i;
+		devices.push_back(device);
+	}
 }
 
 Context::~Context() {
-	delete devices[0];
+	for (Device* device : devices) {
+		delete device;
+	}
+	devices.clear();
 }
 
 
