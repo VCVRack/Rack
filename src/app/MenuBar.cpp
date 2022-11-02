@@ -881,22 +881,24 @@ struct HelpButton : MenuButton {
 
 
 struct MeterLabel : ui::Label {
-	int frameIndex = 0;
+	int frameCount = 0;
 	double frameDurationTotal = 0.0;
-	double frameDurationAvg = 0.0;
-	double uiLastTime = 0.0;
-	double uiLastThreadTime = 0.0;
-	double uiFrac = 0.0;
+	double frameDurationAvg = NAN;
+	// double uiLastTime = 0.0;
+	// double uiLastThreadTime = 0.0;
+	// double uiFrac = 0.0;
 
 	void step() override {
 		// Compute frame rate
 		double frameDuration = APP->window->getLastFrameDuration();
-		frameDurationTotal += frameDuration;
-		frameIndex++;
+		if (std::isfinite(frameDuration)) {
+			frameDurationTotal += frameDuration;
+			frameCount++;
+		}
 		if (frameDurationTotal >= 1.0) {
-			frameDurationAvg = frameDurationTotal / frameIndex;
+			frameDurationAvg = frameDurationTotal / frameCount;
 			frameDurationTotal = 0.0;
-			frameIndex = 0;
+			frameCount = 0;
 		}
 
 		// Compute UI thread CPU
@@ -909,9 +911,10 @@ struct MeterLabel : ui::Label {
 		// 	uiLastTime = time;
 		// }
 
+		double fps = std::isfinite(frameDurationAvg) ? 1.0 / frameDurationAvg : 0.0;
 		double meterAverage = APP->engine->getMeterAverage();
 		double meterMax = APP->engine->getMeterMax();
-		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max", 1.0 / frameDurationAvg, meterAverage * 100, meterMax * 100);
+		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max", fps, meterAverage * 100, meterMax * 100);
 		Label::step();
 	}
 };
