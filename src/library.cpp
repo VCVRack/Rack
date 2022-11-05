@@ -90,7 +90,7 @@ void checkAppUpdate() {
 
 	json_t* downloadUrlsJ = json_object_get(resJ, "downloadUrls");
 	if (downloadUrlsJ) {
-		json_t* downloadUrlJ = json_object_get(downloadUrlsJ, APP_OS.c_str());
+		json_t* downloadUrlJ = json_object_get(downloadUrlsJ, APP_ARCH.c_str());
 		if (downloadUrlJ)
 			appDownloadUrl = json_string_value(downloadUrlJ);
 	}
@@ -351,16 +351,16 @@ void syncUpdate(std::string slug) {
 	updateProgress = 0.f;
 	DEFER({updateProgress = 0.f;});
 
-	INFO("Downloading plugin %s v%s for %s", slug.c_str(), update.version.c_str(), APP_OS.c_str());
+	INFO("Downloading plugin %s v%s for %s", slug.c_str(), update.version.c_str(), APP_ARCH.c_str());
 
 	// Get download URL
 	std::string downloadUrl = API_URL + "/download";
 	downloadUrl += "?slug=" + network::encodeUrl(slug);
 	downloadUrl += "&version=" + network::encodeUrl(update.version);
-	downloadUrl += "&os=" + network::encodeUrl(APP_OS);
+	downloadUrl += "&os=" + network::encodeUrl(APP_ARCH);
 
 	// Get file path
-	std::string packageFilename = slug + "-" + update.version + "-" + APP_OS + ".vcvplugin";
+	std::string packageFilename = slug + "-" + update.version + "-" + APP_ARCH + ".vcvplugin";
 	std::string packagePath = system::join(plugin::pluginsPath, packageFilename);
 
 	// Download plugin package

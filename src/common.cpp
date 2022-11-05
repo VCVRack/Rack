@@ -20,19 +20,21 @@ const std::string APP_EDITION = "Free";
 const std::string APP_EDITION_NAME = "Free";
 const std::string APP_VERSION_MAJOR = "2";
 const std::string APP_VERSION = TOSTRING(_APP_VERSION);
+const std::string APP_ARCH =
 #if defined ARCH_WIN
-	const std::string APP_OS = "win";
-#elif ARCH_MAC
-	const std::string APP_OS = "mac";
+	"win"
+#elif defined ARCH_MAC
+	"mac"
 #elif defined ARCH_LIN
-	const std::string APP_OS = "lin";
+	"lin"
 #endif
+	"-"
 #if defined ARCH_X64
-	const std::string APP_ARCH = "x64";
+	"x64"
+#elif defined ARCH_ARM64
+	"arm64"
 #endif
-#if defined ARCH_ARM64
-	const std::string APP_ARCH = "arm64";
-#endif
+	;
 const std::string API_URL = "https://api.vcvrack.com";
 
 
