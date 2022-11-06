@@ -357,7 +357,7 @@ void syncUpdate(std::string slug) {
 	std::string downloadUrl = API_URL + "/download";
 	downloadUrl += "?slug=" + network::encodeUrl(slug);
 	downloadUrl += "&version=" + network::encodeUrl(update.version);
-	downloadUrl += "&os=" + network::encodeUrl(APP_ARCH);
+	downloadUrl += "&arch=" + network::encodeUrl(APP_ARCH);
 
 	// Get file path
 	std::string packageFilename = slug + "-" + update.version + "-" + APP_ARCH + ".vcvplugin";
