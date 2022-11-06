@@ -483,7 +483,7 @@ void Manager::fromJson(json_t* rootJ) {
 	if (versionJ)
 		version = json_string_value(versionJ);
 	if (version != APP_VERSION) {
-		INFO("Patch was made with Rack v%s, current Rack version is v%s", version.c_str(), APP_VERSION.c_str());
+		INFO("Patch was made with Rack %s, current Rack version is %s", version.c_str(), APP_VERSION.c_str());
 	}
 
 	// path

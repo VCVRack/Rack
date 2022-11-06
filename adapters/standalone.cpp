@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Log environment
-	INFO("%s %s v%s", APP_NAME.c_str(), APP_EDITION_NAME.c_str(), APP_VERSION.c_str());
+	INFO("%s %s %s", APP_NAME.c_str(), APP_EDITION_NAME.c_str(), APP_VERSION.c_str());
 	INFO("%s", system::getOperatingSystemInfo().c_str());
 	std::string argsList;
 	for (int i = 0; i < argc; i++) {

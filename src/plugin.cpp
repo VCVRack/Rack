@@ -196,7 +196,7 @@ static Plugin* loadPlugin(std::string path) {
 		return NULL;
 	}
 
-	INFO("Loaded %s v%s", plugin->slug.c_str(), plugin->version.c_str());
+	INFO("Loaded %s %s", plugin->slug.c_str(), plugin->version.c_str());
 	plugins.push_back(plugin);
 	return plugin;
 }

@@ -164,7 +164,7 @@ void Module::fromJson(json_t* rootJ) {
 	if (versionJ) {
 		std::string version = json_string_value(versionJ);
 		if (version != this->model->plugin->version) {
-			INFO("Patch created with %s v%s, currently using v%s.", this->model->plugin->slug.c_str(), version.c_str(), this->model->plugin->version.c_str());
+			INFO("Patch created with %s %s, currently using version %s.", this->model->plugin->slug.c_str(), version.c_str(), this->model->plugin->version.c_str());
 		}
 	}
 
