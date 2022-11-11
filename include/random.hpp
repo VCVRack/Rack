@@ -61,14 +61,12 @@ struct Xoroshiro128Plus {
 };
 
 
-// Simple thread-local API
+// Simple global API
 
-/** Initializes the thread-local RNG state.
-Must call when creating a thread, otherwise random state is undefined (might always return 0).
-*/
 void init();
 
-/** Returns the thread-local generator.
+/** Returns the generator.
+Named "local" because the generator was thread-local in previous versions.
 */
 Xoroshiro128Plus& local();
 

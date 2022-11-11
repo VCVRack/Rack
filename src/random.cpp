@@ -1,18 +1,13 @@
-#include <atomic>
-
-#include <time.h>
-#include <sys/time.h>
-
 #include <random.hpp>
 #include <math.hpp>
+#include <system.hpp>
 
 
 namespace rack {
 namespace random {
 
 
-thread_local Xoroshiro128Plus rng;
-static std::atomic<uint64_t> threadCounter {0};
+static Xoroshiro128Plus rng;
 
 
 void init() {
@@ -20,12 +15,12 @@ void init() {
 	if (rng.isSeeded())
 		return;
 
-	// Get epoch time in microseconds for seed
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	uint64_t usec = uint64_t(tv.tv_sec) * 1000 * 1000 + tv.tv_usec;
-	// Add number of initialized threads so far to random seed, so two threads don't get the same seed if initialized at the same time.
-	rng.seed(usec, threadCounter++);
+	// Get epoch time for seed
+	double time = system::getUnixTime();
+	uint64_t sec = time;
+	uint64_t nsec = std::fmod(time, 1.0) * 1e9;
+	rng.seed(sec, nsec);
+
 	// Shift state a few times due to low seed entropy
 	for (int i = 0; i < 4; i++) {
 		rng();
