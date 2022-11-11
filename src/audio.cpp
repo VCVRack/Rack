@@ -31,9 +31,6 @@ void Device::unsubscribe(Port* port) {
 }
 
 void Device::processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames) {
-	// Zero output in case no Port writes values to it.
-	std::memset(output, 0, frames * outputStride * sizeof(float));
-
 	std::lock_guard<std::mutex> lock(processMutex);
 	for (Port* port : subscribed) {
 		// Setting the thread context should probably be the responsibility of Port, but because processInput() etc are overridden, this is the only good place for it.
@@ -47,6 +44,11 @@ void Device::processBuffer(const float* input, int inputStride, float* output, i
 	for (Port* port : subscribed) {
 		contextSet(port->context);
 		port->processOutput(output + port->outputOffset, outputStride, frames);
+	}
+
+	if (subscribed.empty()) {
+		// Clear output if no Port writes values to it.
+		std::fill_n(output, frames * outputStride, 0.f);
 	}
 }
 
