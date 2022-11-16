@@ -340,14 +340,15 @@ void settingsMergeJson(json_t* rootJ) {
 
 
 /** Given slug => fallback slug.
-Correctly handles bidirectional fallbacks.
-To request fallback slugs to be added to this list, open a GitHub issue.
+Supports bidirectional fallbacks.
+To request fallback slugs to be added to this list, contact VCV support.
 */
 static const std::map<std::string, std::string> pluginSlugFallbacks = {
 	{"VultModulesFree", "VultModules"},
 	{"VultModules", "VultModulesFree"},
 	{"AudibleInstrumentsPreview", "AudibleInstruments"},
 	{"SequelSequencers", "DanielDavies"},
+	{"DelexanderVol1", "DelexandraVol1"},
 	// {"", ""},
 };
 
