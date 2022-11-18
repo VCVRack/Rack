@@ -45,8 +45,8 @@ static fuzzysearch::Database<plugin::Model*> modelDb;
 
 static void modelDbInit() {
 	modelDb = fuzzysearch::Database<plugin::Model*>();
-	modelDb.setWeights({1.f, 1.f, 0.1f, 1.f, 0.5f, 0.5f});
-	modelDb.setThreshold(0.25f);
+	modelDb.setWeights({1.0f, 1.0f, 1.0f, 0.8f, 1.0f});
+	modelDb.setThreshold(0.5f);
 
 	// Iterate plugins
 	for (plugin::Plugin* plugin : plugin::plugins) {
@@ -58,18 +58,17 @@ static void modelDbInit() {
 				// Add all aliases of a tag
 				for (const std::string& tagAlias : tag::tagAliases[tagId]) {
 					tagStr += tagAlias;
-					tagStr += ", ";
+					tagStr += " ";
 				}
 			}
 			std::vector<std::string> fields = {
 				model->plugin->brand,
 				model->plugin->name,
-				model->plugin->description,
 				model->name,
 				model->description,
 				tagStr,
 			};
-			// DEBUG("%s; %s; %s; %s; %s; %s", fields[0].c_str(), fields[1].c_str(), fields[2].c_str(), fields[3].c_str(), fields[4].c_str(), fields[5].c_str());
+			// DEBUG("%s; %s; %s; %s; %s; %s", fields[0].c_str(), fields[1].c_str(), fields[2].c_str(), fields[3].c_str(), fields[4].c_str());
 			modelDb.addEntry(model, fields);
 		}
 	}
