@@ -90,7 +90,6 @@ struct Window::Internal {
 	int frame = 0;
 	bool ignoreNextMouseDelta = false;
 	double monitorRefreshRate = 0.0;
-	int frameSwapInterval = -1;
 	double frameTime = NAN;
 	double lastFrameDuration = NAN;
 
