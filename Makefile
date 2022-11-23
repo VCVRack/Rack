@@ -143,9 +143,9 @@ ifdef ARCH_WIN
 endif
 
 DIST_RES := res cacert.pem Core.json template.vcv LICENSE-GPLv3.txt
-DIST_NAME := RackFree-"$(VERSION)"-$(ARCH_NAME)
+DIST_NAME := RackFree-$(VERSION)-$(ARCH_NAME)
 DIST_SDK_DIR := Rack-SDK
-DIST_SDK := Rack-SDK-"$(VERSION)"-$(ARCH_NAME).zip
+DIST_SDK := Rack-SDK-$(VERSION)-$(ARCH_NAME).zip
 ifdef ARCH_MAC
 	DIST_BUNDLE := VCV Rack $(VERSION_MAJOR) Free.app
 else
