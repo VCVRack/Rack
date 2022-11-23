@@ -1,7 +1,6 @@
 RACK_DIR ?= .
 VERSION_MAJOR := 2
-VERSION := $(shell git describe --tags)
-VERSION := $(patsubst v%,%,$(VERSION))
+VERSION := 2.2.0
 
 FLAGS += -Iinclude -Idep/include
 
