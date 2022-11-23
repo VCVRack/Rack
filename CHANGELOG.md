@@ -2,6 +2,18 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.2.0 (in development)
+- Add arm64 build.
+- Rename plugin packages to SLUG-VERSION-OS-CPU.vcvplugin.
+- Add MIDI Loopback driver, allowing sending MIDI messages between modules with MIDI ports.
+- Improve fuzzy search in modular browser.
+- Rack Pro
+	- Add VST3, Audio Unit, and CLAP plugin adapters.
+	- Add framerate setting to plugins.
+- API
+	- Add `system::sleep()`.
+	- Make `random::get()`, `uniform()`, etc use global random state instead of thread-local.
+
 ### 2.1.2 (2022-07-04)
 - Add old module moving behavior (nearest and force-moving), available by disabling "View > Auto-squeeze algorithm".
 - Reorganized View menu.
