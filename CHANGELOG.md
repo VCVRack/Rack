@@ -2,11 +2,11 @@
 
 In this document, Ctrl means Cmd on Mac.
 
-### 2.2.0 (in development)
-- Add arm64 build.
-- Rename plugin packages to SLUG-VERSION-OS-CPU.vcvplugin.
-- Add MIDI Loopback driver, allowing sending MIDI messages between modules with MIDI ports.
+### 2.2.0 (2022-11-23)
+- Add MIDI Loopback driver, allowing modules with MIDI ports to send MIDI messages to other modules.
 - Improve fuzzy search in modular browser.
+- Allow building on arm64 CPUs.
+- Rename plugin packages to SLUG-VERSION-OS-CPU.vcvplugin.
 - Rack Pro
 	- Add VST3, Audio Unit, and CLAP plugin adapters.
 	- Add framerate setting to plugins.
