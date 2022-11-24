@@ -4,7 +4,7 @@ In this document, Ctrl means Cmd on Mac.
 
 ### 2.2.0 (2022-11-23)
 - Add MIDI Loopback driver, allowing modules with MIDI ports to send MIDI messages to other modules.
-- Improve fuzzy search in modular browser.
+- Improve fuzzy search in module browser.
 - Allow building on ARM64 CPUs.
 - Rename plugin packages to `SLUG-VERSION-OS-CPU.vcvplugin`.
 - Rack Pro
