@@ -244,6 +244,18 @@ endif
 	cd dist && zip -q -9 -r "$(DIST_SDK)" "$(DIST_SDK_DIR)"
 
 
+install: dist
+ifdef ARCH_MAC
+	sudo installer -pkg dist/"$(DIST_NAME)".pkg -target /
+endif
+
+
+uninstall:
+ifdef ARCH_MAC
+	sudo rm -rf /Applications/"$(DIST_BUNDLE)"
+endif
+
+
 # Target not supported for public use
 notarize:
 ifdef ARCH_MAC
