@@ -20,6 +20,12 @@ FLAGS += -Wall -Wextra -Wno-unused-parameter
 # C++ standard
 CXXFLAGS += -std=c++11
 
+# Define compiler/linker target if cross-compiling
+ifdef CROSS_COMPILE
+	FLAGS += --target=$(MACHINE)
+	LDFLAGS += --target=$(MACHINE)
+endif
+
 # Architecture-independent flags
 ifdef ARCH_X64
 	FLAGS += -DARCH_X64

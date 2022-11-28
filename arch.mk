@@ -1,4 +1,8 @@
-MACHINE := $(shell $(CC) -dumpmachine)
+ifdef CROSS_COMPILE
+	MACHINE := $(CROSS_COMPILE)
+else
+	MACHINE ?= $(shell $(CC) -dumpmachine)
+endif
 
 ifneq (,$(findstring x86_64-,$(MACHINE)))
 	ARCH_X64 := 1

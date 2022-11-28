@@ -10,6 +10,12 @@ DEP_FLAGS += -g -O3
 # Static libs don't usually compiled with -fPIC, but since we're including them in a shared library, it's needed.
 DEP_FLAGS += -fPIC
 
+# Define compiler/linker target if cross-compiling
+ifdef CROSS_COMPILE
+	DEP_FLAGS += --target=$(MACHINE)
+	DEP_LDFLAGS += --target=$(MACHINE)
+endif
+
 ifdef ARCH_X64
 	DEP_FLAGS += -march=nehalem
 endif
