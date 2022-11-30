@@ -26,7 +26,7 @@ static const std::map<RtAudio::Api, std::string> RTAUDIO_API_NAMES = {
 	{RtAudio::WINDOWS_WASAPI, "WASAPI"},
 	{RtAudio::WINDOWS_ASIO, "ASIO"},
 	{RtAudio::WINDOWS_DS, "DirectSound"},
-	{RtAudio::MACOSX_CORE, "CoreAudio"},
+	{RtAudio::MACOSX_CORE, "Core Audio"},
 	{RtAudio::RTAUDIO_DUMMY, "Dummy"},
 	{RtAudio::UNSPECIFIED, "Unspecified"},
 };
