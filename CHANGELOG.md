@@ -2,12 +2,15 @@
 
 In this document, Ctrl means Cmd on Mac.
 
-### 2.2.1 (in development)
+### 2.2.1 (2022-12-07)
 - Add `CROSS_COMPILE` environment variable to specify target triplet for building plugins for non-native architectures.
 - Accept `aarch64` in target triplet as alias for ARM64.
 - Rack Pro
-	- Re-enable rtaudio and rtmidi in plugin adapters, so audio/MIDI devices can be used directly by Rack.
-	- Fix VST3 adapter not loading on Bitwig Linux and possibly other hosts, by providing VST3 as folder bundle instead of single file.
+	- Re-enable rtaudio and rtmidi in plugin adapters, so hardware audio/MIDI devices can be used directly by Rack.
+	- Fix VST3 not receiving MIDI CC input from DAWs.
+	- Fix VST3 not sending MIDI output to some DAWs.
+	- Fix VST3 in Bitwig resetting parameters when adding/removing modules.
+	- Fix VST3 adapter not loading on Bitwig Linux and possibly other hosts, by providing VST3 as a folder bundle instead of a single file.
 	- Fix CLAP adapter not loading on Windows, by statically linking libgcc.
 
 ### 2.2.0 (2022-11-23)
