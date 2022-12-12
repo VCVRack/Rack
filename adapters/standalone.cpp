@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 				asset::userDir = optarg;
 			} break;
 			case 'v': {
-				std::fprintf(stderr, "%s %s %s %s\n", APP_NAME.c_str(), APP_EDITION_NAME.c_str(), APP_VERSION.c_str(), APP_ARCH.c_str());
+				std::fprintf(stderr, "%s %s %s %s-%s\n", APP_NAME.c_str(), APP_EDITION_NAME.c_str(), APP_VERSION.c_str(), APP_OS.c_str(), APP_CPU.c_str());
 				return 0;
 			}
 			// Mac "app translocation" passes a nonsense -psn_... flag, so -p is reserved.

@@ -258,7 +258,8 @@ extern const std::string APP_EDITION;
 extern const std::string APP_EDITION_NAME;
 extern const std::string APP_VERSION_MAJOR;
 extern const std::string APP_VERSION;
-extern const std::string APP_ARCH;
+extern const std::string APP_OS;
+extern const std::string APP_CPU;
 extern const std::string API_URL;
 
 
