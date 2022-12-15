@@ -64,6 +64,11 @@ ifdef ARCH_WIN
 	LDFLAGS += -lpthread -lopengl32 -lgdi32 -lws2_32 -lcomdlg32 -lole32 -ldsound -lwinmm -lksuser -lshlwapi -lmfplat -lmfuuid -lwmcodecdspuuid -ldbghelp -lcrypt32
 endif
 
+# Some libraries aren't needed by plugins and might conflict with DAWs that load libRack, so make their symbols local to libRack instead of global (default).
+LDFLAGS += -Wl,--exclude-libs,libzstd.a
+LDFLAGS += -Wl,--exclude-libs,librtmidi.a
+LDFLAGS += -Wl,--exclude-libs,librtaudio.a
+
 include compile.mk
 
 # Standalone adapter
