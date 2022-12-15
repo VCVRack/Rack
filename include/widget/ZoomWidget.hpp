@@ -6,7 +6,7 @@ namespace rack {
 namespace widget {
 
 
-/** A Widget with a dynamic zoom level. */
+/** Resizes the scale of appearance and PositionEvents of children. */
 struct ZoomWidget : Widget {
 	/** Use setZoom() and getZoom() instead of using this variable directly. */
 	float zoom = 1.f;
@@ -15,6 +15,7 @@ struct ZoomWidget : Widget {
 	float getRelativeZoom(Widget* ancestor) override;
 	math::Rect getViewport(math::Rect r) override;
 	float getZoom();
+	/** Sets zoom scale and triggers DirtyEvent recursively if scale is changed, so children FramebufferWidgets are redrawn. */
 	void setZoom(float zoom);
 	void draw(const DrawArgs& args) override;
 	void drawLayer(const DrawArgs& args, int layer) override;

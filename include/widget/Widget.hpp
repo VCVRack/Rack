@@ -36,21 +36,28 @@ struct Widget : WeakBase {
 	virtual ~Widget();
 
 	math::Rect getBox();
+	/** Calls setPosition() and then setSize(). */
 	void setBox(math::Rect box);
 	math::Vec getPosition();
+	/** Sets position and triggers RepositionEvent if position changed. */
 	void setPosition(math::Vec pos);
 	math::Vec getSize();
+	/** Sets size and triggers ResizeEvent if size changed. */
 	void setSize(math::Vec size);
 	widget::Widget* getParent();
 	bool isVisible();
+	/** Sets `visible` and triggers ShowEvent or HideEvent if changed. */
 	void setVisible(bool visible);
+	/** Makes Widget visible and triggers ShowEvent if changed. */
 	void show() {
 		setVisible(true);
 	}
+	/** Makes Widget not visible and triggers HideEvent if changed. */
 	void hide() {
 		setVisible(false);
 	}
 
+	/** Requests this Widget's parent to delete it in the next step(). */
 	void requestDelete();
 
 	/** Returns the smallest rectangle containing this widget's children (visible and invisible) in its local coordinates.
@@ -119,10 +126,13 @@ struct Widget : WeakBase {
 	void addChildBelow(Widget* child, Widget* sibling);
 	void addChildAbove(Widget* child, Widget* sibling);
 	/** Removes widget from list of children if it exists.
+	Triggers RemoveEvent of child.
 	Does not delete widget but transfers ownership to caller
 	*/
 	void removeChild(Widget* child);
-	/** Removes and deletes all children */
+	/** Removes and deletes all child Widgets.
+	Triggers RemoveEvent of all children.
+	*/
 	void clearChildren();
 
 	/** Advances the module by one frame */
@@ -152,7 +162,9 @@ struct Widget : WeakBase {
 	*/
 	virtual void drawLayer(const DrawArgs& args, int layer);
 
-	/** Draws a particular child. */
+	/** Draws a particular child.
+	Saves and restores NanoVG context to prevent changing the given context.
+	*/
 	void drawChild(Widget* child, const DrawArgs& args, int layer = 0);
 
 	// Events
