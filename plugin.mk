@@ -23,8 +23,14 @@ LDFLAGS += -L$(RACK_DIR) -lRack
 
 include $(RACK_DIR)/arch.mk
 
+TARGET := plugin
+ifndef ARCH_X64
+	# On non-x64, append CPU name to plugin binary
+	TARGET := $(TARGET)-$(ARCH_CPU)
+endif
+
 ifdef ARCH_LIN
-	TARGET := plugin.so
+	TARGET := $(TARGET).so
 	# This prevents static variables in the DSO (dynamic shared object) from being preserved after dlclose().
 	FLAGS += -fno-gnu-unique
 	# When Rack loads a plugin, it symlinks /tmp/Rack2 to its system dir, so the plugin can link to libRack.
@@ -35,13 +41,13 @@ ifdef ARCH_LIN
 endif
 
 ifdef ARCH_MAC
-	TARGET := plugin.dylib
+	TARGET := $(TARGET).dylib
 	LDFLAGS += -undefined dynamic_lookup
 	RACK_USER_DIR ?= $(HOME)/Documents/Rack2
 endif
 
 ifdef ARCH_WIN
-	TARGET := plugin.dll
+	TARGET := $(TARGET).dll
 	LDFLAGS += -static-libstdc++
 	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack2
 endif

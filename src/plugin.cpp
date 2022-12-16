@@ -102,7 +102,16 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 #elif ARCH_MAC
 	libraryExt = "dylib";
 #endif
-	std::string libraryPath = system::join(plugin->path, "plugin." + libraryExt);
+
+#if defined ARCH_X64
+	// Use `plugin.EXT` on x64 for backward compatibility.
+	// Change to `plugin-OS-CPU.EXT` in Rack 3.
+	std::string libraryFilename = "plugin." + libraryExt;
+#else
+	// Use `plugin-CPU.EXT` on other CPUs like ARM64
+	std::string libraryFilename = "plugin-" + APP_CPU + "." + libraryExt;
+#endif
+	std::string libraryPath = system::join(plugin->path, libraryFilename);
 
 	// Check file existence
 	if (!system::isFile(libraryPath))
