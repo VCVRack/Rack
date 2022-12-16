@@ -140,9 +140,9 @@ void init(Plugin* p) {
 
 	git_ignore = """/build
 /dist
-/plugin.so
-/plugin.dylib
-/plugin.dll
+/*.so
+/*.dylib
+/*.dll
 .DS_Store
 """
 	with open(os.path.join(plugin_dir, ".gitignore"), "w") as f:
