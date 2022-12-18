@@ -530,11 +530,6 @@ void Window::step() {
 }
 
 
-void Window::activateContext() {
-	glfwMakeContextCurrent(win);
-}
-
-
 static void flipBitmap(uint8_t* pixels, int width, int height, int depth) {
 	for (int y = 0; y < height / 2; y++) {
 		int flipY = height - y - 1;
