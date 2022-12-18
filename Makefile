@@ -65,10 +65,13 @@ ifdef ARCH_WIN
 endif
 
 # Some libraries aren't needed by plugins and might conflict with DAWs that load libRack, so make their symbols local to libRack instead of global (default).
-LDFLAGS += -Wl,--exclude-libs,libzstd.a
-LDFLAGS += -Wl,--exclude-libs,libarchive.a
-LDFLAGS += -Wl,--exclude-libs,librtmidi.a
-LDFLAGS += -Wl,--exclude-libs,librtaudio.a
+# --exclude-libs is unavailable on Apple ld
+ifndef ARCH_MAC
+	LDFLAGS += -Wl,--exclude-libs,libzstd.a
+	LDFLAGS += -Wl,--exclude-libs,libarchive.a
+	LDFLAGS += -Wl,--exclude-libs,librtmidi.a
+	LDFLAGS += -Wl,--exclude-libs,librtaudio.a
+endif
 
 include compile.mk
 
