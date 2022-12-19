@@ -22,15 +22,20 @@ const std::string APP_VERSION_MAJOR = "2";
 const std::string APP_VERSION = TOSTRING(_APP_VERSION);
 #if defined ARCH_WIN
 	const std::string APP_OS = "win";
+	const std::string APP_OS_NAME = "Windows";
 #elif defined ARCH_MAC
 	const std::string APP_OS = "mac";
+	const std::string APP_OS_NAME = "macOS";
 #elif defined ARCH_LIN
 	const std::string APP_OS = "lin";
+	const std::string APP_OS_NAME = "Linux";
 #endif
 #if defined ARCH_X64
 	const std::string APP_CPU = "x64";
+	const std::string APP_CPU_NAME = "x64";
 #elif defined ARCH_ARM64
 	const std::string APP_CPU = "arm64";
+	const std::string APP_CPU_NAME = "ARM64";
 #endif
 const std::string API_URL = "https://api.vcvrack.com";
 

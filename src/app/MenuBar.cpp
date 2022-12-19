@@ -844,6 +844,8 @@ struct HelpButton : MenuButton {
 
 		menu->addChild(createMenuLabel(APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION));
 
+		menu->addChild(createMenuLabel(APP_OS_NAME + " " + APP_CPU_NAME));
+
 		menu->addChild(createMenuItem("Open user folder", "", [=]() {
 			system::openDirectory(asset::user(""));
 		}));
