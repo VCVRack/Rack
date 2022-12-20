@@ -27,7 +27,7 @@ namespace rack {
 namespace window {
 
 
-static const math::Vec WINDOW_SIZE_MIN = math::Vec(480, 320);
+static const math::Vec WINDOW_SIZE_MIN = math::Vec(640, 480);
 
 
 Font::~Font() {
