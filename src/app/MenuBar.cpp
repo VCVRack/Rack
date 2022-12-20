@@ -842,10 +842,6 @@ struct HelpButton : MenuButton {
 
 		menu->addChild(new ui::MenuSeparator);
 
-		menu->addChild(createMenuLabel(APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION));
-
-		menu->addChild(createMenuLabel(APP_OS_NAME + " " + APP_CPU_NAME));
-
 		menu->addChild(createMenuItem("Open user folder", "", [=]() {
 			system::openDirectory(asset::user(""));
 		}));
@@ -882,7 +878,7 @@ struct HelpButton : MenuButton {
 ////////////////////
 
 
-struct MeterLabel : ui::Label {
+struct InfoLabel : ui::Label {
 	int frameCount = 0;
 	double frameDurationTotal = 0.0;
 	double frameDurationAvg = NAN;
@@ -913,17 +909,25 @@ struct MeterLabel : ui::Label {
 		// 	uiLastTime = time;
 		// }
 
-		double fps = std::isfinite(frameDurationAvg) ? 1.0 / frameDurationAvg : 0.0;
-		double meterAverage = APP->engine->getMeterAverage();
-		double meterMax = APP->engine->getMeterMax();
-		text = string::f("%.1f fps  %.1f%% avg  %.1f%% max", fps, meterAverage * 100, meterMax * 100);
+		text = "";
+
+		if (box.size.x >= 460) {
+			double fps = std::isfinite(frameDurationAvg) ? 1.0 / frameDurationAvg : 0.0;
+			double meterAverage = APP->engine->getMeterAverage();
+			double meterMax = APP->engine->getMeterMax();
+			text += string::f("%.1f fps  %.1f%% avg  %.1f%% max", fps, meterAverage * 100, meterMax * 100);
+			text += "     ";
+		}
+
+		text += APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION + " " + APP_OS_NAME + " " + APP_CPU_NAME;
+
 		Label::step();
 	}
 };
 
 
 struct MenuBar : widget::OpaqueWidget {
-	MeterLabel* meterLabel;
+	InfoLabel* infoLabel;
 
 	MenuBar() {
 		const float margin = 5;
@@ -958,16 +962,11 @@ struct MenuBar : widget::OpaqueWidget {
 		helpButton->text = "Help";
 		layout->addChild(helpButton);
 
-		// ui::Label* titleLabel = new ui::Label;
-		// titleLabel->color.a = 0.5;
-		// layout->addChild(titleLabel);
-
-		meterLabel = new MeterLabel;
-		meterLabel->box.pos.y = margin;
-		meterLabel->box.size.x = 300;
-		meterLabel->alignment = ui::Label::RIGHT_ALIGNMENT;
-		meterLabel->color.a = 0.5;
-		addChild(meterLabel);
+		infoLabel = new InfoLabel;
+		infoLabel->box.size.x = 600;
+		infoLabel->alignment = ui::Label::RIGHT_ALIGNMENT;
+		infoLabel->color.a = 0.5;
+		layout->addChild(infoLabel);
 	}
 
 	void draw(const DrawArgs& args) override {
@@ -978,8 +977,8 @@ struct MenuBar : widget::OpaqueWidget {
 	}
 
 	void step() override {
-		meterLabel->box.pos.x = box.size.x - meterLabel->box.size.x - 5;
 		Widget::step();
+		infoLabel->box.size.x = box.size.x - infoLabel->box.pos.x - 5;
 	}
 };
 
