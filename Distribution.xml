@@ -6,7 +6,7 @@
 		<os-version min="10.9"/>
 	</allowed-os-versions>
 
-	<options require-scripts="false" customize="never"/>
+	<options require-scripts="false" customize="never" hostArchtectures="x86_64,arm64"/>
 	<choices-outline>
 		<line choice="com.vcvrack.rack"/>
 	</choices-outline>
