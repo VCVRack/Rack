@@ -2,6 +2,15 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.2.2 (in development)
+- Display Rack edition, version, OS, CPU, and plugin type in menu bar to help with troubleshooting.
+- Add long-form command line options.
+- Zero audio output of all channels in `audio::Device::processBuffer()` before writing, to avoid sending uninitialized values to audio device.
+- API
+	- Don't include SIMDE headers on x64, fixing symbol conflicts when plugins include x64 intrinsic headers.
+	- Don't export symbols from libarchive, zstd, rtaudio, and rtmidi to avoid conflicts with hosts that use these libraries. Rack plugins can no longer link to these libraries.
+	- Rename plugin binary to `plugin-arm64.dylib` on Mac ARM64 so multiple plugin architectures can coexist in the same Rack user folder.
+
 ### 2.2.1 (2022-12-07)
 - Add `CROSS_COMPILE` environment variable to specify target triplet for building plugins for non-native architectures.
 - Accept `aarch64` in target triplet as alias for ARM64.
