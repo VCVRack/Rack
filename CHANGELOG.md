@@ -2,10 +2,12 @@
 
 In this document, Ctrl means Cmd on Mac.
 
-### 2.2.2 (in development)
+### 2.2.2 (2022-12-27)
 - Display Rack edition, version, OS, CPU, and plugin type in menu bar to help with troubleshooting.
 - Add long-form command line options.
 - Zero audio output of all channels in `audio::Device::processBuffer()` before writing, to avoid sending uninitialized values to audio device.
+- Rack Pro
+	- Fix blank plugin window on certain Linux Nvidia graphics drivers.
 - API
 	- Don't include SIMDE headers on x64, fixing symbol conflicts when plugins include x64 intrinsic headers.
 	- Don't export symbols from libarchive, zstd, rtaudio, and rtmidi to avoid conflicts with hosts that use these libraries. Rack plugins can no longer link to these libraries.
