@@ -114,13 +114,24 @@ struct Device {
 	/** Sets the block size of the device, re-opening it if needed. */
 	virtual void setBlockSize(int blockSize) {}
 
-	// Called by Driver::subscribe().
+	/** Adds Port to set of subscribed Ports.
+	Called by Driver::subscribe().
+	*/
 	virtual void subscribe(Port* port);
+	/** Removes Port from set of subscribed Ports.
+	Called by Driver::unsubscribe().
+	*/
 	virtual void unsubscribe(Port* port);
 
-	// Called by this Device class, forwards to subscribed Ports.
+	/** Processes audio for each subscribed Port.
+	Called by driver code.
+	`input` and `output` must be non-overlapping.
+	Overwrites all `output`, so it is unnecessary to initialize.
+	*/
 	void processBuffer(const float* input, int inputStride, float* output, int outputStride, int frames);
+	/** Called by driver code when stream starts. */
 	void onStartStream();
+	/** Called by driver code when stream stops. */
 	void onStopStream();
 };
 
