@@ -338,7 +338,7 @@ struct Audio : Module {
 			// Audio-2: VU meter
 			if (NUM_AUDIO_INPUTS == 2) {
 				for (int i = 0; i < NUM_AUDIO_INPUTS; i++) {
-					lights[VU_LIGHTS + i * 6 + 0].setBrightness(vuMeter[i].getBrightness(-3, 0));
+					lights[VU_LIGHTS + i * 6 + 0].setBrightness(vuMeter[i].getBrightness(0, 0));
 					lights[VU_LIGHTS + i * 6 + 1].setBrightness(vuMeter[i].getBrightness(-6, -3));
 					lights[VU_LIGHTS + i * 6 + 2].setBrightness(vuMeter[i].getBrightness(-12, -6));
 					lights[VU_LIGHTS + i * 6 + 3].setBrightness(vuMeter[i].getBrightness(-24, -12));
