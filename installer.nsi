@@ -78,6 +78,14 @@ Section "${NAME}" INSTALL_SECTION
 	SectionIn RO
 	SetOutPath "$INSTDIR"
 
+	# Uninstall existing version silently before installing.
+	# This is needed because the VST3 adapter used to be a file, and now it is a bundle (folder), and NSIS can't overwrite files with folders.
+	# "_?=" makes the uninstaller block until exit. Explanation at bottom of page:
+	# https://nsis.sourceforge.io/Docs/Chapter3.html
+	# Fails gracefully if uninstaller does not exist.
+	DetailPrint "Uninstalling existing version"
+	ExecWait '"$INSTDIR\Uninstall.exe" /S _?=$INSTDIR'
+
 	File /r "dist\${RACK_DIR}\*"
 
 	; Store installation folder
