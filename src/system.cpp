@@ -824,7 +824,8 @@ std::string getOperatingSystemInfo() {
 	char osversion[32];
 	int osversion_name[2] = {CTL_KERN, KERN_OSRELEASE};
 	size_t osversion_len = sizeof(osversion) - 1;
-	if (sysctl(osversion_name, 2, osversion, &osversion_len, NULL, 0) != 0) return "Mac";
+	if (sysctl(osversion_name, 2, osversion, &osversion_len, NULL, 0) != 0)
+		return "Mac";
 
 	int major = 0;
 	int minor = 0;
@@ -833,6 +834,9 @@ std::string getOperatingSystemInfo() {
 
 	// Try to match version numbers to retail versions
 	if (major >= 20) {
+		if (major >= 22) {
+			minor -= 1;
+		}
 		major -= 9;
 		return string::f("Mac %d.%d", major, minor);
 	}
