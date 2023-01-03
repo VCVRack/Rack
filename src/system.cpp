@@ -575,6 +575,12 @@ static void unarchiveToDirectory(const std::string& archivePath, const std::vect
 		archive_entry_set_pathname(entry, entryPath.c_str());
 #endif
 
+		// Delete zero-byte files
+		if (archive_entry_filetype(entry) == AE_IFREG && archive_entry_size(entry) == 0) {
+			remove(entryPath);
+			continue;
+		}
+
 		// Write entry to disk
 		r = archive_write_header(disk, entry);
 		if (r < ARCHIVE_OK)

@@ -146,6 +146,9 @@ or
 
 	tar -xf archivePath --zstd -C dirPath
 
+As a special case, zero-byte files in the archive cause the unarchiver to delete existing files instead of overwriting them.
+This is useful for removing presets in .vcvplugin packages, for example.
+
 Throws on error.
 */
 void unarchiveToDirectory(const std::string& archivePath, const std::string& dirPath);
