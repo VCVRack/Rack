@@ -71,6 +71,7 @@ int main(int argc, char* argv[]) {
 	std::string patchPath;
 	bool screenshot = false;
 	float screenshotZoom = 1.f;
+	const std::string appInfo = APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION + " " + APP_OS_NAME + " " + APP_CPU_NAME;
 
 	// Parse command line arguments
 	static const struct option longOptions[] = {
@@ -108,7 +109,7 @@ int main(int argc, char* argv[]) {
 				asset::userDir = optarg;
 			} break;
 			case 'v': {
-				std::fprintf(stderr, "%s %s %s %s-%s\n", APP_NAME.c_str(), APP_EDITION_NAME.c_str(), APP_VERSION.c_str(), APP_OS.c_str(), APP_CPU.c_str());
+				std::fprintf(stderr, "%s\n", appInfo.c_str());
 				return 0;
 			}
 			// Mac "app translocation" passes a nonsense -psn_... flag, so -p is reserved.
@@ -142,7 +143,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	// Log environment
-	INFO("%s %s %s", APP_NAME.c_str(), APP_EDITION_NAME.c_str(), APP_VERSION.c_str());
+	INFO("%s", appInfo.c_str());
 	INFO("%s", system::getOperatingSystemInfo().c_str());
 	std::string argsList;
 	for (int i = 0; i < argc; i++) {
