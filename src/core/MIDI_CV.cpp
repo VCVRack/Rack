@@ -528,9 +528,17 @@ struct MIDI_CVWidget : ModuleWidget {
 		menu->addChild(new MenuSeparator);
 
 		static const std::vector<float> pwRanges = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 24, 36, 48};
-		menu->addChild(createSubmenuItem("Pitch bend range", string::f("%g", module->pwRange), [=](Menu* menu) {
+		auto getPwRangeLabel = [](float pwRange) -> std::string {
+			if (pwRange == 0)
+				return "Off";
+			else if (std::abs(pwRange) < 12)
+				return string::f("%g semitone", pwRange) + (pwRange == 1 ? "" : "s");
+			else
+				return string::f("%g octave", pwRange / 12) + (pwRange / 12 == 1 ? "" : "s");
+		};
+		menu->addChild(createSubmenuItem("Pitch bend range", getPwRangeLabel(module->pwRange), [=](Menu* menu) {
 			for (size_t i = 0; i < pwRanges.size(); i++) {
-				menu->addChild(createCheckMenuItem(string::f("%g", pwRanges[i]), "",
+				menu->addChild(createCheckMenuItem(getPwRangeLabel(pwRanges[i]), "",
 					[=]() {return module->pwRange == pwRanges[i];},
 					[=]() {module->pwRange = pwRanges[i];}
 				));
@@ -541,7 +549,9 @@ struct MIDI_CVWidget : ModuleWidget {
 
 		static const std::vector<int> clockDivisions = {24 * 4, 24 * 2, 24, 24 / 2, 24 / 4, 24 / 8, 2, 1};
 		static const std::vector<std::string> clockDivisionLabels = {"Whole", "Half", "Quarter", "8th", "16th", "32nd", "12 PPQN", "24 PPQN"};
-		menu->addChild(createSubmenuItem("CLK/N divider", "", [=](Menu* menu) {
+		size_t clockDivisionIndex = std::find(clockDivisions.begin(), clockDivisions.end(), module->clockDivision) - clockDivisions.begin();
+		std::string clockDivisionLabel = (clockDivisionIndex < clockDivisionLabels.size()) ? clockDivisionLabels[clockDivisionIndex] : "";
+		menu->addChild(createSubmenuItem("CLK/N divider", clockDivisionLabel, [=](Menu* menu) {
 			for (size_t i = 0; i < clockDivisions.size(); i++) {
 				menu->addChild(createCheckMenuItem(clockDivisionLabels[i], "",
 					[=]() {return module->clockDivision == clockDivisions[i];},
