@@ -82,6 +82,7 @@ int main(int argc, char* argv[]) {
 		{"system", required_argument, NULL, 's'},
 		{"user", required_argument, NULL, 'u'},
 		{"version", no_argument, NULL, 'v'},
+		{"help", no_argument, NULL, 256},
 		{NULL, 0, NULL, 0}
 	};
 	int c;
@@ -110,6 +111,11 @@ int main(int argc, char* argv[]) {
 			} break;
 			case 'v': {
 				std::fprintf(stderr, "%s\n", appInfo.c_str());
+				return 0;
+			}
+			case 256: { // --help
+				std::fprintf(stderr, "%s\n", appInfo.c_str());
+				std::fprintf(stderr, "https://vcvrack.com/manual/Installing#Command-line-usage\n");
 				return 0;
 			}
 			// Mac "app translocation" passes a nonsense -psn_... flag, so -p is reserved.
