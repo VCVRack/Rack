@@ -307,6 +307,8 @@ void PortWidget::createContextMenu() {
 			menu->addChild(item);
 		}
 	}
+
+	appendContextMenu(menu);
 }
 
 
