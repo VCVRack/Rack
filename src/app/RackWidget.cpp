@@ -623,6 +623,8 @@ void RackWidget::removeModule(ModuleWidget* m) {
 
 	// Remove module from ModuleContainer
 	internal->moduleContainer->removeChild(m);
+
+	updateExpanders();
 }
 
 ModuleWidget* RackWidget::getModule(int64_t moduleId) {
