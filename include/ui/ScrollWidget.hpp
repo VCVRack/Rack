@@ -23,6 +23,9 @@ struct ScrollWidget : widget::OpaqueWidget {
 
 	ScrollWidget();
 	~ScrollWidget();
+	math::Vec getScrollOffset() {
+		return offset;
+	}
 	void scrollTo(math::Rect r);
 	/** Returns the bound of allowed `offset` values in pixels. */
 	math::Rect getContainerOffsetBound();

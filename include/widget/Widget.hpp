@@ -85,7 +85,7 @@ struct Widget : WeakBase {
 	}
 	/** Returns a subset of the given Rect bounded by the box of this widget and all ancestors.
 	*/
-	virtual math::Rect getViewport(math::Rect r);
+	virtual math::Rect getViewport(math::Rect r = math::Rect::inf());
 
 	template <class T>
 	T* getAncestorOfType() {

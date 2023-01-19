@@ -401,6 +401,8 @@ static PasteJsonResult RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 	that->deselectAll();
 
 	std::map<int64_t, ModuleWidget*> newModules;
+	math::Vec posMin(INFINITY, INFINITY);
+	math::Vec posMax(-INFINITY, -INFINITY);
 
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
@@ -435,13 +437,24 @@ static PasteJsonResult RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 		double x = 0.0, y = 0.0;
 		json_unpack(posJ, "[F, F]", &x, &y);
 		math::Vec pos = math::Vec(x, y);
-		pos = pos.mult(RACK_GRID_SIZE);
-		mw->box.pos = pos.plus(RACK_OFFSET);
+		mw->box.pos = pos * RACK_GRID_SIZE + RACK_OFFSET;
+		posMin = posMin.min(mw->box.getTopLeft());
+		posMax = posMax.max(mw->box.getBottomRight());
 
 		that->internal->moduleContainer->addChild(mw);
 		that->select(mw);
 
 		newModules[id] = mw;
+	}
+
+	// Adjust center of selection to appear at center of rack view
+	math::Vec posCenter = (posMin + posMax) / 2;
+	math::Vec rackCenter = APP->scene->rack->getViewport().getCenter();
+	math::Vec posDelta = ((rackCenter - posCenter) / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
+
+	for (auto pair : newModules) {
+		ModuleWidget* mw = pair.second;
+		mw->box.pos += posDelta;
 	}
 
 	// This calls updateExpanders()
