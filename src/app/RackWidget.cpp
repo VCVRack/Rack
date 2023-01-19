@@ -393,13 +393,14 @@ void RackWidget::fromJson(json_t* rootJ) {
 	}
 }
 
-struct PasteJsonReturn {
-	std::map<int64_t, int64_t> newModuleIds;
+struct PasteJsonResult {
+	/** Old module ID -> new module */
+	std::map<int64_t, ModuleWidget*> newModules;
 };
-static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, history::ComplexAction* complexAction) {
+static PasteJsonResult RackWidget_pasteJson(RackWidget* that, json_t* rootJ, history::ComplexAction* complexAction) {
 	that->deselectAll();
 
-	std::map<int64_t, int64_t> newModuleIds;
+	std::map<int64_t, ModuleWidget*> newModules;
 
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
@@ -440,7 +441,7 @@ static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 		that->internal->moduleContainer->addChild(mw);
 		that->select(mw);
 
-		newModuleIds[id] = mw->module->id;
+		newModules[id] = mw;
 	}
 
 	// This calls updateExpanders()
@@ -462,23 +463,25 @@ static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 		json_array_foreach(cablesJ, cableIndex, cableJ) {
 			engine::Cable::jsonStripIds(cableJ);
 
-			// Remap old module IDs to new IDs
+			// Overwrite old module IDs with new module IDs
 			json_t* inputModuleIdJ = json_object_get(cableJ, "inputModuleId");
 			if (!inputModuleIdJ)
 				continue;
 			int64_t inputModuleId = json_integer_value(inputModuleIdJ);
-			inputModuleId = get(newModuleIds, inputModuleId, -1);
-			if (inputModuleId < 0)
+			auto inputModuleIdIt = newModules.find(inputModuleId);
+			if (inputModuleIdIt == newModules.end())
 				continue;
+			inputModuleId = inputModuleIdIt->second->module->id;
 			json_object_set(cableJ, "inputModuleId", json_integer(inputModuleId));
 
 			json_t* outputModuleIdJ = json_object_get(cableJ, "outputModuleId");
 			if (!outputModuleIdJ)
 				continue;
 			int64_t outputModuleId = json_integer_value(outputModuleIdJ);
-			outputModuleId = get(newModuleIds, outputModuleId, -1);
-			if (outputModuleId < 0)
+			auto outputModuleIdIt = newModules.find(outputModuleId);
+			if (outputModuleIdIt == newModules.end())
 				continue;
+			outputModuleId = outputModuleIdIt->second->module->id;
 			json_object_set(cableJ, "outputModuleId", json_integer(outputModuleId));
 
 			// Create Cable
@@ -506,7 +509,7 @@ static PasteJsonReturn RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 		}
 	}
 
-	return {newModuleIds};
+	return {newModules};
 }
 
 void RackWidget::pasteJsonAction(json_t* rootJ) {
@@ -1163,16 +1166,15 @@ void RackWidget::cloneSelectionAction(bool cloneCables) {
 	// Clone cables attached to inputs of selected modules but outputs of non-selected modules
 	if (cloneCables) {
 		for (CableWidget* cw : getCompleteCables()) {
-			auto inputIt = p.newModuleIds.find(cw->getCable()->inputModule->id);
-			if (inputIt == p.newModuleIds.end())
+			auto inputIt = p.newModules.find(cw->getCable()->inputModule->id);
+			if (inputIt == p.newModules.end())
 				continue;
 
-			auto outputIt = p.newModuleIds.find(cw->getCable()->outputModule->id);
-			if (outputIt != p.newModuleIds.end())
+			auto outputIt = p.newModules.find(cw->getCable()->outputModule->id);
+			if (outputIt != p.newModules.end())
 				continue;
 
-			int64_t clonedInputModuleId = inputIt->second;
-			engine::Module* clonedInputModule = APP->engine->getModule(clonedInputModuleId);
+			engine::Module* clonedInputModule = inputIt->second->module;
 
 			// Create cable attached to cloned ModuleWidget's input
 			engine::Cable* clonedCable = new engine::Cable;
