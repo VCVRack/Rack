@@ -48,6 +48,7 @@ struct RackWidget : widget::OpaqueWidget {
 	void clear();
 	void mergeJson(json_t* rootJ);
 	void fromJson(json_t* rootJ);
+	/** Pastes module JSON or selection JSON at the mouse position. */
 	void pasteJsonAction(json_t* rootJ);
 	void pasteModuleJsonAction(json_t* moduleJ);
 	void pasteClipboardAction();

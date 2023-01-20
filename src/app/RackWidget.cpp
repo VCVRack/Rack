@@ -401,8 +401,8 @@ static PasteJsonResult RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 	that->deselectAll();
 
 	std::map<int64_t, ModuleWidget*> newModules;
-	math::Vec posMin(INFINITY, INFINITY);
-	math::Vec posMax(-INFINITY, -INFINITY);
+	math::Vec minPos(INFINITY, INFINITY);
+	math::Vec maxPos(-INFINITY, -INFINITY);
 
 	// modules
 	json_t* modulesJ = json_object_get(rootJ, "modules");
@@ -438,8 +438,8 @@ static PasteJsonResult RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 		json_unpack(posJ, "[F, F]", &x, &y);
 		math::Vec pos = math::Vec(x, y);
 		mw->box.pos = pos * RACK_GRID_SIZE + RACK_OFFSET;
-		posMin = posMin.min(mw->box.getTopLeft());
-		posMax = posMax.max(mw->box.getBottomRight());
+		minPos = minPos.min(mw->box.getTopLeft());
+		maxPos = maxPos.max(mw->box.getBottomRight());
 
 		that->internal->moduleContainer->addChild(mw);
 		that->select(mw);
@@ -448,13 +448,13 @@ static PasteJsonResult RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 	}
 
 	// Adjust center of selection to appear at center of rack view
-	math::Vec posCenter = (posMin + posMax) / 2;
-	math::Vec rackCenter = APP->scene->rack->getViewport().getCenter();
-	math::Vec posDelta = ((rackCenter - posCenter) / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
+	math::Vec selectionCenter = (minPos + maxPos) / 2;
+	math::Vec mousePos = that->internal->mousePos;
+	math::Vec deltaPos = ((mousePos - selectionCenter) / RACK_GRID_SIZE).round() * RACK_GRID_SIZE;
 
 	for (auto pair : newModules) {
 		ModuleWidget* mw = pair.second;
-		mw->box.pos += posDelta;
+		mw->box.pos += deltaPos;
 	}
 
 	// This calls updateExpanders()
@@ -1029,6 +1029,9 @@ void RackWidget::loadSelection(std::string path) {
 	if (!rootJ)
 		throw Exception("File is not a valid selection file. JSON parsing error at %s %d:%d %s", error.source, error.line, error.column, error.text);
 	DEFER({json_decref(rootJ);});
+
+	// Set mouse position to center of rack viewport, so selection is placed in view.
+	internal->mousePos = getViewport().getCenter();
 
 	pasteJsonAction(rootJ);
 }
