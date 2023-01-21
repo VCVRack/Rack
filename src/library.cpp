@@ -226,7 +226,7 @@ void checkUpdates() {
 		// Get plugin manifest
 		json_t* manifestJ = json_object_get(manifestsJ, pluginSlug.c_str());
 		if (!manifestJ) {
-			WARN("VCV account has plugin %s but no manifest was found", pluginSlug.c_str());
+			// Skip plugin silently
 			continue;
 		}
 
