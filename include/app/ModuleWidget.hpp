@@ -18,6 +18,7 @@ struct ModuleWidget : widget::OpaqueWidget {
 	struct Internal;
 	Internal* internal;
 
+	/** Not owned */
 	plugin::Model* model = NULL;
 	/** Owned */
 	engine::Module* module = NULL;
@@ -28,18 +29,19 @@ struct ModuleWidget : widget::OpaqueWidget {
 	}
 	~ModuleWidget();
 
+	/** Returns the Model instance of this ModuleWidget. */
 	plugin::Model* getModel();
 	void setModel(plugin::Model* model);
 
-	/** Returns the attached Module. */
+	/** Returns Module attached to this ModuleWidget. */
 	engine::Module* getModule();
-	/** Returns the attached Module, casted to the given Module type. */
+	/** Returns Module attached to this ModuleWidget, casted to the given Module type. */
 	template <class TModule>
 	TModule* getModule() {
 		return dynamic_cast<TModule*>(getModule());
 	}
 	/** Associates this ModuleWidget with the Module.
-	Transfers ownership.
+	Transfers ownership to `this`.
 	*/
 	void setModule(engine::Module* module);
 
