@@ -31,7 +31,13 @@ struct ModuleWidget : widget::OpaqueWidget {
 	plugin::Model* getModel();
 	void setModel(plugin::Model* model);
 
+	/** Returns the attached Module. */
 	engine::Module* getModule();
+	/** Returns the attached Module, casted to the given Module type. */
+	template <class TModule>
+	TModule* getModule() {
+		return dynamic_cast<TModule*>(getModule());
+	}
 	/** Associates this ModuleWidget with the Module.
 	Transfers ownership.
 	*/
