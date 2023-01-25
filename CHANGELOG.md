@@ -2,6 +2,20 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.2.3 (2023-01-25)
+- Place module selection nearest to mouse position when pasted and nearest to the center of the rack viewport when imported.
+- Allow custom menu items to be appended to port's context menu.
+- Rack Pro
+	- Enable Loopback MIDI driver in all plugin adapters.
+	- Fix MIDI CC output of VST3 adapter.
+	- Fix Windows installer not overwriting existing VST3 plugin bundle on Windows.
+	- Store and recall window size of VST3.
+	- Fix MIDI clock input in CLAP adapter.
+	- Make CLAP adapter a Note Effect and Audio Effect as well as an Instrument.
+- API
+	- Make unarchiver handle zero-byte files as a special case by deleting destination files instead of overwriting them. This allows plugin packages to remove old presets by including a zero-byte file with its filename.
+	- Add `ModuleWidget::getModule<TModule>()` convenience method.
+
 ### 2.2.2 (2022-12-27)
 - Display Rack edition, version, OS, CPU, and plugin type in menu bar to help with troubleshooting.
 - Add long-form command line options.

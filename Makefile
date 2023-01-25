@@ -1,6 +1,6 @@
 RACK_DIR ?= .
 VERSION_MAJOR := 2
-VERSION := 2.2.2
+VERSION := 2.2.3
 
 FLAGS += -Iinclude -Idep/include
 
