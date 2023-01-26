@@ -201,8 +201,8 @@ struct Engine::Internal {
 
 	float sampleRate = 0.f;
 	float sampleTime = 0.f;
-	int64_t block = 0;
 	int64_t frame = 0;
+	int64_t block = 0;
 	int64_t blockFrame = 0;
 	double blockTime = 0.0;
 	int blockFrames = 0;
@@ -674,18 +674,13 @@ void Engine::yieldWorkers() {
 }
 
 
-int64_t Engine::getBlock() {
-	return internal->block;
-}
-
-
 int64_t Engine::getFrame() {
 	return internal->frame;
 }
 
 
-void Engine::setFrame(int64_t frame) {
-	internal->frame = frame;
+int64_t Engine::getBlock() {
+	return internal->block;
 }
 
 

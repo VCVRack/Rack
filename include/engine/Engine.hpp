@@ -63,29 +63,23 @@ struct Engine {
 	Call this in your Module::stepBlock() method to hint that the operation will take more than ~0.1 ms.
 	*/
 	void yieldWorkers();
+	/** Returns the number of sample frames since the Engine was created.
+	*/
+	int64_t getFrame();
 	/** Returns the number of stepBlock() calls since the Engine was created.
 	*/
 	int64_t getBlock();
-	/** Returns the frame counter which increases every sample step.
-	Not necessarily monotonically increasing. Can be reset at any time.
-	*/
-	int64_t getFrame();
-	/** Sets the frame counter.
-	Useful for when the DAW playhead position jumps to a new position.
-	Rack plugins and standalone Rack should not call this function.
-	*/
-	void setFrame(int64_t frame);
 	/** Returns the frame when stepBlock() was last called.
 	*/
 	int64_t getBlockFrame();
 	/** Returns the time in seconds when stepBlock() was last called.
 	*/
 	double getBlockTime();
-	/** Returns the total number of frames in the current stepBlock() call.
+	/** Returns the number of frames requested by the last stepBlock() call.
 	*/
 	int getBlockFrames();
 	/** Returns the total time that stepBlock() is advancing, in seconds.
-	Calculated by `stepFrames / sampleRate`.
+	Calculated by `blockFrames / sampleRate`.
 	*/
 	double getBlockDuration();
 	/** Returns the average block processing time divided by block time in the last T seconds.
