@@ -5,7 +5,9 @@ In this document, Ctrl means Cmd on Mac.
 ### 2.2.3 (2023-01-25)
 - Place module selection nearest to mouse position when pasted and nearest to the center of the rack viewport when imported.
 - Allow custom menu items to be appended to port's context menu.
+- Fix ignored MIDI input messages while using small audio block sizes.
 - Rack Pro
+	- Fix hang when dialog box opens on Windows, such as after syncing library plugins.
 	- Enable Loopback MIDI driver in all plugin adapters.
 	- Fix MIDI CC output of VST3 adapter.
 	- Fix Windows installer not overwriting existing VST3 plugin bundle on Windows.
