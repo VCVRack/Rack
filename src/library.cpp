@@ -255,7 +255,7 @@ void checkUpdates() {
 			continue;
 		}
 
-		// Check if update is needed
+		// Check that update is needed
 		plugin::Plugin* p = plugin::getPlugin(pluginSlug);
 		if (p) {
 			if (update.version == p->version)
@@ -264,9 +264,13 @@ void checkUpdates() {
 				continue;
 		}
 
-		// Require that plugin is available
-		json_t* availableJ = json_object_get(manifestJ, "available");
-		if (!json_boolean_value(availableJ))
+		// Check that plugin is available for this arch
+		json_t* archesJ = json_object_get(manifestJ, "arches");
+		if (!archesJ)
+			continue;
+		std::string arch = APP_OS + "-" + APP_CPU;
+		json_t* archJ = json_object_get(archesJ, arch.c_str());
+		if (!json_boolean_value(archJ))
 			continue;
 
 		// Get changelog URL
