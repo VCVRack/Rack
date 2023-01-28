@@ -485,7 +485,7 @@ static PasteJsonResult RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 			if (inputModuleIdIt == newModules.end())
 				continue;
 			inputModuleId = inputModuleIdIt->second->module->id;
-			json_object_set(cableJ, "inputModuleId", json_integer(inputModuleId));
+			json_object_set_new(cableJ, "inputModuleId", json_integer(inputModuleId));
 
 			json_t* outputModuleIdJ = json_object_get(cableJ, "outputModuleId");
 			if (!outputModuleIdJ)
@@ -495,7 +495,7 @@ static PasteJsonResult RackWidget_pasteJson(RackWidget* that, json_t* rootJ, his
 			if (outputModuleIdIt == newModules.end())
 				continue;
 			outputModuleId = outputModuleIdIt->second->module->id;
-			json_object_set(cableJ, "outputModuleId", json_integer(outputModuleId));
+			json_object_set_new(cableJ, "outputModuleId", json_integer(outputModuleId));
 
 			// Create Cable
 			engine::Cable* cable = new engine::Cable;

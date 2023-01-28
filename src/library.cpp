@@ -66,7 +66,7 @@ void checkAppUpdate() {
 
 	std::string versionUrl = API_URL + "/version";
 	json_t* reqJ = json_object();
-	json_object_set(reqJ, "edition", json_string(APP_EDITION.c_str()));
+	json_object_set_new(reqJ, "edition", json_string(APP_EDITION.c_str()));
 	DEFER({json_decref(reqJ);});
 
 	json_t* resJ = network::requestJson(network::METHOD_GET, versionUrl, reqJ);
@@ -115,8 +115,8 @@ void logIn(std::string email, std::string password) {
 
 	loginStatus = "Logging in...";
 	json_t* reqJ = json_object();
-	json_object_set(reqJ, "email", json_string(email.c_str()));
-	json_object_set(reqJ, "password", json_string(password.c_str()));
+	json_object_set_new(reqJ, "email", json_string(email.c_str()));
+	json_object_set_new(reqJ, "password", json_string(password.c_str()));
 	std::string url = API_URL + "/token";
 	json_t* resJ = network::requestJson(network::METHOD_POST, url, reqJ);
 	json_decref(reqJ);
@@ -196,7 +196,7 @@ void checkUpdates() {
 	// Get library manifests
 	std::string manifestsUrl = API_URL + "/library/manifests";
 	json_t* manifestsReq = json_object();
-	json_object_set(manifestsReq, "version", json_string(APP_VERSION_MAJOR.c_str()));
+	json_object_set_new(manifestsReq, "version", json_string(APP_VERSION_MAJOR.c_str()));
 	json_t* manifestsResJ = network::requestJson(network::METHOD_GET, manifestsUrl, manifestsReq);
 	json_decref(manifestsReq);
 	if (!manifestsResJ) {

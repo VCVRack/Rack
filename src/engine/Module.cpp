@@ -217,7 +217,7 @@ json_t* Module::paramsToJson() {
 
 		json_object_set_new(paramJ, "id", json_integer(paramId));
 
-		json_array_append(rootJ, paramJ);
+		json_array_append_new(rootJ, paramJ);
 	}
 	return rootJ;
 }
