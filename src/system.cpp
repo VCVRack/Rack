@@ -185,9 +185,15 @@ bool remove(const std::string& path) {
 }
 
 
-int removeRecursively(const std::string& path) {
+int removeRecursively(const std::string& pathStr) {
+	fs::path path = fs::u8path(pathStr);
 	try {
-		return fs::remove_all(fs::u8path(path));
+		// Make all entries writable before attempting to remove
+		for (auto& entry : fs::recursive_directory_iterator(path)) {
+			fs::permissions(entry.path(), fs::perms::owner_write, fs::perm_options::add);
+		}
+
+		return fs::remove_all(path);
 	}
 	catch (fs::filesystem_error& e) {
 		return 0;
