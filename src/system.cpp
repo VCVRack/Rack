@@ -499,9 +499,9 @@ static la_ssize_t archiveReadVectorCallback(struct archive *a, void* client_data
 	return len;
 }
 
-static void unarchiveToDirectory(const std::string& archivePath, const std::vector<uint8_t>* archiveData, const std::string& dirPath) {
+static void unarchiveToDirectory(const std::string& archivePath, const std::vector<uint8_t>* archiveData, const std::string& dirPathStr) {
 #if defined ARCH_MAC
-	// libarchive depends on locale so set thread
+	// libarchive depends on locale so set thread locale
 	// If locale is not found, returns NULL which resets thread to global locale
 	locale_t loc = newlocale(LC_CTYPE_MASK, "en_US.UTF-8", NULL);
 	locale_t oldLoc = uselocale(loc);
@@ -510,6 +510,8 @@ static void unarchiveToDirectory(const std::string& archivePath, const std::vect
 		uselocale(oldLoc);
 	});
 #endif
+
+	fs::path dirPath = fs::u8path(dirPathStr);
 
 	// Based on minitar.c extract() in libarchive examples
 	int r;
@@ -564,20 +566,34 @@ static void unarchiveToDirectory(const std::string& archivePath, const std::vect
 			throw Exception("Unarchiver could not read entry from archive: %s", archive_error_string(a));
 
 		// Convert relative pathname to absolute based on dirPath
-		std::string entryPath = archive_entry_pathname(entry);
-		// DEBUG("entryPath: %s", entryPath.c_str());
-		if (!fs::u8path(entryPath).is_relative())
-			throw Exception("Unarchiver does not support absolute tar paths: %s", entryPath.c_str());
-		entryPath = (fs::u8path(dirPath) / fs::u8path(entryPath)).generic_u8string();
+		fs::path entryPath = fs::u8path(archive_entry_pathname(entry));
+		// DEBUG("entryPath: %s", entryPath.generic_u8string().c_str());
+		if (!entryPath.is_relative())
+			throw Exception("Unarchiver does not support absolute tar paths: %s", entryPath.u8string().c_str());
+
+		entryPath = dirPath / entryPath;
 #if defined ARCH_WIN
-		archive_entry_copy_pathname_w(entry, string::UTF8toUTF16(entryPath).c_str());
+		archive_entry_copy_pathname_w(entry, string::UTF8toUTF16(entryPath.u8string()).c_str());
 #else
-		archive_entry_set_pathname(entry, entryPath.c_str());
+		archive_entry_set_pathname(entry, entryPath.u8string().c_str());
 #endif
 
+		mode_t mode = archive_entry_mode(entry);
+		mode_t filetype = archive_entry_filetype(entry);
+		int64_t size = archive_entry_size(entry);
+
+		// Force minimum modes
+		if (filetype == AE_IFREG) {
+			mode |= 0644;
+		}
+		else if (filetype == AE_IFDIR) {
+			mode |= 0755;
+		}
+		archive_entry_set_mode(entry, mode);
+
 		// Delete zero-byte files
-		if (archive_entry_filetype(entry) == AE_IFREG && archive_entry_size(entry) == 0) {
-			remove(entryPath);
+		if (filetype == AE_IFREG && size == 0) {
+			remove(entryPath.generic_u8string());
 			continue;
 		}
 
