@@ -13,13 +13,13 @@
 
 ## Credits
 
-- [Andrew Belt](https://github.com/AndrewBelt): VCV Rack developer
+- [Andrew Belt](https://github.com/AndrewBelt): Lead Rack developer
+- [Pyer](https://www.pyer.be/): Module design, component graphics
+- [Richie Hindle](http://entrian.com/audio/): Rack developer, bug fixes
 - [Grayscale](https://grayscale.info/): Module design, branding
-- [Pyer](https://www.pyer.be/): Component graphics
-- [Richie Hindle](http://entrian.com/audio/): OS/DAW-dependent bug fixes
-- Christoph Scholtes: VCV Library reviews and builds
+- Christoph Scholtes: [Library reviews](https://github.com/VCVRack/library) and [plugin toolchain](https://github.com/VCVRack/rack-plugin-toolchain)
 - Rack plugin developers: Authorship shown on each plugin's [VCV Library](https://library.vcvrack.com/) page
-- Rack users like you: Bug reports and feature requests
+- Rack users like you: [Bug reports and feature requests](https://vcvrack.com/support)
 
 ## Software libraries
 
