@@ -391,6 +391,7 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 
 				// If module positions are locked, don't consume left-click
 				if (settings::lockModules) {
+					e.consume(NULL);
 					return;
 				}
 
@@ -420,6 +421,7 @@ void ModuleWidget::onButton(const ButtonEvent& e) {
 
 			// If module positions are locked, don't consume left-click
 			if (settings::lockModules) {
+				e.consume(NULL);
 				return;
 			}
 
