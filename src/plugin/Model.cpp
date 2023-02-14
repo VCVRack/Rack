@@ -62,9 +62,12 @@ void Model::fromJson(json_t* rootJ) {
 
 	// hidden
 	json_t* hiddenJ = json_object_get(rootJ, "hidden");
-	// Use `disabled` as an alias which was deprecated in Rack 2.0
+	// "disabled" was a deprecated alias in Rack <2
 	if (!hiddenJ)
 		hiddenJ = json_object_get(rootJ, "disabled");
+	// "deprecated" was a deprecated alias in Rack <2.2.4
+	if (!hiddenJ)
+		hiddenJ = json_object_get(rootJ, "deprecated");
 	if (hiddenJ) {
 		// Don't un-hide Model if already hidden by C++
 		if (json_boolean_value(hiddenJ))
