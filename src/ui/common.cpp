@@ -1,4 +1,5 @@
 #include <ui/common.hpp>
+#include <settings.hpp>
 
 
 namespace rack {
@@ -6,16 +7,13 @@ namespace ui {
 
 
 void init() {
-	// Default
-	setTheme(nvgRGB(0x20, 0x20, 0x20), nvgRGB(0xf0, 0xf0, 0xf0));
-	// Dark
-	// setTheme(nvgRGB(0x00, 0x00, 0x00), nvgRGB(0xff, 0xff, 0xff));
-	// Light
-	// setTheme(nvgRGB(0xe8, 0xe8, 0xe8), nvgRGB(0x00, 0x00, 0x00));
+	refreshTheme();
 }
+
 
 void destroy() {
 }
+
 
 void setTheme(NVGcolor bg, NVGcolor fg) {
 	BNDwidgetTheme w;
@@ -71,6 +69,20 @@ void setTheme(NVGcolor bg, NVGcolor fg) {
 	t.tooltipTheme.innerColor = bg;
 
 	bndSetTheme(t);
+}
+
+
+void refreshTheme() {
+	if (settings::uiTheme == "light") {
+		setTheme(nvgRGB(0xe8, 0xe8, 0xe8), nvgRGB(0x00, 0x00, 0x00));
+	}
+	else if (settings::uiTheme == "dark") {
+		setTheme(nvgRGB(0x00, 0x00, 0x00), nvgRGB(0xff, 0xff, 0xff));
+	}
+	else {
+		// Default
+		setTheme(nvgRGB(0x20, 0x20, 0x20), nvgRGB(0xf0, 0xf0, 0xf0));
+	}
 }
 
 

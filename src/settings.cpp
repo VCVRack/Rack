@@ -26,6 +26,7 @@ math::Vec windowSize = math::Vec(1024, 720);
 math::Vec windowPos = math::Vec(NAN, NAN);
 bool invertZoom = false;
 float pixelRatio = 0.0;
+std::string uiTheme = "default";
 float cableOpacity = 0.5;
 float cableTension = 1.0;
 float rackBrightness = 1.0;
@@ -127,6 +128,8 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "invertZoom", json_boolean(invertZoom));
 
 	json_object_set_new(rootJ, "pixelRatio", json_real(pixelRatio));
+
+	json_object_set_new(rootJ, "uiTheme", json_string(uiTheme.c_str()));
 
 	json_object_set_new(rootJ, "cableOpacity", json_real(cableOpacity));
 
@@ -286,6 +289,10 @@ void fromJson(json_t* rootJ) {
 	json_t* pixelRatioJ = json_object_get(rootJ, "pixelRatio");
 	if (pixelRatioJ)
 		pixelRatio = json_number_value(pixelRatioJ);
+
+	json_t* uiThemeJ = json_object_get(rootJ, "uiTheme");
+	if (uiThemeJ)
+		uiTheme = json_string_value(uiThemeJ);
 
 	json_t* cableOpacityJ = json_object_get(rootJ, "cableOpacity");
 	if (cableOpacityJ)

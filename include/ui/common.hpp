@@ -24,6 +24,8 @@ namespace ui {
 PRIVATE void init();
 PRIVATE void destroy();
 void setTheme(NVGcolor bg, NVGcolor fg);
+/** Sets theme from settings. */
+void refreshTheme();
 
 
 } // namespace ui

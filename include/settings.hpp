@@ -43,6 +43,8 @@ extern bool invertZoom;
 0 for auto.
 */
 extern float pixelRatio;
+/** Name of UI theme, specified in ui::refreshTheme() */
+extern std::string uiTheme;
 /** Opacity of cables in the range [0, 1] */
 extern float cableOpacity;
 /** Straightness of cables in the range [0, 1]. Unitless and arbitrary. */
