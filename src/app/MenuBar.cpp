@@ -936,6 +936,8 @@ struct InfoLabel : ui::Label {
 
 		text += APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION + " " + APP_OS_NAME + " " + APP_CPU_NAME;
 
+		color = bndGetTheme()->menuTheme.textColor;
+
 		Label::step();
 	}
 };
