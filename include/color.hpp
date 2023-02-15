@@ -34,6 +34,8 @@ NVGcolor plus(NVGcolor a, NVGcolor b);
 /** Multiplies color components elementwise. */
 NVGcolor mult(NVGcolor a, NVGcolor b);
 NVGcolor mult(NVGcolor a, float x);
+/** Interpolates RGBA color values. */
+NVGcolor lerp(NVGcolor a, NVGcolor b, float t);
 /** Screen blending with alpha compositing */
 NVGcolor screen(NVGcolor a, NVGcolor b);
 /** Multiplies alpha value. */

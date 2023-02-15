@@ -44,6 +44,13 @@ NVGcolor mult(NVGcolor a, float x) {
 	return a;
 }
 
+NVGcolor lerp(NVGcolor a, NVGcolor b, float t) {
+	NVGcolor c;
+	for (int i = 0; i < 4; i++)
+		c.rgba[i] = a.rgba[i] * (1 - t) + b.rgba[i] * t;
+	return c;
+}
+
 /** Screen blending with alpha compositing */
 NVGcolor screen(NVGcolor a, NVGcolor b) {
 	if (a.a == 0.f)
