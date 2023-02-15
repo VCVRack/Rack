@@ -6,27 +6,30 @@ namespace ui {
 
 
 void init() {
-	setTheme(nvgRGB(0x33, 0x33, 0x33), nvgRGB(0xf0, 0xf0, 0xf0));
+	// Default
+	setTheme(nvgRGB(0x20, 0x20, 0x20), nvgRGB(0xf0, 0xf0, 0xf0));
+	// Dark
+	// setTheme(nvgRGB(0x00, 0x00, 0x00), nvgRGB(0xff, 0xff, 0xff));
+	// Light
+	// setTheme(nvgRGB(0xe8, 0xe8, 0xe8), nvgRGB(0x00, 0x00, 0x00));
 }
 
 void destroy() {
 }
 
 void setTheme(NVGcolor bg, NVGcolor fg) {
-	// Assume dark background and light foreground
-
 	BNDwidgetTheme w;
-	w.outlineColor = bg;
+	w.outlineColor = color::lerp(bg, fg, 0.1);
 	w.itemColor = fg;
-	w.innerColor = bg;
-	w.innerSelectedColor = color::plus(bg, nvgRGB(0x30, 0x30, 0x30));
+	w.innerColor = color::lerp(bg, fg, 0.1);
+	w.innerSelectedColor = color::lerp(bg, fg, 0.2);
 	w.textColor = fg;
 	w.textSelectedColor = fg;
 	w.shadeTop = 0;
 	w.shadeDown = 0;
 
 	BNDtheme t;
-	t.backgroundColor = color::plus(bg, nvgRGB(0x30, 0x30, 0x30));
+	t.backgroundColor = bg;
 	t.regularTheme = w;
 	t.toolTheme = w;
 	t.radioTheme = w;
@@ -40,21 +43,32 @@ void setTheme(NVGcolor bg, NVGcolor fg) {
 	t.menuTheme = w;
 	t.menuItemTheme = w;
 
-	t.sliderTheme.itemColor = bg;
-	t.sliderTheme.innerColor = color::plus(bg, nvgRGB(0x50, 0x50, 0x50));
-	t.sliderTheme.innerSelectedColor = color::plus(bg, nvgRGB(0x60, 0x60, 0x60));
+	// Slider filled background
+	t.sliderTheme.itemColor = color::lerp(bg, fg, 0.1);
+	// Slider background
+	t.sliderTheme.innerColor = color::lerp(bg, fg, 0.4);
+	t.sliderTheme.innerSelectedColor = color::lerp(bg, fg, 0.6);
 
-	t.textFieldTheme = t.sliderTheme;
-	t.textFieldTheme.textColor = color::minus(bg, nvgRGB(0x20, 0x20, 0x20));
+	// Text field background
+	t.textFieldTheme.innerColor = color::lerp(bg, fg, 0.7);
+	t.textFieldTheme.innerSelectedColor = color::lerp(bg, fg, 0.8);
+	// Text
+	t.textFieldTheme.textColor = color::lerp(bg, fg, -0.2);
 	t.textFieldTheme.textSelectedColor = t.textFieldTheme.textColor;
-	t.textFieldTheme.itemColor = color::plus(bg, nvgRGB(0x30, 0x30, 0x30));
+	// Placeholder text and highlight background
+	t.textFieldTheme.itemColor = color::lerp(bg, fg, 0.3);
 
-	t.scrollBarTheme.itemColor = color::plus(bg, nvgRGB(0x50, 0x50, 0x50));
-	t.scrollBarTheme.innerColor = bg;
+	t.scrollBarTheme.itemColor = color::lerp(bg, fg, 0.4);
+	t.scrollBarTheme.innerColor = color::lerp(bg, fg, 0.1);
 
-	t.menuTheme.innerColor = color::minus(bg, nvgRGB(0x10, 0x10, 0x10));
-	t.menuTheme.textColor = color::minus(fg, nvgRGB(0x50, 0x50, 0x50));
+	// Menu background
+	t.menuTheme.innerColor = bg;
+	// Menu label text
+	t.menuTheme.textColor = color::lerp(bg, fg, 0.6);
 	t.menuTheme.textSelectedColor = t.menuTheme.textColor;
+
+	// Tooltip background
+	t.tooltipTheme.innerColor = bg;
 
 	bndSetTheme(t);
 }
