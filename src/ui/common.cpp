@@ -74,7 +74,7 @@ void setTheme(NVGcolor bg, NVGcolor fg) {
 
 void refreshTheme() {
 	if (settings::uiTheme == "light") {
-		setTheme(nvgRGB(0xe8, 0xe8, 0xe8), nvgRGB(0x00, 0x00, 0x00));
+		setTheme(nvgRGB(0xfb, 0xfb, 0xfb), nvgRGB(0x04, 0x04, 0x04));
 	}
 	else if (settings::uiTheme == "dark") {
 		setTheme(nvgRGB(0x00, 0x00, 0x00), nvgRGB(0xff, 0xff, 0xff));
