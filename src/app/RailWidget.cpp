@@ -3,6 +3,7 @@
 #include <asset.hpp>
 #include <widget/SvgWidget.hpp>
 #include <widget/FramebufferWidget.hpp>
+#include <settings.hpp>
 
 
 namespace rack {
@@ -26,13 +27,35 @@ RailWidget::RailWidget() {
 	addChild(internal->railFb);
 
 	internal->railSw = new widget::SvgWidget;
-	internal->railSw->setSvg(window::Svg::load(asset::system("res/ComponentLibrary/Rail.svg")));
 	internal->railFb->addChild(internal->railSw);
 }
 
 
 RailWidget::~RailWidget() {
 	delete internal;
+}
+
+
+void RailWidget::step() {
+	// Set rail SVG from theme
+	std::shared_ptr<window::Svg> railSvg;
+	if (settings::uiTheme == "light") {
+		railSvg = window::Svg::load(asset::system("res/ComponentLibrary/Rail-light.svg"));
+	}
+	else if (settings::uiTheme == "dark") {
+		railSvg = window::Svg::load(asset::system("res/ComponentLibrary/Rail-dark.svg"));
+	}
+	else {
+		// Default
+		railSvg = window::Svg::load(asset::system("res/ComponentLibrary/Rail.svg"));
+	}
+
+	if (internal->railSw->svg != railSvg) {
+		internal->railSw->setSvg(railSvg);
+		internal->railFb->setDirty();
+	}
+
+	TransparentWidget::step();
 }
 
 

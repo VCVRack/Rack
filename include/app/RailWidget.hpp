@@ -13,6 +13,7 @@ struct RailWidget : widget::TransparentWidget {
 
 	RailWidget();
 	~RailWidget();
+	void step() override;
 	void draw(const DrawArgs& args) override;
 };
 
