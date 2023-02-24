@@ -42,10 +42,10 @@ void setTheme(NVGcolor bg, NVGcolor fg) {
 	t.menuItemTheme = w;
 
 	// Slider filled background
-	t.sliderTheme.itemColor = color::lerp(bg, fg, 0.1);
+	t.sliderTheme.itemColor = color::lerp(bg, fg, 0.4);
 	// Slider background
-	t.sliderTheme.innerColor = color::lerp(bg, fg, 0.4);
-	t.sliderTheme.innerSelectedColor = color::lerp(bg, fg, 0.6);
+	t.sliderTheme.innerColor = color::lerp(bg, fg, 0.0);
+	t.sliderTheme.innerSelectedColor = color::lerp(bg, fg, 0.1);
 
 	// Text field background
 	t.textFieldTheme.innerColor = color::lerp(bg, fg, 0.7);
@@ -74,7 +74,7 @@ void setTheme(NVGcolor bg, NVGcolor fg) {
 
 void refreshTheme() {
 	if (settings::uiTheme == "light") {
-		setTheme(nvgRGB(0xfb, 0xfb, 0xfb), nvgRGB(0x04, 0x04, 0x04));
+		setTheme(nvgRGB(0xf0, 0xf0, 0xf0), nvgRGB(0x04, 0x04, 0x04));
 	}
 	else if (settings::uiTheme == "dark") {
 		setTheme(nvgRGB(0x00, 0x00, 0x00), nvgRGB(0xff, 0xff, 0xff));
