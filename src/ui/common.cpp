@@ -76,11 +76,11 @@ void refreshTheme() {
 	if (settings::uiTheme == "light") {
 		setTheme(nvgRGB(0xf0, 0xf0, 0xf0), nvgRGB(0x04, 0x04, 0x04));
 	}
-	else if (settings::uiTheme == "dark") {
+	else if (settings::uiTheme == "hcdark") {
 		setTheme(nvgRGB(0x00, 0x00, 0x00), nvgRGB(0xff, 0xff, 0xff));
 	}
 	else {
-		// Default
+		// Dark
 		setTheme(nvgRGB(0x20, 0x20, 0x20), nvgRGB(0xf0, 0xf0, 0xf0));
 	}
 }

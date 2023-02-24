@@ -422,8 +422,8 @@ struct ViewButton : MenuButton {
 		menu->addChild(new ui::MenuSeparator);
 		menu->addChild(createMenuLabel("Appearance"));
 
-		static const std::vector<std::string> uiThemes = {"default", "light", "dark"};
-		static const std::vector<std::string> uiThemeLabels = {"Default", "Light", "Dark"};
+		static const std::vector<std::string> uiThemes = {"dark", "light", "hcdark"};
+		static const std::vector<std::string> uiThemeLabels = {"Dark", "Light", "High contrast dark"};
 		menu->addChild(createIndexSubmenuItem("Theme", uiThemeLabels,
 			[=]() -> size_t {
 				auto it = std::find(uiThemes.begin(), uiThemes.end(), settings::uiTheme);

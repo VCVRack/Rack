@@ -42,11 +42,11 @@ void RailWidget::step() {
 	if (settings::uiTheme == "light") {
 		railSvg = window::Svg::load(asset::system("res/ComponentLibrary/Rail-light.svg"));
 	}
-	else if (settings::uiTheme == "dark") {
-		railSvg = window::Svg::load(asset::system("res/ComponentLibrary/Rail-dark.svg"));
+	else if (settings::uiTheme == "hcdark") {
+		railSvg = window::Svg::load(asset::system("res/ComponentLibrary/Rail-hcdark.svg"));
 	}
 	else {
-		// Default
+		// Dark
 		railSvg = window::Svg::load(asset::system("res/ComponentLibrary/Rail.svg"));
 	}
 
