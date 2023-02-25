@@ -8,6 +8,7 @@
 #include <context.hpp>
 #include <patch.hpp>
 #include <asset.hpp>
+#include <system.hpp>
 
 
 namespace rack {
@@ -491,14 +492,17 @@ void save(std::string path) {
 	json_t* rootJ = toJson();
 	if (!rootJ)
 		return;
+	DEFER({json_decref(rootJ);});
 
-	FILE* file = std::fopen(path.c_str(), "w");
+	std::string tmpPath = path + ".tmp";
+	FILE* file = std::fopen(tmpPath.c_str(), "w");
 	if (!file)
 		return;
-	DEFER({std::fclose(file);});
 
 	json_dumpf(rootJ, file, JSON_INDENT(2));
-	json_decref(rootJ);
+	std::fclose(file);
+	system::remove(path);
+	system::rename(tmpPath, path);
 }
 
 void load(std::string path) {
@@ -515,9 +519,9 @@ void load(std::string path) {
 	json_t* rootJ = json_loadf(file, 0, &error);
 	if (!rootJ)
 		throw Exception("Settings file has invalid JSON at %d:%d %s", error.line, error.column, error.text);
+	DEFER({json_decref(rootJ);});
 
 	fromJson(rootJ);
-	json_decref(rootJ);
 }
 
 
