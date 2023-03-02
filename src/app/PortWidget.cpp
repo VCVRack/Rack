@@ -444,7 +444,7 @@ void PortWidget::onDragStart(const DragStartEvent& e) {
 		cw = new CableWidget;
 
 		// Set color
-		if (internal->overrideColor.a > 0.f)
+		if (internal->overrideCreateCable)
 			cw->color = internal->overrideColor;
 		else
 			cw->color = APP->scene->rack->getNextCableColor();

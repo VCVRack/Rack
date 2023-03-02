@@ -377,10 +377,6 @@ void RackWidget::fromJson(json_t* rootJ) {
 		try {
 			cw->setCable(cable);
 			cw->fromJson(cableJ);
-			// In <=v1, cable colors were not serialized, so choose one from the available colors.
-			if (cw->color.a == 0.f) {
-				cw->color = getNextCableColor();
-			}
 		}
 		catch (Exception& e) {
 			delete cw;

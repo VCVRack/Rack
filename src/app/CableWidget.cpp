@@ -229,10 +229,13 @@ void CableWidget::mergeJson(json_t* rootJ) {
 
 void CableWidget::fromJson(json_t* rootJ) {
 	json_t* colorJ = json_object_get(rootJ, "color");
-	if (colorJ) {
+	if (colorJ && json_is_string(colorJ)) {
+		color = color::fromHexString(json_string_value(colorJ));
+	}
+	else {
 		// In <v0.6.0, cables used JSON objects instead of hex strings. Just ignore them if so and use the existing cable color.
-		if (json_is_string(colorJ))
-			color = color::fromHexString(json_string_value(colorJ));
+		// In <=v1, cable colors were not serialized.
+		color = APP->scene->rack->getNextCableColor();
 	}
 }
 
@@ -251,12 +254,15 @@ void CableWidget::step() {
 	math::Vec inputPos = getInputPos();
 	math::Vec slump = getSlumpPos(outputPos, inputPos);
 
+	NVGcolor colorOpaque = color;
+	colorOpaque.a = 1.f;
+
 	// Draw output plug
 	bool outputTop = !isComplete() || APP->scene->rack->getTopCable(outputPort) == this;
 	outputPlug->setPosition(outputPos);
 	outputPlug->setTop(outputTop);
 	outputPlug->setAngle(slump.minus(outputPos).arg());
-	outputPlug->setColor(color);
+	outputPlug->setColor(colorOpaque);
 	outputPlug->setPortWidget(outputPort);
 
 	// Draw input plug
@@ -264,7 +270,7 @@ void CableWidget::step() {
 	inputPlug->setPosition(inputPos);
 	inputPlug->setTop(inputTop);
 	inputPlug->setAngle(slump.minus(inputPos).arg());
-	inputPlug->setColor(color);
+	inputPlug->setColor(colorOpaque);
 	inputPlug->setPortWidget(inputPort);
 
 	Widget::step();
