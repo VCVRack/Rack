@@ -8,16 +8,49 @@ namespace dsp {
 
 /** Detects when a boolean changes from false to true */
 struct BooleanTrigger {
-	bool state = true;
+	enum State : uint8_t {
+		LOW,
+		HIGH,
+		UNINITIALIZED
+	};
+	union {
+		State s = UNINITIALIZED;
+		/** Deprecated */
+		bool state;
+	};
 
 	void reset() {
-		state = true;
+		s = UNINITIALIZED;
 	}
 
-	bool process(bool state) {
-		bool triggered = (state && !this->state);
-		this->state = state;
+	/** Returns whether the input changed from false to true. */
+	bool process(bool in) {
+		bool triggered = (s == LOW) && in;
+		s = in ? HIGH : LOW;
 		return triggered;
+	}
+
+	enum Event {
+		NONE = 0,
+		TRIGGERED = 1,
+		UNTRIGGERED = -1
+	};
+	/** Returns TRIGGERED if the input changed from false to true, and UNTRIGGERED if the input changed from true to false.
+	*/
+	Event processEvent(bool in) {
+		Event event = NONE;
+		if (s == LOW && in) {
+			event = TRIGGERED;
+		}
+		else if (s == HIGH && !in) {
+			event = UNTRIGGERED;
+		}
+		s = in ? HIGH : LOW;
+		return event;
+	}
+
+	bool isHigh() {
+		return s == HIGH;
 	}
 };
 
@@ -33,9 +66,9 @@ struct TSchmittTrigger {
 	void reset() {
 		state = T::mask();
 	}
-	T process(T in, T offThreshold = 0.f, T onThreshold = 1.f) {
-		T on = (in >= onThreshold);
-		T off = (in <= offThreshold);
+	T process(T in, T lowThreshold = 0.f, T highThreshold = 1.f) {
+		T on = (in >= highThreshold);
+		T off = (in <= lowThreshold);
 		T triggered = ~state & on;
 		state = on | (state & ~off);
 		return triggered;
@@ -48,10 +81,19 @@ struct TSchmittTrigger {
 
 template <>
 struct TSchmittTrigger<float> {
-	bool state = true;
+	enum State : uint8_t {
+		LOW,
+		HIGH,
+		UNINITIALIZED
+	};
+	union {
+		State s = UNINITIALIZED;
+		/** Deprecated. Backward compatible API */
+		bool state;
+	};
 
 	void reset() {
-		state = true;
+		s = UNINITIALIZED;
 	}
 
 	/** Updates the state of the Schmitt Trigger given a value.
@@ -62,25 +104,59 @@ struct TSchmittTrigger<float> {
 
 	for example.
 	*/
-	bool process(float in, float offThreshold = 0.f, float onThreshold = 1.f) {
-		if (state) {
-			// HIGH to LOW
-			if (in <= offThreshold) {
-				state = false;
-			}
-		}
-		else {
+	bool process(float in, float lowThreshold = 0.f, float highThreshold = 1.f) {
+		if (s == LOW && in >= highThreshold) {
 			// LOW to HIGH
-			if (in >= onThreshold) {
-				state = true;
-				return true;
-			}
+			s = HIGH;
+			return true;
+		}
+		else if (s == HIGH && in <= lowThreshold) {
+			// HIGH to LOW
+			s = LOW;
+		}
+		else if (s == UNINITIALIZED && in >= highThreshold) {
+			// UNINITIALIZED to HIGH
+			s = HIGH;
+		}
+		else if (s == UNINITIALIZED && in <= lowThreshold) {
+			// UNINITIALIZED to LOW
+			s = LOW;
 		}
 		return false;
 	}
 
+	enum Event {
+		NONE = 0,
+		TRIGGERED = 1,
+		UNTRIGGERED = -1
+	};
+	/** Returns TRIGGERED if the input reached highThreshold, and UNTRIGGERED if the input reached lowThreshold.
+	*/
+	Event processEvent(float in, float lowThreshold = 0.f, float highThreshold = 1.f) {
+		Event event = NONE;
+		if (s == LOW && in >= highThreshold) {
+			// LOW to HIGH
+			s = HIGH;
+			event = TRIGGERED;
+		}
+		else if (s == HIGH && in <= lowThreshold) {
+			// HIGH to LOW
+			s = LOW;
+			event = UNTRIGGERED;
+		}
+		else if (s == UNINITIALIZED && in >= highThreshold) {
+			// UNINITIALIZED to HIGH
+			s = HIGH;
+		}
+		else if (s == UNINITIALIZED && in <= lowThreshold) {
+			// UNINITIALIZED to LOW
+			s = LOW;
+		}
+		return event;
+	}
+
 	bool isHigh() {
-		return state;
+		return s == HIGH;
 	}
 };
 
