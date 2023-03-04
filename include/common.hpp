@@ -229,7 +229,7 @@ struct Exception : std::exception {
 };
 
 
-/** Given a std::map, returns the value of the given key, or returns `def` if the key doesn't exist.
+/** Given a std::map `c`, returns the value of the given key, or returns `def` if the key doesn't exist.
 Does *not* add the default value to the map.
 
 Posted to https://stackoverflow.com/a/63683271/272642.
@@ -243,11 +243,21 @@ Example:
 	// w is 0 because no default value is given, so it assumes the default int.
 */
 template <typename C>
-typename C::mapped_type get(const C& m, const typename C::key_type& key, const typename C::mapped_type& def = typename C::mapped_type()) {
-	typename C::const_iterator it = m.find(key);
-	if (it == m.end())
+const typename C::mapped_type& get(const C& c, const typename C::key_type& key, const typename C::mapped_type& def = typename C::mapped_type()) {
+	typename C::const_iterator it = c.find(key);
+	if (it == c.end())
 		return def;
 	return it->second;
+}
+
+
+/** Given a std::vector `c`, returns the value of the given index `i`, or returns `def` if the index is out of bounds.
+*/
+template <typename C>
+const typename C::value_type& get(const C& c, typename C::size_type i, const typename C::value_type& def = typename C::value_type()) {
+	if (i >= c.size())
+		return def;
+	return c[i];
 }
 
 
