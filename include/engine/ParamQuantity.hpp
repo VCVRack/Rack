@@ -68,12 +68,18 @@ struct ParamQuantity : Quantity {
 
 	Param* getParam();
 
-	/** Deprecated. Use setValue() instead. */
+	/** Deprecated. Use setValue() instead, which is identical since Rack 2.3.0. */
 	DEPRECATED void setSmoothValue(float value);
-	/** Deprecated. Use getValue() instead. */
+	/** Deprecated. Use getValue() instead, which is identical since Rack 2.3.0. */
 	DEPRECATED float getSmoothValue();
 
+	/** Sets the Param value immediately without smoothing.
+	If value is currently being smoothed by the engine, smoothing is canceled.
+	*/
 	void setDirectValue(float value);
+	/** Gets the Param value post-smoothing.
+	If value is currently being smoothed by the engine, the return value is different than getValue().
+	*/
 	float getDirectValue();
 
 	/** Sets the Param's smoothing target value, or direct value if smoothing is disabled.
