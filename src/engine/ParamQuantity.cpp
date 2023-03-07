@@ -19,6 +19,29 @@ engine::Param* ParamQuantity::getParam() {
 }
 
 void ParamQuantity::setSmoothValue(float value) {
+	setValue(value);
+}
+
+float ParamQuantity::getSmoothValue() {
+	return getValue();
+}
+
+void ParamQuantity::setDirectValue(float value) {
+	if (!module)
+		return;
+	value = math::clampSafe(value, getMinValue(), getMaxValue());
+	if (snapEnabled)
+		value = std::round(value);
+	APP->engine->setParamValue(module, paramId, value);
+}
+
+float ParamQuantity::getDirectValue() {
+	if (!module)
+		return 0.f;
+	return APP->engine->getParamValue(module, paramId);
+}
+
+void ParamQuantity::setValue(float value) {
 	if (!module)
 		return;
 	value = math::clampSafe(value, getMinValue(), getMaxValue());
@@ -30,28 +53,13 @@ void ParamQuantity::setSmoothValue(float value) {
 		APP->engine->setParamValue(module, paramId, value);
 }
 
-float ParamQuantity::getSmoothValue() {
+float ParamQuantity::getValue() {
 	if (!module)
 		return 0.f;
 	if (smoothEnabled)
 		return APP->engine->getParamSmoothValue(module, paramId);
 	else
 		return APP->engine->getParamValue(module, paramId);
-}
-
-void ParamQuantity::setValue(float value) {
-	if (!module)
-		return;
-	value = math::clampSafe(value, getMinValue(), getMaxValue());
-	if (snapEnabled)
-		value = std::round(value);
-	APP->engine->setParamValue(module, paramId, value);
-}
-
-float ParamQuantity::getValue() {
-	if (!module)
-		return 0.f;
-	return APP->engine->getParamValue(module, paramId);
 }
 
 float ParamQuantity::getMinValue() {
@@ -67,8 +75,7 @@ float ParamQuantity::getDefaultValue() {
 }
 
 float ParamQuantity::getDisplayValue() {
-	// We don't want the text to be smoothed (animated), so get the smooth target value.
-	float v = getSmoothValue();
+	float v = getValue();
 	if (displayBase == 0.f) {
 		// Linear
 		// v is unchanged

@@ -72,7 +72,7 @@ void Knob::onDragStart(const DragStartEvent& e) {
 
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		internal->oldValue = pq->getSmoothValue();
+		internal->oldValue = pq->getValue();
 		internal->snapDelta = 0.f;
 	}
 
@@ -103,7 +103,7 @@ void Knob::onDragEnd(const DragEndEvent& e) {
 
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		float newValue = pq->getSmoothValue();
+		float newValue = pq->getValue();
 		if (!std::isnan(internal->oldValue) && internal->oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange* h = new history::ParamChange;
@@ -150,7 +150,7 @@ void Knob::onDragMove(const DragMoveEvent& e) {
 
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		float value = pq->getSmoothValue();
+		float value = pq->getValue();
 
 		// Ratio between parameter value scale / (angle range / 2*pi)
 		float rangeRatio;
@@ -224,7 +224,7 @@ void Knob::onDragMove(const DragMoveEvent& e) {
 		}
 
 		// Set value
-		pq->setSmoothValue(value);
+		pq->setValue(value);
 	}
 
 	internal->distDragged += e.mouseDelta.norm();
@@ -254,7 +254,7 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 	if (!pq)
 		return;
 
-	float value = pq->getSmoothValue();
+	float value = pq->getValue();
 	// Set old value if unset
 	if (std::isnan(internal->oldValue)) {
 		internal->oldValue = value;
@@ -284,7 +284,7 @@ void Knob::onHoverScroll(const HoverScrollEvent& e) {
 	}
 
 	value += delta;
-	pq->setSmoothValue(value);
+	pq->setValue(value);
 
 	e.consume(this);
 }
@@ -298,7 +298,7 @@ void Knob::onLeave(const LeaveEvent& e) {
 
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		float newValue = pq->getSmoothValue();
+		float newValue = pq->getValue();
 		if (!std::isnan(internal->oldValue) && internal->oldValue != newValue) {
 			// Push ParamChange history action
 			history::ParamChange* h = new history::ParamChange;

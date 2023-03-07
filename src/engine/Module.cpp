@@ -250,7 +250,7 @@ void Module::paramsFromJson(json_t* rootJ) {
 
 		json_t* valueJ = json_object_get(paramJ, "value");
 		if (valueJ)
-			pq->setValue(json_number_value(valueJ));
+			pq->setDirectValue(json_number_value(valueJ));
 	}
 }
 

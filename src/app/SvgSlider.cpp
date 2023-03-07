@@ -57,7 +57,7 @@ void SvgSlider::onChange(const ChangeEvent& e) {
 	float v = 1.f;
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		v = math::rescale(pq->getSmoothValue(), pq->getMinValue(), pq->getMaxValue(), 0.f, 1.f);
+		v = pq->getScaledValue();
 	}
 
 	// Interpolate handle position

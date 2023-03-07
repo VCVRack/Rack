@@ -172,7 +172,7 @@ void ParamWidget::destroyTooltip() {
 void ParamWidget::step() {
 	engine::ParamQuantity* pq = getParamQuantity();
 	if (pq) {
-		float value = pq->getSmoothValue();
+		float value = pq->getValue();
 		// Dispatch change event when the ParamQuantity value changes
 		if (value != internal->lastValue) {
 			ChangeEvent eChange;

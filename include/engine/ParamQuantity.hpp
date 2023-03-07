@@ -14,7 +14,10 @@ namespace engine {
 struct Module;
 
 
-/** A Quantity that wraps an engine::Param. */
+/** A Quantity that wraps an engine::Param.
+
+If `smoothEnabled` is true, all methods access/modify the target value of the Engine's smoothing algorithm for a Param instead of the value directly.
+*/
 struct ParamQuantity : Quantity {
 	Module* module = NULL;
 	int paramId = -1;
@@ -64,11 +67,26 @@ struct ParamQuantity : Quantity {
 	bool snapEnabled = false;
 
 	Param* getParam();
-	/** If smoothEnabled is true, requests to the engine to smoothly move to a target value each sample. */
-	void setSmoothValue(float value);
-	float getSmoothValue();
 
+	/** Deprecated. Use setValue() instead. */
+	DEPRECATED void setSmoothValue(float value);
+	/** Deprecated. Use getValue() instead. */
+	DEPRECATED float getSmoothValue();
+
+	void setDirectValue(float value);
+	float getDirectValue();
+
+	/** Sets the Param's smoothing target value, or direct value if smoothing is disabled.
+
+	Before Rack 2.3.0, this always set the Param's value directly.
+	For this behavior, use `setDirectValue()` instead.
+	*/
 	void setValue(float value) override;
+	/** Gets the Param's smoothing target value, or direct value if smoothing is disabled.
+
+	Before Rack 2.3.0, this always got the Param's value directly.
+	For this behavior, use `getDirectValue()` instead.
+	*/
 	float getValue() override;
 	float getMinValue() override;
 	float getMaxValue() override;
