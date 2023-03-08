@@ -996,6 +996,8 @@ struct MenuBar : widget::OpaqueWidget {
 	void step() override {
 		Widget::step();
 		infoLabel->box.size.x = box.size.x - infoLabel->box.pos.x - 5;
+		// Setting 50% alpha prevents Label from using the default UI theme color, so set the color manually here.
+		infoLabel->color = color::alpha(bndGetTheme()->regularTheme.textColor, 0.5);
 	}
 };
 

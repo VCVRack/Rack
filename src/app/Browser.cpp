@@ -518,7 +518,6 @@ struct Browser : widget::OpaqueWidget {
 
 		countLabel = new ui::Label;
 		countLabel->box.size.x = 100;
-		countLabel->color.a = 0.5;
 		headerLayout->addChild(countLabel);
 
 		SortButton* sortButton = new SortButton;
