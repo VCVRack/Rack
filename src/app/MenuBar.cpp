@@ -936,8 +936,6 @@ struct InfoLabel : ui::Label {
 
 		text += APP_NAME + " " + APP_EDITION_NAME + " " + APP_VERSION + " " + APP_OS_NAME + " " + APP_CPU_NAME;
 
-		color = bndGetTheme()->menuTheme.textColor;
-
 		Label::step();
 	}
 };
@@ -982,7 +980,6 @@ struct MenuBar : widget::OpaqueWidget {
 		infoLabel = new InfoLabel;
 		infoLabel->box.size.x = 600;
 		infoLabel->alignment = ui::Label::RIGHT_ALIGNMENT;
-		infoLabel->color.a = 0.5;
 		layout->addChild(infoLabel);
 	}
 
