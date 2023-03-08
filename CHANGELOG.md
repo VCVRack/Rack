@@ -2,6 +2,23 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.3.0 (2023-03-08)
+- Add "View > Themes" menu with new UI themes: light and high-contrast dark.
+- Fix file permissions resulting in error when loading certain patches.
+- Don't select modules on click when module positions are locked.
+- Fix small memory leak when pasting modules or selections.
+- Fix incorrect panel scale when moving window between screens with different scale.
+- Rack Pro
+	- Don't force MIDI output message channel to 1 in VST3 adapter. Offer all 16 channels.
+	- Fix aftertouch and polyphonic pressure on all MIDI channels in VST3 and CLAP adapters.
+- API
+	- Make `ParamQuantity::set/getValue()` set/get the Param's target value of the Engine's per-sample smoothing algorithm instead of the Param's immediate value. Add `ParamQuantity::set/getImmediateValue()`. Deprecate `ParamQuantity::set/getSmoothValue()`.
+	- Add `dsp::polyDirect()`, `dsp::polyHorner()`, and `dsp::polyEstrin()`.
+	- Rename `dsp::approxExp2_taylor5()` to `dsp::exp2_taylor5()` and improve polynomial coefficients.
+	- Add `color::lerp()`.
+	- Add `BooleanTrigger::processEvent()` and `SchmittTrigger::processEvent()`.
+	- Add `get()` helper function for `std::vector`.
+
 ### 2.2.3 (2023-01-25)
 - Place module selection nearest to mouse position when pasted and nearest to the center of the rack viewport when imported.
 - Allow custom menu items to be appended to port's context menu.
