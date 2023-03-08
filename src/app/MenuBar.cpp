@@ -487,11 +487,11 @@ struct ViewButton : MenuButton {
 		menu->addChild(knobScrollSensitivitySlider);
 
 		menu->addChild(new ui::MenuSeparator);
-		menu->addChild(createMenuLabel("Module"));
+		menu->addChild(createMenuLabel("Modules"));
 
 		menu->addChild(createBoolPtrMenuItem("Lock positions", "", &settings::lockModules));
 
-		menu->addChild(createBoolPtrMenuItem("Auto-squeeze algorithm (experimental)", "", &settings::squeezeModules));
+		menu->addChild(createBoolPtrMenuItem("Smart rearrangement", "", &settings::squeezeModules));
 	}
 };
 
