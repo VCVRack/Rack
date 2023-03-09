@@ -796,12 +796,15 @@ struct LibraryButton : MenuButton {
 		ui::Menu* menu = createMenu<LibraryMenu>();
 		menu->cornerFlags = BND_CORNER_TOP;
 		menu->box.pos = getAbsoluteOffset(math::Vec(0, box.size.y));
+
 		// Check for updates when menu is opened
-		std::thread t([&]() {
-			system::setThreadName("Library");
-			library::checkUpdates();
-		});
-		t.detach();
+		if (!settings::devMode) {
+			std::thread t([&]() {
+				system::setThreadName("Library");
+				library::checkUpdates();
+			});
+			t.detach();
+		}
 	}
 
 	void step() override {
