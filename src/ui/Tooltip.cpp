@@ -26,7 +26,14 @@ void Tooltip::step() {
 void Tooltip::draw(const DrawArgs& args) {
 	bndTooltipBackground(args.vg, 0.0, 0.0, box.size.x, box.size.y);
 	nvgTextLineHeight(args.vg, 1.2);
+
+	// Because there is no bndThemeLabel() function, temporarily replace the menu text color with tooltip text color and draw a menu label
+	BNDtheme* theme = (BNDtheme*) bndGetTheme();
+	NVGcolor menuTextColor = theme->menuTheme.textColor;
+	theme->menuTheme.textColor = theme->tooltipTheme.textColor;
 	bndMenuLabel(args.vg, 0.0, 0.0, INFINITY, box.size.y, -1, text.c_str());
+	theme->menuTheme.textColor = menuTextColor;
+
 	Widget::draw(args);
 }
 

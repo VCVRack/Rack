@@ -67,6 +67,7 @@ void setTheme(NVGcolor bg, NVGcolor fg) {
 
 	// Tooltip background
 	t.tooltipTheme.innerColor = bg;
+	t.tooltipTheme.textColor = fg;
 
 	bndSetTheme(t);
 }
