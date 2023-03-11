@@ -358,6 +358,7 @@ static const std::map<std::string, std::string> pluginSlugFallbacks = {
 	{"AudibleInstrumentsPreview", "AudibleInstruments"},
 	{"SequelSequencers", "DanielDavies"},
 	{"DelexanderVol1", "DelexandraVol1"},
+	{"VCV-Pro", "Fundamental"},
 	// {"", ""},
 };
 
