@@ -11,7 +11,7 @@
 - [Communities](https://vcvrack.com/manual/Communities)
 - [Licenses](LICENSE.md) ([HTML](LICENSE.html))
 
-## Credits
+## Acknowledgments
 
 - [Andrew Belt](https://github.com/AndrewBelt): Lead Rack developer
 - [Pyer](https://www.pyer.be/): Module design, component graphics
@@ -21,7 +21,7 @@
 - Rack plugin developers: Authorship shown on each plugin's [VCV Library](https://library.vcvrack.com/) page
 - Rack users like you: [Bug reports and feature requests](https://vcvrack.com/support)
 
-## Software libraries
+## Dependency libraries
 
 - [GLFW](https://www.glfw.org/)
 - [GLEW](http://glew.sourceforge.net/)
