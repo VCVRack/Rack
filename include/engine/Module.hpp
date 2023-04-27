@@ -152,7 +152,9 @@ struct Module {
 	template <class TSwitchQuantity = SwitchQuantity>
 	TSwitchQuantity* configSwitch(int paramId, float minValue, float maxValue, float defaultValue, std::string name = "", std::vector<std::string> labels = {}) {
 		TSwitchQuantity* sq = configParam<TSwitchQuantity>(paramId, minValue, maxValue, defaultValue, name);
-		sq->labels = labels;
+		sq->ParamQuantity::snapEnabled = true;
+		sq->ParamQuantity::smoothEnabled = false;
+		sq->SwitchQuantity::labels = labels;
 		return sq;
 	}
 
@@ -162,7 +164,9 @@ struct Module {
 	template <class TSwitchQuantity = SwitchQuantity>
 	TSwitchQuantity* configButton(int paramId, std::string name = "") {
 		TSwitchQuantity* sq = configParam<TSwitchQuantity>(paramId, 0.f, 1.f, 0.f, name);
-		sq->randomizeEnabled = false;
+		sq->ParamQuantity::snapEnabled = true;
+		sq->ParamQuantity::smoothEnabled = false;
+		sq->ParamQuantity::randomizeEnabled = false;
 		return sq;
 	}
 
