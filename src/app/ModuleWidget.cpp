@@ -990,6 +990,12 @@ void ModuleWidget::createContextMenu() {
 	// Info
 	menu->addChild(createSubmenuItem("Info", "", [=](ui::Menu* menu) {
 		model->appendContextMenu(menu);
+
+		if (!weakThis)
+			return;
+		menu->addChild(new ui::MenuSeparator);
+		menu->addChild(createMenuLabel("Module instance ID:"));
+		menu->addChild(createMenuLabel(string::f("%lld", (long long) weakThis->module->getId())));
 	}));
 
 	// Preset
