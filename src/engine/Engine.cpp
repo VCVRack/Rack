@@ -244,7 +244,7 @@ struct Engine::Internal {
 };
 
 
-static void Engine_updateExpander_NoLock(Engine* that, Module* module, bool side) {
+static void Engine_updateExpander_NoLock(Engine* that, Module* module, uint8_t side) {
 	Module::Expander& expander = side ? module->rightExpander : module->leftExpander;
 	Module* oldExpanderModule = expander.module;
 

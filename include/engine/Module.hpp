@@ -309,7 +309,7 @@ struct Module {
 		return rightExpander;
 	}
 	/** Returns the left Expander for `side = 0` and the right Expander for `side = 1`. */
-	Expander& getExpander(int side) {
+	Expander& getExpander(uint8_t side) {
 		return side ? rightExpander : leftExpander;
 	}
 
@@ -420,8 +420,8 @@ struct Module {
 	}
 
 	struct ExpanderChangeEvent {
-		/** False for left, true for right. */
-		bool side;
+		/** 0 for left, 1 for right. */
+		uint8_t side;
 	};
 	/** Called after an expander is added, removed, or changed on either the left or right side of the Module.
 	*/
