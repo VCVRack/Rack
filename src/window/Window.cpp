@@ -358,6 +358,7 @@ Window::Window() {
 
 	if (APP->scene) {
 		widget::Widget::ContextCreateEvent e;
+		e.vg = vg;
 		APP->scene->onContextCreate(e);
 	}
 }
@@ -366,6 +367,7 @@ Window::Window() {
 Window::~Window() {
 	if (APP->scene) {
 		widget::Widget::ContextDestroyEvent e;
+		e.vg = vg;
 		APP->scene->onContextDestroy(e);
 	}
 
