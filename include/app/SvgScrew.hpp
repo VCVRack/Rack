@@ -22,5 +22,15 @@ struct SvgScrew : widget::Widget {
 DEPRECATED typedef SvgScrew SVGScrew;
 
 
+struct ThemedSvgScrew : SvgScrew {
+	std::shared_ptr<window::Svg> lightSvg;
+	std::shared_ptr<window::Svg> darkSvg;
+
+	void step() override;
+	void setSvg(std::shared_ptr<window::Svg> lightSvg, std::shared_ptr<window::Svg> darkSvg);
+};
+
+
+
 } // namespace app
 } // namespace rack

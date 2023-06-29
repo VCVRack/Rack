@@ -65,9 +65,20 @@ TWidget* createWidgetCentered(math::Vec pos) {
 }
 
 
-inline app::SvgPanel* createPanel(std::string svgPath) {
-	app::SvgPanel* panel = new app::SvgPanel;
+/** Creates an SvgPanel and loads the SVG from the given path. */
+template <class TPanel = app::SvgPanel>
+TPanel* createPanel(std::string svgPath) {
+	TPanel* panel = new TPanel;
 	panel->setBackground(window::Svg::load(svgPath));
+	return panel;
+}
+
+
+/** Creates a ThemedSvgPanel and loads the light/dark SVGs from the given paths. */
+template <class TPanel = app::ThemedSvgPanel>
+TPanel* createPanel(std::string lightSvgPath, std::string darkSvgPath) {
+	TPanel* panel = new TPanel;
+	panel->setBackground(window::Svg::load(lightSvgPath), window::Svg::load(darkSvgPath));
 	return panel;
 }
 

@@ -43,6 +43,7 @@ bool tooltips = true;
 bool cpuMeter = false;
 bool lockModules = false;
 bool squeezeModules = true;
+bool preferDarkPanels = false;
 #if defined ARCH_MAC
 	// Most Mac GPUs can't handle rendering the screen every frame, so use 30 Hz by default.
 	float frameRateLimit = 30.f;
@@ -161,6 +162,8 @@ json_t* toJson() {
 	json_object_set_new(rootJ, "lockModules", json_boolean(lockModules));
 
 	json_object_set_new(rootJ, "squeezeModules", json_boolean(squeezeModules));
+
+	json_object_set_new(rootJ, "preferDarkPanels", json_boolean(preferDarkPanels));
 
 	json_object_set_new(rootJ, "frameRateLimit", json_real(frameRateLimit));
 
@@ -354,6 +357,10 @@ void fromJson(json_t* rootJ) {
 	json_t* squeezeModulesJ = json_object_get(rootJ, "squeezeModules");
 	if (squeezeModulesJ)
 		squeezeModules = json_boolean_value(squeezeModulesJ);
+
+	json_t* preferDarkPanelsJ = json_object_get(rootJ, "preferDarkPanels");
+	if (preferDarkPanelsJ)
+		preferDarkPanels = json_boolean_value(preferDarkPanelsJ);
 
 	// Legacy setting in Rack <2.2
 	json_t* frameSwapIntervalJ = json_object_get(rootJ, "frameSwapInterval");

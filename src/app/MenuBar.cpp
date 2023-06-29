@@ -492,6 +492,8 @@ struct ViewButton : MenuButton {
 		menu->addChild(createBoolPtrMenuItem("Lock positions", "", &settings::lockModules));
 
 		menu->addChild(createBoolPtrMenuItem("Smart rearrangement", "", &settings::squeezeModules));
+
+		menu->addChild(createBoolPtrMenuItem("Prefer dark panels", "", &settings::preferDarkPanels));
 	}
 };
 

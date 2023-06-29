@@ -984,6 +984,13 @@ struct ScrewBlack : app::SvgScrew {
 	}
 };
 
+struct ThemedScrew : app::ThemedSvgScrew {
+	ThemedScrew() {
+		setSvg(Svg::load(asset::system("res/ComponentLibrary/ScrewSilver.svg")), Svg::load(asset::system("res/ComponentLibrary/ScrewBlack.svg")));
+	}
+};
+
+
 struct SegmentDisplay : widget::Widget {
 	int lightsLen = 0;
 	bool vertical = false;

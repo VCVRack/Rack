@@ -30,5 +30,14 @@ struct SvgPanel : widget::Widget {
 DEPRECATED typedef SvgPanel SVGPanel;
 
 
+struct ThemedSvgPanel : SvgPanel {
+	std::shared_ptr<window::Svg> lightSvg;
+	std::shared_ptr<window::Svg> darkSvg;
+
+	void step() override;
+	void setBackground(std::shared_ptr<window::Svg> lightSvg, std::shared_ptr<window::Svg> darkSvg);
+};
+
+
 } // namespace app
 } // namespace rack
