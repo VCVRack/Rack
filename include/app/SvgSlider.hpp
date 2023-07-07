@@ -30,7 +30,7 @@ struct SvgSlider : app::SliderKnob {
 		setBackgroundSvg(svg);
 	}
 	DEPRECATED void setHandleSVG(std::shared_ptr<window::Svg> svg) {
-		setBackgroundSvg(svg);
+		setHandleSvg(svg);
 	}
 	DEPRECATED void setSVGs(std::shared_ptr<window::Svg> backgroundSvg, std::shared_ptr<window::Svg> handleSvg) {
 		setBackgroundSvg(backgroundSvg);
