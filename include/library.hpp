@@ -13,6 +13,8 @@ struct UpdateInfo {
 	std::string name;
 	std::string version;
 	std::string changelogUrl;
+	/** Only defined if plugin does not meet Rack version requirement */
+	std::string minRackVersion;
 	bool downloaded = false;
 };
 

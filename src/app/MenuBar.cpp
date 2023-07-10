@@ -664,25 +664,36 @@ struct SyncUpdateItem : ui::MenuItem {
 			return NULL;
 		library::UpdateInfo update = it->second;
 
-		if (update.changelogUrl == "")
-			return NULL;
-
 		ui::Menu* menu = new ui::Menu;
 
-		std::string changelogUrl = update.changelogUrl;
-		menu->addChild(createMenuItem("Changelog", "", [=]() {
-			system::openBrowser(changelogUrl);
-		}));
+		if (update.minRackVersion != "") {
+			menu->addChild(createMenuLabel(string::f("Requires Rack %s+", update.minRackVersion.c_str())));
+		}
 
+		if (update.changelogUrl != "") {
+			std::string changelogUrl = update.changelogUrl;
+			menu->addChild(createMenuItem("Changelog", "", [=]() {
+				system::openBrowser(changelogUrl);
+			}));
+		}
+
+		if (menu->children.empty()) {
+			delete menu;
+			return NULL;
+		}
 		return menu;
 	}
 
 	void step() override {
-		disabled = library::isSyncing;
+		if (library::isSyncing)
+			disabled = true;
 
 		auto it = library::updateInfos.find(slug);
 		if (it != library::updateInfos.end()) {
 			library::UpdateInfo update = it->second;
+
+			if (update.minRackVersion != "")
+				disabled = true;
 
 			if (update.downloaded) {
 				rightText = CHECKMARK_STRING;

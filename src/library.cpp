@@ -12,6 +12,7 @@
 #include <asset.hpp>
 #include <settings.hpp>
 #include <plugin.hpp>
+#include <string.hpp>
 
 
 namespace rack {
@@ -278,6 +279,16 @@ void checkUpdates() {
 		if (changelogUrlJ)
 			update.changelogUrl = json_string_value(changelogUrlJ);
 
+		// Get minRackVersion
+		json_t* minRackVersionJ = json_object_get(manifestJ, "minRackVersion");
+		if (minRackVersionJ) {
+			std::string minRackVersion = json_string_value(minRackVersionJ);
+			// Check that Rack version is at least minRackVersion
+			if (string::Version(APP_VERSION) < string::Version(minRackVersion)) {
+				update.minRackVersion = minRackVersion;
+			}
+		}
+
 		// Add update to updates map
 		updateInfos[pluginSlug] = update;
 	}
@@ -348,6 +359,10 @@ void syncUpdate(std::string slug) {
 	if (it == updateInfos.end())
 		return;
 	UpdateInfo update = it->second;
+
+	// Don't update if not compatible with Rack version
+	if (update.minRackVersion != "")
+		return;
 
 	updateSlug = slug;
 	DEFER({updateSlug = "";});
