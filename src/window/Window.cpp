@@ -564,6 +564,11 @@ void Window::screenshot(const std::string& screenshotPath) {
 
 
 void Window::screenshotModules(const std::string& screenshotsDir, float zoom) {
+	// Disable preferDarkPanels
+	bool preferDarkPanels = settings::preferDarkPanels;
+	settings::preferDarkPanels = false;
+	DEFER({settings::preferDarkPanels = preferDarkPanels;});
+
 	// Iterate plugins and create directories
 	system::createDirectories(screenshotsDir);
 	for (plugin::Plugin* p : plugin::plugins) {
