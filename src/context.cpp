@@ -48,7 +48,6 @@ Context::~Context() {
 static thread_local Context* threadContext = NULL;
 
 Context* contextGet() {
-	assert(threadContext);
 	return threadContext;
 }
 
