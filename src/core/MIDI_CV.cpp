@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 
 #include "plugin.hpp"
 
@@ -40,6 +41,7 @@ struct MIDI_CV : Module {
 	bool smooth;
 	int clockDivision;
 	int channels;
+	int channelsUnison;
 	enum PolyMode {
 		ROTATE_MODE,
 		REUSE_MODE,
@@ -54,7 +56,10 @@ struct MIDI_CV : Module {
 	bool pedal;
 	// Indexed by channel
 	uint8_t notes[16];
+	uint8_t unisonIndecies[16];
 	bool gates[16];
+	bool gatesForceGap[16];
+	bool gateForceGaps;
 	uint8_t velocities[16];
 	uint8_t aftertouches[16];
 	std::vector<uint8_t> heldNotes;
@@ -90,8 +95,10 @@ struct MIDI_CV : Module {
 		configOutput(CLOCK_OUTPUT, "Clock");
 		configOutput(CLOCK_DIV_OUTPUT, "Clock divider");
 		configOutput(START_OUTPUT, "Start trigger");
-		configOutput(STOP_OUTPUT, "Stop trigger");
-		configOutput(CONTINUE_OUTPUT, "Continue trigger");
+		configOutput(STOP_OUTPUT, "Unison CV");
+		configOutput(CONTINUE_OUTPUT, "Voice CV");
+		// configOutput(STOP_OUTPUT, "Stop trigger");
+		// configOutput(CONTINUE_OUTPUT, "Continue trigger");
 		heldNotes.reserve(128);
 		for (int c = 0; c < 16; c++) {
 			pwFilters[c].setTau(1 / 30.f);
@@ -103,18 +110,22 @@ struct MIDI_CV : Module {
 	void onReset() override {
 		smooth = true;
 		channels = 1;
+		channelsUnison = 1;
 		polyMode = ROTATE_MODE;
 		pwRange = 2;
 		clockDivision = 24;
 		panic();
 		midiInput.reset();
+		gateForceGaps = true;
 	}
 
 	/** Resets performance state */
 	void panic() {
 		for (int c = 0; c < 16; c++) {
 			notes[c] = 60;
+			unisonIndecies[c] = 0;
 			gates[c] = false;
+			gatesForceGap[c] = false;
 			velocities[c] = 0;
 			aftertouches[c] = 0;
 			pws[c] = 8192;
@@ -125,6 +136,17 @@ struct MIDI_CV : Module {
 		pedal = false;
 		rotateIndex = -1;
 		heldNotes.clear();
+	}
+
+	float channelUnisonTransformBi(int index, float scale)
+	{
+		if (channelsUnison == 1) return 0;
+		return 10.f*float(index)*scale - 5.f;
+	}
+	float channelTransformBi(int index, float scale)
+	{
+		if (channels == 1) return 0;
+		return 10.f*float(index)*scale - 5.f;
 	}
 
 	void process(const ProcessArgs& args) override {
@@ -163,22 +185,29 @@ struct MIDI_CV : Module {
 		outputs[VELOCITY_OUTPUT].setChannels(channels);
 		outputs[AFTERTOUCH_OUTPUT].setChannels(channels);
 		outputs[RETRIGGER_OUTPUT].setChannels(channels);
+		outputs[STOP_OUTPUT].setChannels(channels);
+		outputs[CONTINUE_OUTPUT].setChannels(channels);
+		const float channelUnisonScale = 1.f/float(channelsUnison == 1 ? 1 : channelsUnison - 1);
+		const float channelScale = 1.f/float(channels == 1 ? 1 : channels - 1);
 		for (int c = 0; c < channels; c++) {
 			float pw = pwValues[(polyMode == MPE_MODE) ? c : 0];
 			float pitch = (notes[c] - 60.f + pw * pwRange) / 12.f;
 			outputs[PITCH_OUTPUT].setVoltage(pitch, c);
-			outputs[GATE_OUTPUT].setVoltage(gates[c] ? 10.f : 0.f, c);
+			outputs[GATE_OUTPUT].setVoltage(gates[c] && !gatesForceGap[c] ? 10.f : 0.f, c);
 			outputs[VELOCITY_OUTPUT].setVoltage(rescale(velocities[c], 0, 127, 0.f, 10.f), c);
 			outputs[AFTERTOUCH_OUTPUT].setVoltage(rescale(aftertouches[c], 0, 127, 0.f, 10.f), c);
 			outputs[RETRIGGER_OUTPUT].setVoltage(retriggerPulses[c].process(args.sampleTime) ? 10.f : 0.f, c);
+			outputs[STOP_OUTPUT].setVoltage(channelUnisonTransformBi(unisonIndecies[c], channelUnisonScale), c);
+			outputs[CONTINUE_OUTPUT].setVoltage(channelTransformBi(c, channelScale), c);
+			gatesForceGap[c] = false;
 		}
 
 		// Set clock and transport outputs
 		outputs[CLOCK_OUTPUT].setVoltage(clockPulse.process(args.sampleTime) ? 10.f : 0.f);
 		outputs[CLOCK_DIV_OUTPUT].setVoltage(clockDividerPulse.process(args.sampleTime) ? 10.f : 0.f);
 		outputs[START_OUTPUT].setVoltage(startPulse.process(args.sampleTime) ? 10.f : 0.f);
-		outputs[STOP_OUTPUT].setVoltage(stopPulse.process(args.sampleTime) ? 10.f : 0.f);
-		outputs[CONTINUE_OUTPUT].setVoltage(continuePulse.process(args.sampleTime) ? 10.f : 0.f);
+		//outputs[STOP_OUTPUT].setVoltage(stopPulse.process(args.sampleTime) ? 10.f : 0.f);
+		//outputs[CONTINUE_OUTPUT].setVoltage(continuePulse.process(args.sampleTime) ? 10.f : 0.f);
 	}
 
 	void processMessage(const midi::Message& msg) {
@@ -192,9 +221,13 @@ struct MIDI_CV : Module {
 			// note on
 			case 0x9: {
 				if (msg.getValue() > 0) {
-					int c = msg.getChannel();
-					pressNote(msg.getNote(), &c);
-					velocities[c] = msg.getValue();
+					int midiChannel = msg.getChannel();
+					auto indicies = pressNote(msg.getNote(), midiChannel);
+					for (int u=0; (u < channelsUnison) && (indicies[u] >= 0); u++)
+					{
+						uint8_t c = indicies[u];
+						velocities[c] = msg.getValue();
+					}
 				}
 				else {
 					// For some reason, some keyboards send a "note on" event with a velocity of 0 to signal that the key has been released.
@@ -295,15 +328,15 @@ struct MIDI_CV : Module {
 		}
 	}
 
-	int assignChannel(uint8_t note) {
-		if (channels == 1)
-			return 0;
+	int assignChannel(uint8_t note, uint8_t unisonIndex) {
+		if (channels == channelsUnison)
+			return unisonIndex;
 
 		switch (polyMode) {
 			case REUSE_MODE: {
 				// Find channel with the same note
 				for (int c = 0; c < channels; c++) {
-					if (notes[c] == note)
+					if ((notes[c] == note) && (unisonIndecies[c] == unisonIndex))
 						return c;
 				}
 			} // fallthrough
@@ -341,7 +374,9 @@ struct MIDI_CV : Module {
 		}
 	}
 
-	void pressNote(uint8_t note, int* channel) {
+	std::array<uint8_t, 17> pressNote(uint8_t note, int midiChannel) {
+		std::array<uint8_t, 17> indicies;
+		indicies[0] = -1;
 		// Remove existing similar note
 		auto it = std::find(heldNotes.begin(), heldNotes.end(), note);
 		if (it != heldNotes.end())
@@ -350,15 +385,32 @@ struct MIDI_CV : Module {
 		heldNotes.push_back(note);
 		// Determine actual channel
 		if (polyMode == MPE_MODE) {
+			// need to handle this case as well to allow for unison
 			// Channel is already decided for us
+			// Set note
+			uint8_t c = midiChannel;
+			indicies[0] = c;
+			indicies[1] = -1;
+			notes[c] = note;
+			gates[c] = true;
+			unisonIndecies[c] = c % channelsUnison;
+			retriggerPulses[c].trigger(1e-3);
 		}
 		else {
-			*channel = assignChannel(note);
+			for (int u = 0; u < channelsUnison; u++)
+			{
+				uint8_t c = assignChannel(note, u);
+				//uint8_t c = u;
+				indicies[u] = c;
+				// Set note
+				notes[c] = note;
+				gates[c] = true;
+				unisonIndecies[c] = u;
+				retriggerPulses[c].trigger(1e-3);
+			}
+			indicies[channelsUnison] = -1;
 		}
-		// Set note
-		notes[*channel] = note;
-		gates[*channel] = true;
-		retriggerPulses[*channel].trigger(1e-3);
+		return indicies;
 	}
 
 	void releaseNote(uint8_t note) {
@@ -373,15 +425,21 @@ struct MIDI_CV : Module {
 		for (int c = 0; c < channels; c++) {
 			if (notes[c] == note) {
 				gates[c] = false;
+				// this will stay low even when gates[c] = true
+				// is set by a note on before the gate is sent as low
+				gatesForceGap[c] = gateForceGaps;
 			}
 		}
 		// Set last note if monophonic
-		if (channels == 1) {
+		if (channels == channelsUnison) {
 			if (note == notes[0] && !heldNotes.empty()) {
 				uint8_t lastNote = heldNotes.back();
-				notes[0] = lastNote;
-				gates[0] = true;
-				return;
+				for (int u = 0; u < channelsUnison; u++)
+				{
+					uint8_t c = unisonIndecies[u];
+					notes[c] = lastNote;
+					gates[c] = true;
+				}
 			}
 		}
 	}
@@ -397,10 +455,14 @@ struct MIDI_CV : Module {
 			return;
 		pedal = false;
 		// Set last note if monophonic
-		if (channels == 1) {
+		if (channels == channelsUnison) {
 			if (!heldNotes.empty()) {
 				uint8_t lastNote = heldNotes.back();
-				notes[0] = lastNote;
+				for (int u = 0; u < channelsUnison; u++)
+				{
+					uint8_t c = unisonIndecies[u];
+					notes[c] = lastNote;
+				}
 			}
 		}
 		// Clear notes that are not held if polyphonic
@@ -412,11 +474,17 @@ struct MIDI_CV : Module {
 				for (uint8_t note : heldNotes) {
 					if (notes[c] == note) {
 						gates[c] = true;
-						break;
 					}
 				}
 			}
 		}
+	}
+
+	void setUnisonChannels(int channelsUnison) {
+		if (channelsUnison == this->channelsUnison)
+			return;
+		this->channelsUnison = channelsUnison;
+		panic();
 	}
 
 	void setChannels(int channels) {
@@ -438,6 +506,7 @@ struct MIDI_CV : Module {
 		json_object_set_new(rootJ, "pwRange", json_real(pwRange));
 		json_object_set_new(rootJ, "smooth", json_boolean(smooth));
 		json_object_set_new(rootJ, "channels", json_integer(channels));
+		json_object_set_new(rootJ, "channelsUnison", json_integer(channelsUnison));
 		json_object_set_new(rootJ, "polyMode", json_integer(polyMode));
 		json_object_set_new(rootJ, "clockDivision", json_integer(clockDivision));
 		// Saving/restoring pitch and mod doesn't make much sense for MPE.
@@ -464,6 +533,10 @@ struct MIDI_CV : Module {
 		json_t* channelsJ = json_object_get(rootJ, "channels");
 		if (channelsJ)
 			setChannels(json_integer_value(channelsJ));
+
+		json_t* channelsUnisonJ = json_object_get(rootJ, "channelsUnison");
+		if (channelsUnisonJ)
+			setChannels(json_integer_value(channelsUnisonJ));
 
 		json_t* polyModeJ = json_object_get(rootJ, "polyMode");
 		if (polyModeJ)
@@ -560,6 +633,15 @@ struct MIDI_CVWidget : ModuleWidget {
 			}
 		}));
 
+		menu->addChild(createSubmenuItem("Unison channels", string::f("%d", module->channelsUnison), [=](Menu* menu) {
+			for (int u = 1; u <= 16; u++) {
+				menu->addChild(createCheckMenuItem((u == 1) ? "1 (Off)" : string::f("%d", u), "",
+					[=]() {return module->channelsUnison == u;},
+					[=]() {module->setUnisonChannels(u);}
+				));
+			}
+		}));
+
 		menu->addChild(createSubmenuItem("Polyphony channels", string::f("%d", module->channels), [=](Menu* menu) {
 			for (int c = 1; c <= 16; c++) {
 				menu->addChild(createCheckMenuItem((c == 1) ? "Monophonic" : string::f("%d", c), "",
@@ -575,6 +657,8 @@ struct MIDI_CVWidget : ModuleWidget {
 			"Reset",
 			"MPE",
 		}, &module->polyMode));
+
+		menu->addChild(createBoolPtrMenuItem("Gate force gaps", "", &module->gateForceGaps));
 
 		menu->addChild(createMenuItem("Panic", "",
 			[=]() {module->panic();}
