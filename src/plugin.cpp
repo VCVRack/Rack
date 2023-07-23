@@ -103,14 +103,7 @@ static InitCallback loadPluginCallback(Plugin* plugin) {
 	libraryExt = "dylib";
 #endif
 
-#if defined ARCH_X64
-	// Use `plugin.EXT` on x64 for backward compatibility.
-	// Change to `plugin-OS-CPU.EXT` in Rack 3.
 	std::string libraryFilename = "plugin." + libraryExt;
-#else
-	// Use `plugin-CPU.EXT` on other CPUs like ARM64
-	std::string libraryFilename = "plugin-" + APP_CPU + "." + libraryExt;
-#endif
 	std::string libraryPath = system::join(plugin->path, libraryFilename);
 
 	// Check file existence
@@ -260,9 +253,14 @@ void init() {
 	// Load Core
 	loadPlugin("");
 
-	pluginsPath = asset::user("plugins");
-
 	// Get user plugins directory
+	pluginsPath = asset::user("plugins");
+	// Use `plugins-CPU` dir on non-x64 platforms
+#if !defined ARCH_X64
+	if (!settings::devMode) {
+		pluginsPath += "-" + APP_CPU;
+	}
+#endif
 	system::createDirectory(pluginsPath);
 
 	// Don't load plugins if safe mode is enabled
