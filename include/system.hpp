@@ -167,7 +167,7 @@ void setThreadName(const std::string& name);
 /** Returns the caller's human-readable stack trace with "\n"-separated lines. */
 std::string getStackTrace();
 /** Returns the number of seconds since application launch.
-Gives the most precise (fine-grained) time differences available on the OS for benchmarking purposes, while being fast to compute.
+Gives the most precise (fine-grained) monotonic (non-decreasing) time differences available on the OS for benchmarking purposes, while being fast to compute.
 */
 double getTime();
 /** Returns time since 1970-01-01 00:00:00 UTC in seconds.
