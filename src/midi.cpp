@@ -1,6 +1,6 @@
 #include <map>
 #include <utility>
-#include <queue>
+#include <deque>
 #include <mutex>
 
 #include <midi.hpp>
@@ -288,30 +288,13 @@ std::vector<int> Input::getChannels() {
 
 static const size_t InputQueue_maxSize = 8192;
 
-struct InputQueue_Compare {
-	bool operator()(const Message& a, const Message& b) {
-		return a.getFrame() > b.getFrame();
-	}
-};
-
-struct InputQueue_Queue : std::priority_queue<Message, std::vector<Message>, InputQueue_Compare> {
-	void reserve(size_t capacity) {
-		c.reserve(capacity);
-	}
-	void clear() {
-		// Messing with the protected container is dangerous, but completely clearing it should be fine.
-		c.clear();
-	}
-};
-
 struct InputQueue::Internal {
-	InputQueue_Queue queue;
+	std::deque<Message> queue;
 	std::mutex mutex;
 };
 
 InputQueue::InputQueue() {
 	internal = new Internal;
-	internal->queue.reserve(InputQueue_maxSize);
 }
 
 InputQueue::~InputQueue() {
@@ -323,19 +306,28 @@ void InputQueue::onMessage(const Message& message) {
 	// Reject MIDI message if queue is full
 	if (internal->queue.size() >= InputQueue_maxSize)
 		return;
+	// Message timestamp must be monotonically increasing, otherwise clear the queue.
+	if (!internal->queue.empty() && message.getFrame() < internal->queue.back().getFrame()) {
+		internal->queue.clear();
+	}
 	// Push to queue
-	internal->queue.push(message);
+	internal->queue.push_back(message);
 }
 
 bool InputQueue::tryPop(Message* messageOut, int64_t maxFrame) {
+	// Check if queue is empty before locking, to avoid frequent unnecessary locking
 	if (internal->queue.empty())
 		return false;
 
 	std::lock_guard<std::mutex> lock(internal->mutex);
-	const Message& msg = internal->queue.top();
-	if (msg.getFrame() <= maxFrame) {
-		*messageOut = msg;
-		internal->queue.pop();
+
+	if (internal->queue.empty())
+		return false;
+
+	const Message& message = internal->queue.front();
+	if (message.getFrame() <= maxFrame) {
+		*messageOut = message;
+		internal->queue.pop_front();
 		return true;
 	}
 
