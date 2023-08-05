@@ -785,6 +785,12 @@ struct PJ301MPort : app::SvgPort {
 	}
 };
 
+struct ThemedPJ301MPort : app::ThemedSvgPort {
+	ThemedPJ301MPort() {
+		setSvg(Svg::load(asset::system("res/ComponentLibrary/PJ301M.svg")), Svg::load(asset::system("res/ComponentLibrary/PJ301M-dark.svg")));
+	}
+};
+
 struct PJ3410Port : app::SvgPort {
 	PJ3410Port() {
 		setSvg(Svg::load(asset::system("res/ComponentLibrary/PJ3410.svg")));
