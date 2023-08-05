@@ -35,10 +35,6 @@ void SvgKnob::setSvg(std::shared_ptr<window::Svg> svg) {
 	// shadow->box = shadow->box.grow(math::Vec(2, 2));
 
 	fb->setDirty();
-
-	// Dispatch ChangeEvent
-	ChangeEvent eChange;
-	onChange(eChange);
 }
 
 void SvgKnob::onChange(const ChangeEvent& e) {

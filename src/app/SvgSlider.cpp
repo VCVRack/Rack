@@ -27,10 +27,6 @@ void SvgSlider::setBackgroundSvg(std::shared_ptr<window::Svg> svg) {
 	box.size = background->box.size;
 	fb->box.size = background->box.size;
 	fb->setDirty();
-
-	// Dispatch ChangeEvent
-	ChangeEvent eChange;
-	onChange(eChange);
 }
 
 
@@ -41,20 +37,12 @@ void SvgSlider::setHandleSvg(std::shared_ptr<window::Svg> svg) {
 	handle->setSvg(svg);
 	handle->box.pos = minHandlePos;
 	fb->setDirty();
-
-	// Dispatch ChangeEvent
-	ChangeEvent eChange;
-	onChange(eChange);
 }
 
 
 void SvgSlider::setHandlePos(math::Vec minHandlePos, math::Vec maxHandlePos) {
 	this->minHandlePos = minHandlePos;
 	this->maxHandlePos = maxHandlePos;
-
-	// Dispatch ChangeEvent
-	ChangeEvent eChange;
-	onChange(eChange);
 }
 
 
