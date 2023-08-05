@@ -3,6 +3,7 @@
 #include <widget/Widget.hpp>
 #include <widget/FramebufferWidget.hpp>
 #include <widget/SvgWidget.hpp>
+#include <settings.hpp>
 
 
 namespace rack {
@@ -26,8 +27,16 @@ struct ThemedSvgScrew : SvgScrew {
 	std::shared_ptr<window::Svg> lightSvg;
 	std::shared_ptr<window::Svg> darkSvg;
 
-	void step() override;
-	void setSvg(std::shared_ptr<window::Svg> lightSvg, std::shared_ptr<window::Svg> darkSvg);
+	void setSvg(std::shared_ptr<window::Svg> lightSvg, std::shared_ptr<window::Svg> darkSvg) {
+		this->lightSvg = lightSvg;
+		this->darkSvg = darkSvg;
+		SvgScrew::setSvg(settings::preferDarkPanels ? darkSvg : lightSvg);
+	}
+
+	void step() override {
+		SvgScrew::setSvg(settings::preferDarkPanels ? darkSvg : lightSvg);
+		SvgScrew::step();
+	}
 };
 
 

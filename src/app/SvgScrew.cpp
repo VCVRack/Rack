@@ -20,23 +20,10 @@ void SvgScrew::setSvg(std::shared_ptr<window::Svg> svg) {
 		return;
 
 	sw->setSvg(svg);
-	fb->setDirty();
-
 	fb->box.size = sw->box.size;
 	box.size = sw->box.size;
-}
 
-
-void ThemedSvgScrew::step() {
-	SvgScrew::setSvg(settings::preferDarkPanels ? darkSvg : lightSvg);
-	SvgScrew::step();
-}
-
-
-void ThemedSvgScrew::setSvg(std::shared_ptr<window::Svg> lightSvg, std::shared_ptr<window::Svg> darkSvg) {
-	this->lightSvg = lightSvg;
-	this->darkSvg = darkSvg;
-	SvgScrew::setSvg(settings::preferDarkPanels ? darkSvg : lightSvg);
+	fb->setDirty();
 }
 
 

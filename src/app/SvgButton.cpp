@@ -39,6 +39,7 @@ void SvgButton::addFrame(std::shared_ptr<window::Svg> svg) {
 		// Move shadow downward by 10%
 		shadow->box.size = sw->box.size;
 		shadow->box.pos = math::Vec(0, sw->box.size.y * 0.10);
+		fb->setDirty();
 	}
 }
 
@@ -49,7 +50,7 @@ void SvgButton::onDragStart(const DragStartEvent& e) {
 
 	if (frames.size() >= 2) {
 		sw->setSvg(frames[1]);
-		fb->dirty = true;
+		fb->setDirty();
 	}
 }
 
@@ -57,7 +58,7 @@ void SvgButton::onDragStart(const DragStartEvent& e) {
 void SvgButton::onDragEnd(const DragEndEvent& e) {
 	if (frames.size() >= 1) {
 		sw->setSvg(frames[0]);
-		fb->dirty = true;
+		fb->setDirty();
 	}
 }
 

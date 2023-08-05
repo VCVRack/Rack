@@ -20,14 +20,18 @@ SvgPort::SvgPort() {
 }
 
 void SvgPort::setSvg(std::shared_ptr<window::Svg> svg) {
+	if (svg == sw->svg)
+		return;
+
 	sw->setSvg(svg);
 	fb->box.size = sw->box.size;
 	box.size = sw->box.size;
+
 	// Move shadow downward by 10%
 	shadow->box.size = sw->box.size;
 	shadow->box.pos = math::Vec(0, sw->box.size.y * 0.10);
 
-	fb->dirty = true;
+	fb->setDirty();
 }
 
 

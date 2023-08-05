@@ -1,5 +1,5 @@
 #include <app/SvgPanel.hpp>
-#include <settings.hpp>
+#include <context.hpp>
 
 
 namespace rack {
@@ -40,31 +40,20 @@ void SvgPanel::step() {
 	Widget::step();
 }
 
+
 void SvgPanel::setBackground(std::shared_ptr<window::Svg> svg) {
 	if (svg == this->svg)
 		return;
 	this->svg = svg;
 
 	sw->setSvg(svg);
-	fb->setDirty();
 
 	// Round framebuffer size to nearest grid
 	fb->box.size = sw->box.size.div(RACK_GRID_SIZE).round().mult(RACK_GRID_SIZE);
 	panelBorder->box.size = fb->box.size;
 	box.size = fb->box.size;
-}
 
-
-void ThemedSvgPanel::step() {
-	SvgPanel::setBackground(settings::preferDarkPanels ? darkSvg : lightSvg);
-	SvgPanel::step();
-}
-
-
-void ThemedSvgPanel::setBackground(std::shared_ptr<window::Svg> lightSvg, std::shared_ptr<window::Svg> darkSvg) {
-	this->lightSvg = lightSvg;
-	this->darkSvg = darkSvg;
-	SvgPanel::setBackground(settings::preferDarkPanels ? darkSvg : lightSvg);
+	fb->setDirty();
 }
 
 

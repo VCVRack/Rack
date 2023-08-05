@@ -21,14 +21,24 @@ SvgKnob::SvgKnob() {
 }
 
 void SvgKnob::setSvg(std::shared_ptr<window::Svg> svg) {
+	if (svg == sw->svg)
+		return;
+
 	sw->setSvg(svg);
 	tw->box.size = sw->box.size;
 	fb->box.size = sw->box.size;
 	box.size = sw->box.size;
+
 	shadow->box.size = sw->box.size;
 	// Move shadow downward by 10%
 	shadow->box.pos = math::Vec(0, sw->box.size.y * 0.10);
 	// shadow->box = shadow->box.grow(math::Vec(2, 2));
+
+	fb->setDirty();
+
+	// Dispatch ChangeEvent
+	ChangeEvent eChange;
+	onChange(eChange);
 }
 
 void SvgKnob::onChange(const ChangeEvent& e) {
@@ -56,7 +66,7 @@ void SvgKnob::onChange(const ChangeEvent& e) {
 		tw->translate(center);
 		tw->rotate(angle);
 		tw->translate(center.neg());
-		fb->dirty = true;
+		fb->setDirty();
 	}
 	Knob::onChange(e);
 }
