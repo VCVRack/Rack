@@ -774,6 +774,10 @@ struct LibraryMenu : ui::Menu {
 				library::logOut();
 			}));
 
+			addChild(createMenuItem("Account settings", "", [=]() {
+				system::openBrowser("https://vcvrack.com/account");
+			}));
+
 			addChild(createMenuItem("Browse VCV Library", "", [=]() {
 				system::openBrowser("https://library.vcvrack.com/");
 			}));
