@@ -179,12 +179,12 @@ struct Gate_MIDI : Module {
 struct Gate_MIDIWidget : ModuleWidget {
 	Gate_MIDIWidget(Gate_MIDI* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/Gate_MIDI.svg")));
+		setPanel(createPanel(asset::system("res/Core/Gate_MIDI.svg"), asset::system("res/Core/Gate_MIDI-dark.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 78.431)), module, Gate_MIDI::GATE_INPUTS + 0));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 78.431)), module, Gate_MIDI::GATE_INPUTS + 1));

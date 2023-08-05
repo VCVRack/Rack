@@ -229,12 +229,12 @@ struct MIDICC_CV : Module {
 struct MIDICC_CVWidget : ModuleWidget {
 	MIDICC_CVWidget(MIDICC_CV* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/MIDICC_CV.svg")));
+		setPanel(createPanel(asset::system("res/Core/MIDICC_CV.svg"), asset::system("res/Core/MIDICC_CV-dark.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(8.189, 78.431)), module, MIDICC_CV::CC_OUTPUT + 0));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(19.739, 78.431)), module, MIDICC_CV::CC_OUTPUT + 1));

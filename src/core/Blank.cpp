@@ -47,7 +47,8 @@ struct BlankPanel : Widget {
 	void draw(const DrawArgs& args) override {
 		nvgBeginPath(args.vg);
 		nvgRect(args.vg, 0.0, 0.0, box.size.x, box.size.y);
-		nvgFillColor(args.vg, nvgRGB(0xe6, 0xe6, 0xe6));
+		NVGcolor bg = settings::preferDarkPanels ? nvgRGB(42, 42, 42) : nvgRGB(235, 235, 235);
+		nvgFillColor(args.vg, bg);
 		nvgFill(args.vg);
 		Widget::draw(args);
 	}
@@ -141,10 +142,10 @@ struct BlankWidget : ModuleWidget {
 		rightHandle->module = module;
 		addChild(rightHandle);
 
-		addChild(createWidget<ScrewSilver>(Vec(15, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(15, 365)));
-		topRightScrew = createWidget<ScrewSilver>(Vec(box.size.x - 30, 0));
-		bottomRightScrew = createWidget<ScrewSilver>(Vec(box.size.x - 30, 365));
+		addChild(createWidget<ThemedScrew>(Vec(15, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(15, 365)));
+		topRightScrew = createWidget<ThemedScrew>(Vec(box.size.x - 30, 0));
+		bottomRightScrew = createWidget<ThemedScrew>(Vec(box.size.x - 30, 365));
 		addChild(topRightScrew);
 		addChild(bottomRightScrew);
 

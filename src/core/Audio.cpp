@@ -453,12 +453,12 @@ struct AudioWidget : ModuleWidget {
 		setModule(module);
 
 		if (NUM_AUDIO_INPUTS == 8 && NUM_AUDIO_OUTPUTS == 8) {
-			setPanel(Svg::load(asset::system("res/Core/Audio8.svg")));
+			setPanel(createPanel(asset::system("res/Core/Audio8.svg"), asset::system("res/Core/Audio8-dark.svg")));
 
-			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+			addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+			addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+			addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+			addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.81, 57.929)), module, TAudio::AUDIO_INPUTS + 0));
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.359, 57.929)), module, TAudio::AUDIO_INPUTS + 1));
@@ -494,12 +494,12 @@ struct AudioWidget : ModuleWidget {
 			addChild(display);
 		}
 		else if (NUM_AUDIO_INPUTS == 16 && NUM_AUDIO_OUTPUTS == 16) {
-			setPanel(Svg::load(asset::system("res/Core/Audio16.svg")));
+			setPanel(createPanel(asset::system("res/Core/Audio16.svg"), asset::system("res/Core/Audio16-dark.svg")));
 
-			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+			addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+			addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+			addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+			addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.815, 57.929)), module, TAudio::AUDIO_INPUTS + 0));
 			addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.364, 57.929)), module, TAudio::AUDIO_INPUTS + 1));
@@ -559,12 +559,12 @@ struct AudioWidget : ModuleWidget {
 			addChild(display);
 		}
 		else if (NUM_AUDIO_INPUTS == 2 && NUM_AUDIO_OUTPUTS == 2) {
-			setPanel(Svg::load(asset::system("res/Core/Audio2.svg")));
+			setPanel(createPanel(asset::system("res/Core/Audio2.svg"), asset::system("res/Core/Audio2-dark.svg")));
 
-			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-			addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-			addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+			addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+			addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+			addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+			addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 			addParam(createParamCentered<RoundLargeBlackKnob>(mm2px(Vec(12.869, 77.362)), module, TAudio::LEVEL_PARAM));
 

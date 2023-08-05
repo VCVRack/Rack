@@ -491,12 +491,12 @@ struct MIDI_CV : Module {
 struct MIDI_CVWidget : ModuleWidget {
 	MIDI_CVWidget(MIDI_CV* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/MIDI_CV.svg")));
+		setPanel(createPanel(asset::system("res/Core/MIDI_CV.svg"), asset::system("res/Core/MIDI_CV-dark.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.905, 64.347)), module, MIDI_CV::PITCH_OUTPUT));
 		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 64.347)), module, MIDI_CV::GATE_OUTPUT));

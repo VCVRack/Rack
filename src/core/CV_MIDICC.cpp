@@ -138,12 +138,12 @@ struct CV_MIDICC : Module {
 struct CV_MIDICCWidget : ModuleWidget {
 	CV_MIDICCWidget(CV_MIDICC* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/CV_MIDICC.svg")));
+		setPanel(createPanel(asset::system("res/Core/CV_MIDICC.svg"), asset::system("res/Core/CV_MIDICC-dark.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(8.189, 78.431)), module, CV_MIDICC::CC_INPUTS + 0));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(19.739, 78.431)), module, CV_MIDICC::CC_INPUTS + 1));

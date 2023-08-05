@@ -149,12 +149,12 @@ struct CV_MIDIPanicItem : MenuItem {
 struct CV_MIDIWidget : ModuleWidget {
 	CV_MIDIWidget(CV_MIDI* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/CV_MIDI.svg")));
+		setPanel(createPanel(asset::system("res/Core/CV_MIDI.svg"), asset::system("res/Core/CV_MIDI-dark.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(7.906, 64.347)), module, CV_MIDI::PITCH_INPUT));
 		addInput(createInputCentered<PJ301MPort>(mm2px(Vec(20.249, 64.347)), module, CV_MIDI::GATE_INPUT));

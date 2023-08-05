@@ -478,12 +478,12 @@ struct MIDIMapDisplay : MidiDisplay {
 struct MIDIMapWidget : ModuleWidget {
 	MIDIMapWidget(MIDIMap* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/MIDIMap.svg")));
+		setPanel(createPanel(asset::system("res/Core/MIDIMap.svg"), asset::system("res/Core/MIDIMap-dark.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		MIDIMapDisplay* display = createWidget<MIDIMapDisplay>(mm2px(Vec(0.0, 12.869)));
 		display->box.size = mm2px(Vec(50.8, 105.059));

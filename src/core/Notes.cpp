@@ -70,12 +70,12 @@ struct NotesDisplay : LedDisplay {
 struct NotesWidget : ModuleWidget {
 	NotesWidget(NotesModule* module) {
 		setModule(module);
-		setPanel(Svg::load(asset::system("res/Core/Notes.svg")));
+		setPanel(createPanel(asset::system("res/Core/Notes.svg"), asset::system("res/Core/Notes-dark.svg")));
 
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
-		addChild(createWidget<ScrewSilver>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
-		addChild(createWidget<ScrewSilver>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
 		NotesDisplay* notesDisplay = createWidget<NotesDisplay>(mm2px(Vec(0.0, 12.869)));
 		notesDisplay->box.size = mm2px(Vec(81.28, 105.059));
