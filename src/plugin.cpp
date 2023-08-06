@@ -254,13 +254,22 @@ void init() {
 	loadPlugin("");
 
 	// Get user plugins directory
-	pluginsPath = asset::user("plugins");
-	// Use `plugins-CPU` dir on non-x64 platforms
-#if !defined ARCH_X64
-	if (!settings::devMode) {
-		pluginsPath += "-" + APP_CPU;
+	if (settings::devMode) {
+		pluginsPath = asset::user("plugins");
+	}
+	else {
+		pluginsPath = asset::user("plugins-" + APP_OS + "-" + APP_CPU);
+	}
+
+	// In Rack <2.4.0, plugins dir was "plugins" regardless of arch.
+	// Rename old dir if running x64.
+#if defined ARCH_X64
+	std::string oldPluginsPath = asset::user("plugins");
+	if (system::isDirectory(oldPluginsPath)) {
+		system::rename(oldPluginsPath, pluginsPath);
 	}
 #endif
+
 	system::createDirectory(pluginsPath);
 
 	// Don't load plugins if safe mode is enabled

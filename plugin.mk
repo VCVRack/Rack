@@ -48,11 +48,7 @@ ifdef ARCH_WIN
 	RACK_USER_DIR ?= $(USERPROFILE)/Documents/Rack2
 endif
 
-PLUGINS_DIR := $(RACK_USER_DIR)/plugins
-ifndef ARCH_X64
-	# On non-x64, append CPU name to plugins dir
-	PLUGINS_DIR := $(PLUGINS_DIR)-$(ARCH_CPU)
-endif
+PLUGINS_DIR := $(RACK_USER_DIR)/plugins-$(ARCH_OS)-$(ARCH_CPU)
 
 DEP_FLAGS += -fPIC
 include $(RACK_DIR)/dep.mk
