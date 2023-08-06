@@ -498,18 +498,18 @@ struct MIDI_CVWidget : ModuleWidget {
 		addChild(createWidget<ThemedScrew>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 		addChild(createWidget<ThemedScrew>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
 
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.905, 64.347)), module, MIDI_CV::PITCH_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 64.347)), module, MIDI_CV::GATE_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.591, 64.347)), module, MIDI_CV::VELOCITY_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.905, 80.603)), module, MIDI_CV::AFTERTOUCH_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 80.603)), module, MIDI_CV::PW_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.591, 80.603)), module, MIDI_CV::MOD_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.905, 96.859)), module, MIDI_CV::CLOCK_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 96.707)), module, MIDI_CV::CLOCK_DIV_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.591, 96.859)), module, MIDI_CV::RETRIGGER_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(7.905, 113.115)), module, MIDI_CV::START_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(20.248, 113.115)), module, MIDI_CV::STOP_OUTPUT));
-		addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(32.591, 112.975)), module, MIDI_CV::CONTINUE_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(7.905, 64.347)), module, MIDI_CV::PITCH_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(20.248, 64.347)), module, MIDI_CV::GATE_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(32.591, 64.347)), module, MIDI_CV::VELOCITY_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(7.905, 80.603)), module, MIDI_CV::AFTERTOUCH_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(20.248, 80.603)), module, MIDI_CV::PW_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(32.591, 80.603)), module, MIDI_CV::MOD_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(7.905, 96.859)), module, MIDI_CV::CLOCK_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(20.248, 96.707)), module, MIDI_CV::CLOCK_DIV_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(32.591, 96.859)), module, MIDI_CV::RETRIGGER_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(7.905, 113.115)), module, MIDI_CV::START_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(20.248, 113.115)), module, MIDI_CV::STOP_OUTPUT));
+		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(32.591, 112.975)), module, MIDI_CV::CONTINUE_OUTPUT));
 
 		MidiDisplay* display = createWidget<MidiDisplay>(mm2px(Vec(0.0, 13.048)));
 		display->box.size = mm2px(Vec(40.64, 29.012));
