@@ -2,6 +2,23 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.4.0 (2023-08-06)
+- Add "View > Use dark panels if available" menu item.
+- Show module ID in module's Info menu.
+- Fix order of input MIDI messages having the same frame timestamp. This fixes *VCV MIDI to CV* from sometimes duplicating clock pulses when transport starts.
+- Core
+	- Add dark panels.
+- Rack Pro
+	- Add CLAP FX and Generator plugin adapters in addition to existing Instrument plugin.
+	- Fix file dialogs from sometimes loading/saving the wrong Rack plugin instance when multiple instances are running.
+	- Fix crash when using Mac VST3 and AU plugins simultaneously in a DAW.
+	- Fix crash when removing one of multiple running plugin instances in Studio One.
+	- Fix CLAP plugin discarding output MIDI messages.
+- API
+	- Add `ThemedSvgPanel` and `ThemedSvgScrew` classes which automatically switch SVGs when dark panels are toggled.
+	- Add `"minRackVersion"` property to plugin manifest, which prevents Rack from downloading plugin if version is not compatible.
+	- Fix `ContextCreateEvent` and `ContextDestroyEvent` not defining `vg` NanoVG context.
+
 ### 2.3.0 (2023-03-08)
 - Add "View > Themes" menu with new UI themes: light and high-contrast dark.
 - Fix file permissions resulting in error when loading certain patches.
