@@ -31,7 +31,7 @@ void LedDisplay::draw(const DrawArgs& args) {
 	nvgBeginPath(args.vg);
 	nvgMoveTo(args.vg, 0.0, box.size.y + 0.5);
 	nvgLineTo(args.vg, box.size.x, box.size.y + 0.5);
-	nvgStrokeColor(args.vg, nvgRGBAf(1, 1, 1, 0.30));
+	nvgStrokeColor(args.vg, nvgRGBAf(1, 1, 1, 0.25));
 	nvgStrokeWidth(args.vg, 1.0);
 	nvgStroke(args.vg);
 
