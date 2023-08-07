@@ -6,6 +6,7 @@ In this document, Ctrl means Cmd on Mac.
 - Add "View > Use dark panels if available" menu item.
 - Show module ID in module's Info menu.
 - Fix order of input MIDI messages having the same frame timestamp. This fixes *VCV MIDI to CV* from sometimes duplicating clock pulses when transport starts.
+- Move plugins folder to `<Rack user folder>/plugins-<OS>-<CPU>`.
 - Core
 	- Add dark panels.
 - Rack Pro
