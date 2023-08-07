@@ -66,7 +66,7 @@ ZSTD_COMPRESSION_LEVEL ?= 19
 dist: all
 	rm -rf dist
 	mkdir -p dist/$(SLUG)
-	@# Strip and copy plugin binary
+	@# Strip symbols from binary
 	cp $(TARGET) dist/$(SLUG)/
 ifdef ARCH_MAC
 	$(STRIP) -S dist/$(SLUG)/$(TARGET)
@@ -74,6 +74,10 @@ ifdef ARCH_MAC
 	$(OTOOL) -L dist/$(SLUG)/$(TARGET)
 else
 	$(STRIP) -s dist/$(SLUG)/$(TARGET)
+endif
+	@# Sign binary if CODESIGN is defined
+ifdef CODESIGN
+	$(CODESIGN) dist/$(SLUG)/$(TARGET)
 endif
 	@# Copy distributables
 ifdef ARCH_MAC
