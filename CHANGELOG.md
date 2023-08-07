@@ -2,7 +2,7 @@
 
 In this document, Ctrl means Cmd on Mac.
 
-### 2.4.0 (2023-08-06)
+### 2.4.0 (2023-08-07)
 - Add "View > Use dark panels if available" menu item.
 - Show module ID in module's Info menu.
 - Fix order of input MIDI messages having the same frame timestamp. This fixes *VCV MIDI to CV* from sometimes duplicating clock pulses when transport starts.
