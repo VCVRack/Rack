@@ -680,11 +680,10 @@ struct BefacoTinyKnob : app::SvgKnob {
 
 struct BefacoSlidePot : app::SvgSlider {
 	BefacoSlidePot() {
-		math::Vec margin = math::Vec(3.5, 3.5);
-		maxHandlePos = math::Vec(-1, -2).plus(margin);
-		minHandlePos = math::Vec(-1, 87).plus(margin);
 		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/BefacoSlidePot.svg")));
 		setHandleSvg(Svg::load(asset::system("res/ComponentLibrary/BefacoSlidePotHandle.svg")));
+		math::Vec margin = math::Vec(3.5, 3.5);
+		setHandlePos(math::Vec(-1, 87).plus(margin), math::Vec(-1, -2).plus(margin));
 		background->box.pos = margin;
 		box.size = background->box.size.plus(margin.mult(2));
 	}
@@ -705,11 +704,10 @@ using LEDSlider = VCVSlider;
 struct VCVSliderHorizontal : app::SvgSlider {
 	VCVSliderHorizontal() {
 		horizontal = true;
-		// TODO Fix positions
-		maxHandlePos = mm2px(math::Vec(22.078, 0.738).plus(math::Vec(0, 2)));
-		minHandlePos = mm2px(math::Vec(0.738, 0.738).plus(math::Vec(0, 2)));
 		// TODO Fix SVG
 		setBackgroundSvg(Svg::load(asset::system("res/ComponentLibrary/VCVSliderHorizontal.svg")));
+		// TODO Fix positions
+		setHandlePos(mm2px(math::Vec(0.738, 0.738).plus(math::Vec(0, 2))), mm2px(math::Vec(22.078, 0.738).plus(math::Vec(0, 2))));
 	}
 };
 using LEDSliderHorizontal = VCVSliderHorizontal;

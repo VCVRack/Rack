@@ -202,6 +202,9 @@ struct ModelBox : widget::OpaqueWidget {
 		mwc->addChild(moduleWidget);
 		mwc->box.size = moduleWidget->box.size;
 
+		// Step ModuleWidget so it can set its default appearance.
+		moduleWidget->step();
+
 		updateZoom();
 	}
 

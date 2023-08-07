@@ -35,7 +35,7 @@ void SvgSlider::setHandleSvg(std::shared_ptr<window::Svg> svg) {
 		return;
 
 	handle->setSvg(svg);
-	handle->box.pos = minHandlePos;
+	handle->box.pos = maxHandlePos;
 	fb->setDirty();
 }
 
@@ -43,6 +43,9 @@ void SvgSlider::setHandleSvg(std::shared_ptr<window::Svg> svg) {
 void SvgSlider::setHandlePos(math::Vec minHandlePos, math::Vec maxHandlePos) {
 	this->minHandlePos = minHandlePos;
 	this->maxHandlePos = maxHandlePos;
+
+	// Set handle pos to maximum by default
+	handle->box.pos = maxHandlePos;
 }
 
 
