@@ -161,37 +161,31 @@ inline float_4 atan2(float_4 x, float_4 y) {
 using std::trunc;
 
 inline float_4 trunc(float_4 a) {
-	return float_4(_mm_cvtepi32_ps(_mm_cvttps_epi32(a.v)));
+	return float_4(_mm_round_ps(a.v, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC));
 }
 
 using std::floor;
 
 inline float_4 floor(float_4 a) {
-	float_4 b = trunc(a);
-	b -= (b > a) & 1.f;
-	return b;
+	return float_4(_mm_round_ps(a.v, _MM_FROUND_TO_NEG_INF | _MM_FROUND_NO_EXC));
 }
 
 using std::ceil;
 
 inline float_4 ceil(float_4 a) {
-	float_4 b = trunc(a);
-	b += (b < a) & 1.f;
-	return b;
+	return float_4(_mm_round_ps(a.v, _MM_FROUND_TO_POS_INF | _MM_FROUND_NO_EXC));
 }
 
 using std::round;
 
 inline float_4 round(float_4 a) {
-	a += ifelse(a < 0, -0.5f, 0.5f);
-	float_4 b = trunc(a);
-	return b;
+	return float_4(_mm_round_ps(a.v, _MM_FROUND_TO_NEAREST_INT | _MM_FROUND_NO_EXC));
 }
 
 using std::fmod;
 
 inline float_4 fmod(float_4 a, float_4 b) {
-	return a - trunc(a / b) * b;
+	return a - floor(a / b) * b;
 }
 
 using std::hypot;
