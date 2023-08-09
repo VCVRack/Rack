@@ -685,11 +685,16 @@ struct SyncUpdateItem : ui::MenuItem {
 	}
 
 	void step() override {
+		disabled = false;
+
 		if (library::isSyncing)
 			disabled = true;
 
 		auto it = library::updateInfos.find(slug);
-		if (it != library::updateInfos.end()) {
+		if (it == library::updateInfos.end()) {
+			disabled = true;
+		}
+		else {
 			library::UpdateInfo update = it->second;
 
 			if (update.minRackVersion != "")
