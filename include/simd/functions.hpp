@@ -160,6 +160,11 @@ inline float_4 atan2(float_4 x, float_4 y) {
 
 using std::trunc;
 
+// SIMDe defines _MM_FROUND_NO_EXC with a prefix
+#ifndef _MM_FROUND_NO_EXC
+	#define _MM_FROUND_NO_EXC SIMDE_MM_FROUND_NO_EXC
+#endif
+
 inline float_4 trunc(float_4 a) {
 	return float_4(_mm_round_ps(a.v, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC));
 }
