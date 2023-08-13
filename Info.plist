@@ -15,7 +15,7 @@
 	<key>CFBundleShortVersionString</key><string>{VERSION}</string>
 	<key>NSHumanReadableCopyright</key><string>Copyright © VCV</string>
 	<key>NSPrincipalClass</key><string>NSApplication</string>
-	<key>NSHighResolutionCapable</key><string>YES</string>
+	<key>NSHighResolutionCapable</key><true/>
 	<key>NSMicrophoneUsageDescription</key><string>This is required for using line input from audio interfaces.</string>
 
 	<key>CFBundleDocumentTypes</key>
