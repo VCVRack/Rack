@@ -28,6 +28,7 @@ std::string fV(const char* format, va_list args) {
 	// va_lists cannot be reused but we need it twice, so clone args.
 	va_list args2;
 	va_copy(args2, args);
+	DEFER({va_end(args2);});
 	// Compute size of required buffer
 	int size = vsnprintf(NULL, 0, format, args);
 	if (size < 0)
