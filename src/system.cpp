@@ -788,16 +788,16 @@ double getTime() {
 	LARGE_INTEGER counter;
 	QueryPerformanceCounter(&counter);
 	return (counter.QuadPart - startCounter) * counterTime;
-#endif
-#if defined ARCH_LIN
+#elif defined ARCH_LIN
 	struct timespec ts;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
 	int64_t time = int64_t(ts.tv_sec) * 1000000000LL + ts.tv_nsec;
 	return (time - startTime) / 1e9;
-#endif
-#if defined ARCH_MAC
+#elif defined ARCH_MAC
 	int64_t counter = mach_absolute_time();
 	return (counter - startCounter) * counterTime;
+#else
+	return 0.0;
 #endif
 }
 
@@ -833,6 +833,8 @@ double getThreadTime() {
 	if (GetThreadTimes(GetCurrentThread(), &creationTime, &exitTime, &kernelTime, &userTime) == 0)
 		return 0.0;
 	return ((uint64_t(userTime.dwHighDateTime) << 32) + userTime.dwLowDateTime) * 1e-7;
+#else
+	return 0.0;
 #endif
 }
 
