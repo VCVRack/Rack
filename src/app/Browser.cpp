@@ -45,7 +45,7 @@ static fuzzysearch::Database<plugin::Model*> modelDb;
 
 static void modelDbInit() {
 	modelDb = fuzzysearch::Database<plugin::Model*>();
-	modelDb.setWeights({1.0f, 1.0f, 1.0f, 0.8f, 1.0f});
+	modelDb.setWeights({0.9f, 0.75f, 1.0f, 0.8f, 0.9f});
 	modelDb.setThreshold(0.5f);
 
 	// Iterate plugins
