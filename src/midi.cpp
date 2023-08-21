@@ -307,8 +307,12 @@ void InputQueue::onMessage(const Message& message) {
 	if (internal->queue.size() >= InputQueue_maxSize)
 		return;
 	// Message timestamp must be monotonically increasing, otherwise clear the queue.
-	if (!internal->queue.empty() && message.getFrame() < internal->queue.back().getFrame()) {
-		internal->queue.clear();
+	if (!internal->queue.empty()) {
+		const Message& lastMessage = internal->queue.back();
+		if (message.getFrame() < lastMessage.getFrame()) {
+			WARN("MIDI message at frame %lld added to InputQueue after later message at frame %lld", (long long) message.getFrame(), (long long) lastMessage.getFrame());
+			internal->queue.clear();
+		}
 	}
 	// Push to queue
 	internal->queue.push_back(message);
