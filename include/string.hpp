@@ -118,6 +118,16 @@ struct Version {
 	operator std::string() const;
 	/** Returns whether this version is earlier than `other`. */
 	bool operator<(const Version& other);
+
+	std::string getMajor() const {
+		return get(parts, 0, "");
+	}
+	std::string getMinor() const {
+		return get(parts, 1, "");
+	}
+	std::string getRevision() const {
+		return get(parts, 2, "");
+	}
 };
 
 
