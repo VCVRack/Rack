@@ -40,6 +40,7 @@ ifdef ARCH_MAC
 	TARGET := $(TARGET).dylib
 	LDFLAGS += -undefined dynamic_lookup
 	RACK_USER_DIR ?= $(HOME)/Documents/Rack2
+	CODESIGN ?= codesign -f -s -
 endif
 
 ifdef ARCH_WIN
