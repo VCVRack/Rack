@@ -2,6 +2,15 @@
 
 In this document, Ctrl means Cmd on Mac.
 
+### 2.4.1 (2023-08-24)
+- Improve module browser search order.
+- Fix Library menu plugin update items not being re-enabled when downloading is completed.
+- Rack Pro
+	- Fix discarded MIDI input messages for all plugin adapters.
+- API
+	- Add `LightButton` to component library.
+	- Use SSE4.1 intrinsics in `simd::trunc`, `floor`, `ceil`, `round`, and `fmod` to improve performance.
+
 ### 2.4.0 (2023-08-07)
 - Add "View > Use dark panels if available" menu item.
 - Show module ID in module's Info menu.
