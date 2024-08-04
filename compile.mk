@@ -88,7 +88,7 @@ build/%.m.o: %.m
 
 build/%.mm.o: %.mm
 	@mkdir -p $(@D)
-	$(CC) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 build/%.bin.o: %
 	@mkdir -p $(@D)
