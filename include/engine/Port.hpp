@@ -160,6 +160,8 @@ struct Port {
 		}
 		// Set higher channel voltages to 0
 		for (uint8_t c = channels; c < this->channels; c++) {
+			if (c >= PORT_MAX_CHANNELS)
+ 				__builtin_unreachable();
 			voltages[c] = 0.f;
 		}
 		// Don't allow caller to set port as disconnected
