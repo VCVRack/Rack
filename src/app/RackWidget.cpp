@@ -60,7 +60,7 @@ static ModuleWidget* moduleWidgetFromJson(json_t* moduleJ) {
 struct ModuleContainer : widget::Widget {
 	void draw(const DrawArgs& args) override {
 		// Draw ModuleWidget shadows
-		Widget::drawLayer(args, -1);
+		// Widget::drawLayer(args, -1);
 
 		Widget::draw(args);
 	}
@@ -103,7 +103,7 @@ struct CableContainer : widget::TransparentWidget {
 	void drawLayer(const DrawArgs& args, int layer) override {
 		if (layer == 3) {
 			// Draw cable shadows
-			Widget::drawLayer(args, -1);
+			// Widget::drawLayer(args, -1);
 
 			// Draw cables
 			Widget::draw(args);

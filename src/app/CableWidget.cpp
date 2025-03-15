@@ -354,14 +354,14 @@ void CableWidget::drawLayer(const DrawArgs& args, int layer) {
 
 	if (layer == -1) {
 		// Draw cable shadow
-		math::Vec shadowSlump = slump.plus(math::Vec(0, 30));
-		nvgBeginPath(args.vg);
-		nvgMoveTo(args.vg, VEC_ARGS(outputPos));
-		nvgQuadTo(args.vg, VEC_ARGS(shadowSlump), VEC_ARGS(inputPos));
-		NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.10);
-		nvgStrokeColor(args.vg, shadowColor);
-		nvgStrokeWidth(args.vg, thickness - 1.0);
-		nvgStroke(args.vg);
+		// math::Vec shadowSlump = slump.plus(math::Vec(0, 30));
+		// nvgBeginPath(args.vg);
+		// nvgMoveTo(args.vg, VEC_ARGS(outputPos));
+		// nvgQuadTo(args.vg, VEC_ARGS(shadowSlump), VEC_ARGS(inputPos));
+		// NVGcolor shadowColor = nvgRGBAf(0, 0, 0, 0.10);
+		// nvgStrokeColor(args.vg, shadowColor);
+		// nvgStrokeWidth(args.vg, thickness - 1.0);
+		// nvgStroke(args.vg);
 	}
 	else if (layer == 0) {
 		// Draw cable outline
