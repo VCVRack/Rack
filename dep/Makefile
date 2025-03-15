@@ -177,16 +177,18 @@ $(libspeexdsp): | speexdsp
 	$(MAKE) -C speexdsp
 	$(MAKE) -C speexdsp install
 
-libsamplerate-0.1.9:
-	$(WGET) "https://github.com/libsndfile/libsamplerate/releases/download/0.1.9/libsamplerate-0.1.9.tar.gz" || $(WGET) "http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz"
-	$(SHA256) libsamplerate-0.1.9.tar.gz 0a7eb168e2f21353fb6d84da152e4512126f7dc48ccb0be80578c565413444c1
-	$(UNTAR) libsamplerate-0.1.9.tar.gz
-	rm libsamplerate-0.1.9.tar.gz
+libsamplerate-0.2.2:
+	$(WGET) "https://github.com/libsndfile/libsamplerate/releases/download/0.2.2/libsamplerate-0.2.2.tar.xz"
+	$(SHA256) libsamplerate-0.2.2.tar.xz 3258da280511d24b49d6b08615bbe824d0cacc9842b0e4caf11c52cf2b043893
+	$(UNTAR) libsamplerate-0.2.2.tar.xz
+	rm libsamplerate-0.2.2.tar.xz
 
-$(libsamplerate): | libsamplerate-0.1.9
-	cd libsamplerate-0.1.9 && $(CONFIGURE) --disable-fftw --disable-sndfile
-	$(MAKE) -C libsamplerate-0.1.9
-	$(MAKE) -C libsamplerate-0.1.9 install
+$(libsamplerate): | libsamplerate-0.2.2
+	cd libsamplerate-0.2.2 && mkdir build
+	cd libsamplerate-0.2.2/build && $(CMAKE) -DCMAKE_BUILD_TYPE=Release ..
+	cd libsamplerate-0.2.2/build && $(MAKE) install
+	cd libsamplerate-0.2.2/build && $(CMAKE) -DBUILD_SHARED_LIBS=ON ..
+	cd libsamplerate-0.2.2/build && $(MAKE) install
 
 RTMIDI_FLAGS += --enable-shared=no
 ifdef ARCH_LIN
@@ -269,7 +271,7 @@ $(simde): simde/simde
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.14 libsamplerate-0.1.9 openssl-3.3.2 curl-8.10.0 zstd-1.5.6 libarchive-3.7.7 rtaudio nanovg nanosvg oui-blendish osdialog
+src: glew-2.1.0 glfw jansson-2.14 libsamplerate-0.2.2 openssl-3.3.2 curl-8.10.0 zstd-1.5.6 libarchive-3.7.7 rtaudio nanovg nanosvg oui-blendish osdialog
 
 clean:
 	git clean -fdx
