@@ -144,19 +144,19 @@ $(libcurl): | $(openssl) curl-8.10.0
 	$(MAKE) -C curl-8.10.0
 	$(MAKE) -C curl-8.10.0 install
 
-zstd-1.5.6:
-	$(WGET) "https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz"
-	$(SHA256) zstd-1.5.6.tar.gz 8c29e06cf42aacc1eafc4077ae2ec6c6fcb96a626157e0593d5e82a34fd403c1
+zstd-1.5.7:
+	$(WGET) "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz"
+	$(SHA256) zstd-1.5.7.tar.gz eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3
 	# HACK This tar archive creates a symlink "untar" to "tar" before tar exists. This is okay on UNIX but not on Windows where symlinks are copies of files. So create a fake "tar" so the unarchiving works.
-	mkdir -p zstd-1.5.6/tests/cli-tests/bin
-	touch zstd-1.5.6/tests/cli-tests/bin/zstd
-	$(UNTAR) zstd-1.5.6.tar.gz
-	rm zstd-1.5.6.tar.gz
+	mkdir -p zstd-1.5.7/tests/cli-tests/bin
+	touch zstd-1.5.7/tests/cli-tests/bin/zstd
+	$(UNTAR) zstd-1.5.7.tar.gz
+	rm zstd-1.5.7.tar.gz
 
-$(zstd): | zstd-1.5.6
-	cd zstd-1.5.6/build/cmake && $(CMAKE) -DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_SHARED=OFF -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_TESTS=OFF -DZSTD_MULTITHREAD_SUPPORT=OFF .
-	$(MAKE) -C zstd-1.5.6/build/cmake
-	$(MAKE) -C zstd-1.5.6/build/cmake install
+$(zstd): | zstd-1.5.7
+	cd zstd-1.5.7/build/cmake && $(CMAKE) -DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_SHARED=OFF -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_TESTS=OFF -DZSTD_MULTITHREAD_SUPPORT=OFF .
+	$(MAKE) -C zstd-1.5.7/build/cmake
+	$(MAKE) -C zstd-1.5.7/build/cmake install
 
 libarchive-3.7.7:
 	$(WGET) "https://github.com/libarchive/libarchive/releases/download/v3.7.7/libarchive-3.7.7.tar.gz" || $(WGET) "https://libarchive.org/downloads/libarchive-3.7.7.tar.gz"
