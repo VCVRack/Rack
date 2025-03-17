@@ -3,9 +3,9 @@
 <plist version="1.0">
 <array>
 	<dict>
-		<key>BundleHasStrictIdentifier</key><true/>
+		<key>BundleHasStrictIdentifier</key><false/>
 		<key>BundleIsVersionChecked</key><false/>
-		<key>BundleIsRelocatable</key><false/>
+		<key>BundleIsRelocatable</key><true/>
 		<key>BundleOverwriteAction</key><string>upgrade</string>
 		<key>RootRelativeBundlePath</key><string>VCV Rack 2 Free.app</string>
 	</dict>
