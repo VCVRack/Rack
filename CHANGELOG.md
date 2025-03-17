@@ -2,6 +2,10 @@
 
 In this document, Ctrl means Command (⌘) on Mac.
 
+### 2.6.2 (2025-03-17)
+- Fix incorrect audio driver being loaded from patches made in Rack ≤2.6.0.
+- Fix Mac installer creating duplicate app bundle.
+
 ### 2.6.1 (2025-03-14)
 - Add UI translations for:
 	- German

@@ -57,6 +57,10 @@ void destroy() {
 	std::lock_guard<std::mutex> timeoutLock(timeoutMutex);
 	std::lock_guard<std::mutex> appUpdateLock(appUpdateMutex);
 	std::lock_guard<std::mutex> updateLock(updateMutex);
+
+	// Clear globals in case init() is called again
+	loginStatus = "";
+	updateInfos.clear();
 }
 
 

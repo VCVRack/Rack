@@ -18,22 +18,82 @@
 namespace rack {
 
 
-static const std::map<RtAudio::Api, std::string> RTAUDIO_API_NAMES = {
-	{RtAudio::LINUX_ALSA, "ALSA"},
-	{RtAudio::UNIX_JACK, "JACK"},
-	{RtAudio::LINUX_PULSE, "PulseAudio"},
-	{RtAudio::LINUX_OSS, "OSS"},
-	{RtAudio::WINDOWS_WASAPI, "WASAPI"},
-	{RtAudio::WINDOWS_ASIO, "ASIO"},
-	{RtAudio::WINDOWS_DS, "DirectSound"},
-	{RtAudio::MACOSX_CORE, "Core Audio"},
-	{RtAudio::RTAUDIO_DUMMY, "Dummy"},
-	{RtAudio::UNSPECIFIED, "Unspecified"},
+struct RtAudioDevice;
+
+
+struct RtAudioDriver : audio::Driver {
+	RtAudio::Api api;
+	std::string name;
+	RtAudio* rtAudio = NULL;
+	// deviceId -> Device
+	std::map<int, RtAudioDevice*> devices;
+
+	RtAudioDriver(RtAudio::Api api, std::string name) {
+		this->api = api;
+		this->name = name;
+
+		INFO("Creating RtAudio %s driver", name.c_str());
+		rtAudio = new RtAudio(api, [](RtAudioErrorType type, const std::string& errorText) {
+			WARN("RtAudio error %d: %s", type, errorText.c_str());
+		});
+
+		rtAudio->showWarnings(false);
+	}
+
+	~RtAudioDriver() {
+		assert(devices.empty());
+		if (rtAudio)
+			delete rtAudio;
+	}
+
+	std::string getName() override {
+		return name;
+	}
+
+	std::vector<int> getDeviceIds() override {
+		std::vector<int> deviceIds;
+		if (rtAudio) {
+			for (unsigned int id : rtAudio->getDeviceIds()) {
+				deviceIds.push_back(id);
+			}
+		}
+		return deviceIds;
+	}
+
+	std::string getDeviceName(int deviceId) override {
+		if (rtAudio) {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+			if (deviceInfo.ID > 0)
+				return deviceInfo.name;
+		}
+		return "";
+	}
+
+	int getDeviceNumInputs(int deviceId) override {
+		if (rtAudio) {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+			if (deviceInfo.ID > 0)
+				return deviceInfo.inputChannels;
+		}
+		return 0;
+	}
+
+	int getDeviceNumOutputs(int deviceId) override {
+		if (rtAudio) {
+			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
+			if (deviceInfo.ID > 0)
+				return deviceInfo.outputChannels;
+		}
+		return 0;
+	}
+
+	audio::Device* subscribe(int deviceId, audio::Port* port) override;
+	void unsubscribe(int deviceId, audio::Port* port) override;
 };
 
 
 struct RtAudioDevice : audio::Device {
-	RtAudio::Api api;
+	RtAudioDriver* driver;
 	int deviceId;
 	RtAudio* rtAudio;
 	RtAudio::DeviceInfo deviceInfo;
@@ -43,13 +103,13 @@ struct RtAudioDevice : audio::Device {
 	int blockSize = 0;
 	float sampleRate = 0;
 
-	RtAudioDevice(RtAudio::Api api, int deviceId) {
-		this->api = api;
+	RtAudioDevice(RtAudioDriver* driver, int deviceId) {
+		this->driver = driver;
 		this->deviceId = deviceId;
 
 		// Create RtAudio object
-		INFO("Creating RtAudio %s device", RTAUDIO_API_NAMES.at(api).c_str());
-		rtAudio = new RtAudio(api, [](RtAudioErrorType type, const std::string& errorText) {
+		INFO("Creating RtAudio %s device", driver->getName().c_str());
+		rtAudio = new RtAudio(driver->api, [](RtAudioErrorType type, const std::string& errorText) {
 			WARN("RtAudio error %d: %s", type, errorText.c_str());
 		});
 
@@ -59,7 +119,7 @@ struct RtAudioDevice : audio::Device {
 			// Query device ID
 			deviceInfo = rtAudio->getDeviceInfo(deviceId);
 			if (deviceInfo.ID == 0)
-				throw Exception("Failed to query RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+				throw Exception("Failed to query RtAudio %s device %d", driver->getName().c_str(), deviceId);
 
 			openStream();
 		}
@@ -78,7 +138,7 @@ struct RtAudioDevice : audio::Device {
 	void openStream() {
 		// Open new device
 		if (deviceInfo.outputChannels == 0 && deviceInfo.inputChannels == 0) {
-			throw Exception("RtAudio %s device %d has 0 inputs and 0 outputs", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			throw Exception("RtAudio %s device %d has 0 inputs and 0 outputs", driver->getName().c_str(), deviceId);
 		}
 
 		inputParameters = RtAudio::StreamParameters();
@@ -109,25 +169,25 @@ struct RtAudioDevice : audio::Device {
 
 		if (blockSize <= 0) {
 			// DirectSound should use a higher default block size
-			if (api == RtAudio::WINDOWS_DS)
+			if (driver->api == RtAudio::WINDOWS_DS)
 				blockSize = 1024;
 			else
 				blockSize = 256;
 		}
 
-		INFO("Opening RtAudio %s device %d: %s (%d in, %d out, %d sample rate, %d block size)", RTAUDIO_API_NAMES.at(api).c_str(), deviceId, deviceInfo.name.c_str(), inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
+		INFO("Opening RtAudio %s device %d: %s (%d in, %d out, %d sample rate, %d block size)", driver->getName().c_str(), deviceId, deviceInfo.name.c_str(), inputParameters.nChannels, outputParameters.nChannels, closestSampleRate, blockSize);
 		if (rtAudio->openStream(
 			outputParameters.nChannels > 0 ? &outputParameters : NULL,
 			inputParameters.nChannels > 0 ? &inputParameters : NULL,
 			RTAUDIO_FLOAT32, closestSampleRate, (unsigned int*) &blockSize,
 			&rtAudioCallback, this, &options)) {
-			throw Exception("Failed to open RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			throw Exception("Failed to open RtAudio %s device %d", driver->getName().c_str(), deviceId);
 		}
 
 		try {
-			INFO("Starting RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			INFO("Starting RtAudio %s device %d", driver->getName().c_str(), deviceId);
 			if (rtAudio->startStream()) {
-				throw Exception("Failed to start RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+				throw Exception("Failed to start RtAudio %s device %d", driver->getName().c_str(), deviceId);
 			}
 
 			// Update sample rate to actual value
@@ -143,11 +203,11 @@ struct RtAudioDevice : audio::Device {
 
 	void closeStream() {
 		if (rtAudio->isStreamRunning()) {
-			INFO("Stopping RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			INFO("Stopping RtAudio %s device %d", driver->getName().c_str(), deviceId);
 			rtAudio->stopStream();
 		}
 		if (rtAudio->isStreamOpen()) {
-			INFO("Closing RtAudio %s device %d", RTAUDIO_API_NAMES.at(api).c_str(), deviceId);
+			INFO("Closing RtAudio %s device %d", driver->getName().c_str(), deviceId);
 			rtAudio->closeStream();
 		}
 
@@ -220,126 +280,72 @@ struct RtAudioDevice : audio::Device {
 };
 
 
-struct RtAudioDriver : audio::Driver {
-	RtAudio::Api api;
-	// deviceId -> Device
-	std::map<int, RtAudioDevice*> devices;
-	RtAudio* rtAudio = NULL;
+audio::Device* RtAudioDriver::subscribe(int deviceId, audio::Port* port) {
+	RtAudioDevice* device;
+	auto it = devices.find(deviceId);
+	if (it == devices.end()) {
+		// ASIO only allows one device to be used simultaneously
+		if (api == RtAudio::WINDOWS_ASIO && devices.size() >= 1)
+			throw Exception("ASIO driver only allows one audio device to be used simultaneously");
 
-	RtAudioDriver(RtAudio::Api api) {
-		this->api = api;
-
-		INFO("Creating RtAudio %s driver", RTAUDIO_API_NAMES.at(api).c_str());
-		rtAudio = new RtAudio(api, [](RtAudioErrorType type, const std::string& errorText) {
-			WARN("RtAudio error %d: %s", type, errorText.c_str());
-		});
-
-		rtAudio->showWarnings(false);
+		// Can throw Exception
+		device = new RtAudioDevice(this, deviceId);
+		devices[deviceId] = device;
+	}
+	else {
+		device = it->second;
 	}
 
-	~RtAudioDriver() {
-		assert(devices.empty());
-		if (rtAudio)
-			delete rtAudio;
+	device->subscribe(port);
+	return device;
+}
+
+
+void RtAudioDriver::unsubscribe(int deviceId, audio::Port* port) {
+	auto it = devices.find(deviceId);
+	if (it == devices.end())
+		return;
+	RtAudioDevice* device = it->second;
+	device->unsubscribe(port);
+
+	if (device->subscribed.empty()) {
+		devices.erase(it);
+		delete device;
 	}
+}
 
-	std::string getName() override {
-		return RTAUDIO_API_NAMES.at(api);
-	}
 
-	std::vector<int> getDeviceIds() override {
-		std::vector<int> deviceIds;
-		if (rtAudio) {
-			for (unsigned int id : rtAudio->getDeviceIds()) {
-				deviceIds.push_back(id);
-			}
-		}
-		return deviceIds;
-	}
-
-	std::string getDeviceName(int deviceId) override {
-		if (rtAudio) {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
-			if (deviceInfo.ID > 0)
-				return deviceInfo.name;
-		}
-		return "";
-	}
-
-	int getDeviceNumInputs(int deviceId) override {
-		if (rtAudio) {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
-			if (deviceInfo.ID > 0)
-				return deviceInfo.inputChannels;
-		}
-		return 0;
-	}
-
-	int getDeviceNumOutputs(int deviceId) override {
-		if (rtAudio) {
-			RtAudio::DeviceInfo deviceInfo = rtAudio->getDeviceInfo(deviceId);
-			if (deviceInfo.ID > 0)
-				return deviceInfo.outputChannels;
-		}
-		return 0;
-	}
-
-	audio::Device* subscribe(int deviceId, audio::Port* port) override {
-		RtAudioDevice* device;
-		auto it = devices.find(deviceId);
-		if (it == devices.end()) {
-			// ASIO only allows one device to be used simultaneously
-			if (api == RtAudio::WINDOWS_ASIO && devices.size() >= 1)
-				throw Exception("ASIO driver only allows one audio device to be used simultaneously");
-
-			// Can throw Exception
-			device = new RtAudioDevice(api, deviceId);
-			devices[deviceId] = device;
-		}
-		else {
-			device = it->second;
-		}
-
-		device->subscribe(port);
-		return device;
-	}
-
-	void unsubscribe(int deviceId, audio::Port* port) override {
-		auto it = devices.find(deviceId);
-		if (it == devices.end())
-			return;
-		RtAudioDevice* device = it->second;
-		device->unsubscribe(port);
-
-		if (device->subscribed.empty()) {
-			devices.erase(it);
-			delete device;
-		}
-	}
+struct ApiInfo {
+	// Should match indices in https://github.com/VCVRack/rtaudio/blob/ece277bd839603648c80c8a5f145678e13bc23f3/RtAudio.cpp#L107-L118
+	int driverId;
+	RtAudio::Api rtApi;
+	// Used instead of RtAudio::getApiName()
+	std::string name;
+};
+// The vector order here defines the order in the audio driver menu
+static const std::vector<ApiInfo> API_INFOS = {
+	{1, RtAudio::LINUX_ALSA, "ALSA"},
+	{2, RtAudio::LINUX_PULSE, "PulseAudio"},
+	{4, RtAudio::UNIX_JACK, "JACK"},
+	{5, RtAudio::MACOSX_CORE, "Core Audio"},
+	{6, RtAudio::WINDOWS_WASAPI, "WASAPI"},
+	{7, RtAudio::WINDOWS_ASIO, "ASIO"},
+	{8, RtAudio::WINDOWS_DS, "DirectSound"},
 };
 
 
 void rtaudioInit() {
+	// Get RtAudio's driver list
 	std::vector<RtAudio::Api> apis;
 	RtAudio::getCompiledApi(apis);
 
-	// I don't like the order returned by getCompiledApi(), so reorder it here.
-	std::vector<RtAudio::Api> orderedApis = {
-		RtAudio::LINUX_ALSA,
-		RtAudio::LINUX_PULSE,
-		RtAudio::UNIX_JACK,
-		RtAudio::LINUX_OSS,
-		RtAudio::WINDOWS_WASAPI,
-		RtAudio::WINDOWS_ASIO,
-		RtAudio::WINDOWS_DS,
-		RtAudio::MACOSX_CORE,
-	};
-	for (RtAudio::Api api : orderedApis) {
-		auto it = std::find(apis.begin(), apis.end(), api);
-		if (it != apis.end()) {
-			RtAudioDriver* driver = new RtAudioDriver(api);
-			audio::addDriver((int) api, driver);
-		}
+	for (const ApiInfo& apiInfo : API_INFOS) {
+		auto it = std::find(apis.begin(), apis.end(), apiInfo.rtApi);
+		if (it == apis.end())
+			continue;
+		// Create and add driver
+		RtAudioDriver* driver = new RtAudioDriver(apiInfo.rtApi, apiInfo.name);
+		audio::addDriver(apiInfo.driverId, driver);
 	}
 }
 

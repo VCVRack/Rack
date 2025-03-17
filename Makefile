@@ -175,10 +175,14 @@ DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
 DIST_RES := res cacert.pem Core.json template.vcv LICENSE-GPLv3.txt $(DIST_HTML) translations
 DIST_SDK_DIR := Rack-SDK
 DIST_SDK = Rack-SDK-$(VERSION)-$(ARCH_NAME).zip
+FUNDAMENTAL_VERSION ?= 2.6.1
+FUNDAMENTAL_FILENAME := Fundamental-$(FUNDAMENTAL_VERSION)-$(ARCH_NAME).vcvplugin
 
 
 dist: $(TARGET) $(STANDALONE_TARGET) $(DIST_HTML)
 	mkdir -p dist
+	# Download Fundamental package if not already downloaded
+	[ -f "$(FUNDAMENTAL_FILENAME)" ] || curl -o "$(FUNDAMENTAL_FILENAME)" "https://api.vcvrack.com/download?slug=Fundamental&version=$(FUNDAMENTAL_VERSION)&arch=$(ARCH_NAME)"
 ifdef ARCH_LIN
 	mkdir -p dist/"$(DIST_DIR)"
 	cp $(TARGET) dist/"$(DIST_DIR)"/
@@ -190,7 +194,7 @@ ifdef ARCH_LIN
 	ldd dist/"$(DIST_DIR)"/$(STANDALONE_TARGET)
 	# Copy resources
 	cp -R $(DIST_RES) dist/"$(DIST_DIR)"/
-	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/
+	cp "$(FUNDAMENTAL_FILENAME)" dist/"$(DIST_DIR)"/
 endif
 ifdef ARCH_MAC
 	mkdir -p dist/"$(DIST_BUNDLE)"
@@ -210,7 +214,7 @@ ifdef ARCH_MAC
 	$(SED) 's/{VERSION}/$(VERSION)/g' dist/"$(DIST_BUNDLE)"/Contents/Info.plist
 	cp -R icon.icns dist/"$(DIST_BUNDLE)"/Contents/Resources/
 	cp -R $(DIST_RES) dist/"$(DIST_BUNDLE)"/Contents/Resources/
-	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_BUNDLE)"/Contents/Resources/
+	cp "$(FUNDAMENTAL_FILENAME)" dist/"$(DIST_BUNDLE)"/Contents/Resources/
 endif
 ifdef ARCH_WIN
 	mkdir -p dist/"$(DIST_DIR)"
@@ -223,7 +227,7 @@ ifdef ARCH_WIN
 	cp /mingw64/bin/libwinpthread-1.dll dist/"$(DIST_DIR)"/
 	cp /mingw64/bin/libstdc++-6.dll dist/"$(DIST_DIR)"/
 	cp /mingw64/bin/libgcc_s_seh-1.dll dist/"$(DIST_DIR)"/
-	cp plugins/Fundamental/dist/Fundamental-*.vcvplugin dist/"$(DIST_DIR)"/
+	cp "$(FUNDAMENTAL_FILENAME)" dist/"$(DIST_DIR)"/
 endif
 
 

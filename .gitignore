@@ -11,6 +11,7 @@
 *.res
 *.d
 *.dSYM
+*.vcvplugin
 /build
 /Rack
 /dep

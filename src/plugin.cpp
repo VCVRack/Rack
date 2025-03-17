@@ -250,9 +250,9 @@ static void extractPackages(std::string path) {
 }
 
 static std::string getFundamentalPackagePath() {
-	std::regex r("Fundamental-.*-" + APP_OS + "-" + APP_CPU + "\\.vcvplugin");
 	for (const std::string& path : system::getEntries(asset::systemDir)) {
-		if (std::regex_match(system::getFilename(path), r))
+		std::string filename = system::getFilename(path);
+		if (string::startsWith(filename, "Fundamental-") && string::endsWith(filename, APP_OS + "-" + APP_CPU + ".vcvplugin"))
 			return path;
 	}
 	return "";
