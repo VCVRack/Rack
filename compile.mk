@@ -18,7 +18,7 @@ FLAGS += -O3 -funsafe-math-optimizations -fno-omit-frame-pointer
 # Warnings
 FLAGS += -Wall -Wextra -Wno-unused-parameter
 # C++ standard
-CXXFLAGS += -std=c++11
+CXXFLAGS += -std=c++17
 
 # Define compiler/linker target if cross-compiling
 ifdef CROSS_COMPILE
