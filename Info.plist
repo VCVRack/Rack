@@ -7,12 +7,12 @@
 	<key>CFBundleName</key><string>VCV Rack 2 Free</string>
 	<key>CFBundleDisplayName</key><string>VCV Rack 2 Free</string>
 	<key>CFBundleIdentifier</key><string>com.vcvrack.rack2</string>
-	<key>CFBundleVersion</key><string>{VERSION}</string>
+	<key>CFBundleVersion</key><string>{RACK_VERSION}</string>
 	<key>CFBundlePackageType</key><string>APPL</string>
 	<key>CFBundleSignature</key><string>RACK</string>
 	<key>CFBundleExecutable</key><string>Rack</string>
 	<key>CFBundleIconFile</key><string>icon</string>
-	<key>CFBundleShortVersionString</key><string>{VERSION}</string>
+	<key>CFBundleShortVersionString</key><string>{RACK_VERSION}</string>
 	<key>NSHumanReadableCopyright</key><string>Copyright © VCV</string>
 	<key>NSPrincipalClass</key><string>NSApplication</string>
 	<key>NSHighResolutionCapable</key><true/>

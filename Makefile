@@ -1,7 +1,7 @@
 RACK_DIR ?= .
-EDITION := Free
-VERSION_MAJOR := 2
-VERSION ?= $(patsubst v%,%,$(shell git describe --tags --match "v$(VERSION_MAJOR).*"))
+RACK_EDITION := Free
+RACK_VERSION_MAJOR := 2
+RACK_VERSION ?= $(patsubst v%,%,$(shell git describe --tags --match "v$(RACK_VERSION_MAJOR).*"))
 
 FLAGS += -Iinclude -Idep/include
 
@@ -17,7 +17,7 @@ SOURCES += dep/tinyexpr/tinyexpr.c
 SOURCES += $(wildcard src/*.c src/*/*.c)
 SOURCES += $(wildcard src/*.cpp src/*/*.cpp)
 
-build/src/common.cpp.o: FLAGS += -D_APP_VERSION=$(VERSION)
+build/src/common.cpp.o: FLAGS += -D_RACK_VERSION=$(RACK_VERSION)
 build/dep/tinyexpr/tinyexpr.c.o: FLAGS += -DTE_POW_FROM_RIGHT -DTE_NAT_LOG
 
 FLAGS += -fPIC
@@ -164,17 +164,17 @@ endif
 
 # The following targets are not supported for public use
 
-DIST_NAME = Rack$(EDITION)-$(VERSION)-$(ARCH_NAME)
+DIST_NAME = Rack$(RACK_EDITION)-$(RACK_VERSION)-$(ARCH_NAME)
 ifdef ARCH_MAC
-	DIST_BUNDLE := VCV Rack $(VERSION_MAJOR) $(EDITION).app
+	DIST_BUNDLE := VCV Rack $(RACK_VERSION_MAJOR) $(RACK_EDITION).app
 else
-	DIST_DIR := Rack$(VERSION_MAJOR)$(EDITION)
+	DIST_DIR := Rack$(RACK_VERSION_MAJOR)$(RACK_EDITION)
 endif
 DIST_MD := $(wildcard *.md)
 DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
 DIST_RES := res cacert.pem Core.json template.vcv LICENSE-GPLv3.txt $(DIST_HTML) translations
 DIST_SDK_DIR := Rack-SDK
-DIST_SDK = Rack-SDK-$(VERSION)-$(ARCH_NAME).zip
+DIST_SDK = Rack-SDK-$(RACK_VERSION)-$(ARCH_NAME).zip
 FUNDAMENTAL_VERSION ?= 2.6.1
 FUNDAMENTAL_FILENAME := Fundamental-$(FUNDAMENTAL_VERSION)-$(ARCH_NAME).vcvplugin
 
@@ -211,7 +211,7 @@ ifdef ARCH_MAC
 	otool -L dist/"$(DIST_BUNDLE)"/Contents/MacOS/$(STANDALONE_TARGET)
 	# Copy resources
 	cp Info.plist dist/"$(DIST_BUNDLE)"/Contents/
-	$(SED) 's/{VERSION}/$(VERSION)/g' dist/"$(DIST_BUNDLE)"/Contents/Info.plist
+	$(SED) 's/{RACK_VERSION}/$(RACK_VERSION)/g' dist/"$(DIST_BUNDLE)"/Contents/Info.plist
 	cp -R icon.icns dist/"$(DIST_BUNDLE)"/Contents/Resources/
 	cp -R $(DIST_RES) dist/"$(DIST_BUNDLE)"/Contents/Resources/
 	cp "$(FUNDAMENTAL_FILENAME)" dist/"$(DIST_BUNDLE)"/Contents/Resources/
@@ -273,7 +273,7 @@ endif
 ifdef ARCH_WIN
 	# Make NSIS installer
 	# pacman -S mingw-w64-x86_64-nsis
-	makensis -DVERSION_MAJOR=$(VERSION_MAJOR) -DVERSION=$(VERSION) "-XOutFile dist/$(DIST_NAME).exe" installer.nsi
+	makensis -DRACK_VERSION_MAJOR=$(RACK_VERSION_MAJOR) -DRACK_VERSION=$(RACK_VERSION) "-XOutFile dist/$(DIST_NAME).exe" installer.nsi
 endif
 
 

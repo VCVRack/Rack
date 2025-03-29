@@ -19,7 +19,7 @@ const std::string APP_NAME = "VCV Rack";
 const std::string APP_EDITION = "Pro";
 const std::string APP_EDITION_NAME = "[SR's Build]";
 const std::string APP_VERSION_MAJOR = "2";
-const std::string APP_VERSION = TOSTRING(_APP_VERSION);
+const std::string APP_VERSION = TOSTRING(_RACK_VERSION);
 #if defined ARCH_WIN
 	const std::string APP_OS = "win";
 	const std::string APP_OS_NAME = "Windows";

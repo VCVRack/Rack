@@ -422,10 +422,19 @@ struct ViewButton : MenuButton {
 			}
 		}));
 
-		menu->addChild(createIndexPtrSubmenuItem(string::translate("MenuBar.view.pixelRatio"), {
-			string::translate("MenuBar.view.pixelRatio.auto"),
-			"100%", "200%", "300%"
-		}, &settings::pixelRatio));
+		static const std::vector<float> pixelRatios = {0, 1, 1.5, 2, 2.5, 3};
+		std::vector<std::string> pixelRatioLabels;
+		for (float pixelRatio : pixelRatios) {
+			pixelRatioLabels.push_back(pixelRatio == 0.f ? string::translate("MenuBar.view.pixelRatio.auto") : string::f("%0.f%%", pixelRatio * 100.f));
+		}
+		menu->addChild(createIndexSubmenuItem(string::translate("MenuBar.view.pixelRatio"), pixelRatioLabels, [=]() -> size_t {
+			auto it = std::find(pixelRatios.begin(), pixelRatios.end(), settings::pixelRatio);
+			if (it == pixelRatios.end())
+				return -1;
+			return it - pixelRatios.begin();
+		}, [=](size_t i) {
+			settings::pixelRatio = pixelRatios[i];
+		}));
 
 		ZoomSlider* zoomSlider = new ZoomSlider;
 		zoomSlider->box.size.x = 250.0;
