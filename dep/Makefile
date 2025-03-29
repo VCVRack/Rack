@@ -104,16 +104,16 @@ $(glfw): | glfw
 	$(MAKE) -C glfw/build
 	$(MAKE) -C glfw/build install
 
-jansson-2.14:
-	$(WGET) "https://github.com/akheron/jansson/releases/download/v2.14/jansson-2.14.tar.gz" || $(WGET) "http://www.digip.org/jansson/releases/jansson-2.14.tar.gz"
-	$(SHA256) jansson-2.14.tar.gz 5798d010e41cf8d76b66236cfb2f2543c8d082181d16bc3085ab49538d4b9929
-	$(UNTAR) jansson-2.14.tar.gz
-	rm jansson-2.14.tar.gz
+jansson-2.12:
+	$(WGET) "https://github.com/akheron/jansson/releases/download/v2.12/jansson-2.12.tar.gz" || $(WGET) "http://www.digip.org/jansson/releases/jansson-2.12.tar.gz"
+	$(SHA256) jansson-2.12.tar.gz 5f8dec765048efac5d919aded51b26a32a05397ea207aa769ff6b53c7027d2c9
+	$(UNTAR) jansson-2.12.tar.gz
+	rm jansson-2.12.tar.gz
 
-$(jansson): | jansson-2.14
-	cd jansson-2.14 && $(CONFIGURE)
-	$(MAKE) -C jansson-2.14
-	$(MAKE) -C jansson-2.14 install
+$(jansson): | jansson-2.12
+	cd jansson-2.12 && $(CONFIGURE)
+	$(MAKE) -C jansson-2.12
+	$(MAKE) -C jansson-2.12 install
 
 openssl-3.3.2:
 	$(WGET) "https://github.com/openssl/openssl/releases/download/openssl-3.3.2/openssl-3.3.2.tar.gz"
@@ -144,32 +144,32 @@ $(libcurl): | $(openssl) curl-8.10.0
 	$(MAKE) -C curl-8.10.0
 	$(MAKE) -C curl-8.10.0 install
 
-zstd-1.5.7:
-	$(WGET) "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz"
-	$(SHA256) zstd-1.5.7.tar.gz eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3
+zstd-1.5.6:
+	$(WGET) "https://github.com/facebook/zstd/releases/download/v1.5.6/zstd-1.5.6.tar.gz"
+	$(SHA256) zstd-1.5.6.tar.gz 8c29e06cf42aacc1eafc4077ae2ec6c6fcb96a626157e0593d5e82a34fd403c1
 	# HACK This tar archive creates a symlink "untar" to "tar" before tar exists. This is okay on UNIX but not on Windows where symlinks are copies of files. So create a fake "tar" so the unarchiving works.
-	mkdir -p zstd-1.5.7/tests/cli-tests/bin
-	touch zstd-1.5.7/tests/cli-tests/bin/zstd
-	$(UNTAR) zstd-1.5.7.tar.gz
-	rm zstd-1.5.7.tar.gz
+	mkdir -p zstd-1.5.6/tests/cli-tests/bin
+	touch zstd-1.5.6/tests/cli-tests/bin/zstd
+	$(UNTAR) zstd-1.5.6.tar.gz
+	rm zstd-1.5.6.tar.gz
 
-$(zstd): | zstd-1.5.7
-	cd zstd-1.5.7/build/cmake && $(CMAKE) -DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_SHARED=OFF -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_TESTS=OFF -DZSTD_MULTITHREAD_SUPPORT=OFF .
-	$(MAKE) -C zstd-1.5.7/build/cmake
-	$(MAKE) -C zstd-1.5.7/build/cmake install
+$(zstd): | zstd-1.5.6
+	cd zstd-1.5.6/build/cmake && $(CMAKE) -DZSTD_BUILD_PROGRAMS=OFF -DZSTD_BUILD_SHARED=OFF -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_TESTS=OFF -DZSTD_MULTITHREAD_SUPPORT=OFF .
+	$(MAKE) -C zstd-1.5.6/build/cmake
+	$(MAKE) -C zstd-1.5.6/build/cmake install
 
-libarchive-3.7.8:
-	$(WGET) "https://github.com/libarchive/libarchive/releases/download/v3.7.8/libarchive-3.7.8.tar.gz" || $(WGET) "https://libarchive.org/downloads/libarchive-3.7.8.tar.gz"
-	$(SHA256) libarchive-3.7.8.tar.gz a123d87b1bd8adb19e8c187da17ae2d957c7f9596e741b929e6b9ceefea5ad0f
-	$(UNTAR) libarchive-3.7.8.tar.gz
-	rm libarchive-3.7.8.tar.gz
+libarchive-3.7.7:
+	$(WGET) "https://github.com/libarchive/libarchive/releases/download/v3.7.7/libarchive-3.7.7.tar.gz" || $(WGET) "https://libarchive.org/downloads/libarchive-3.7.7.tar.gz"
+	$(SHA256) libarchive-3.7.7.tar.gz 4cc540a3e9a1eebdefa1045d2e4184831100667e6d7d5b315bb1cbc951f8ddff
+	$(UNTAR) libarchive-3.7.7.tar.gz
+	rm libarchive-3.7.7.tar.gz
 
-$(libarchive): | $(zstd) libarchive-3.7.8
+$(libarchive): | $(zstd) libarchive-3.7.7
 	#cd libarchive-3.7.7 && $(CONFIGURE) --enable-shared=no --enable-static=yes --disable-bsdtar --disable-bsdcat --disable-bsdcpio --disable-posix-regex-lib --disable-xattr --disable-acl --without-zlib --without-bz2lib  --without-libb2 --without-iconv --without-lz4 --without-lzma --without-cng --without-openssl --without-xml2 --without-expat
-	cd libarchive-3.7.8 && mkdir -p build
-	cd libarchive-3.7.8/build && $(CMAKE) -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF -DENABLE_ACL=OFF -DENABLE_BZip2=OFF -DENABLE_CAT=OFF -DENABLE_CNG=OFF -DENABLE_COVERAGE=OFF -DENABLE_CPIO=OFF -DENABLE_EXPAT=OFF -DENABLE_ICONV=OFF -DENABLE_LIBB2=OFF -DENABLE_LIBXML2=OFF -DENABLE_LZ4=OFF -DENABLE_LZMA=OFF -DENABLE_LZO=OFF -DENABLE_MBEDTLS=OFF -DENABLE_NETTLE=OFF -DENABLE_OPENSSL=OFF -DENABLE_TAR=OFF -DENABLE_TEST=OFF -DENABLE_UNZIP=OFF -DENABLE_WERROR=OFF -DENABLE_XATTR=OFF -DENABLE_ZLIB=OFF -DENABLE_ZSTD=ON -DZSTD_INCLUDE_DIR:PATH=$(DEP_PATH)/include -DZSTD_LIBRARY=$(DEP_PATH)/lib/libzstd.a ..
-	$(MAKE) -C libarchive-3.7.8/build
-	$(MAKE) -C libarchive-3.7.8/build install
+	cd libarchive-3.7.7 && mkdir -p build
+	cd libarchive-3.7.7/build && $(CMAKE) -DBUILD_TESTING=OFF -DBUILD_SHARED_LIBS=OFF -DENABLE_ACL=OFF -DENABLE_BZip2=OFF -DENABLE_CAT=OFF -DENABLE_CNG=OFF -DENABLE_COVERAGE=OFF -DENABLE_CPIO=OFF -DENABLE_EXPAT=OFF -DENABLE_ICONV=OFF -DENABLE_LIBB2=OFF -DENABLE_LIBXML2=OFF -DENABLE_LZ4=OFF -DENABLE_LZMA=OFF -DENABLE_LZO=OFF -DENABLE_MBEDTLS=OFF -DENABLE_NETTLE=OFF -DENABLE_OPENSSL=OFF -DENABLE_TAR=OFF -DENABLE_TEST=OFF -DENABLE_UNZIP=OFF -DENABLE_WERROR=OFF -DENABLE_XATTR=OFF -DENABLE_ZLIB=OFF -DENABLE_ZSTD=ON -DWINDOWS_VERSION="WIN7" -DZSTD_INCLUDE_DIR:PATH=$(DEP_PATH)/include -DZSTD_LIBRARY=$(DEP_PATH)/lib/libzstd.a ..
+	$(MAKE) -C libarchive-3.7.7/build
+	$(MAKE) -C libarchive-3.7.7/build install
 
 $(libspeexdsp): | speexdsp
 	cd speexdsp && ./autogen.sh
@@ -177,18 +177,16 @@ $(libspeexdsp): | speexdsp
 	$(MAKE) -C speexdsp
 	$(MAKE) -C speexdsp install
 
-libsamplerate-0.2.2:
-	$(WGET) "https://github.com/libsndfile/libsamplerate/releases/download/0.2.2/libsamplerate-0.2.2.tar.xz"
-	$(SHA256) libsamplerate-0.2.2.tar.xz 3258da280511d24b49d6b08615bbe824d0cacc9842b0e4caf11c52cf2b043893
-	$(UNTAR) libsamplerate-0.2.2.tar.xz
-	rm libsamplerate-0.2.2.tar.xz
+libsamplerate-0.1.9:
+	$(WGET) "https://github.com/libsndfile/libsamplerate/releases/download/0.1.9/libsamplerate-0.1.9.tar.gz" || $(WGET) "http://www.mega-nerd.com/SRC/libsamplerate-0.1.9.tar.gz"
+	$(SHA256) libsamplerate-0.1.9.tar.gz 0a7eb168e2f21353fb6d84da152e4512126f7dc48ccb0be80578c565413444c1
+	$(UNTAR) libsamplerate-0.1.9.tar.gz
+	rm libsamplerate-0.1.9.tar.gz
 
-$(libsamplerate): | libsamplerate-0.2.2
-	cd libsamplerate-0.2.2 && mkdir build
-	cd libsamplerate-0.2.2/build && $(CMAKE) -DCMAKE_BUILD_TYPE=Release ..
-	cd libsamplerate-0.2.2/build && $(MAKE) install
-	cd libsamplerate-0.2.2/build && $(CMAKE) -DBUILD_SHARED_LIBS=ON ..
-	cd libsamplerate-0.2.2/build && $(MAKE) install
+$(libsamplerate): | libsamplerate-0.1.9
+	cd libsamplerate-0.1.9 && $(CONFIGURE) --disable-fftw --disable-sndfile
+	$(MAKE) -C libsamplerate-0.1.9
+	$(MAKE) -C libsamplerate-0.1.9 install
 
 RTMIDI_FLAGS += --enable-shared=no
 ifdef ARCH_LIN
@@ -215,10 +213,14 @@ ifdef ARCH_MAC
 RTAUDIO_FLAGS += -DRTAUDIO_API_CORE=ON -DRTAUDIO_API_PULSE=OFF -DRTAUDIO_API_JACK=OFF
 endif
 ifdef ARCH_WIN
-RTAUDIO_FLAGS += -DRTAUDIO_API_DS=OFF -DRTAUDIO_API_WASAPI=ON
+RTAUDIO_FLAGS += -DRTAUDIO_API_DS=ON -DRTAUDIO_API_WASAPI=ON
 # ASIO is proprietary software owned by Steinberg, so distributing it with your own VCV Rack build would violate Rack's GPLv3 license.
 # However, since VCV owns the copyright of all GPL'd code in the Rack package, we include ASIO in the Windows build for convenience to our users.
+ifdef RTAUDIO_ASIO
 RTAUDIO_FLAGS += -DRTAUDIO_API_ASIO=ON
+else
+RTAUDIO_FLAGS += -DRTAUDIO_API_ASIO=OFF
+endif
 endif
 
 # RtAudio on Windows and Mac uses these macros to enable UTF-8 device names
@@ -267,7 +269,7 @@ $(simde): simde/simde
 
 # Helpers
 
-src: glew-2.1.0 glfw jansson-2.14 libsamplerate-0.2.2 openssl-3.3.2 curl-8.10.0 zstd-1.5.7 libarchive-3.7.8 rtaudio nanovg nanosvg oui-blendish osdialog
+src: glew-2.1.0 glfw jansson-2.12 libsamplerate-0.1.9 openssl-3.3.2 curl-8.10.0 zstd-1.5.6 libarchive-3.7.7 rtaudio nanovg nanosvg oui-blendish osdialog
 
 clean:
 	git clean -fdx

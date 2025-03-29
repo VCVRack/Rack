@@ -115,16 +115,23 @@ struct MIDIMap : Module {
 			if (values[cc] < 0)
 				continue;
 			float value = values[cc] / 127.f;
-			// Detect behavior from MIDI buttons.
+
+			// Detect MIDI CC buttons
 			if (smooth && std::fabs(valueFilters[id].out - value) < 1.f) {
 				// Smooth value with filter
-				valueFilters[id].process(args.sampleTime * divider.getDivision(), value);
+				value = valueFilters[id].process(args.sampleTime * divider.getDivision(), value);
 			}
 			else {
-				// Jump value
+				// Jump filter value, don't filter
 				valueFilters[id].out = value;
 			}
-			paramQuantity->setScaledValue(valueFilters[id].out);
+
+			// Scale and snap value based on ParamQuantity
+			value = paramQuantity->fromScaled(value);
+			if (paramQuantity->snapEnabled)
+				value = std::round(value);
+			// Set param value without Engine smoothing, since it is already filtered.
+			APP->engine->setParamValue(module, paramId, value);
 		}
 	}
 

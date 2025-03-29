@@ -1,10 +1,10 @@
 !include "MUI2.nsh"
 
-!define NAME_FULL "VCV Rack Free ${VERSION}"
-!define NAME "VCV Rack ${VERSION_MAJOR} Free"
-!define RACK_DIR "Rack${VERSION_MAJOR}Free"
-!define INSTALL_REG "Software\VCV\Rack${VERSION_MAJOR}Free"
-!define UNINSTALL_REG "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCVRack${VERSION_MAJOR}Free"
+!define NAME_FULL "VCV Rack Free ${RACK_VERSION}"
+!define NAME "VCV Rack ${RACK_VERSION_MAJOR} Free"
+!define RACK_DIR "Rack${RACK_VERSION_MAJOR}Free"
+!define INSTALL_REG "Software\VCV\Rack${RACK_VERSION_MAJOR}Free"
+!define UNINSTALL_REG "Software\Microsoft\Windows\CurrentVersion\Uninstall\VCVRack${RACK_VERSION_MAJOR}Free"
 
 Name "${NAME_FULL}"
 Unicode True
@@ -94,7 +94,7 @@ Section "${NAME}" INSTALL_SECTION
 	; Write uninstaller info
 	WriteRegStr HKLM "${UNINSTALL_REG}" "DisplayName" "${NAME}"
 	WriteRegStr HKLM "${UNINSTALL_REG}" "DisplayIcon" '"$INSTDIR\Rack.exe"'
-	WriteRegStr HKLM "${UNINSTALL_REG}" "DisplayVersion" "${VERSION}"
+	WriteRegStr HKLM "${UNINSTALL_REG}" "DisplayVersion" "${RACK_VERSION}"
 	WriteRegStr HKLM "${UNINSTALL_REG}" "UninstallString" '"$INSTDIR\Uninstall.exe"'
 	WriteRegStr HKLM "${UNINSTALL_REG}" "QuietUninstallString" '"$INSTDIR\Uninstall.exe" /S'
 	WriteRegStr HKLM "${UNINSTALL_REG}" "InstallLocation" '"$INSTDIR"'
@@ -115,10 +115,6 @@ Section "${NAME}" INSTALL_SECTION
 	; Create shortcuts
 	CreateShortcut "$DESKTOP\${NAME}.lnk" "$INSTDIR\Rack.exe"
 	CreateShortcut "$SMPROGRAMS\${NAME}.lnk" "$INSTDIR\Rack.exe"
-
-	; Add allowed app to Controlled Folder Access
-	ExpandEnvStrings $0 "%COMSPEC%"
-	ExecShellWait "" '"$0"' "/C powershell -ExecutionPolicy Bypass -WindowStyle Hidden $\"Add-MpPreference -ControlledFolderAccessAllowedApplications '$INSTDIR\Rack.exe'$\"" SW_HIDE
 SectionEnd
 
 
