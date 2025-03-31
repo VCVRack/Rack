@@ -458,7 +458,7 @@ void Manager::pushRecentPath(std::string path) {
 	// Add path to top of recent patches
 	recent.push_front(path);
 	// Limit recent patches size
-	recent.resize(std::min((int) recent.size(), 10));
+	recent.resize(std::min((int) recent.size(), 20));
 }
 
 
