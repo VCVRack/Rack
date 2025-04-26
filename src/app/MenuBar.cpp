@@ -928,6 +928,12 @@ struct LibraryMenu : ui::Menu {
 			syncItem->text = string::translate("MenuBar.library.updateAll");
 			addChild(syncItem);
 
+            addChild(new ui::MenuSeparator);
+			addChild(createMenuItem("Restart Rack", "", [=]() {
+				APP->window->close();
+				settings::restart = true;
+			}));
+
 			if (!library::updateInfos.empty()) {
 				addChild(new ui::MenuSeparator);
 				addChild(createMenuLabel(string::translate("MenuBar.library.updates")));
