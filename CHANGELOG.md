@@ -2,6 +2,12 @@
 
 In this document, Ctrl means Command (⌘) on Mac.
 
+### 2.6.4 (2025-04-18)
+- Fix dragging knobs on Mac when UI scale is set to non-Auto.
+- SDK
+	- Fix GLEW and libarchive build failure when CMake 4 is installed.
+	- Update to GLEW 2.2.0.
+
 ### 2.6.3 (2025-03-26)
 - Fix failure to launch on Windows 7.
 - Rack Pro
@@ -36,7 +42,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 - Core
 	- Fix DC filter accuracy of Right input when normalled to Left input in VCV Audio 2.
 	- Change default MIDI CC numbers of *VCV MIDI CC to CV* and *VCV CV to MIDI CC* modules to 1-16 instead of 0-15.
-- API
+- SDK
 	- Add `Widget::KeyBaseEvent::isKeyCommand()` for checking key commands on all keyboard layouts.
 	- Add `settings::language` global variable.
 	- Add `string::UTF32toUTF8()`, `UTF8toUTF32()`, and `UTF8*()` functions.
@@ -57,7 +63,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 	- Allow VST3 plugin to receive MIDI CC, pitch bend, and channel aftertouch.
 - Core
 	- MIDI to CV: When sustain pedal is released in monophonic mode, turn off gate if no notes are held.
-- API
+- SDK
 	- Don't combine SDK packages for Mac-x64 and Mac-arm64.
 	- Update to libcurl 8.10.0 and OpenSSL 3.3.2.
 	- Add `dsp::MidiParser` class.
@@ -68,7 +74,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 - Allow building multi-arch x64+arm64 "Universal" Mac binary.
 - Optimize engine's cable stepping algorithm to be as CPU-efficient as non-stackable inputs.
 - Limit log file size to 10 MB.
-- API
+- SDK
 	- Define `ARCH_*` macros in `arch.hpp` header (included in `rack.hpp`) instead of in compiler flags.
 
 ### 2.5.1 (2024-04-16)
@@ -91,7 +97,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 - Add `"verifyHttpsCerts"` setting to disable verifying HTTPS certificates.
 - Rack Pro
 	- Fix MIDI note velocity scale in CLAP adapter.
-- API
+- SDK
 	- Don't zero output port voltages when disconnecting cables.
 	- Fix `ExpanderChangeEvent` not being dispatched when removing an adjacent module.
 
@@ -100,7 +106,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 - Fix Library menu plugin update items not being re-enabled when downloading is completed.
 - Rack Pro
 	- Fix discarded MIDI input messages for all plugin adapters.
-- API
+- SDK
 	- Add `LightButton` to component library.
 	- Use SSE4.1 intrinsics in `simd::trunc`, `floor`, `ceil`, `round`, and `fmod` to improve performance.
 
@@ -117,7 +123,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 	- Fix crash when using Mac VST3 and AU plugins simultaneously in a DAW.
 	- Fix crash when removing one of multiple running plugin instances in Studio One.
 	- Fix CLAP plugin discarding output MIDI messages.
-- API
+- SDK
 	- Add `ThemedSvgPanel` and `ThemedSvgScrew` classes which automatically switch SVGs when dark panels are toggled.
 	- Add `"minRackVersion"` property to plugin manifest, which prevents Rack from downloading plugin if version is not compatible.
 	- Fix `ContextCreateEvent` and `ContextDestroyEvent` not defining `vg` NanoVG context.
@@ -131,7 +137,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 - Rack Pro
 	- Don't force MIDI output message channel to 1 in VST3 adapter. Offer all 16 channels.
 	- Fix aftertouch and polyphonic pressure on all MIDI channels in VST3 and CLAP adapters.
-- API
+- SDK
 	- Make `ParamQuantity::set/getValue()` set/get the Param's target value of the Engine's per-sample smoothing algorithm instead of the Param's immediate value. Add `ParamQuantity::set/getImmediateValue()`. Deprecate `ParamQuantity::set/getSmoothValue()`.
 	- Add `dsp::polyDirect()`, `dsp::polyHorner()`, and `dsp::polyEstrin()`.
 	- Rename `dsp::approxExp2_taylor5()` to `dsp::exp2_taylor5()` and improve polynomial coefficients.
@@ -151,7 +157,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 	- Store and recall window size of VST3.
 	- Fix MIDI clock input in CLAP adapter.
 	- Make CLAP adapter a Note Effect and Audio Effect as well as an Instrument.
-- API
+- SDK
 	- Make unarchiver handle zero-byte files as a special case by deleting destination files instead of overwriting them. This allows plugin packages to remove old presets by including a zero-byte file with its filename.
 	- Add `ModuleWidget::getModule<TModule>()` convenience method.
 
@@ -161,7 +167,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 - Zero audio output of all channels in `audio::Device::processBuffer()` before writing, to avoid sending uninitialized values to audio device.
 - Rack Pro
 	- Fix blank plugin window on certain Linux Nvidia graphics drivers.
-- API
+- SDK
 	- Don't include SIMDE headers on x64, fixing symbol conflicts when plugins include x64 intrinsic headers.
 	- Don't export symbols from libarchive, zstd, rtaudio, and rtmidi to avoid conflicts with hosts that use these libraries. Rack plugins can no longer link to these libraries.
 	- Rename plugin binary to `plugin-arm64.dylib` on Mac ARM64 so multiple plugin architectures can coexist in the same Rack user folder.
@@ -185,7 +191,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 - Rack Pro
 	- Add VST3, Audio Unit, and CLAP plugin adapters.
 	- Add framerate setting to plugins.
-- API
+- SDK
 	- Add `system::sleep()`.
 	- Make `random::get()`, `uniform()`, etc use global random state instead of thread-local.
 
@@ -203,7 +209,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 - Fix probabilistic crash when undoing a module paste action.
 - Rack Pro
 	- Fix VST2 window size not being remembered on Mac.
-- API
+- SDK
 	- Make `SvgButton` dispatch `ActionEvent` only on left mouse down, instead of left/right mouse down and drag drop.
 
 ### 2.1.0 (2022-02-26)
@@ -349,7 +355,7 @@ In this document, Ctrl means Command (⌘) on Mac.
 	- Allow disabling smoothing for MIDI-CV (pitch and mod wheel), MIDI-CC, and MIDI-Map.
 	- Add several module presets for many Core modules.
 
-- API
+- SDK
 	- Add setters/getters for nearly every instance variable in Rack's API. Use these for higher likelihood of stability.
 	- Compile Rack and plugins with `-march=nehalem`, enabling (and requiring) up to SSE4.2 and POPCNT instruction sets.
 	- Add `Module::configInput()` and `Module::configOutput()` for adding names to ports.

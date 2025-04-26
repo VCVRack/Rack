@@ -136,7 +136,6 @@ int main(int argc, char* argv[]) {
 	}
 	logger::init();
 	random::init();
-	string::init();
 
 	// Test code
 	// exit(0);
@@ -167,6 +166,8 @@ int main(int argc, char* argv[]) {
 	INFO("Bundle path: %s", asset::bundlePath.c_str());
 #endif
 	INFO("System time: %s", string::formatTimeISO(system::getUnixTime()).c_str());
+
+	string::init();
 
 	// Load settings
 	settings::init();
