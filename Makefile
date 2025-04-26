@@ -138,10 +138,13 @@ perf: $(STANDALONE_TARGET)
 	hotspot perf.data
 	rm perf.data
 
+VALGRIND_FLAGS += --gen-suppressions=all
+VALGRIND_FLAGS += --suppressions=valgrind.supp
+VALGRIND_FLAGS += --leak-check=full
+VALGRIND_FLAGS += --track-origins=yes
+VALGRIND_FLAGS += --exit-on-first-error=yes
 valgrind: $(STANDALONE_TARGET)
-	# --gen-suppressions=yes
-	# --leak-check=full
-	valgrind --suppressions=valgrind.supp ./$< -d
+	valgrind $(VALGRIND_FLAGS) ./$< -d
 
 clean:
 	rm -rfv build dist $(TARGET) $(STANDALONE_TARGET) *.a
@@ -175,7 +178,7 @@ DIST_HTML := $(patsubst %.md, build/%.html, $(DIST_MD))
 DIST_RES := res cacert.pem Core.json template.vcv LICENSE-GPLv3.txt $(DIST_HTML) translations
 DIST_SDK_DIR := Rack-SDK
 DIST_SDK = Rack-SDK-$(RACK_VERSION)-$(ARCH_NAME).zip
-FUNDAMENTAL_VERSION ?= 2.6.1
+FUNDAMENTAL_VERSION ?= 2.6.2
 FUNDAMENTAL_FILENAME := Fundamental-$(FUNDAMENTAL_VERSION)-$(ARCH_NAME).vcvplugin
 
 

@@ -1,54 +1,55 @@
 {
-   <insert_a_suppression_name_here>
-   Memcheck:Addr8
+   <>
+   Memcheck:Cond
    ...
-   obj:/usr/lib/dri/i965_dri.so
+   fun:pa_mainloop_run
+}
+{
+   <>
+   Memcheck:Cond
+   ...
+   obj:/usr/lib/libgallium*
    ...
 }
 {
-   <insert_a_suppression_name_here>
-   Memcheck:Addr4
+   <>
+   Memcheck:Cond
    ...
-   obj:/usr/lib/dri/i965_dri.so
-   ...
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Addr2
-   ...
-   obj:/usr/lib/dri/i965_dri.so
+   obj:/usr/lib/libGLX_mesa*
    ...
 }
 {
-   <insert_a_suppression_name_here>
-   Memcheck:Addr1
+   <>
+   Memcheck:Leak
    ...
-   obj:/usr/lib/dri/i965_dri.so
+   obj:/usr/lib/libgallium*
    ...
 }
-
-
+{
+   <>
+   Memcheck:Leak
+   ...
+   fun:snd_seq_open
+   ...
+}
+{
+   <>
+   Memcheck:Leak
+   ...
+   fun:snd_config_update_r
+   ...
+}
+{
+   <>
+   Memcheck:Leak
+   ...
+   fun:_snd_config_load_with_include
+   ...
+}
 {
    <insert_a_suppression_name_here>
    Memcheck:Leak
-   match-leak-kinds: possible
    ...
-   obj:/usr/lib/libasound.so.2.0.0
-   ...
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: definite
-   ...
-   obj:/usr/lib/libgtk-x11-2.0.so.0.2400.32
-   ...
-}
-{
-   <insert_a_suppression_name_here>
-   Memcheck:Leak
-   match-leak-kinds: possible
-   ...
-   obj:/usr/lib/libgobject-2.0.so.0.5800.3
+   fun:pa_pdispatch_run
    ...
 }

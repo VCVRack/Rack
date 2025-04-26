@@ -98,7 +98,7 @@ struct Window::Internal {
 	int lastWindowHeight = 0;
 
 	int frame = 0;
-	bool ignoreNextMouseDelta = false;
+	double ignoreMouseDeltaUntil = -INFINITY;
 	double monitorRefreshRate = 0.0;
 	double frameTime = NAN;
 	double lastFrameDuration = NAN;
@@ -167,27 +167,14 @@ static void cursorPosCallback(GLFWwindow* win, double xpos, double ypos) {
 	math::Vec mousePos = math::Vec(xpos, ypos).div(APP->window->pixelRatio / APP->window->windowRatio).round();
 	math::Vec mouseDelta = mousePos.minus(APP->window->internal->lastMousePos);
 
+	// if (glfwGetInputMode(win, GLFW_CURSOR) != GLFW_CURSOR_NORMAL && std::fabs(mouseDelta.y) > 20.0) {
+	// 	DEBUG("%d (%f, %f) (%f, %f)", APP->window->internal->frame, VEC_ARGS(mousePos), VEC_ARGS(mouseDelta));
+	// }
+
 	// Workaround for GLFW warping mouse to a different position when the cursor is locked or unlocked.
-	if (APP->window->internal->ignoreNextMouseDelta) {
-		APP->window->internal->ignoreNextMouseDelta = false;
+	if (APP->window->internal->ignoreMouseDeltaUntil > APP->window->internal->frameTime) {
 		mouseDelta = math::Vec();
 	}
-
-	int cursorMode = glfwGetInputMode(win, GLFW_CURSOR);
-	(void) cursorMode;
-
-#if defined ARCH_MAC
-	// Workaround for Mac. We can't use GLFW_CURSOR_DISABLED because it's buggy, so implement it on our own.
-	// This is not an ideal implementation. For example, if the user drags off the screen, the new mouse position will be clamped.
-	if (cursorMode == GLFW_CURSOR_HIDDEN) {
-		// CGSetLocalEventsSuppressionInterval(0.0);
-		glfwSetCursorPos(win, APP->window->internal->lastMousePos.x, APP->window->internal->lastMousePos.y);
-		CGAssociateMouseAndMouseCursorPosition(true);
-		mousePos = APP->window->internal->lastMousePos;
-	}
-	// Because sometimes the cursor turns into an arrow when its position is on the boundary of the window
-	glfwSetCursor(win, NULL);
-#endif
 
 	APP->window->internal->lastMousePos = mousePos;
 
@@ -647,12 +634,14 @@ void Window::cursorLock() {
 	if (!settings::allowCursorLock)
 		return;
 
-#if defined ARCH_MAC
-	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-#else
 	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+	// Due to a bug in GLFW, setting GLFW_CURSOR_DISABLED causes a spurious mouse position delta after a few frames.
+	// https://github.com/glfw/glfw/issues/2523
+	// Emperically, this seems to be up to 3-6 frames at 60 Hz but in fewer frames at lower framerates.
+#if defined ARCH_MAC
+	internal->ignoreMouseDeltaUntil = internal->frameTime + 0.09;
 #endif
-	internal->ignoreNextMouseDelta = true;
 }
 
 
@@ -661,7 +650,6 @@ void Window::cursorUnlock() {
 		return;
 
 	glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	internal->ignoreNextMouseDelta = true;
 }
 
 

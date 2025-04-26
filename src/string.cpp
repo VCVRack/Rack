@@ -577,6 +577,7 @@ static std::map<std::string, std::map<std::string, std::string>> translations;
 
 
 static void loadTranslations() {
+	INFO("Loading translations");
 	translations.clear();
 	std::string translationsDir = asset::system("translations");
 
