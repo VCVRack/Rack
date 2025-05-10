@@ -187,9 +187,9 @@ libsamplerate-0.2.2:
 
 $(libsamplerate): | libsamplerate-0.2.2
 	cd libsamplerate-0.2.2 && mkdir build
-	cd libsamplerate-0.2.2/build && $(CMAKE) -DCMAKE_BUILD_TYPE=Release ..
+	cd libsamplerate-0.2.2/build && $(CMAKE) -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DCMAKE_BUILD_TYPE=Release ..
 	cd libsamplerate-0.2.2/build && $(MAKE) install
-	cd libsamplerate-0.2.2/build && $(CMAKE) -DBUILD_SHARED_LIBS=ON ..
+	cd libsamplerate-0.2.2/build && $(CMAKE) -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DBUILD_SHARED_LIBS=ON ..
 	cd libsamplerate-0.2.2/build && $(MAKE) install
 
 RTMIDI_FLAGS += --enable-shared=no
