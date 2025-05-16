@@ -375,7 +375,7 @@ def panel_to_components(tree):
 		if not color:
 			style = el.get('style')
 			if style:
-				color_match = re.search(r'fill:\S*(#[0-9a-fA-F]{6})', style)
+				color_match = re.search(r'fill:\s*(#[0-9a-fA-F]{6})', style)
 				color = color_match.group(1)
 		if not color:
 			eprint(f"Cannot get color of component: {el}")
@@ -385,14 +385,16 @@ def panel_to_components(tree):
 
 		if color == '#ff0000' or color == '#f00' or color == 'red':
 			components['params'].append(c)
-		if color == '#00ff00' or color == '#0f0' or color == 'lime':
+		elif color == '#00ff00' or color == '#0f0' or color == 'lime':
 			components['inputs'].append(c)
-		if color == '#0000ff' or color == '#00f' or color == 'blue':
+		elif color == '#0000ff' or color == '#00f' or color == 'blue':
 			components['outputs'].append(c)
-		if color == '#ff00ff' or color == '#f0f' or color == 'magenta':
+		elif color == '#ff00ff' or color == '#f0f' or color == 'magenta':
 			components['lights'].append(c)
-		if color == '#ffff00' or color == '#ff0' or color == 'yellow':
+		elif color == '#ffff00' or color == '#ff0' or color == 'yellow':
 			components['widgets'].append(c)
+		else:
+			eprint(f"Wrong color of component: {el}")
 
 	# Sort components
 	top_left_sort = lambda w: w['cy'] + 0.01 * w['cx']
