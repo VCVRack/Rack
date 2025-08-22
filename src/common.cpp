@@ -17,7 +17,7 @@ namespace rack {
 
 const std::string APP_NAME = "VCV Rack";
 const std::string APP_EDITION = "Pro";
-const std::string APP_EDITION_NAME = "[SR's Build]";
+const std::string APP_EDITION_NAME = "[SR Build[GCC15.1] nSVG-git, nVG-4e42b6c, stb_i-230, mem_align]";
 const std::string APP_VERSION_MAJOR = "2";
 const std::string APP_VERSION = TOSTRING(_RACK_VERSION);
 #if defined ARCH_WIN
