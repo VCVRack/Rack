@@ -819,6 +819,10 @@ void init() {
 	glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
 #endif
 
+#if defined ARCH_LIN
+	glfwInitHint(GLFW_PLATFORM, GLFW_PLATFORM_X11);
+#endif
+
 	glfwSetErrorCallback(errorCallback);
 	err = glfwInit();
 	if (err != GLFW_TRUE) {
