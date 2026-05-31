@@ -252,8 +252,8 @@ struct Engine::Internal {
 
 	int threadCount = 0;
 	std::vector<EngineWorker> workers;
-	SpinBarrier engineBarrier;
-	HybridBarrier workerBarrier;
+	HybridBarrier engineBarrier;
+	SpinBarrier workerBarrier;
 	std::atomic<int> workerModuleIndex;
 	// For worker threads
 	Context* context;
@@ -680,7 +680,7 @@ float Engine::getSampleTime() {
 
 
 void Engine::yieldWorkers() {
-	internal->workerBarrier.yield();
+	internal->engineBarrier.yield();
 }
 
 
